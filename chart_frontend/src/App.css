@@ -77,6 +77,7 @@
   width: 200px;
   z-index: 1000;
   position: relative;
+  margin-right: 30px;
 }
 
 #type {
@@ -85,4 +86,23 @@
 
 .select-wrape ~ div label {
   display: none;
+}
+
+.dark {
+  background: #303030;
+}
+
+.dark .react-stockcharts-tooltip {
+  fill: white;
+}
+
+.dark strong {
+  color: white;
+}
+
+/* .react-stockcharts-tooltip {
+  fill: red;
+} */
+.react-stockcharts-tooltip-label {
+  fill: white;
 }

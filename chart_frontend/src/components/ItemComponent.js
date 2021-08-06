@@ -15,43 +15,68 @@ import "react-datetime/css/react-datetime.css";
 
 import { tsvParse, csvParse } from "d3-dsv";
 import { timeParse } from "d3-time-format";
-import StockChart1D2M from "./1D2MStockChart";
-import StockChart4D12M from "./4D12MStockChart";
-import StockChart30D1H from "./30D1HStockChart";
-import StockChart90D4H from "./90D4HStockChart";
-import StockChart90D12H from "./90D12HStockChart";
-import StockChart1Y1D from "./1Y1DStockChart";
+import StockChart from "./stock-chart/StockChart"
+
 
 import { useHistory } from "react-router-dom";
 
 const TutorialsList = (props) => {
     useEffect(() => {
-        console.log("----------------------------")
-        setSelectedOptionTable(props.location.state.value)
+        if (!apiFlag) {
+            setSelectedOptionTable(props.location.state.value)
+            setPeriod(props.location.state.value)
+            if (!isGetSymbolList) {
+                get_tables();
+            }
+            setApiFlag(true)
+        }
+    
     })
     const history = useHistory();
+    const [isGetSymbolList, setIsGetSymbolList] = useState(false)
     const [selectedOptionTable, setSelectedOptionTable] = useState(null)
+    const [symbol, setSymbol] = useState('AAPL');
+    const [symbolList, setSymbolList] = useState([])
+    const [period, setPeriod] = useState('1D2M')
+    const [apiFlag, setApiFlag] = useState(false)
+
     const optionsTable = [
-        { value: '1D_2m', label: '1D_2m' },
-        { value: '4D_12m', label: '4D_12m' },
-        { value: '30D_1h', label: '30D_1h' },
-        { value: '90D_4h', label: '90D_4h' },
-        { value: '90D_12h', label: '90D_12h' },
-        { value: '1Y_1D', label: '1Y_1D' }
+        { value: '1D2M', label: '1D_2m' },
+        { value: '4D12M', label: '4D_12m' },
+        { value: '30D1H', label: '30D_1h' },
+        { value: '90D4H', label: '90D_4h' },
+        { value: '90D12H', label: '90D_12h' },
+        { value: '1Y1D', label: '1Y_1D' }
     ]
-    // const handleClick = () => history.push('/goodbye');
-    const handleClick = () => history.push('/goodbye');
 
     const handleChangeTable = (value) => {
         setSelectedOptionTable(value)
         if (value) {
-            history.push({
-                pathname: '/itemComponent',
-                state: value,
-            });
+            setPeriod(value.value)
         }
-       
+
     }
+
+    const get_tables = () => {
+        fetch(process.env.REACT_APP_BACKEND_URL + "/api/tables")
+            .then(response => response.json())
+            .then(data => {
+                let temp_data = []
+                data.tables.map((x) => {
+                    temp_data.push({
+                        value: x,
+                        label: x
+                    });
+                })
+                setSymbolList(temp_data)
+            })
+    }
+
+    const handlSymbolChange = (e) => {
+        if (e) {
+          setSymbol(e.value)
+        }
+      }
 
     return (
         <div>
@@ -70,22 +95,17 @@ const TutorialsList = (props) => {
                             options={optionsTable}
                         />
                     </div>
+                    <div className="select-option">
+                        <Select
+                            value={symbol}
+                            onChange={handlSymbolChange}
+                            options={symbolList}
+                        />
+                    </div>
                 </div>
             </nav>
-            <div className="graphs-container">
-                {
-                    selectedOptionTable === '1D_2m' 
-                    ? <StockChart1D2M />
-                    : selectedOptionTable === '4D_12m' 
-                    ? <StockChart4D12M />
-                    : selectedOptionTable === '30D_1h' 
-                    ? <StockChart30D1H />
-                    : selectedOptionTable === '90D_4h' 
-                    ? <StockChart90D4H />
-                    : selectedOptionTable === '90D_12h' 
-                    ? <StockChart90D12H />
-                    : <StockChart1Y1D />
-                }
+            <div className="graphs-container dark">
+                < StockChart period={period} symbol={symbol} />
             </div>
         </div>
 
