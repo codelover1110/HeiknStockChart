@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import http from "../http-common";
 import axios from "axios";
 import Select from 'react-select'
-import 'react-select/dist/react-select.css';
 
 import _ from "underscore";
 import moment from "moment";
@@ -21,25 +20,17 @@ import StockChart from "./stock-chart/StockChart"
 import { useHistory } from "react-router-dom";
 
 const TutorialsList = (props) => {
-    useEffect(() => {
-        if (!apiFlag) {
-            setSelectedOptionTable(props.location.state.value)
-            setPeriod(props.location.state.value)
-            if (!isGetSymbolList) {
-                get_tables();
-            }
-            setApiFlag(true)
-        }
-    
-    })
+    const { initPeriod, initIndicators, initSymbol } = props.location.state
+
     const history = useHistory();
     const [isGetSymbolList, setIsGetSymbolList] = useState(false)
     const [selectedOptionTable, setSelectedOptionTable] = useState(null)
-    const [symbol, setSymbol] = useState('AAPL');
+    const [symbol, setSymbol] = useState(initSymbol);
     const [symbolList, setSymbolList] = useState([])
-    const [period, setPeriod] = useState('1D2M')
+    const [period, setPeriod] = useState(initPeriod)
+    const [indicators, setIndicators] = useState(initIndicators);
     const [apiFlag, setApiFlag] = useState(false)
-
+    
     const optionsTable = [
         { value: '1D2M', label: '1D_2m' },
         { value: '4D12M', label: '4D_12m' },
@@ -49,10 +40,34 @@ const TutorialsList = (props) => {
         { value: '1Y1D', label: '1Y_1D' }
     ]
 
+    const optionsIndicator = [
+        {
+          value: 'RSI', label: 'RSI',
+        },
+        {
+          value: 'MACD', label: 'MACD',
+        },
+        {
+          value: 'SMA', label: 'SMA',
+        }
+    ]
+    
+    useEffect(() => {
+        if (!apiFlag) {
+            setSelectedOptionTable(period)
+            setPeriod(period)
+            if (!isGetSymbolList) {
+                get_tables();
+            }
+            setApiFlag(true)
+        }
+    
+    })
+
     const handleChangeTable = (value) => {
         setSelectedOptionTable(value)
         if (value) {
-            setPeriod(value.value)
+            setPeriod(value)
         }
 
     }
@@ -74,9 +89,13 @@ const TutorialsList = (props) => {
 
     const handlSymbolChange = (e) => {
         if (e) {
-          setSymbol(e.value)
+            setSymbol(e)
         }
-      }
+    }
+
+    const handleIndicatorsChange = (options) => {
+        setIndicators(options);
+    }
 
     return (
         <div>
@@ -102,10 +121,20 @@ const TutorialsList = (props) => {
                             options={symbolList}
                         />
                     </div>
+                    <div className="select-multi-option">
+                        <Select
+                        name="filters"
+                        placeholder="Indicators"
+                        value={indicators}
+                        onChange={handleIndicatorsChange}
+                        options={optionsIndicator}
+                        isMulti={true}
+                        />
+                    </div>
                 </div>
             </nav>
             <div className="graphs-container dark">
-                < StockChart period={period} symbol={symbol} />
+                < StockChart period={period.value} symbol={symbol.value} indicators={indicators}/>
             </div>
         </div>
 

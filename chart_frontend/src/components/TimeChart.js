@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import http from "../http-common";
 import axios from "axios";
 import Select from 'react-select'
-import 'react-select/dist/react-select.css';
 
 import _ from "underscore";
 import moment from "moment";
@@ -22,8 +21,9 @@ import { useHistory } from "react-router-dom";
 const TutorialsList = () => {
   const history = useHistory();
   const [selectedOptionTable, setSelectedOptionTable] = useState(null)
-  const [symbol, setSymbol] = useState('AAPL');
+  const [symbol, setSymbol] = useState({value: 'AAPL', label: 'AAPL'});
   const [strategy, setStrategy] = useState(null);
+  const [indicators, setIndicators] = useState([]);
   const [isGetSymbolList, setIsGetSymbolList] = useState(false)
   const [symbolList, setSymbolList] = useState([])
   const optionsTable = [
@@ -41,6 +41,18 @@ const TutorialsList = () => {
     { value: 'Stratgy3', label: 'Stratgy3' },
   ]
 
+  const optionsIndicator = [
+    {
+      value: 'RSI', label: 'RSI',
+    },
+    {
+      value: 'MACD', label: 'MACD',
+    },
+    {
+      value: 'SMA', label: 'SMA',
+    }
+  ]
+
   useEffect(() => {
     if(!isGetSymbolList) {
       get_tables();    
@@ -49,24 +61,33 @@ const TutorialsList = () => {
 
   const handleChangeTable = (value) => {
     setSelectedOptionTable(value)
+    const locationState = {
+      initPeriod: value,
+      initIndicators: indicators,
+      initSymbol: symbol,
+    }
     if (value) {
       history.push({
         pathname: '/itemComponent',
-        state: value,
+        state: locationState,
       });
     }
   }
 
   const handlSymbolChange = (e) => {
     if (e) {
-      setSymbol(e.value)
+      setSymbol(e)
     }
   }
 
   const handleStrategy = (e) => {
     if (e) {
-      setStrategy(e.value)
+      setStrategy(e)
     }
+  }
+  
+  const handleIndicatorsChange = (options) => {
+    setIndicators(options);
   }
 
   const get_tables = () => {
@@ -118,29 +139,39 @@ const TutorialsList = () => {
               placeholder="Strategy"
             />
           </div>
+          <div className="select-multi-option">
+            <Select
+              name="filters"
+              placeholder="Indicators"
+              value={indicators}
+              onChange={handleIndicatorsChange}
+              options={optionsIndicator}
+              isMulti={true}
+            />
+          </div>
         </div>
       </nav>
       <div className="graphs-container dark">
         <div className="row">
           <div className="col-md-4 graph-container" >
-            < StockChart period='1D2M' symbol={symbol}/>
+            < StockChart period='1D2M' symbol={symbol.value} indicators={indicators}/>
           </div>
           <div className="col-md-4 graph-container">
-            <StockChart period='4D12M' symbol={symbol}/>
+            <StockChart period='4D12M' symbol={symbol.value} indicators={indicators}/>
           </div>
           <div className="col-md-4 graph-container">
-            <StockChart period='30D1H' symbol={symbol}/>
+            <StockChart period='30D1H' symbol={symbol.value} indicators={indicators}/>
           </div>
         </div>
         <div className="row">
           <div className="col-md-4 graph-container">
-            <StockChart period='90D4H' symbol={symbol}/>
+            <StockChart period='90D4H' symbol={symbol.value} indicators={indicators}/>
           </div>
           <div className="col-md-4 graph-container">
-            <StockChart period='90D12H' symbol={symbol}/>
+            <StockChart period='90D12H' symbol={symbol.value} indicators={indicators}/>
           </div>
           <div className="col-md-4 graph-container">
-            <StockChart period='1Y1D' symbol={symbol}/>
+            <StockChart period='1Y1D' symbol={symbol.value} indicators={indicators}/>
           </div>
         </div>
       </div>

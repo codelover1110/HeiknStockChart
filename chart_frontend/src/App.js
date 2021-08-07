@@ -5,7 +5,6 @@ import "./App.css";
 
 import TimeChart from "./components/TimeChart";
 import Select from 'react-select'
-import 'react-select/dist/react-select.css';
 
 import ItemComponent from './components/ItemComponent';
 

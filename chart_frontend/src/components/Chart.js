@@ -11,6 +11,7 @@ import {
 	CandlestickSeries,
 	LineSeries,
 	MACDSeries,
+	StraightLine,
 } from "react-stockcharts/lib/series";
 import { XAxis, YAxis } from "react-stockcharts/lib/axes";
 import {
@@ -26,8 +27,9 @@ import {
 	OHLCTooltip,
 	MovingAverageTooltip,
 	MACDTooltip,
+	SingleValueTooltip,
 } from "react-stockcharts/lib/tooltip";
-import { ema, macd, heikinAshi } from "react-stockcharts/lib/indicator";
+import { elderRay, ema, macd, heikinAshi } from "react-stockcharts/lib/indicator";
 import { fitWidth } from "react-stockcharts/lib/helper";
 import { EquidistantChannel, DrawingObjectSelector } from "react-stockcharts/lib/interactive";
 import { last, toObject } from "react-stockcharts/lib/utils";
@@ -86,6 +88,14 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 		});
 		this.setState(state);
 	}
+
+	isIncludeIndicators(indicator) {
+		if (this.props.indicators) {
+			return this.props.indicators.filter((e) => e.value === indicator).length;
+		}
+		return 0;
+	}
+
 	onDrawComplete(channels_1) {
 		// this gets called on
 		// 1. draw complete of drawing object
@@ -100,7 +110,6 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 		console.log(keyCode);
 		switch (keyCode) {
 			case 46: { // DEL
-
 				const channels_1 = this.state.channels_1
 					.filter(each => !each.selected);
 				const channels_3 = this.state.channels_3
@@ -131,7 +140,54 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 			}
 		}
 	}
+
+	calculateHeight () {
+		let index = 1
+		if (this.props.indicators) {
+			if (this.props.indicators.length > 1) {
+				index = this.props.indicators.length
+			}
+		}
+		return 500 + index * 1 * 100
+	}
+
+	calculateOffset (indicator) {
+		if (indicator === 'MACD') {
+			if (this.isIncludeIndicators(indicator)) {
+				if (this.props.indicators.length > 1) {
+					return this.props.indicators.length * 100
+				}
+				return 100;
+			}
+		}
+
+		if (indicator === 'RSI') {
+			if (this.isIncludeIndicators(indicator)) {
+				if (this.isIncludeIndicators('SMA')) {
+					return 200;
+				}
+				return 100;
+			}
+		}
+
+		if (indicator === 'SMA') {
+			return 100;
+		}
+
+		return 0
+	}
+
+	calculateMainHeightOffset() {
+		if ( this.props.indicators ) {
+			if (this.props.indicators.length > 1) {
+				return 300 + (this.props.indicators.length - 1) * 100
+			}
+		}
+		return 300
+	}
+
 	render() {
+		const elder = elderRay();
 		const ha = heikinAshi();
 		const ema26 = ema()
 			.id(0)
@@ -157,12 +213,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 		const { type, data: initialData, width, ratio } = this.props;
 		const { channels_1, channels_3 } = this.state;
 
-		const calculatedData = macdCalculator(((ha(initialData))));
-		console.log("calculatedData===============================>")
-		console.log("calculatedData===============================>")
-		console.log("calculatedData===============================>")
-		console.log("calculatedData===============================>")
-		console.log(calculatedData)
+		const calculatedData = macdCalculator((elder(ha(initialData))));
 		const xScaleProvider = discontinuousTimeScaleProvider
 			.inputDateAccessor(d => d.date);
 		const {
@@ -178,7 +229,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 
 		return (
 			<ChartCanvas ref={this.saveCanvasNode}
-				height={600}
+				height={this.calculateHeight()}
 				width={width}
 				ratio={ratio}
 				margin={{ left: 70, right: 70, top: 20, bottom: 30 }}
@@ -244,7 +295,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 				</Chart>
 				<Chart id={2} height={150}
 					yExtents={[d => d.volume]}
-					origin={(w, h) => [0, h - 300]}
+					origin={(w, h) => [0, h - this.calculateMainHeightOffset()]}
 				>
 					<YAxis axisAt="left" orient="left" ticks={5} tickFormat={format(".2s")} stroke="white" tickStroke="white" />
 
@@ -255,31 +306,91 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 
 					<BarSeries yAccessor={d => d.volume} fill={d => d.close > d.open ? "#6BA583" : "#FF0000"} />
 				</Chart>
-				<Chart id={3} height={150}
-					yExtents={macdCalculator.accessor()}
-					origin={(w, h) => [0, h - 150]} padding={{ top: 10, bottom: 10 }}
-				>
-					<XAxis axisAt="bottom" orient="bottom" stroke="white" tickStroke="white" />
-					<YAxis axisAt="right" orient="right" ticks={2} stroke="white" tickStroke="white" />
+				{this.isIncludeIndicators('MACD') && (
+					<Chart id={3} height={100}
+						yExtents={macdCalculator.accessor()}
+						origin={(w, h) => [0, h - this.calculateOffset('MACD')]} padding={{ top: 30, bottom: 10 }}
+					>
+						<XAxis axisAt="bottom" orient="bottom" stroke="white" tickStroke="white" />
+						<YAxis axisAt="right" orient="right" ticks={2} stroke="white" tickStroke="white" />
 
-					<MouseCoordinateX
-						at="bottom"
-						orient="bottom"
-						displayFormat={timeFormat("%Y-%m-%d")} />
-					<MouseCoordinateY
-						at="right"
-						orient="right"
-						displayFormat={format(".2f")} />
+						<MouseCoordinateX
+							at="bottom"
+							orient="bottom"
+							displayFormat={timeFormat("%Y-%m-%d")} />
+						<MouseCoordinateY
+							at="right"
+							orient="right"
+							displayFormat={format(".2f")} />
 
-					<MACDSeries yAccessor={d => d.macd}
-						{...macdAppearance} />
-					<MACDTooltip
-						origin={[-38, 15]}
-						yAccessor={d => d.macd}
-						options={macdCalculator.options()}
-						appearance={macdAppearance}
-					/>
-				</Chart>
+						<MACDSeries yAccessor={d => d.macd}
+							{...macdAppearance} />
+						<MACDTooltip
+							origin={[-38, 15]}
+							yAccessor={d => d.macd}
+							options={macdCalculator.options()}
+							appearance={macdAppearance}
+						/>
+					</Chart>
+				)}
+				{this.isIncludeIndicators('RSI') && (
+					<Chart id={4} height={100}
+						yExtents={[0, d => elder.accessor()(d) && elder.accessor()(d).bearPower]}
+						origin={(w, h) => [0, h - this.calculateOffset('RSI')]}
+						padding={{ top: 30, bottom: 10 }}
+					>
+						<XAxis axisAt="bottom" orient="bottom" stroke="white" tickStroke="white" />
+						<YAxis axisAt="right" orient="right" stroke="white" tickStroke="white" ticks={4} tickFormat={format(".2f")}/>
+						<MouseCoordinateX
+							at="bottom"
+							orient="bottom"
+							displayFormat={timeFormat("%Y-%m-%d")} />
+						<MouseCoordinateY
+							at="right"
+							orient="right"
+							displayFormat={format(".2f")} />
+						<BarSeries
+							yAccessor={d => elder.accessor()(d) && elder.accessor()(d).bearPower}
+							baseAt={(xScale, yScale, d) => yScale(0)}
+							fill={d => d.side === 'buy' ? '#800080' : d.side === 'sell' ? '#FFA500' : d.side === 'hold' ? '#00FF00' : '#FF0000'} />
+						<StraightLine yValue={0} />
+
+						<SingleValueTooltip
+							yAccessor={d => elder.accessor()(d) && elder.accessor()(d).bearPower}
+							yLabel="RSI - Bear power"
+							yDisplayFormat={format(".2f")}
+							origin={[-40, 70]}/>
+					</Chart>
+				)}
+				{this.isIncludeIndicators('SMA') && (
+					<Chart id={5} height={100}
+						yExtents={[0, d => elder.accessor()(d) && elder.accessor()(d).bearPower]}
+						origin={(w, h) => [0, h - this.calculateOffset('SMA')]}
+						padding={{ top: 30, bottom: 10 }}
+					>
+						<XAxis axisAt="bottom" orient="bottom" stroke="white" tickStroke="white"/>
+						<YAxis axisAt="right" orient="right" stroke="white" tickStroke="white" ticks={4} tickFormat={format(".2f")}/>
+						<MouseCoordinateX
+							at="bottom"
+							orient="bottom"
+							displayFormat={timeFormat("%Y-%m-%d")} />
+						<MouseCoordinateY
+							at="right"
+							orient="right"
+							displayFormat={format(".2f")} />
+						<BarSeries
+							yAccessor={d => elder.accessor()(d) && elder.accessor()(d).bearPower}
+							baseAt={(xScale, yScale, d) => yScale(0)}
+							fill="#FF0000" />
+						<StraightLine yValue={0} />
+
+						<SingleValueTooltip
+							yAccessor={d => elder.accessor()(d) && elder.accessor()(d).bearPower}
+							yLabel="SMA - Bear power"
+							yDisplayFormat={format(".2f")}
+							origin={[-40, 70]}/>
+					</Chart>
+				)}
 				<CrossHairCursor />
 				<DrawingObjectSelector
 					enabled={!this.state.enableInteractiveObject}

@@ -80,6 +80,13 @@
   margin-right: 30px;
 }
 
+.select-multi-option {
+  min-width: 200px;
+  z-index: 1000;
+  position: relative;
+  margin-right: 30px;
+}
+
 #type {
   display: none;
 }

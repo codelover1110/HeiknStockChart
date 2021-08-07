@@ -2,25 +2,18 @@ import React, { useState, useEffect } from "react";
 import Chart from '../Chart';
 // import Chart from '../TestChart';
 import { TypeChooser } from "react-stockcharts/lib/helper";
-import 'react-select/dist/react-select.css';
+import { tsvParse } from  "d3-dsv";
+import { timeParse } from "d3-time-format";
 
 import { getData } from "../utils"
 
 const StockChart = (props) => {
-    const { period, symbol } = props;
+    const { period, symbol, indicators } = props;
     const [tablePrefix, setTablePrefix] = useState('')
     const [dbname, setDbname] = useState('')
 	const [chartData, setChartData] = useState(null)
+    const [isMock,] = useState(false)
 
-    useEffect(() => {
-        getData().then(data => {
-            // setChartData(data)
-            // console.log("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
-            // console.log(data)
-		})
-    })
-	
-    
     useEffect(() => {
         const initPeriodPrefix = () => {
             if (period === '1D2M') {
@@ -64,6 +57,19 @@ const StockChart = (props) => {
 		}
     }, [tablePrefix, symbol])
 
+    function parseData(parse) {
+        return function(d) {
+            d.date = parse(d.date);
+            d.open = +d.open;
+            d.high = +d.high;
+            d.low = +d.low;
+            d.close = +d.close;
+            d.volume = +d.volume;
+    
+            return d;
+        };
+    }
+
     const get_data = (table_name) => {
         const requestOptions = {
 			method: 'POST',
@@ -78,18 +84,27 @@ const StockChart = (props) => {
             return;
         }
 
-        fetch(process.env.REACT_APP_BACKEND_URL+'/api/get_data', requestOptions)
-			.then(response => response.json())
-			.then(data => {
-				data['chart_data']['columns'] = ["date", "open", "high", "low", "close", "volume", "split", "dividend", "absoluteChange", "percentChange"]
-				data['chart_data'].map((x) => {
-					let converDate = new Date(x.date)
-					x.date = converDate
-				})
-                console.log("--------------------------")
-                console.log(data['chart_data'])
-				setChartData(data['chart_data'])
-			})
+        if (!isMock) {
+            fetch(process.env.REACT_APP_BACKEND_URL+'/api/get_data', requestOptions)
+                .then(response => response.json())
+                .then(data => {
+                    data['chart_data']['columns'] = ["date", "open", "high", "low", "close", "volume", "split", "dividend", "absoluteChange", "percentChange"]
+                    data['chart_data'].map((x) => {
+                        let converDate = new Date(x.date)
+                        x.date = converDate
+                    })
+                    // console.log("--------------------------")
+                    // console.log(data['chart_data'])
+                    setChartData(data['chart_data'])
+                })
+        } else {
+            getData().then(data => {
+                setChartData(data)
+                console.log("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+                console.log(data)
+            })
+        }
+
 	}
 
 	return (
@@ -103,7 +118,7 @@ const StockChart = (props) => {
 							</div>
 						</div>
 						<TypeChooser >
-							{type => <Chart type={type} data={chartData} />}
+							{type => <Chart type={type} data={chartData} indicators={indicators}/>}
 						</TypeChooser>
 					</>
 
