@@ -46,6 +46,7 @@ const macdAppearance = {
 	},
 };
 
+// common stock chart
 class CandleStickChartWithEquidistantChannel extends React.Component {
 	constructor(props) {
 		super(props);
