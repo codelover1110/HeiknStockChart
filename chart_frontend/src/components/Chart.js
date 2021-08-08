@@ -37,6 +37,12 @@ import {
 	saveInteractiveNodes,
 	getInteractiveNodes,
 } from "./Interactiveutils";
+import {
+	Annotate,
+	SvgPathAnnotation,
+	buyPath,
+	sellPath,
+} from "react-stockcharts/lib/annotation";
 
 const macdAppearance = {
 	stroke: {
@@ -45,6 +51,16 @@ const macdAppearance = {
 	},
 	fill: {
 		divergence: "#4682B4"
+	},
+};
+
+const rsiAppearance = {
+	stroke: {
+		macd: "#FF0000",
+		signal: "#00F300",
+	},
+	fill: {
+		bearPower: "#4682B4"
 	},
 };
 
@@ -211,7 +227,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 			.accessor(d => d.macd);
 
 		const { type, data: initialData, width, ratio } = this.props;
-		const { channels_1, channels_3 } = this.state;
+		const { channels_1 } = this.state;
 
 		const calculatedData = macdCalculator((elder(ha(initialData))));
 		const xScaleProvider = discontinuousTimeScaleProvider
@@ -222,6 +238,26 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 			xAccessor,
 			displayXAccessor,
 		} = xScaleProvider(calculatedData);
+
+		const defaultAnnotationProps = {
+			onClick: console.log.bind(console),
+		};
+
+		const longAnnotationProps = {
+			...defaultAnnotationProps,
+			y: ({ yScale, datum }) => yScale(datum.low),
+			fill: "#006517",
+			path: buyPath,
+			tooltip: "Buy",
+		};
+
+		const shortAnnotationProps = {
+			...defaultAnnotationProps,
+			y: ({ yScale, datum }) => yScale(datum.high),
+			fill: "#FF0000",
+			path: sellPath,
+			tooltip: "Sell",
+		};
 
 		const start = xAccessor(last(data));
 		const end = xAccessor(data[Math.max(0, data.length - 150)]);
@@ -241,7 +277,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 				displayXAccessor={displayXAccessor}
 				xExtents={xExtents}
 			>
-				<Chart id={1} height={400}
+				<Chart id={1} height={250}
 					yExtents={[d => [d.high, d.low], ema26.accessor(), ema12.accessor()]}
 					padding={{ top: 10, bottom: 20 }}
 				>
@@ -292,12 +328,19 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 						onComplete={this.onDrawComplete}
 						channels={channels_1}
 					/>
+					<Annotate with={SvgPathAnnotation} when={d => d.longShort === "LONG"}
+						usingProps={longAnnotationProps} />
+					<Annotate with={SvgPathAnnotation} when={d => d.longShort === "SHORT"}
+						usingProps={shortAnnotationProps} />
+					
 				</Chart>
 				<Chart id={2} height={150}
 					yExtents={[d => d.volume]}
 					origin={(w, h) => [0, h - this.calculateMainHeightOffset()]}
+					padding={{ top: 10, bottom: 10 }}
 				>
-					<YAxis axisAt="left" orient="left" ticks={5} tickFormat={format(".2s")} stroke="white" tickStroke="white" />
+					<XAxis axisAt="bottom" orient="bottom" stroke="white" tickStroke="white" />
+					<YAxis axisAt="right" orient="right" ticks={5} tickFormat={format(".2s")} stroke="white" tickStroke="white" />
 
 					<MouseCoordinateY
 						at="left"
@@ -337,7 +380,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 					<Chart id={4} height={100}
 						yExtents={[0, d => elder.accessor()(d) && elder.accessor()(d).bearPower]}
 						origin={(w, h) => [0, h - this.calculateOffset('RSI')]}
-						padding={{ top: 30, bottom: 10 }}
+						padding={{ top: 40, bottom: 10 }}
 					>
 						<XAxis axisAt="bottom" orient="bottom" stroke="white" tickStroke="white" />
 						<YAxis axisAt="right" orient="right" stroke="white" tickStroke="white" ticks={4} tickFormat={format(".2f")}/>
@@ -359,7 +402,8 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 							yAccessor={d => elder.accessor()(d) && elder.accessor()(d).bearPower}
 							yLabel="RSI - Bear power"
 							yDisplayFormat={format(".2f")}
-							origin={[-40, 30]}/>
+							appearance={rsiAppearance}
+							origin={[-40, 40]}/>
 					</Chart>
 				)}
 				{this.isIncludeIndicators('SMA') && (
@@ -388,7 +432,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 							yAccessor={d => elder.accessor()(d) && elder.accessor()(d).bearPower}
 							yLabel="SMA - Bear power"
 							yDisplayFormat={format(".2f")}
-							origin={[-40, 30]}/>
+							origin={[-40, 70]}/>
 					</Chart>
 				)}
 				<CrossHairCursor />
