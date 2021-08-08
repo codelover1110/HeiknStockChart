@@ -359,7 +359,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 							yAccessor={d => elder.accessor()(d) && elder.accessor()(d).bearPower}
 							yLabel="RSI - Bear power"
 							yDisplayFormat={format(".2f")}
-							origin={[-40, 70]}/>
+							origin={[-40, 30]}/>
 					</Chart>
 				)}
 				{this.isIncludeIndicators('SMA') && (
@@ -388,7 +388,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 							yAccessor={d => elder.accessor()(d) && elder.accessor()(d).bearPower}
 							yLabel="SMA - Bear power"
 							yDisplayFormat={format(".2f")}
-							origin={[-40, 70]}/>
+							origin={[-40, 30]}/>
 					</Chart>
 				)}
 				<CrossHairCursor />
