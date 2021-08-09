@@ -282,7 +282,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 				}}
 				redraw={true}
 			>
-				<Chart id={1} height={250}
+				<Chart id={1} height={this.isIncludeIndicators('VOLUME') ? 250 : 400}
 					yExtents={[d => [d.high, d.low], ema26.accessor(), ema12.accessor()]}
 					padding={{ top: 10, bottom: 20 }}
 				>
