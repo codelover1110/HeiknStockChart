@@ -26,6 +26,7 @@ const TutorialsList = () => {
   const [indicators, setIndicators] = useState([]);
   const [isGetSymbolList, setIsGetSymbolList] = useState(false)
   const [symbolList, setSymbolList] = useState([])
+  const [chartColumn, setChartColumn] = useState({ value: 6, label: '6' })
   const optionsTable = [
     { value: '1D2M', label: '1D_2m' },
     { value: '4D12M', label: '4D_12m' },
@@ -36,12 +37,15 @@ const TutorialsList = () => {
   ] 
   
   const optionsStratgy = [
-    { value: 'Stratgy1', label: 'Stratgy1' },
-    { value: 'Stratgy2', label: 'Stratgy2' },
-    { value: 'Stratgy3', label: 'Stratgy3' },
+    { value: 'heikfilter', label: 'heikfilter' },
+    { value: 'Strategy2', label: 'Strategy2' },
+    { value: 'Strategy3', label: 'Strategy3' },
   ]
 
   const optionsIndicator = [
+    {
+      value: 'VOLUME', label: 'VOLUME',
+    },
     {
       value: 'RSI', label: 'RSI',
     },
@@ -50,6 +54,21 @@ const TutorialsList = () => {
     },
     {
       value: 'SMA', label: 'SMA',
+    }
+  ]
+
+  const optionsColumn = [
+    {
+      value: 1, label: '1',
+    },
+    {
+      value: 2, label: '2',
+    },
+    {
+      value: 4, label: '4',
+    },
+    {
+      value: 6, label: '6',
     }
   ]
 
@@ -105,6 +124,51 @@ const TutorialsList = () => {
 				})
 	}
 
+  const handleChartsColumnChange = (option) => {
+    setChartColumn(option)
+  }
+
+  const calculateHeightStyle = () => {
+    if (chartColumn.value === 1 || chartColumn.value === 2) {
+      return 'full-height'
+    }
+    return 'half-height'
+  }
+
+  const calculateGridColumn = () => {
+    if (chartColumn.value === 1) {
+      return 12
+    } else if ((chartColumn.value === 2) || (chartColumn.value === 4)) {
+      return 6
+    }
+    return 4
+  }
+
+  const displayChart = () => {
+    return (
+      <div className={`row ${calculateHeightStyle()}`}>
+        <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
+          < StockChart period='1D2M' symbol={symbol.value} indicators={indicators} strategy={strategy} />
+        </div>
+        <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
+          < StockChart period='1D2M' symbol={symbol.value} indicators={indicators} strategy={strategy} />
+        </div>
+        <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
+          < StockChart period='1D2M' symbol={symbol.value} indicators={indicators} strategy={strategy} />
+        </div>
+        <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
+          < StockChart period='1D2M' symbol={symbol.value} indicators={indicators} strategy={strategy} />
+        </div>
+        <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
+          < StockChart period='1D2M' symbol={symbol.value} indicators={indicators} strategy={strategy} />
+        </div>
+        <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
+          < StockChart period='1D2M' symbol={symbol.value} indicators={indicators} strategy={strategy} />
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div>
       <nav className="navbar navbar-expand navbar-dark bg-dark">
@@ -149,31 +213,21 @@ const TutorialsList = () => {
               isMulti={true}
             />
           </div>
+          <div className="select-option">
+            <Select
+              value={chartColumn}
+              onChange={handleChartsColumnChange}
+              options={optionsColumn}
+              placeholder="Columns"
+            />
+          </div>
         </div>
       </nav>
       <div className="graphs-container dark">
-        <div className="row">
-          <div className="col-md-4 graph-container" >
-            < StockChart period='1D2M' symbol={symbol.value} indicators={indicators}/>
-          </div>
-          <div className="col-md-4 graph-container">
-            <StockChart period='4D12M' symbol={symbol.value} indicators={indicators}/>
-          </div>
-          <div className="col-md-4 graph-container">
-            <StockChart period='30D1H' symbol={symbol.value} indicators={indicators}/>
-          </div>
-        </div>
-        <div className="row">
-          <div className="col-md-4 graph-container">
-            <StockChart period='90D4H' symbol={symbol.value} indicators={indicators}/>
-          </div>
-          <div className="col-md-4 graph-container">
-            <StockChart period='90D12H' symbol={symbol.value} indicators={indicators}/>
-          </div>
-          <div className="col-md-4 graph-container">
-            <StockChart period='1Y1D' symbol={symbol.value} indicators={indicators}/>
-          </div>
-        </div>
+        {(chartColumn.value === 1) && displayChart()}
+        {(chartColumn.value === 2) && displayChart()}
+        {(chartColumn.value === 4) && displayChart()}
+        {(chartColumn.value === 6) && displayChart()}
       </div>
     </div>
 

@@ -8,7 +8,7 @@ import { timeParse } from "d3-time-format";
 import { getData } from "../utils"
 
 const StockChart = (props) => {
-    const { period, symbol, indicators } = props;
+    const { period, symbol, indicators, strategy, isShowStrategy } = props;
     const [tablePrefix, setTablePrefix] = useState('')
     const [dbname, setDbname] = useState('')
 	const [chartData, setChartData] = useState(null)
@@ -50,7 +50,7 @@ const StockChart = (props) => {
         initDbNamebyPeriod();
     }, [period])
 
-	useEffect(() => {
+    useEffect(() => {
 		if (symbol) {
 			let table_name = tablePrefix + symbol
             get_data(table_name)
@@ -100,8 +100,8 @@ const StockChart = (props) => {
         } else {
             getData().then(data => {
                 setChartData(data)
-                console.log("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
-                console.log(data)
+                // console.log("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+                // console.log(data)
             })
         }
 
@@ -118,7 +118,7 @@ const StockChart = (props) => {
 							</div>
 						</div>
 						<TypeChooser >
-							{type => <Chart type={type} data={chartData} indicators={indicators}/>}
+							{type => <Chart type={type} data={chartData} indicators={indicators} strategy={strategy} isShowStrategy={isShowStrategy}/>}
 						</TypeChooser>
 					</>
 

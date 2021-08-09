@@ -95,6 +95,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 	componentWillUnmount() {
 		document.removeEventListener("keyup", this.onKeyPress);
 	}
+
 	handleSelection(interactives) {
 		const state = toObject(interactives, each => {
 			return [
@@ -276,6 +277,10 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 				xAccessor={xAccessor}
 				displayXAccessor={displayXAccessor}
 				xExtents={xExtents}
+				onRef={ref => {
+					this.setState({stockChart:  ref})
+				}}
+				redraw={true}
 			>
 				<Chart id={1} height={250}
 					yExtents={[d => [d.high, d.low], ema26.accessor(), ema12.accessor()]}
@@ -328,27 +333,36 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 						onComplete={this.onDrawComplete}
 						channels={channels_1}
 					/>
-					<Annotate with={SvgPathAnnotation} when={d => d.longShort === "LONG"}
-						usingProps={longAnnotationProps} />
-					<Annotate with={SvgPathAnnotation} when={d => d.longShort === "SHORT"}
-						usingProps={shortAnnotationProps} />
-					
+					{
+						((this.props.isShowStrategy) || (this.props.strategy && this.props.strategy.value === 'heikfilter')) && (
+							<Annotate with={SvgPathAnnotation} when={d => d.longShort === "LONG"}
+								usingProps={longAnnotationProps} />
+						)
+					}
+					{
+						((this.props.isShowStrategy) || (this.props.strategy && this.props.strategy.value === 'heikfilter')) && (
+							<Annotate with={SvgPathAnnotation} when={d => d.longShort === "SHORT"}
+								usingProps={shortAnnotationProps} />
+						)
+					}
 				</Chart>
-				<Chart id={2} height={150}
-					yExtents={[d => d.volume]}
-					origin={(w, h) => [0, h - this.calculateMainHeightOffset()]}
-					padding={{ top: 10, bottom: 10 }}
-				>
-					<XAxis axisAt="bottom" orient="bottom" stroke="white" tickStroke="white" />
-					<YAxis axisAt="right" orient="right" ticks={5} tickFormat={format(".2s")} stroke="white" tickStroke="white" />
+				{this.isIncludeIndicators('VOLUME') && (
+					<Chart id={2} height={150}
+						yExtents={[d => d.volume]}
+						origin={(w, h) => [0, h - this.calculateMainHeightOffset()]}
+						padding={{ top: 10, bottom: 10 }}
+					>
+						<XAxis axisAt="bottom" orient="bottom" stroke="white" tickStroke="white" />
+						<YAxis axisAt="right" orient="right" ticks={5} tickFormat={format(".2s")} stroke="white" tickStroke="white" />
 
-					<MouseCoordinateY
-						at="left"
-						orient="left"
-						displayFormat={format(".4s")} />
+						<MouseCoordinateY
+							at="left"
+							orient="left"
+							displayFormat={format(".4s")} />
 
-					<BarSeries yAccessor={d => d.volume} fill={d => d.close > d.open ? "#6BA583" : "#FF0000"} />
-				</Chart>
+						<BarSeries yAccessor={d => d.volume} fill={d => d.close > d.open ? "#6BA583" : "#FF0000"} />
+					</Chart>
+				)}
 				{this.isIncludeIndicators('MACD') && (
 					<Chart id={3} height={100}
 						yExtents={macdCalculator.accessor()}

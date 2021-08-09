@@ -16,17 +16,26 @@
 .graphs-container {
   height: calc(100vh - 56px);
   padding: 20px;
-  overflow: hidden;
+  overflow-y: scroll;
 }
 
 .graph-container {
   border: 2px solid;
+  height: 100%;
 }
 
 .graphs-container > .row {
-  height: 50%;
   padding-bottom: 20px;
 }
+
+.graphs-container > .full-height {
+  height: 100%
+}
+
+.graphs-container > .half-height {
+  height: 50%
+}
+
 
 
 .graphs-container .row .graph-container > div {

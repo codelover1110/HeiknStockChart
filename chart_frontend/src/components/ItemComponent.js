@@ -42,6 +42,9 @@ const TutorialsList = (props) => {
 
     const optionsIndicator = [
         {
+          value: 'VOLUME', label: 'VOLUME',
+        },
+        {
           value: 'RSI', label: 'RSI',
         },
         {
@@ -134,7 +137,7 @@ const TutorialsList = (props) => {
                 </div>
             </nav>
             <div className="graphs-container dark">
-                < StockChart period={period.value} symbol={symbol.value} indicators={indicators}/>
+                < StockChart period={period.value} symbol={symbol.value} indicators={indicators} isShowStrategy={true} />
             </div>
         </div>
 
