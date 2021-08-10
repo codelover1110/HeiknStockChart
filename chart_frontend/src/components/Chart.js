@@ -203,6 +203,30 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 		return 300
 	}
 
+	calculateTooltipOffset0() {
+		if (!this.props.isHomePage) {
+			return 0;
+		}
+		if ( this.props.indicators ) {
+			if (this.props.indicators.length > 1) {
+				return 85 + (this.props.indicators.length - 1) * 25
+			}
+		}
+		return 85
+	}
+	
+	calculateTooltipOffset1() {
+		if (!this.props.isHomePage) {
+			return 0;
+		}
+		if ( this.props.indicators ) {
+			if (this.props.indicators.length > 1) {
+				return 50 + (this.props.indicators.length - 1) * 25
+			}
+		}
+		return 50
+	}
+
 	render() {
 		const elder = elderRay();
 		const ha = heikinAshi();
@@ -246,18 +270,18 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 
 		const longAnnotationProps = {
 			...defaultAnnotationProps,
-			y: ({ yScale, datum }) => yScale(datum.low),
+			y: ({ yScale, datum }) => { return yScale(datum.low) - this.calculateTooltipOffset0() },
 			fill: "#006517",
 			path: buyPath,
-			tooltip: "Buy",
+			tooltip: (e) => `Buy: ${e.low}`,
 		};
 
 		const shortAnnotationProps = {
 			...defaultAnnotationProps,
-			y: ({ yScale, datum }) => yScale(datum.high),
+			y: ({ yScale, datum }) => { return yScale(datum.high) - this.calculateTooltipOffset1()},
 			fill: "#FF0000",
 			path: sellPath,
-			tooltip: "Sell",
+			tooltip: (e) => `Sell: ${e.high}`,
 		};
 
 		const start = xAccessor(last(data));
@@ -282,7 +306,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 				}}
 				redraw={true}
 			>
-				<Chart id={1} height={this.isIncludeIndicators('VOLUME') ? 250 : 400}
+				<Chart id={1} height={this.isIncludeIndicators('VOLUME') ? 250 : 250}
 					yExtents={[d => [d.high, d.low], ema26.accessor(), ema12.accessor()]}
 					padding={{ top: 10, bottom: 20 }}
 				>

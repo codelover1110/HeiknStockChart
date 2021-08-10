@@ -148,22 +148,22 @@ const TutorialsList = () => {
     return (
       <div className={`row ${calculateHeightStyle()}`}>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          < StockChart period='1D2M' symbol={symbol.value} indicators={indicators} strategy={strategy} />
+          < StockChart period='1D2M' symbol={symbol.value} indicators={indicators} strategy={strategy} isHomePage={true}/>
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          < StockChart period='1D2M' symbol={symbol.value} indicators={indicators} strategy={strategy} />
+          < StockChart period='4D12M' symbol={symbol.value} indicators={indicators} strategy={strategy} isHomePage={true}/>
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          < StockChart period='1D2M' symbol={symbol.value} indicators={indicators} strategy={strategy} />
+          < StockChart period='30D1H' symbol={symbol.value} indicators={indicators} strategy={strategy} isHomePage={true}/>
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          < StockChart period='1D2M' symbol={symbol.value} indicators={indicators} strategy={strategy} />
+          < StockChart period='90D4H' symbol={symbol.value} indicators={indicators} strategy={strategy} isHomePage={true}/>
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          < StockChart period='1D2M' symbol={symbol.value} indicators={indicators} strategy={strategy} />
+          < StockChart period='90D12H' symbol={symbol.value} indicators={indicators} strategy={strategy} isHomePage={true}/>
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          < StockChart period='1D2M' symbol={symbol.value} indicators={indicators} strategy={strategy} />
+          < StockChart period='1Y1D' symbol={symbol.value} indicators={indicators} strategy={strategy} isHomePage={true}/>
         </div>
       </div>
     )
