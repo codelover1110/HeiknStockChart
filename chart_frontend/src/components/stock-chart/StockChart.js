@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
-import Chart from '../Chart';
+// import Chart from '../Chart';
+import Chart from '../UpdateChart';
+import CandleChart from "../candle-chart/CandleChart";
+import { CandleData, Deals, Signal } from "../demo/Demo";
 // import Chart from '../TestChart';
 import { TypeChooser } from "react-stockcharts/lib/helper";
 import { tsvParse } from  "d3-dsv";
@@ -12,6 +15,7 @@ const StockChart = (props) => {
     const [tablePrefix, setTablePrefix] = useState('')
     const [dbname, setDbname] = useState('')
 	const [chartData, setChartData] = useState(null)
+	const [dealData, setDealData] = useState([])
     const [isMock,] = useState(false)
 
     useEffect(() => {
@@ -33,17 +37,17 @@ const StockChart = (props) => {
         
         const initDbNamebyPeriod = () => {
             if (period === '1D2M') {
-                setDbname('2m_stocks');
+                setDbname('backtesting_2_minute');
             } else if(period === '4D12M') {
-                setDbname('12m_stocks');
+                setDbname('backtesting_12_minute');
             } else if(period === '30D1H') {
-                setDbname('1h_stocks');
+                setDbname('backtesting_1_hour');
             } else if(period === '90D4H') {
-                setDbname('4h_stocks');
+                setDbname('backtesting_4_hour');
             } else if(period === '90D12H') {
-                setDbname('12h_stocks');
+                setDbname('backtesting_12_hour');
             } else if(period === '1Y1D') {
-                setDbname('1d_stocks');
+                setDbname('backtesting_1_day');
             }
         }
         initPeriodPrefix();
@@ -53,7 +57,7 @@ const StockChart = (props) => {
     useEffect(() => {
 		if (symbol) {
 			let table_name = tablePrefix + symbol
-            get_data(table_name)
+            get_data(table_name, symbol)
 		}
     }, [tablePrefix, symbol])
 
@@ -70,13 +74,14 @@ const StockChart = (props) => {
         };
     }
 
-    const get_data = (table_name) => {
+    const get_data = (table_name, symbol) => {
         const requestOptions = {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({
 				'db_name': dbname,
-				'table_name': table_name
+                'symbol': symbol,
+				'table_name': symbol,
 			})
 		};
 
@@ -96,6 +101,7 @@ const StockChart = (props) => {
                     // console.log("--------------------------")
                     // console.log(data['chart_data'])
                     setChartData(data['chart_data'])
+                    setDealData(data['deals'])
                 })
         } else {
             getData().then(data => {
@@ -118,8 +124,9 @@ const StockChart = (props) => {
 							</div>
 						</div>
 						<TypeChooser >
-							{type => <Chart type={type} data={chartData} indicators={indicators} strategy={strategy} isShowStrategy={isShowStrategy} isHomePage={isHomePage}/>}
+							{type => <Chart type={type} data={chartData} deals={dealData} indicators={indicators} strategy={strategy} isShowStrategy={isShowStrategy} isHomePage={isHomePage}/>}
 						</TypeChooser>
+                        {/* { <CandleChart data={CandleData} deals={Deals} signal={Signal} indicators={indicators} strategy={strategy} isShowStrategy={isShowStrategy} isHomePage={isHomePage}/> } */}
 					</>
 
 			}
