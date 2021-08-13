@@ -1,0 +1,154 @@
+import React from "react";
+import PropTypes from "prop-types";
+
+import { format } from "d3-format";
+import { timeFormat } from "d3-time-format";
+
+import { ChartCanvas, Chart } from "react-stockcharts";
+import {
+	BarSeries,
+	BollingerSeries,
+	CandlestickSeries,
+	LineSeries,
+	StochasticSeries,
+} from "react-stockcharts/lib/series";
+import { XAxis, YAxis } from "react-stockcharts/lib/axes";
+import {
+	CrossHairCursor,
+	EdgeIndicator,
+	CurrentCoordinate,
+	MouseCoordinateX,
+	MouseCoordinateY,
+} from "react-stockcharts/lib/coordinates";
+
+import { discontinuousTimeScaleProvider } from "react-stockcharts/lib/scale";
+import {
+	OHLCTooltip,
+	MovingAverageTooltip,
+	BollingerBandTooltip,
+	StochasticTooltip,
+	GroupTooltip,
+} from "react-stockcharts/lib/tooltip";
+import { ema, stochasticOscillator, bollingerBand } from "react-stockcharts/lib/indicator";
+import { fitWidth } from "react-stockcharts/lib/helper";
+import { last } from "react-stockcharts/lib/utils";
+
+const bbAppearance = {
+	stroke: {
+		top: "#964B00",
+		middle: "#FF6600",
+		bottom: "#964B00",
+	},
+	fill: "#4682B4"
+};
+const stoAppearance = {
+	stroke: Object.assign({},
+		StochasticSeries.defaultProps.stroke,
+		{ top: "#37a600", middle: "#b8ab00", bottom: "#37a600" })
+};
+
+class CandleStickChartWithDarkTheme extends React.Component {
+	render() {
+		const height = 750;
+		const { type, data: initialData, width, ratio } = this.props;
+
+		const margin = { left: 70, right: 70, top: 20, bottom: 30 };
+
+		const gridHeight = height - margin.top - margin.bottom;
+		const gridWidth = width - margin.left - margin.right;
+
+		const showGrid = true;
+
+		const ema20 = ema()
+			.id(0)
+			.options({ windowSize: 20 })
+			.merge((d, c) => { d.ema20 = c; })
+			.accessor(d => d.ema20);
+
+		const ema50 = ema()
+			.id(2)
+			.options({ windowSize: 50 })
+			.merge((d, c) => { d.ema50 = c; })
+			.accessor(d => d.ema50);
+
+		const slowSTO = stochasticOscillator()
+			.options({ windowSize: 14, kWindowSize: 3 })
+			.merge((d, c) => { d.slowSTO = c; })
+			.accessor(d => d.slowSTO);
+		const fastSTO = stochasticOscillator()
+			.options({ windowSize: 14, kWindowSize: 1 })
+			.merge((d, c) => { d.fastSTO = c; })
+			.accessor(d => d.fastSTO);
+		const fullSTO = stochasticOscillator()
+			.options({ windowSize: 14, kWindowSize: 3, dWindowSize: 4 })
+			.merge((d, c) => { d.fullSTO = c; })
+			.accessor(d => d.fullSTO);
+
+		const bb = bollingerBand()
+			.merge((d, c) => { d.bb = c; })
+			.accessor(d => d.bb);
+
+
+		const calculatedData = bb(ema20(ema50(slowSTO(fastSTO(fullSTO(initialData))))));
+		const xScaleProvider = discontinuousTimeScaleProvider
+			.inputDateAccessor(d => d.date);
+		const {
+			data,
+			xScale,
+			xAccessor,
+			displayXAccessor,
+		} = xScaleProvider(calculatedData);
+
+		const start = xAccessor(last(data));
+		const end = xAccessor(data[Math.max(0, data.length - 150)]);
+		const xExtents = [start, end];
+
+
+		return (
+			<ChartCanvas height={750}
+				width={width}
+				ratio={ratio}
+				margin={margin}
+				type={type}
+				seriesName="MSFT"
+				data={data}
+				xScale={xScale}
+				xAccessor={xAccessor}
+				displayXAccessor={displayXAccessor}
+				xExtents={xExtents}
+			>
+
+				<Chart id={3}
+					yExtents={[0, 100]}
+					height={125} origin={(w, h) => [0, h - 375]} padding={{ top: 10, bottom: 10 }}
+				>
+
+					<StochasticSeries
+						yAccessor={d => d.slowSTO}
+						{...stoAppearance} />
+					<StochasticTooltip
+						origin={[-38, 15]}
+						yAccessor={d => d.slowSTO}
+						options={slowSTO.options()}
+						appearance={stoAppearance}
+						label="Slow STO" />
+				</Chart>
+
+				<CrossHairCursor stroke="#FFFFFF" />
+			</ChartCanvas>
+		);
+	}
+}
+CandleStickChartWithDarkTheme.propTypes = {
+	data: PropTypes.array.isRequired,
+	width: PropTypes.number.isRequired,
+	ratio: PropTypes.number.isRequired,
+	type: PropTypes.oneOf(["svg", "hybrid"]).isRequired,
+};
+
+CandleStickChartWithDarkTheme.defaultProps = {
+	type: "svg",
+};
+CandleStickChartWithDarkTheme = fitWidth(CandleStickChartWithDarkTheme);
+
+export default CandleStickChartWithDarkTheme;
