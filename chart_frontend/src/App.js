@@ -6,7 +6,7 @@ import "./App.css";
 import TimeChart from "./components/TimeChart";
 import Select from 'react-select'
 
-import ItemComponent from './components/ItemComponent';
+import ItemChart from './components/ItemChart';
 
 function App() {
   return (
@@ -14,7 +14,7 @@ function App() {
       <div>
         <Switch>
           <Route exact path={["/", "/chart"]} component={TimeChart} />
-          <Route exact path="/itemComponent" component={ItemComponent} />
+          <Route exact path="/ItemChart" component={ItemChart} />
         </Switch>
       </div>
     </Router>

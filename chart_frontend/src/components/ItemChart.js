@@ -20,10 +20,11 @@ import StockChart from "./stock-chart/StockChart"
 import { useHistory } from "react-router-dom";
 
 const TutorialsList = (props) => {
-    const { initPeriod, initIndicators, initSymbol } = props.location.state
+    const { instance, initPeriod, initIndicators, initSymbol } = props.location.state
 
     const history = useHistory();
     const [isGetSymbolList, setIsGetSymbolList] = useState(false)
+    const [selectedInstance, setSelectedInstance] = useState(instance);
     const [selectedOptionTable, setSelectedOptionTable] = useState(null)
     const [symbol, setSymbol] = useState(initSymbol);
     const [strategy, setStrategy] = useState(null);
@@ -32,6 +33,13 @@ const TutorialsList = (props) => {
     const [indicators, setIndicators] = useState(initIndicators);
     const [apiFlag, setApiFlag] = useState(false)
     
+    const optionsInstance = [
+        { value: 'trades', label: 'Trades' },
+        { value: 'backtest', label: 'Back Test' },
+        { value: 'fowardtest', label: 'Foward Test' },
+        { value: 'livetrading', label: 'Live Trading' },
+    ]
+
     const optionsStratgy = [
         { value: 'heikfilter', label: 'heikfilter' },
         { value: 'Strategy2', label: 'Strategy2' },
@@ -125,11 +133,20 @@ const TutorialsList = (props) => {
                     </li>
                     <div className="select-option">
                         <Select
-                            value={selectedOptionTable}
+                            value={selectedInstance}
                             onChange={handleChangeTable}
-                            options={optionsTable}
+                            options={optionsInstance}
                         />
                     </div>
+                    {selectedInstance.value !== 'backtest' && 
+                        (<div className="select-option">
+                            <Select
+                                value={selectedOptionTable}
+                                onChange={handleChangeTable}
+                                options={optionsTable}
+                            />
+                        </div>)
+                    }
                     <div className="select-option">
                         <Select
                             value={symbol}
@@ -145,16 +162,18 @@ const TutorialsList = (props) => {
                         placeholder="Strategy"
                         />
                     </div>
-                    <div className="select-multi-option">
-                        <Select
-                        name="filters"
-                        placeholder="Indicators"
-                        value={indicators}
-                        onChange={handleIndicatorsChange}
-                        options={optionsIndicator}
-                        isMulti={true}
-                        />
-                    </div>
+                    {selectedInstance.value !== 'backtest' && 
+                        (<div className="select-multi-option">
+                            <Select
+                            name="filters"
+                            placeholder="Indicators"
+                            value={indicators}
+                            onChange={handleIndicatorsChange}
+                            options={optionsIndicator}
+                            isMulti={true}
+                            />
+                        </div>)
+                    }
                 </div>
             </nav>
             <div className="graphs-container dark">

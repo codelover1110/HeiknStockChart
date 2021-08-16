@@ -40,7 +40,7 @@ import { last, toObject } from "react-stockcharts/lib/utils";
 import {
 	saveInteractiveNodes,
 	getInteractiveNodes,
-} from "./Interactiveutils";
+} from "../Interactiveutils";
 import {
 	Annotate,
 	LabelAnnotation,
@@ -291,8 +291,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 			);
 			
 		if (deal.length > 0) {
-			console.log("dateLine.date.getTime() === dealLine.ddate.getTime()", deal[0].action)
-		  return deal[0].action;
+			return deal[0].action;
 		}
 	}
 
@@ -322,21 +321,32 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 			onClick: this.addTextLable
 		  };
 	  
-		  const yOpenProps = {
-			y: ({ yScale, datum }) => yScale(datum.high * 1.04)
-		  };
+		const yOpenProps = {
+		y: ({ yScale, datum }) => yScale(datum.high * 1.04 - 100)
+		};
 	  
-		  const yCloseProps = {
-			y: ({ yScale, datum }) => yScale(datum.high * 1.02)
-		  };
+		const yCloseProps = {
+		y: ({ yScale, datum }) => yScale(datum.high * 1.04 - 100)
+		};
 	  
+		const buyTooltipProps = {
+			tooltip: (o) => {
+				return `Buy: ${o.date} \n Price: ${o.price}`
+			}
+		}
+		
+		const sellTooltipProps = {
+			tooltip: (o) => {
+				return `Sell: ${o.date}\nPrice: ${o.price}`
+			}
+		}
 
 		const buy = {
 			...longFillProps,
 			...fontProps,
 			...yOpenProps,
 			text: "\u25B2",
-			tooltip: "Buy",
+			...buyTooltipProps,
 			rotate: 180
 		};
 	  
@@ -344,8 +354,8 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 			...shortFillProps,
 			...fontProps,
 			...yCloseProps,
+			...sellTooltipProps,
 			text: "\u25B2",
-			tooltip: "Sell",
 			rotate: 180
 		};
 
@@ -426,7 +436,8 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 			: this.props.period === '90D12H'
 			? 200 : 1000
 		
-		const end = xAccessor(data[Math.max(0, data.length - periodIndex)]);
+		// const end = xAccessor(data[Math.max(0, data.length - periodIndex)]);
+		const end = xAccessor(data[Math.max(0, data.length - 150)]);
 		const xExtents = [start, end];
 		// console.log("this.props.data.length", this.props.data[1000].date)
 		// const xExtents = [
@@ -436,6 +447,10 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 		// console.log("xExtents", last(data).date, data[Math.max(0, data.length - 150)].date)
 		// console.log("xExtents1", this.props.data[0].date, this.props.data[this.props.data.length - 1].date)
 		
+		const xDisplayFormatProps = {
+			xDisplayFormat: timeFormat("%Y-%m-%d-%H-%M-%S"),
+		}
+
 		return (
 			<ChartCanvas
 				height={this.calculateHeight()}
@@ -481,7 +496,10 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 					<EdgeIndicator itemType="last" orient="right" edgeAt="right"
 						yAccessor={d => d.close} fill={d => d.close > d.open ? "#6BA583" : "#FF0000"} />
 
-					<OHLCTooltip origin={[-40, 0]} />
+					<OHLCTooltip
+						origin={[-40, 0]}
+						{...xDisplayFormatProps}
+					/>
 
 					<MovingAverageTooltip
 						onClick={e => console.log(e)}
@@ -509,9 +527,9 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 						onComplete={this.onDrawComplete}
 						channels={channels_1}
 					/>
-					{/* {
+					{
 						(this.props.strategy && this.props.strategy.value === 'heikfilter') && (
-							// <Annotate with={SvgPathAnnotation} when={d => d.longShort === "LONG"}
+							// <Annotate with={SvgPathAnnotation} when={d => d.action === "SELL"}
 							// 	usingProps={longAnnotationProps} />
 							<Annotate
 								with={LabelAnnotation}
@@ -522,7 +540,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 					}
 					{
 						(this.props.strategy && this.props.strategy.value === 'heikfilter') && (
-							// <Annotate with={SvgPathAnnotation} when={d => d.longShort === "SHORT"}
+							// <Annotate with={SvgPathAnnotation} when={d => d.action === "BUY"}
 							// 	usingProps={shortAnnotationProps} />
 							<Annotate
 								with={LabelAnnotation}
@@ -530,7 +548,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 								usingProps={sell}
 							/>
 						)
-					} */}
+					}
 				</Chart>
 				{this.isIncludeIndicators('VOLUME') && (
 					<Chart id={2} height={150}
@@ -644,50 +662,45 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 					}}
 					onSelect={this.handleSelection}
 				/>
-			<g>
-				<rect
-					className={this.props.classes.CandleChart}
-					x={this.state.x - 100}
-					y={this.state.y - 50}
-					width="200"
-					height="50"
-					stroke="#3D4977"
-					fill="#3D4977"
-					rx="2"
-					ry="2"
-				/>
-				{/* <polygon
-					points={`${this.state.x - 10},${this.state.y} ${this.state.x},
-					${this.state.y + 10} ${this.state.x + 10},${this.state.y}`}
-					fill="#3D4977"
-					stroke="#3D4977"
-					strokeWidth="0"
-				/> */}
-				<ToolTipText x={this.state.x} y={this.state.y}>
-					<tspan
-					className={this.props.classes.CandleChart_type_date}
-					x={this.state.x}
-					textAnchor="middle"
-					dy="-1em"
-					fill={"#fff"}
-					onClick={this.hideTextLabel.bind(this)}
-					>
-					{this.state.dateText}
-					{this.state.status}
-					</tspan>
-					<tspan
-					className={this.props.classes.CandleChart_type_value}
-					x={this.state.x}
-					textAnchor="middle"
-					key="value"
-					dy="-1em"
-					fill={"#fff"}
-					onClick={this.hideTextLabel.bind(this)}
-					>
-					Price: {this.state.valueText}
-					</tspan>
-				</ToolTipText>
-				</g>
+			{!this.props.isHomePage && 
+				<g>
+					<rect
+						className={this.props.classes.CandleChart}
+						x={this.state.x - 100}
+						y={this.state.y - 50}
+						width="200"
+						height="50"
+						stroke="#3D4977"
+						fill="#3D4977"
+						rx="2"
+						ry="2"
+					/>
+					<ToolTipText x={this.state.x} y={this.state.y}>
+						<tspan
+						className={this.props.classes.CandleChart_type_date}
+						x={this.state.x}
+						textAnchor="middle"
+						dy="-1em"
+						fill={"#fff"}
+						onClick={this.hideTextLabel.bind(this)}
+						>
+						{this.state.dateText}
+						{this.state.status}
+						</tspan>
+						<tspan
+						className={this.props.classes.CandleChart_type_value}
+						x={this.state.x}
+						textAnchor="middle"
+						key="value"
+						dy="-1em"
+						fill={"#fff"}
+						onClick={this.hideTextLabel.bind(this)}
+						>
+						Price: {this.state.valueText}
+						</tspan>
+					</ToolTipText>
+					</g>
+				}
 			</ChartCanvas>
 		);
 	}

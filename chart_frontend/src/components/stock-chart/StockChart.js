@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from "react";
+import Chart from '../trades-chart/TradesChart';
+import BackTestChart from '../back-test/BackTestChart'
+import ScatterMock from '../demo/ScatterMock'
+import GroupDataMock from '../demo/GroupMockData'
+import { TypeChooser } from "react-stockcharts/lib/helper";
+// import CandleChart from "../candle-chart/CandleChart";
 // import Chart from '../Chart';
-import Chart from '../UpdateChart';
-import CandleChart from "../candle-chart/CandleChart";
 // import { CandleData, Deals, Signal } from "../demo/Demo";
 // import MockData from '../demo/mock.json'
 // import Chart from '../TestChart';
-import { TypeChooser } from "react-stockcharts/lib/helper";
-import { tsvParse } from  "d3-dsv";
-import { timeParse } from "d3-time-format";
+// import { tsvParse } from  "d3-dsv";
+// import { timeParse } from "d3-time-format";
 
 import { getData } from "../utils"
 
@@ -125,8 +128,14 @@ const StockChart = (props) => {
 							</div>
 						</div>
 						<TypeChooser >
-							{type => <Chart type={type} data={chartData} deals={dealData} indicators={indicators} strategy={strategy} period={period} isHomePage={isHomePage}/>}
-						</TypeChooser>
+                            {type => {
+                                return (
+                                    isHomePage 
+                                    ? <Chart type={type} data={chartData} deals={dealData} indicators={indicators} strategy={strategy} period={period} isHomePage={isHomePage}/>
+                                    : <BackTestChart type={type} data={ScatterMock} GroupDataMock={GroupDataMock}/>
+                                )
+                            }}
+                        </TypeChooser>
                     </>
 
 			}

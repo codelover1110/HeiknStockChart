@@ -21,12 +21,21 @@ import { useHistory } from "react-router-dom";
 const TutorialsList = () => {
   const history = useHistory();
   const [selectedOptionTable, setSelectedOptionTable] = useState(null)
+  const [selectedInstance, setSelectedInstance] = useState([{ value: 'trades', label: 'Trades' }]);
   const [symbol, setSymbol] = useState(null);
   const [strategy, setStrategy] = useState(null);
   const [indicators, setIndicators] = useState([]);
   const [isGetSymbolList, setIsGetSymbolList] = useState(false)
   const [symbolList, setSymbolList] = useState([])
   const [chartColumn, setChartColumn] = useState({ value: 6, label: '6' })
+
+  const optionsInstance = [
+    { value: 'trades', label: 'Trades' },
+    { value: 'backtest', label: 'Back Test' },
+    { value: 'fowardtest', label: 'Foward Test' },
+    { value: 'livetrading', label: 'Live Trading' },
+  ]
+
   const optionsTable = [
     { value: '1D2M', label: '1D_2m' },
     { value: '4D12M', label: '4D_12m' },
@@ -78,6 +87,24 @@ const TutorialsList = () => {
     }  
   }, [])
 
+  const handleInstanceChange = (value) => {
+    setSelectedInstance(value)  
+    if (value.value === 'backtest') {
+      const locationState = {
+        instance: value,
+        initPeriod: { value: '1D2M', label: '1D_2m' },
+        initIndicators: indicators,
+        initSymbol: symbol,
+      }
+      if (value) {
+        history.push({
+          pathname: '/ItemChart',
+          state: locationState,
+        });
+      }
+    }
+  }
+
   const handleChangeTable = (value) => {
     setSelectedOptionTable(value)
     const locationState = {
@@ -87,7 +114,7 @@ const TutorialsList = () => {
     }
     if (value) {
       history.push({
-        pathname: '/itemComponent',
+        pathname: '/ItemChart',
         state: locationState,
       });
     }
@@ -181,6 +208,13 @@ const TutorialsList = () => {
           <li className="nav-item">
             <Link to={"/chart"} className="nav-link"></Link>
           </li>
+          <div className="select-option">
+            <Select
+              value={selectedInstance}
+              onChange={handleInstanceChange}
+              options={optionsInstance}
+            />
+          </div>
           <div className="select-option">
             <Select
               value={selectedOptionTable}
