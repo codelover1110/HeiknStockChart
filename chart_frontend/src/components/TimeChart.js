@@ -266,7 +266,6 @@ const TutorialsList = () => {
         {(chartColumn.value === 6) && displayChart()}
       </div>
     </div>
-
   );
 };
 

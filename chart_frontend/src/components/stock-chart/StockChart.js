@@ -15,7 +15,7 @@ import { TypeChooser } from "react-stockcharts/lib/helper";
 import { getData } from "../utils"
 
 const StockChart = (props) => {
-    const { period, symbol, indicators, strategy, isHomePage } = props;
+    const { instance, period, symbol, indicators, strategy, isHomePage } = props;
     const [tablePrefix, setTablePrefix] = useState('')
     const [dbname, setDbname] = useState('')
 	const [chartData, setChartData] = useState(null)
@@ -114,8 +114,7 @@ const StockChart = (props) => {
                 // console.log(data)
             })
         }
-
-	}
+    }
 
     return (
 		<>
@@ -130,7 +129,7 @@ const StockChart = (props) => {
 						<TypeChooser >
                             {type => {
                                 return (
-                                    isHomePage 
+                                    (isHomePage | (instance !== 'backtest'))
                                     ? <Chart type={type} data={chartData} deals={dealData} indicators={indicators} strategy={strategy} period={period} isHomePage={isHomePage}/>
                                     : <BackTestChart type={type} data={ScatterMock} GroupDataMock={GroupDataMock}/>
                                 )

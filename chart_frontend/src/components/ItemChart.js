@@ -24,13 +24,18 @@ const TutorialsList = (props) => {
 
     const history = useHistory();
     const [isGetSymbolList, setIsGetSymbolList] = useState(false)
-    const [selectedInstance, setSelectedInstance] = useState(instance);
+    const [selectedInstance, setSelectedInstance] = useState(
+        instance ? instance : {
+            value: 'trades',
+            label: 'Trades'
+        });
+    const [tradeResultFile, setTradeResultFile] = useState('heikfilter-1hour-trades')
     const [selectedOptionTable, setSelectedOptionTable] = useState(null)
-    const [symbol, setSymbol] = useState(initSymbol);
-    const [strategy, setStrategy] = useState(null);
+    const [symbol, setSymbol] = useState(initSymbol)
+    const [strategy, setStrategy] = useState(null)
     const [symbolList, setSymbolList] = useState([])
     const [period, setPeriod] = useState(initPeriod)
-    const [indicators, setIndicators] = useState(initIndicators);
+    const [indicators, setIndicators] = useState(initIndicators)
     const [apiFlag, setApiFlag] = useState(false)
     
     const optionsInstance = [
@@ -39,7 +44,8 @@ const TutorialsList = (props) => {
         { value: 'fowardtest', label: 'Foward Test' },
         { value: 'livetrading', label: 'Live Trading' },
     ]
-
+    const [optionsTradeResult, setOptionsTradeResult] = useState([])
+    
     const optionsStratgy = [
         { value: 'heikfilter', label: 'heikfilter' },
         { value: 'Strategy2', label: 'Strategy2' },
@@ -105,20 +111,38 @@ const TutorialsList = (props) => {
             })
     }
 
+    const handleInstanceChange = (e) => {
+        setSelectedInstance(e)
+    }
+
     const handlSymbolChange = (e) => {
         if (e) {
             setSymbol(e)
         }
     }
 
-    const handleStrategy = (e) => {
+    const handleStrategyChange = (e) => {
         if (e) {
           setStrategy(e)
+            if (e.value === 'heikfilter') {
+                setOptionsTradeResult([
+                    { value: 'heikfilter-1hour-trades', label: '1-Hour-Trades' },
+                    { value: 'heikfilter-2mins-trades', label: '2-Mins-Trades' },
+                    { value: 'heikfilter-12mins-trades', label: '12-Mins-Trades' },
+                    { value: 'heikfilter-4hours-trades', label: '4-Hours-Trades' },
+                ])
+            } else {
+                setOptionsTradeResult([])
+            }
         }
       }
 
     const handleIndicatorsChange = (options) => {
         setIndicators(options);
+    }
+
+    const handleTradeResultFileChange = (e) => {
+        setTradeResultFile(e);
     }
 
     return (
@@ -134,7 +158,7 @@ const TutorialsList = (props) => {
                     <div className="select-option">
                         <Select
                             value={selectedInstance}
-                            onChange={handleChangeTable}
+                            onChange={handleInstanceChange}
                             options={optionsInstance}
                         />
                     </div>
@@ -157,7 +181,7 @@ const TutorialsList = (props) => {
                     <div className="select-option">
                         <Select
                         value={strategy}
-                        onChange={handleStrategy}
+                        onChange={handleStrategyChange}
                         options={optionsStratgy}
                         placeholder="Strategy"
                         />
@@ -165,19 +189,30 @@ const TutorialsList = (props) => {
                     {selectedInstance.value !== 'backtest' && 
                         (<div className="select-multi-option">
                             <Select
-                            name="filters"
-                            placeholder="Indicators"
-                            value={indicators}
-                            onChange={handleIndicatorsChange}
-                            options={optionsIndicator}
-                            isMulti={true}
+                                name="filters"
+                                placeholder="Indicators"
+                                value={indicators}
+                                onChange={handleIndicatorsChange}
+                                options={optionsIndicator}
+                                isMulti={true}
+                            />
+                        </div>)
+                    }
+                    {selectedInstance.value === 'backtest' && 
+                        (<div className="select-option">
+                            <Select
+                                name="filters"
+                                placeholder="Trade Result File"
+                                value={tradeResultFile}
+                                onChange={handleTradeResultFileChange}
+                                options={optionsTradeResult}
                             />
                         </div>)
                     }
                 </div>
             </nav>
             <div className="graphs-container dark">
-                < StockChart period={period.value} symbol={symbol.value} indicators={indicators} strategy={strategy} isHomePage={false}/>
+                < StockChart instance={selectedInstance.value} period={period.value} symbol={symbol.value} indicators={indicators} strategy={strategy} isHomePage={false}/>
             </div>
         </div>
 
