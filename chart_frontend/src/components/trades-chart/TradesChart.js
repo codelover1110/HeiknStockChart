@@ -15,6 +15,7 @@ import {
 	LineSeries,
 	MACDSeries,
 	StraightLine,
+	RSISeries,
 } from "react-stockcharts/lib/series";
 import { XAxis, YAxis } from "react-stockcharts/lib/axes";
 import {
@@ -29,11 +30,11 @@ import { discontinuousTimeScaleProvider } from "react-stockcharts/lib/scale";
 import {
 	OHLCTooltip,
 	ToolTipText,
-	MovingAverageTooltip,
 	MACDTooltip,
 	SingleValueTooltip,
+	RSITooltip,
 } from "react-stockcharts/lib/tooltip";
-import { elderRay, ema, macd, heikinAshi } from "react-stockcharts/lib/indicator";
+import { atr, elderRay, ema, macd, heikinAshi, rsi } from "react-stockcharts/lib/indicator";
 import { fitWidth } from "react-stockcharts/lib/helper";
 import { EquidistantChannel, DrawingObjectSelector } from "react-stockcharts/lib/interactive";
 import { last, toObject } from "react-stockcharts/lib/utils";
@@ -64,9 +65,9 @@ const rsiAppearance = {
 		macd: "#FF0000",
 		signal: "#00F300",
 	},
-	fill: {
+	fille: {
 		bearPower: "#4682B4"
-	},
+	}
 };
 
 // common stock chart
@@ -237,9 +238,9 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 		if (indicator === 'RSI') {
 			if (this.isIncludeIndicators(indicator)) {
 				if (this.isIncludeIndicators('SMA')) {
-					return 200;
+					return 250;
 				}
-				return 100;
+				return 150;
 			}
 		}
 
@@ -382,6 +383,16 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 			.merge((d, c) => { d.macd = c; })
 			.accessor(d => d.macd);
 
+		const rsiCalculator = rsi()
+		.options({ windowSize: 14 })
+		.merge((d, c) => {d.rsi = c;})
+		.accessor(d => d.rsi);
+			
+		const atr14 = atr()
+		.options({ windowSize: 14 })
+		.merge((d, c) => {d.atr14 = c;})
+		.accessor(d => d.atr14);	
+
 		const { type, data: initialData, width, ratio } = this.props;
 		const { channels_1 } = this.state;
 
@@ -392,7 +403,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 		initialData.forEach(line => {
 			line.date = dayjs(line.date).toDate();
 		  });
-		const calculatedData = macdCalculator((elder(ha(initialData))));
+		const calculatedData = macdCalculator((elder(ha(rsiCalculator(atr14(initialData))))));
 		
 		const xScaleProvider = discontinuousTimeScaleProvider
 			.inputDateAccessor(d => d.date);
@@ -451,6 +462,18 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 			xDisplayFormat: timeFormat("%Y-%m-%d-%H-%M-%S"),
 		}
 
+		const RSIStrokeDashArray = {
+			opacity: {
+				top: 0,
+				middle: 0,
+				bottom: 0
+			},
+		};
+
+		const SMATooltipProps = {
+			valueFill: '#ffffff'
+		}
+
 		return (
 			<ChartCanvas
 				height={this.calculateHeight()}
@@ -501,7 +524,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 						{...xDisplayFormatProps}
 					/>
 
-					<MovingAverageTooltip
+					{/* <MovingAverageTooltip
 						onClick={e => console.log(e)}
 						origin={[-38, 15]}
 						options={[
@@ -518,15 +541,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 								windowSize: ema12.options().windowSize,
 							},
 						]}
-					/>
-
-					<EquidistantChannel
-						ref={this.saveInteractiveNodes("EquidistantChannel", 1)}
-						enabled={this.state.enableInteractiveObject}
-						onStart={() => console.log("START")}
-						onComplete={this.onDrawComplete}
-						channels={channels_1}
-					/>
+					/> */}
 					{
 						(this.props.strategy && this.props.strategy.value === 'heikfilter') && (
 							// <Annotate with={SvgPathAnnotation} when={d => d.action === "SELL"}
@@ -595,33 +610,40 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 					</Chart>
 				)}
 				{this.isIncludeIndicators('RSI') && (
-					<Chart id={4} height={100}
-						yExtents={[0, d => elder.accessor()(d) && elder.accessor()(d).bearPower]}
+					<Chart id={4}
+						yExtents={[0, 100]}
+						height={100}
 						origin={(w, h) => [0, h - this.calculateOffset('RSI')]}
-						padding={{ top: 40, bottom: 10 }}
+						padding={{ top: 10, bottom: 10 }}
 					>
-						<XAxis axisAt="bottom" orient="bottom" stroke="white" tickStroke="white" />
-						<YAxis axisAt="right" orient="right" stroke="white" tickStroke="white" ticks={4} tickFormat={format(".2f")}/>
-						<MouseCoordinateX
-							at="bottom"
+						<XAxis 
+							axisAt="bottom"
 							orient="bottom"
-							displayFormat={timeFormat("%Y-%m-%d")} />
+							showTicks={true}
+							outerTickSize={0} 
+							stroke="white"
+							tickStroke="white"
+						/>
+						<YAxis
+							axisAt="right"
+							orient="right"
+							ticks={2}
+							stroke="white"
+							tickStroke="white"
+						/>
 						<MouseCoordinateY
 							at="right"
 							orient="right"
 							displayFormat={format(".2f")} />
-						<BarSeries
-							yAccessor={d => elder.accessor()(d) && elder.accessor()(d).bearPower}
-							baseAt={(xScale, yScale, d) => { yScale(0) }}
-							fill={d => d.side === 'buy' ? '#800080' : d.side === 'sell' ? '#FFA500' : d.side === 'hold' ? '#00FF00' : '#FF0000'} />
-						<StraightLine yValue={0} />
 
-						<SingleValueTooltip
-							yAccessor={d => elder.accessor()(d) && elder.accessor()(d).bearPower}
-							yLabel="RSI - Bear power"
-							yDisplayFormat={format(".2f")}
-							appearance={rsiAppearance}
-							origin={[-40, 40]}/>
+						<RSISeries 
+							yAccessor={d => d.rsi}
+							{...RSIStrokeDashArray}
+						/>
+
+						<RSITooltip origin={[-38, 15]}
+							yAccessor={d => d.rsi}
+							options={rsiCalculator.options()} />
 					</Chart>
 				)}
 				{this.isIncludeIndicators('SMA') && (
@@ -650,7 +672,9 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 							yAccessor={d => elder.accessor()(d) && elder.accessor()(d).bearPower}
 							yLabel="SMA - Bear power"
 							yDisplayFormat={format(".2f")}
-							origin={[-40, 70]}/>
+							origin={[-40, 30]}
+							{...SMATooltipProps}
+						/>
 					</Chart>
 				)}
 				<CrossHairCursor />

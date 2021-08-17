@@ -161,7 +161,7 @@ class BubbleChart extends React.Component {
 		<div>
 			<ChartCanvas ratio={ratio} width={width} height={250}
 					margin={{ left: 70, right: 70, top: 20, bottom: 50 }} type={type}
-					seriesName="Wealth & Health of Nations"
+					seriesName="Hunter Violette - Hei Kin Ashi"
 					data={data}
 					xAccessor={xAccessor}
 					displayXAccessor={displayXAccessor}

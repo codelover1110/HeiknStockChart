@@ -1,18 +1,24 @@
- const GroupDataMock = [
+const GroupDataMock = [
     {
         symbol: 'GOOG',
         winning: 200,
-        losing: 121
+        winningAvg: 180,
+        losing: 121,
+        losingAvg: 110
     },
     {
         symbol: 'AMZN',
         winning: 300,
-        losing: 111
+        winningAvg: 250,
+        losing: 111,
+        losingAvg: 110
     },
     {
         symbol: 'ATVI',
         winning: 240,
-        losing: 101
+        winningAvg: 213,
+        losing: 101,
+        losingAvg: 120
     }
 ]
 

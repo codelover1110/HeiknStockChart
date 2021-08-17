@@ -41,17 +41,17 @@ const StockChart = (props) => {
         
         const initDbNamebyPeriod = () => {
             if (period === '1D2M') {
-                setDbname('backtesting_2_minute');
+                setDbname('backtest_2_minute');
             } else if(period === '4D12M') {
-                setDbname('backtesting_12_minute');
+                setDbname('backtest_12_minute');
             } else if(period === '30D1H') {
-                setDbname('backtesting_1_hour');
+                setDbname('backtest_1_hour');
             } else if(period === '90D4H') {
-                setDbname('backtesting_4_hour');
+                setDbname('backtest_4_hour');
             } else if(period === '90D12H') {
-                setDbname('backtesting_12_hour');
+                setDbname('backtest_12_hour');
             } else if(period === '1Y1D') {
-                setDbname('backtesting_1_day');
+                setDbname('backtest_1_day');
             }
         }
         initPeriodPrefix();
