@@ -23,6 +23,7 @@ const StockChart = (props) => {
         strategy,
         isHomePage,
         multiSymbol,
+        tradeResultFile,
     } = props;
     const [tablePrefix, setTablePrefix] = useState('')
     const [dbname, setDbname] = useState('')
@@ -68,9 +69,9 @@ const StockChart = (props) => {
     useEffect(() => {
 		if (symbol || multiSymbol.length) {
 			let table_name = tablePrefix + symbol
-            get_data(table_name, symbol)
+            get_data(symbol)
 		}
-    }, [tablePrefix, symbol, multiSymbol])
+    }, [instance, tablePrefix, symbol, multiSymbol])
 
     function parseData(parse) {
         return function(d) {
@@ -113,7 +114,7 @@ const StockChart = (props) => {
             })
         } else {
             const symbols = multiSymbol.map((symbol) => symbol.value);
-            if (!symbols.length) {
+            if (!symbols.length | !tradeResultFile) {
                 return;
             }
             const requestOptions = {
@@ -121,6 +122,7 @@ const StockChart = (props) => {
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
                     'symbols': symbols,
+                    'table_name': tradeResultFile,
                 })
             };
             fetch(process.env.REACT_APP_BACKEND_URL+'/api/get_backtesting_data', requestOptions)
@@ -134,7 +136,7 @@ const StockChart = (props) => {
     return (
 		<>
 			{
-				// chartData == null ? <div>Loading...</div> :
+				chartData == null ? <div>Loading...</div> :
 					<>
 						<div className="select-wrape">
                             <div>

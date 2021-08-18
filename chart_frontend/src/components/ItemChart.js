@@ -21,7 +21,7 @@ import { useHistory } from "react-router-dom";
 
 const TutorialsList = (props) => {
     const { instance, initPeriod, initIndicators, initSymbol } = props.location.state
-
+    
     const history = useHistory();
     const [isGetSymbolList, setIsGetSymbolList] = useState(false)
     const [selectedInstance, setSelectedInstance] = useState(
@@ -29,7 +29,7 @@ const TutorialsList = (props) => {
             value: 'charting',
             label: 'Charting'
         });
-    // const [tradeResultFile, setTradeResultFile] = useState('heikfilter-1hour-trades')
+    const [tradeResultFile, setTradeResultFile] = useState('heikfilter-1hour-trades')
     const [selectedOptionTable, setSelectedOptionTable] = useState(null)
     const [symbol, setSymbol] = useState(initSymbol)
     const [multiSymbol, setMultiSymbol] = useState([initSymbol])
@@ -38,7 +38,7 @@ const TutorialsList = (props) => {
     const [period, setPeriod] = useState(initPeriod)
     const [indicators, setIndicators] = useState(initIndicators)
     const [apiFlag, setApiFlag] = useState(false)
-    
+
     const optionsInstance = [
         { value: 'charting', label: 'Charting' },
         { value: 'performance', label: 'Performance' },
@@ -129,16 +129,16 @@ const TutorialsList = (props) => {
     const handleStrategyChange = (e) => {
         if (e) {
           setStrategy(e)
-            // if (e.value === 'heikfilter') {
-            //     setOptionsTradeResult([
-            //         { value: 'heikfilter-1hour-trades', label: '1-Hour-Trades' },
-            //         { value: 'heikfilter-2mins-trades', label: '2-Mins-Trades' },
-            //         { value: 'heikfilter-12mins-trades', label: '12-Mins-Trades' },
-            //         { value: 'heikfilter-4hours-trades', label: '4-Hours-Trades' },
-            //     ])
-            // } else {
-            //     setOptionsTradeResult([])
-            // }
+            if (e.value === 'heikfilter') {
+                setOptionsTradeResult([
+                    { value: 'heikfilter-1hour-trades', label: '1-Hour-Trades' },
+                    { value: 'heikfilter-2mins-trades', label: '2-Mins-Trades' },
+                    { value: 'heikfilter-12mins-trades', label: '12-Mins-Trades' },
+                    { value: 'heikfilter-4hours-trades', label: '4-Hours-Trades' },
+                ])
+            } else {
+                setOptionsTradeResult([])
+            }
         }
       }
 
@@ -146,9 +146,9 @@ const TutorialsList = (props) => {
         setIndicators(options);
     }
 
-    // const handleTradeResultFileChange = (e) => {
-    //     setTradeResultFile(e);
-    // }
+    const handleTradeResultFileChange = (e) => {
+        setTradeResultFile(e);
+    }
 
     return (
         <div>
@@ -213,7 +213,7 @@ const TutorialsList = (props) => {
                             />
                         </div>)
                     }
-                    {/* {selectedInstance.value === 'performance' && 
+                    {selectedInstance.value === 'performance' && 
                         <div className="select-option">
                             <Select
                                 name="filters"
@@ -223,7 +223,7 @@ const TutorialsList = (props) => {
                                 options={optionsTradeResult}
                             />
                         </div>
-                    } */}
+                    }
                 </div>
             </nav>
             <div className="graphs-container dark">
@@ -235,7 +235,7 @@ const TutorialsList = (props) => {
                     indicators={indicators}
                     strategy={strategy}
                     isHomePage={false}
-                    // tradeResultFile={tradeResultFile.value}
+                    tradeResultFile={tradeResultFile.value}
                 />
             </div>
         </div>
