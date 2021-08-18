@@ -27,7 +27,7 @@ const TutorialsList = (props) => {
     const [selectedInstance, setSelectedInstance] = useState(
         instance ? instance : {
             value: 'trades',
-            label: 'Trades'
+            label: 'Charting'
         });
     const [tradeResultFile, setTradeResultFile] = useState('heikfilter-1hour-trades')
     const [selectedOptionTable, setSelectedOptionTable] = useState(null)
@@ -39,10 +39,9 @@ const TutorialsList = (props) => {
     const [apiFlag, setApiFlag] = useState(false)
     
     const optionsInstance = [
-        { value: 'trades', label: 'Trades' },
-        { value: 'backtest', label: 'Back Test' },
-        { value: 'fowardtest', label: 'Foward Test' },
-        { value: 'livetrading', label: 'Live Trading' },
+        { value: 'trades', label: 'Charting' },
+        { value: 'backtest', label: 'Performance' },
+        { value: 'optimization ', label: 'Optimization ' },
     ]
     const [optionsTradeResult, setOptionsTradeResult] = useState([])
     

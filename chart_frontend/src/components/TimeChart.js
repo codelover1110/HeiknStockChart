@@ -21,7 +21,7 @@ import { useHistory } from "react-router-dom";
 const TutorialsList = () => {
   const history = useHistory();
   const [selectedOptionTable, setSelectedOptionTable] = useState(null)
-  const [selectedInstance, setSelectedInstance] = useState([{ value: 'trades', label: 'Trades' }]);
+  const [selectedInstance, setSelectedInstance] = useState([{ value: 'trades', label: 'Charting' }]);
   const [symbol, setSymbol] = useState(null);
   const [strategy, setStrategy] = useState(null);
   const [indicators, setIndicators] = useState([]);
@@ -30,10 +30,9 @@ const TutorialsList = () => {
   const [chartColumn, setChartColumn] = useState({ value: 6, label: '6' })
 
   const optionsInstance = [
-    { value: 'trades', label: 'Trades' },
-    { value: 'backtest', label: 'Back Test' },
-    { value: 'fowardtest', label: 'Foward Test' },
-    { value: 'livetrading', label: 'Live Trading' },
+    { value: 'trades', label: 'Charting' },
+    { value: 'backtest', label: 'Performance' },
+    { value: 'optimization ', label: 'Optimization' },
   ]
 
   const optionsTable = [
@@ -213,6 +212,7 @@ const TutorialsList = () => {
               value={selectedInstance}
               onChange={handleInstanceChange}
               options={optionsInstance}
+              placeholder="Charting"
             />
           </div>
           <div className="select-option">

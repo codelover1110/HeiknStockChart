@@ -610,40 +610,69 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 					</Chart>
 				)}
 				{this.isIncludeIndicators('RSI') && (
-					<Chart id={4}
-						yExtents={[0, 100]}
-						height={100}
+					// <Chart id={4}
+					// 	yExtents={[0, 100]}
+					// 	height={100}
+					// 	origin={(w, h) => [0, h - this.calculateOffset('RSI')]}
+					// 	padding={{ top: 10, bottom: 10 }}
+					// >
+					// 	<XAxis 
+					// 		axisAt="bottom"
+					// 		orient="bottom"
+					// 		showTicks={true}
+					// 		outerTickSize={0} 
+					// 		stroke="white"
+					// 		tickStroke="white"
+					// 	/>
+					// 	<YAxis
+					// 		axisAt="right"
+					// 		orient="right"
+					// 		ticks={2}
+					// 		stroke="white"
+					// 		tickStroke="white"
+					// 	/>
+					// 	<MouseCoordinateY
+					// 		at="right"
+					// 		orient="right"
+					// 		displayFormat={format(".2f")} />
+
+					// 	<RSISeries 
+					// 		yAccessor={d => d.rsi}
+					// 		{...RSIStrokeDashArray}
+					// 	/>
+
+					// 	<RSITooltip origin={[-38, 15]}
+					// 		yAccessor={d => d.rsi}
+					// 		options={rsiCalculator.options()} />
+					// </Chart>
+					<Chart id={4} height={100}
+						yExtents={[0, d => elder.accessor()(d) && elder.accessor()(d).bearPower]}
 						origin={(w, h) => [0, h - this.calculateOffset('RSI')]}
-						padding={{ top: 10, bottom: 10 }}
+						padding={{ top: 40, bottom: 10 }}
 					>
-						<XAxis 
-							axisAt="bottom"
+						<XAxis axisAt="bottom" orient="bottom" stroke="white" tickStroke="white" />
+						<YAxis axisAt="right" orient="right" stroke="white" tickStroke="white" ticks={4} tickFormat={format(".2f")}/>
+						<MouseCoordinateX
+							at="bottom"
 							orient="bottom"
-							showTicks={true}
-							outerTickSize={0} 
-							stroke="white"
-							tickStroke="white"
-						/>
-						<YAxis
-							axisAt="right"
-							orient="right"
-							ticks={2}
-							stroke="white"
-							tickStroke="white"
-						/>
+							displayFormat={timeFormat("%Y-%m-%d")} />
 						<MouseCoordinateY
 							at="right"
 							orient="right"
 							displayFormat={format(".2f")} />
+						<BarSeries
+							yAccessor={d => elder.accessor()(d) && elder.accessor()(d).bearPower}
+							baseAt={(xScale, yScale, d) => yScale(0)}
+							fill={d => d.side === 'buy' ? '#800080' : d.side === 'sell' ? '#FFA500' : d.side === 'hold' ? '#00FF00' : '#FF0000'} />
+						<StraightLine yValue={0} />
 
-						<RSISeries 
-							yAccessor={d => d.rsi}
-							{...RSIStrokeDashArray}
-						/>
-
-						<RSITooltip origin={[-38, 15]}
-							yAccessor={d => d.rsi}
-							options={rsiCalculator.options()} />
+						<SingleValueTooltip
+							yAccessor={d => elder.accessor()(d) && elder.accessor()(d).bearPower}
+							yLabel="RSI - Bear power"
+							yDisplayFormat={format(".2f")}
+							appearance={rsiAppearance}
+							{...SMATooltipProps}
+							origin={[-40, 40]}/>
 					</Chart>
 				)}
 				{this.isIncludeIndicators('SMA') && (
