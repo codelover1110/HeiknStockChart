@@ -21,7 +21,8 @@ import { useHistory } from "react-router-dom";
 const TutorialsList = () => {
   const history = useHistory();
   const [selectedOptionTable, setSelectedOptionTable] = useState(null)
-  const [selectedInstance, setSelectedInstance] = useState([{ value: 'trades', label: 'Charting' }]);
+  const [selectedInstance, setSelectedInstance] = useState([{ value: 'stress_test', label: 'Stress Test' }]);
+  const [selectedViewType, setSelectedViewType] = useState([{ value: 'charting', label: 'Charting' }]);
   const [symbol, setSymbol] = useState(null);
   const [strategy, setStrategy] = useState(null);
   const [indicators, setIndicators] = useState([]);
@@ -30,8 +31,15 @@ const TutorialsList = () => {
   const [chartColumn, setChartColumn] = useState({ value: 6, label: '6' })
 
   const optionsInstance = [
-    { value: 'trades', label: 'Charting' },
-    { value: 'backtest', label: 'Performance' },
+    { value: 'stress_test', label: 'Stress Test' },
+    { value: 'optimization', label: 'Optimization' },
+    { value: 'forward_test ', label: 'Forward Test' },
+    { value: 'live_trading ', label: 'Live Trading' },
+  ]
+  
+  const optionsViewTypes = [
+    { value: 'charting', label: 'Charting' },
+    { value: 'performance', label: 'Performance' },
     { value: 'optimization ', label: 'Optimization' },
   ]
 
@@ -88,7 +96,11 @@ const TutorialsList = () => {
 
   const handleInstanceChange = (value) => {
     setSelectedInstance(value)  
-    if (value.value === 'backtest') {
+  }
+  
+  const handleViewTypeChange = (value) => {
+    setSelectedViewType(value)  
+    if (value.value === 'performance') {
       const locationState = {
         instance: value,
         initPeriod: { value: '1D2M', label: '1D_2m' },
@@ -212,6 +224,14 @@ const TutorialsList = () => {
               value={selectedInstance}
               onChange={handleInstanceChange}
               options={optionsInstance}
+              placeholder="Instance"
+            />
+          </div>
+          <div className="select-option">
+            <Select
+              value={selectedViewType}
+              onChange={handleViewTypeChange}
+              options={optionsViewTypes}
               placeholder="Charting"
             />
           </div>

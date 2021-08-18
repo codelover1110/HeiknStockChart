@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Chart from '../trades-chart/TradesChart';
-import BackTestChart from '../back-test/BackTestChart'
+import PerformanceChart from '../performance-chart/PerformanceChart'
 import ScatterMock from '../demo/ScatterMock'
 import GroupDataMock from '../demo/GroupMockData'
 import { TypeChooser } from "react-stockcharts/lib/helper";
@@ -15,13 +15,20 @@ import { TypeChooser } from "react-stockcharts/lib/helper";
 import { getData } from "../utils"
 
 const StockChart = (props) => {
-    const { instance, period, symbol, indicators, strategy, isHomePage } = props;
+    const { 
+        instance,
+        period,
+        symbol,
+        indicators,
+        strategy,
+        isHomePage,
+        multiSymbol,
+    } = props;
     const [tablePrefix, setTablePrefix] = useState('')
     const [dbname, setDbname] = useState('')
 	const [chartData, setChartData] = useState(null)
 	const [dealData, setDealData] = useState([])
-    const [isMock,] = useState(false)
-
+    
     useEffect(() => {
         const initPeriodPrefix = () => {
             if (period === '1D2M') {
@@ -59,11 +66,11 @@ const StockChart = (props) => {
     }, [period])
 
     useEffect(() => {
-		if (symbol) {
+		if (symbol || multiSymbol.length) {
 			let table_name = tablePrefix + symbol
             get_data(table_name, symbol)
 		}
-    }, [tablePrefix, symbol])
+    }, [tablePrefix, symbol, multiSymbol])
 
     function parseData(parse) {
         return function(d) {
@@ -78,48 +85,56 @@ const StockChart = (props) => {
         };
     }
 
-    const get_data = (table_name, symbol) => {
-        const requestOptions = {
-			method: 'POST',
-			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify({
-				'db_name': dbname,
-                'symbol': symbol,
-				'table_name': symbol,
-			})
-		};
-
+    const get_data = (symbol) => {
         if (!dbname) {
             return;
         }
 
-        if (!isMock) {
+        if (instance !== 'performance') {
+            const requestOptions = {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    'db_name': dbname,
+                    'symbol': symbol,
+                    'table_name': symbol,
+                })
+            };
             fetch(process.env.REACT_APP_BACKEND_URL+'/api/get_data', requestOptions)
+            .then(response => response.json())
+            .then(data => {
+                data['chart_data']['columns'] = ["date", "open", "high", "low", "close", "volume", "split", "dividend", "absoluteChange", "percentChange"]
+                data['chart_data'].map((x) => {
+                    let converDate = new Date(x.date)
+                    x.date = converDate
+                })
+                setChartData(data['chart_data'])
+                setDealData(data['deals'])
+            })
+        } else {
+            const symbols = multiSymbol.map((symbol) => symbol.value);
+            if (!symbols.length) {
+                return;
+            }
+            const requestOptions = {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    'symbols': symbols,
+                })
+            };
+            fetch(process.env.REACT_APP_BACKEND_URL+'/api/get_backtesting_data', requestOptions)
                 .then(response => response.json())
                 .then(data => {
-                    data['chart_data']['columns'] = ["date", "open", "high", "low", "close", "volume", "split", "dividend", "absoluteChange", "percentChange"]
-                    data['chart_data'].map((x) => {
-                        let converDate = new Date(x.date)
-                        x.date = converDate
-                    })
-                    // console.log("--------------------------")
-                    // console.log(data['chart_data'])
                     setChartData(data['chart_data'])
-                    setDealData(data['deals'])
                 })
-        } else {
-            getData().then(data => {
-                setChartData(data)
-                // console.log("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
-                // console.log(data)
-            })
         }
     }
 
     return (
 		<>
 			{
-				chartData == null ? <div>Loading...</div> :
+				// chartData == null ? <div>Loading...</div> :
 					<>
 						<div className="select-wrape">
                             <div>
@@ -129,9 +144,9 @@ const StockChart = (props) => {
 						<TypeChooser >
                             {type => {
                                 return (
-                                    (isHomePage | (instance !== 'backtest'))
+                                    (isHomePage | (instance !== 'performance'))
                                     ? <Chart type={type} data={chartData} deals={dealData} indicators={indicators} strategy={strategy} period={period} isHomePage={isHomePage}/>
-                                    : <BackTestChart type={type} data={ScatterMock} GroupDataMock={GroupDataMock}/>
+                                    : <PerformanceChart type={type} data={chartData} multiSymbol={multiSymbol.map((symbol) => symbol.value)}/>
                                 )
                             }}
                         </TypeChooser>
