@@ -75,7 +75,7 @@ export class MultiLineChart extends React.Component {
       for (const property in data) {
         series.push({
           name: property,
-          data: data[property].map((o) => this.props.isPercent ? o.percent : o.percent)
+          data: data[property].map((o) => this.props.isPercent ? o.percent : o.efficiency)
         })
       }
     })

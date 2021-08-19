@@ -12,6 +12,7 @@ const TutorialsList = () => {
   const [selectedInstance, setSelectedInstance] = useState([{ value: 'stress_test', label: 'Stress Test' }]);
   const [selectedViewType, setSelectedViewType] = useState([{ value: 'charting', label: 'Charting' }]);
   const [symbol, setSymbol] = useState(null);
+  const [microStrategy, setMicroStrategy] = useState(null)
   const [strategy, setStrategy] = useState(null);
   const [indicators, setIndicators] = useState([]);
   const [isGetSymbolList, setIsGetSymbolList] = useState(false)
@@ -21,8 +22,8 @@ const TutorialsList = () => {
   const optionsInstance = [
     { value: 'stress_test', label: 'Stress Test' },
     { value: 'optimization', label: 'Optimization' },
-    { value: 'forward_test ', label: 'Forward Test' },
-    { value: 'live_trading ', label: 'Live Trading' },
+    { value: 'forward_test', label: 'Forward Test' },
+    { value: 'live_trading', label: 'Live Trading' },
   ]
   
   const optionsViewTypes = [
@@ -31,7 +32,7 @@ const TutorialsList = () => {
     { value: 'optimization ', label: 'Optimization' },
   ]
 
-  const optionsTable = [
+  const optionsMicroStrategy = [
     { value: '1D2M', label: '1D_2m' },
     { value: '4D12M', label: '4D_12m' },
     { value: '30D1H', label: '30D_1h' },
@@ -90,8 +91,8 @@ const TutorialsList = () => {
     setSelectedViewType(value)  
     if (value.value === 'performance') {
       const locationState = {
-        instance: value,
-        initPeriod: { value: '1D2M', label: '1D_2m' },
+        viewType: value,
+        initMicroStrategy: { value: '1D2M', label: '1D_2m' },
         initIndicators: indicators,
         initSymbol: symbol,
       }
@@ -107,7 +108,7 @@ const TutorialsList = () => {
   const handleChangeTable = (value) => {
     setSelectedOptionTable(value)
     const locationState = {
-      initPeriod: value,
+      initMicroStrategy: value,
       initIndicators: indicators,
       initSymbol: symbol,
     }
@@ -128,6 +129,12 @@ const TutorialsList = () => {
   const handleStrategy = (e) => {
     if (e) {
       setStrategy(e)
+    }
+  }
+  
+  const handleMicroStrategyChange = (e) => {
+    if (e) {
+      setMicroStrategy(e)
     }
   }
   
@@ -176,22 +183,22 @@ const TutorialsList = () => {
         
       <div className={`row ${calculateHeightStyle()}`}>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          {symbol && (< StockChart period='1D2M' symbol={symbol.value} indicators={indicators} strategy={strategy} isHomePage={true}/>)}
+          {symbol && (< StockChart microStrategy='1D2M' symbol={symbol.value} indicators={indicators} strategy={strategy} isHomePage={true}/>)}
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          {symbol && (< StockChart period='4D12M' symbol={symbol.value} indicators={indicators} strategy={strategy} isHomePage={true}/>)}
+          {symbol && (< StockChart microStrategy='4D12M' symbol={symbol.value} indicators={indicators} strategy={strategy} isHomePage={true}/>)}
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          {symbol && (< StockChart period='30D1H' symbol={symbol.value} indicators={indicators} strategy={strategy} isHomePage={true}/>)}
+          {symbol && (< StockChart microStrategy='30D1H' symbol={symbol.value} indicators={indicators} strategy={strategy} isHomePage={true}/>)}
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          {symbol && (< StockChart period='90D4H' symbol={symbol.value} indicators={indicators} strategy={strategy} isHomePage={true}/>)}
+          {symbol && (< StockChart microStrategy='90D4H' symbol={symbol.value} indicators={indicators} strategy={strategy} isHomePage={true}/>)}
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          {symbol && (< StockChart period='90D12H' symbol={symbol.value} indicators={indicators} strategy={strategy} isHomePage={true}/>)}
+          {symbol && (< StockChart microStrategy='90D12H' symbol={symbol.value} indicators={indicators} strategy={strategy} isHomePage={true}/>)}
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          {symbol && (< StockChart period='1Y1D' symbol={symbol.value} indicators={indicators} strategy={strategy} isHomePage={true}/>)}
+          {symbol && (< StockChart microStrategy='1Y1D' symbol={symbol.value} indicators={indicators} strategy={strategy} isHomePage={true}/>)}
         </div>
       </div>
     )
@@ -225,14 +232,6 @@ const TutorialsList = () => {
           </div>
           <div className="select-option">
             <Select
-              value={selectedOptionTable}
-              onChange={handleChangeTable}
-              options={optionsTable}
-              placeholder="Period"
-            />
-          </div>
-          <div className="select-option">
-            <Select
               value={symbol}
               onChange={handlSymbolChange}
               options={symbolList}
@@ -245,6 +244,14 @@ const TutorialsList = () => {
               onChange={handleStrategy}
               options={optionsStratgy}
               placeholder="Strategy"
+            />
+          </div>
+          <div className="select-option">
+            <Select
+              value={microStrategy}
+              onChange={handleMicroStrategyChange}
+              options={optionsMicroStrategy}
+              placeholder="Micro Strategy"
             />
           </div>
           <div className="select-multi-option">

@@ -14,8 +14,8 @@ import { TypeChooser } from "react-stockcharts/lib/helper";
 
 const StockChart = (props) => {
     const { 
-        instance,
-        period,
+        viewType,
+        microStrategy,
         symbol,
         indicators,
         strategy,
@@ -23,75 +23,46 @@ const StockChart = (props) => {
         multiSymbol,
         tradeResultFile,
     } = props;
-    const [tablePrefix, setTablePrefix] = useState('')
+    // const [tablePrefix, setTablePrefix] = useState('')
     const [dbname, setDbname] = useState('')
 	const [chartData, setChartData] = useState(null)
 	const [dealData, setDealData] = useState([])
     
     useEffect(() => {
-        const initPeriodPrefix = () => {
-            if (period === '1D2M') {
-                setTablePrefix('2_minute_');
-            } else if(period === '4D12M') {
-                setTablePrefix('12_minute_');
-            } else if(period === '30D1H') {
-                setTablePrefix('1_hour_');
-            } else if(period === '90D4H') {
-                setTablePrefix('4_hour_');
-            } else if(period === '90D12H') {
-                setTablePrefix('12_hour_');
-            } else if(period === '1Y1D') {
-                setTablePrefix('1_day_');
-            }
-        }
-        
-        const initDbNamebyPeriod = () => {
-            if (period === '1D2M') {
+        const initDbNamebyMicroStrategy = () => {
+            if (microStrategy === '1D2M') {
                 setDbname('backtest_2_minute');
-            } else if(period === '4D12M') {
+            } else if(microStrategy === '4D12M') {
                 setDbname('backtest_12_minute');
-            } else if(period === '30D1H') {
+            } else if(microStrategy === '30D1H') {
                 setDbname('backtest_1_hour');
-            } else if(period === '90D4H') {
+            } else if(microStrategy === '90D4H') {
                 setDbname('backtest_4_hour');
-            } else if(period === '90D12H') {
+            } else if(microStrategy === '90D12H') {
                 setDbname('backtest_12_hour');
-            } else if(period === '1Y1D') {
+            } else if(microStrategy === '1Y1D') {
                 setDbname('backtest_1_day');
             }
         }
-        initPeriodPrefix();
-        initDbNamebyPeriod();
-    }, [period])
+        initDbNamebyMicroStrategy();
+    }, [microStrategy])
 
     useEffect(() => {
-        if ((instance === 'performance') && (!multiSymbol.length)) {
-            setChartData(null)    
-        }
-		if (symbol || multiSymbol.length) {
+        setChartData(null)      
+    }, [viewType])
+
+    useEffect(() => {
+        if (symbol || multiSymbol.length) {
 			get_data(symbol)
 		}
-    }, [instance, tablePrefix, symbol, multiSymbol, tradeResultFile])
-
-    function parseData(parse) {
-        return function(d) {
-            d.date = parse(d.date);
-            d.open = +d.open;
-            d.high = +d.high;
-            d.low = +d.low;
-            d.close = +d.close;
-            d.volume = +d.volume;
-    
-            return d;
-        };
-    }
+    }, [dbname, viewType, symbol, multiSymbol, tradeResultFile])
 
     const get_data = (symbol) => {
         if (!dbname) {
             return;
         }
 
-        if (instance !== 'performance') {
+        if (viewType !== 'performance') {
             const requestOptions = {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -138,16 +109,11 @@ const StockChart = (props) => {
 			{
 				chartData == null ? <div>Loading...</div> :
 					<>
-						{/* <div className="select-wrape">
-                            <div>
-								<strong>{period} [NASDAQ]</strong>
-							</div>
-						</div> */}
 						<TypeChooser >
                             {type => {
                                 return (
-                                    (isHomePage | (instance !== 'performance'))
-                                    ? <Chart type={type} data={chartData} deals={dealData} indicators={indicators} strategy={strategy} period={period} isHomePage={isHomePage}/>
+                                    (isHomePage | (viewType !== 'performance'))
+                                    ? <Chart type={type} data={chartData} deals={dealData} indicators={indicators} strategy={strategy} microStrategy={microStrategy} isHomePage={isHomePage}/>
                                     : <PerformanceChart type={type} data={chartData} multiSymbol={multiSymbol.map((symbol) => symbol.value)}/>
                                 )
                             }}

@@ -7,30 +7,45 @@ import StockChart from "./stock-chart/StockChart"
 import { useHistory } from "react-router-dom";
 
 const TutorialsList = (props) => {
-    const { instance, initPeriod, initIndicators, initSymbol } = props.location.state
+    const { instance, viewType, initMicroStrategy, initIndicators, initSymbol } = props.location.state
     
     const history = useHistory();
     const [isGetSymbolList, setIsGetSymbolList] = useState(false)
+    
     const [selectedInstance, setSelectedInstance] = useState(
-        instance ? instance : {
-            value: 'charting',
-            label: 'Charting'
-        });
+      instance 
+      ? instance
+      : { value: 'stress_test', label: 'Stress Test' }
+    );
+    const [selectedViewType, setSelectedViewType] = useState(
+      viewType
+      ? viewType
+      : { value: 'charting', label: 'Charting' }
+    );
+
     const [tradeResultFile, setTradeResultFile] = useState('heikfilter-1hour-trades')
     const [selectedOptionTable, setSelectedOptionTable] = useState(null)
     const [symbol, setSymbol] = useState(initSymbol)
     const [multiSymbol, setMultiSymbol] = useState([initSymbol])
     const [strategy, setStrategy] = useState(null)
     const [symbolList, setSymbolList] = useState([])
-    const [period, setPeriod] = useState(initPeriod)
+    const [microStrategy, setMicroStrategy] = useState(initMicroStrategy)
     const [indicators, setIndicators] = useState(initIndicators)
     const [apiFlag, setApiFlag] = useState(false)
 
     const optionsInstance = [
-        { value: 'charting', label: 'Charting' },
-        { value: 'performance', label: 'Performance' },
-        { value: 'optimization ', label: 'Optimization ' },
+      { value: 'stress_test', label: 'Stress Test' },
+      { value: 'optimization', label: 'Optimization' },
+      { value: 'forward_test', label: 'Forward Test' },
+      { value: 'live_trading', label: 'Live Trading' },
     ]
+      
+    const optionsViewTypes = [
+      { value: 'charting', label: 'Charting' },
+      { value: 'performance', label: 'Performance' },
+      { value: 'optimization ', label: 'Optimization' },
+    ]    
+
     const [optionsTradeResult, setOptionsTradeResult] = useState([])
     
     const optionsStratgy = [
@@ -39,14 +54,14 @@ const TutorialsList = (props) => {
         { value: 'Strategy3', label: 'Strategy3' },
     ]
 
-    const optionsTable = [
-        { value: '1D2M', label: '1D_2m' },
-        { value: '4D12M', label: '4D_12m' },
-        { value: '30D1H', label: '30D_1h' },
-        { value: '90D4H', label: '90D_4h' },
-        { value: '90D12H', label: '90D_12h' },
-        { value: '1Y1D', label: '1Y_1D' }
-    ]
+    // const optionsTable = [
+    //     { value: '1D2M', label: '1D_2m' },
+    //     { value: '4D12M', label: '4D_12m' },
+    //     { value: '30D1H', label: '30D_1h' },
+    //     { value: '90D4H', label: '90D_4h' },
+    //     { value: '90D12H', label: '90D_12h' },
+    //     { value: '1Y1D', label: '1Y_1D' }
+    // ]
 
     const optionsIndicator = [
         {
@@ -65,8 +80,8 @@ const TutorialsList = (props) => {
     
     useEffect(() => {
         if (!apiFlag) {
-            setSelectedOptionTable(period)
-            setPeriod(period)
+            setSelectedOptionTable(microStrategy)
+            setMicroStrategy(microStrategy)
             if (!isGetSymbolList) {
                 get_tables();
             }
@@ -78,7 +93,7 @@ const TutorialsList = (props) => {
     const handleChangeTable = (value) => {
         setSelectedOptionTable(value)
         if (value) {
-            setPeriod(value)
+            setMicroStrategy(value)
         }
     }
 
@@ -98,7 +113,11 @@ const TutorialsList = (props) => {
     }
 
     const handleInstanceChange = (e) => {
-        setSelectedInstance(e)
+      setSelectedInstance(e)
+    }
+    
+    const handleViewTypeChange = (e) => {
+        setSelectedViewType(e)
     }
 
     const handlSymbolChange = (e) => {
@@ -146,47 +165,63 @@ const TutorialsList = (props) => {
                         <Link to={"/chart"} className="nav-link"></Link>
                     </li>
                     <div className="select-option">
-                        <Select
-                            value={selectedInstance}
-                            onChange={handleInstanceChange}
-                            options={optionsInstance}
-                        />
+                      <Select
+                        value={selectedInstance}
+                        onChange={handleInstanceChange}
+                        options={optionsInstance}
+                        placeholder="Instance"
+                      />
                     </div>
-                    {selectedInstance.value !== 'performance' && 
-                        (<div className="select-option">
+                    <div className="select-option">
+                      <Select
+                        value={selectedViewType}
+                        onChange={handleViewTypeChange}
+                        options={optionsViewTypes}
+                        placeholder="Charting"
+                      />
+                    </div>
+                    {selectedViewType.value !== 'performance'
+                      ? (<div className="select-option">
+                        <Select
+                            value={symbol}
+                            onChange={handlSymbolChange}
+                            options={symbolList}
+                        />
+                          </div>)
+                      : (<div className="select-multi-option">
                             <Select
-                                value={selectedOptionTable}
-                                onChange={handleChangeTable}
-                                options={optionsTable}
+                                value={multiSymbol}
+                                onChange={handlMultiSymbolChange}
+                                options={symbolList}
+                                isMulti={true}
                             />
                         </div>)
                     }
-                    {selectedInstance.value !== 'performance'
-                        ?   (<div className="select-option">
-                                <Select
-                                    value={symbol}
-                                    onChange={handlSymbolChange}
-                                    options={symbolList}
-                                />
-                            </div>)
-                        :   (<div className="select-multi-option">
-                                <Select
-                                    value={multiSymbol}
-                                    onChange={handlMultiSymbolChange}
-                                    options={symbolList}
-                                    isMulti={true}
-                                />
-                            </div>)
+                    {console.log("great ::: ", selectedInstance.value, (selectedInstance.value !== 'forward_test'), (selectedInstance.value !== 'live_trading'))}
+                    {(selectedInstance.value !== 'forward_test') && 
+                     (selectedInstance.value !== 'live_trading') &&
+                     (<div className="select-option">
+                          <Select
+                          value={strategy}
+                          onChange={handleStrategyChange}
+                          options={optionsStratgy}
+                          placeholder="Strategy"
+                          />
+                      </div>)
                     }
-                    <div className="select-option">
+                    {selectedInstance.value !== 'forward_test' && 
+                     selectedInstance.value !== 'live_trading' && 
+                     (<div className="select-option">
                         <Select
-                        value={strategy}
-                        onChange={handleStrategyChange}
-                        options={optionsStratgy}
-                        placeholder="Strategy"
+                          name="filters"
+                          placeholder="Trade Result File"
+                          value={tradeResultFile}
+                          onChange={handleTradeResultFileChange}
+                          options={optionsTradeResult}
                         />
-                    </div>
-                    {selectedInstance.value !== 'performance' && 
+                      </div>)
+                    }
+                    {selectedViewType.value !== 'performance' && 
                         (<div className="select-multi-option">
                             <Select
                                 name="filters"
@@ -198,23 +233,12 @@ const TutorialsList = (props) => {
                             />
                         </div>)
                     }
-                    {selectedInstance.value === 'performance' && 
-                        <div className="select-option">
-                            <Select
-                                name="filters"
-                                placeholder="Trade Result File"
-                                value={tradeResultFile}
-                                onChange={handleTradeResultFileChange}
-                                options={optionsTradeResult}
-                            />
-                        </div>
-                    }
                 </div>
             </nav>
             <div className="graphs-container dark">
                 < StockChart 
-                    instance={selectedInstance.value}
-                    period={period.value}
+                    viewType={selectedViewType.value}
+                    microStrategy={microStrategy.value}
                     symbol={symbol.value}
                     multiSymbol={multiSymbol}
                     indicators={indicators}
