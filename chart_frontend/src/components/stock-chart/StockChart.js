@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import Chart from '../trades-chart/TradesChart';
 import PerformanceChart from '../performance-chart/PerformanceChart'
-import ScatterMock from '../demo/ScatterMock'
-import GroupDataMock from '../demo/GroupMockData'
 import { TypeChooser } from "react-stockcharts/lib/helper";
+// import ScatterMock from '../demo/ScatterMock'
+// import GroupDataMock from '../demo/GroupMockData'
 // import CandleChart from "../candle-chart/CandleChart";
 // import Chart from '../Chart';
 // import { CandleData, Deals, Signal } from "../demo/Demo";
@@ -11,8 +11,6 @@ import { TypeChooser } from "react-stockcharts/lib/helper";
 // import Chart from '../TestChart';
 // import { tsvParse } from  "d3-dsv";
 // import { timeParse } from "d3-time-format";
-
-import { getData } from "../utils"
 
 const StockChart = (props) => {
     const { 
@@ -67,11 +65,13 @@ const StockChart = (props) => {
     }, [period])
 
     useEffect(() => {
+        if ((instance === 'performance') && (!multiSymbol.length)) {
+            setChartData(null)    
+        }
 		if (symbol || multiSymbol.length) {
-			let table_name = tablePrefix + symbol
-            get_data(symbol)
+			get_data(symbol)
 		}
-    }, [instance, tablePrefix, symbol, multiSymbol])
+    }, [instance, tablePrefix, symbol, multiSymbol, tradeResultFile])
 
     function parseData(parse) {
         return function(d) {
@@ -138,11 +138,11 @@ const StockChart = (props) => {
 			{
 				chartData == null ? <div>Loading...</div> :
 					<>
-						<div className="select-wrape">
+						{/* <div className="select-wrape">
                             <div>
 								<strong>{period} [NASDAQ]</strong>
 							</div>
-						</div>
+						</div> */}
 						<TypeChooser >
                             {type => {
                                 return (

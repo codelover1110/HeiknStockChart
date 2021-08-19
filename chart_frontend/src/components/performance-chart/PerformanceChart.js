@@ -1,3 +1,6 @@
+import { MultiLineChart } from './MultiLineChart'
+import GroupApexBar from './GroupBarChart'
+
 import { set } from "d3-collection";
 import { scaleOrdinal, schemeCategory10, scaleLinear } from  "d3-scale";
 import { format } from "d3-format";
@@ -22,6 +25,7 @@ import { elderRay, ema, macd, heikinAshi } from "react-stockcharts/lib/indicator
 import { discontinuousTimeScaleProvider } from "react-stockcharts/lib/scale";
 import { HoverTooltip } from "react-stockcharts/lib/tooltip";
 import { hexToRGBA } from "react-stockcharts/lib/utils";
+import { TypeChooser } from "react-stockcharts/lib/helper";
 
 import { fitWidth } from "react-stockcharts/lib/helper";
 import temp from './temp.json';
@@ -84,6 +88,7 @@ class BubbleChart extends React.Component {
 			.accessor(d => d.ema20);
 
 		const { data: mainData, type, width, ratio,multiSymbol } = this.props;
+
 		const initialData = temp['chart_data']['percentEfficiency'];
 		
 		const GroupDataMock = temp['chart_data']['winningLosing'];
@@ -123,8 +128,6 @@ class BubbleChart extends React.Component {
 	
 
 		const calculatedData = macdCalculator((elder(ha(ema20(initialData)))));
-
-		console.log("calculatedData.......................", calculatedData)
 
 		const xScaleProvider = discontinuousTimeScaleProvider
 			.inputDateAccessor(d => d.date);
@@ -171,92 +174,21 @@ class BubbleChart extends React.Component {
 			  };
 			};
 		}
-
+		if (mainData == null) {
+			return <div>Loading...</div>
+		}
 		return (
-		<div>
-			<ChartCanvas ratio={ratio} width={width} height={250}
-				margin={{ left: 70, right: 70, top: 20, bottom: 50 }} type={type}
-				seriesName="Hunter Violette - Hei Kin Ashi"
-				data={data}
-				xAccessor={xAccessor}
-				displayXAccessor={displayXAccessor}
-				xScale={xScale}
-				padding={{ left: 20, right: 20 }}
-			>
-				<Chart id={1}
-					yExtents={[d => {
-						return multiSymbol.map(symbol => {
-							return d.percent[symbol];
-						});
-					}, ema20.accessor()] }
-					yMousePointerRectWidth={45}
-					padding={{ top: 30, bottom: 30 }}>
-					<XAxis axisAt="bottom" orient="bottom" ticks={2} tickFormat={format(",d")} stroke="white" tickStroke="white"/>
-					<YAxis axisAt="right" orient="right" stroke="white" tickStroke="white"/>
-					{multiSymbol.map(symbol => {
-						return (
-							// <LineSeries 
-							// 	yAccessor={d => {
-							// 			if (d.percent[symbol]) {
-							// 				return d.percent[symbol]
-							// 			}
-							// 			return
-							// 		}} 
-							// 	stroke="#ff7f0e"
-							// />
-							<LineSeries yAccessor={ema20.accessor()} stroke={ema20.stroke()}/>
-							// <ScatterSeries key={`ScatterSeries-${symbol}`} yAccessor={d => {
-							// 		if (d.percent[symbol]) {
-							// 			return d.percent[symbol]
-							// 		}
-							// 		return
-							// 	}} 
-							// 	marker={CircleMarker}
-							// 	markerProps={{ r: d => radius(d, symbol), fill: fill }}
-							// />
-						)	
-					})}
-					{multiSymbol.map(symbol => {
-						return (
-							<CurrentCoordinate yAccessor={ema20.accessor()} fill={ema20.stroke()} />
-						)})
-					}
-
-					
-					{/* <HoverTooltip
-						fontFill="#000000"
-						stroke="#295d8a"
-						bgFill="#295d8a"
-						fill="#f8f8f8"
-						bgOpacity="0.3"
-						yAccessor={ema50.accessor()}
-						tooltipContent={tooltipContent()}
-						fontSize={15}
-						backgroundShapeCanvas={backgroundShapeCanvas}
-					/>	 */}
-				</Chart>
-			</ChartCanvas>
-			{/* <ChartCanvas ratio={ratio} width={width} height={250}
-				margin={{ left: 70, right: 70, top: 20, bottom: 50 }} type={type}
-				seriesName="Fruits"
-				data={GroupDataMock}
-				xAccessor={d => GroupDataMock.indexOf(d)}
-				xScale={scaleLinear()}
-				padding={{ left: 150, right: 150 }}>
-				<Chart id={10}
-					padding={{ top: 30, bottom: 30 }}
-					yExtents={[0, d => [d.winning, d.losing]]}>
-					<XAxis axisAt="bottom" orient="bottom"
-						innerTickSize={0}
-						tickFormat={i => GroupDataMock[i] && GroupDataMock[i].symbol} 
-						stroke="white" tickStroke="white"/>
-					<YAxis axisAt="right" orient="right" stroke="white" tickStroke="white"/>
-					<GroupedBarSeries yAccessor={[d => d.winning, d => d.losing]}
-						fill={fillGroupBar}
-						spaceBetweenBar={3} />
-				</Chart>
-			</ChartCanvas> */}
-		</div>
+			<div>
+				<MultiLineChart chartData={mainData.percentEfficiency} isPercent={true}/>
+				<MultiLineChart chartData={mainData.percentEfficiency} isPercent={false}/>
+				<TypeChooser>
+					{type => <GroupApexBar type={type} data={mainData.winningLosing} isAverage={false}/>}
+				</TypeChooser>
+				<TypeChooser>
+					{type => <GroupApexBar type={type} data={mainData.winningLosingAvg} isAverage={true}/>}
+				</TypeChooser>
+				
+			</div>
 		);
 	}
 }

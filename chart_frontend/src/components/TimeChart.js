@@ -1,21 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import http from "../http-common";
-import axios from "axios";
 import Select from 'react-select'
-
 import _ from "underscore";
-import moment from "moment";
-
-import { TimeSeries, Index } from "pondjs";
-import Datetime from 'react-datetime';
 import "react-datetime/css/react-datetime.css";
-
-import { tsvParse, csvParse } from "d3-dsv";
-import { timeParse } from "d3-time-format";
 import StockChart from "./stock-chart/StockChart"
-
 import { useHistory } from "react-router-dom";
 
 const TutorialsList = () => {
