@@ -14,14 +14,15 @@ import { TypeChooser } from "react-stockcharts/lib/helper";
 
 const StockChart = (props) => {
     const { 
-        selectedInstance,
+        chartColumn,
         viewType,
-        microStrategy,
         symbol,
-        indicators,
         strategy,
         isHomePage,
+        indicators,
         multiSymbol,
+        microStrategy,
+        selectedInstance,
     } = props;
     // const [tablePrefix, setTablePrefix] = useState('')
     const [dbname, setDbname] = useState('')
@@ -119,22 +120,31 @@ const StockChart = (props) => {
 		<>
 			{
 				chartData == null ? <div>Loading...</div> :
-					<>
-                        <div className="select-wrape">
-                            <div>
-								<strong>{microStrategy} [NASDAQ]</strong>
-							</div>
-						</div>
-						<TypeChooser >
-                            {type => {
-                                return (
-                                    (isHomePage | (viewType !== 'performance'))
-                                    ? <Chart type={type} data={chartData} deals={dealData} indicators={indicators} strategy={strategy} microStrategy={microStrategy} isHomePage={isHomePage}/>
-                                    : <PerformanceChart type={type} data={chartData} multiSymbol={multiSymbol.map((symbol) => symbol.value)}/>
-                                )
-                            }}
-                        </TypeChooser>
-                    </>
+                <>
+                    <div className="select-wrape">
+                        <div>
+                            <strong>{microStrategy} [NASDAQ]</strong>
+                        </div>
+                    </div>
+                    <TypeChooser >
+                        {type => {
+                            return (
+                                (isHomePage | (viewType !== 'performance'))
+                                ? <Chart
+                                    type={type}
+                                    data={chartData}
+                                    deals={dealData}
+                                    strategy={strategy}
+                                    isHomePage={isHomePage}
+                                    indicators={indicators}
+                                    chartColumn={chartColumn}
+                                    microStrategy={microStrategy}
+                                />
+                                : <PerformanceChart type={type} data={chartData} multiSymbol={multiSymbol.map((symbol) => symbol.value)}/>
+                            )
+                        }}
+                    </TypeChooser>
+                </>
 
 			}
 		</>

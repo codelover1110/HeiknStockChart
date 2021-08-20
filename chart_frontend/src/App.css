@@ -34,11 +34,11 @@
 }
 
 .graphs-container > .full-height {
-  height: 100%
+  height: calc(100vh);
 }
 
 .graphs-container > .half-height {
-  height: 50%
+  height: calc(100vh / 2);
 }
 
 
@@ -55,7 +55,7 @@
 }
 
 .graphs-container .row .graph-container > div > div .react-stockchart {
-  height: 100%!important;
+  height: 100%;
 }
 
 .graphs-container .row .graph-container > div > div .react-stockchart > div {

@@ -208,22 +208,77 @@ const TutorialsList = () => {
         
       <div className={`row ${calculateHeightStyle()}`}>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          {symbol && (< StockChart selectedInstance={selectedInstance.value} microStrategy='heikfilter-2mins-trades' symbol={symbol.value} indicators={indicators} strategy={strategy} isHomePage={true}/>)}
+          {symbol && (
+            < StockChart 
+              selectedInstance={selectedInstance.value}
+              microStrategy='heikfilter-2mins-trades'
+              symbol={symbol.value}
+              indicators={indicators}
+              strategy={strategy}
+              isHomePage={true}
+              chartColumn={chartColumn.value}
+            />
+          )}
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          {symbol && (< StockChart selectedInstance={selectedInstance.value} microStrategy='heikfilter-12mins-trades' symbol={symbol.value} indicators={indicators} strategy={strategy} isHomePage={true}/>)}
+          {symbol && (
+          < StockChart 
+            selectedInstance={selectedInstance.value}
+            microStrategy='heikfilter-12mins-trades'
+            symbol={symbol.value}
+            indicators={indicators}
+            strategy={strategy}
+            isHomePage={true}
+            chartColumn={chartColumn.value}
+          />)}
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          {symbol && (< StockChart selectedInstance={selectedInstance.value} microStrategy='heikfilter-1hour-trades' symbol={symbol.value} indicators={indicators} strategy={strategy} isHomePage={true}/>)}
+          {symbol && (
+            < StockChart
+              selectedInstance={selectedInstance.value}
+              microStrategy='heikfilter-1hour-trades'
+              symbol={symbol.value}
+              indicators={indicators}
+              strategy={strategy}
+              isHomePage={true}
+              chartColumn={chartColumn.value}
+            />)}
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          {symbol && (< StockChart selectedInstance={selectedInstance.value} microStrategy='heikfilter-4hours-trades' symbol={symbol.value} indicators={indicators} strategy={strategy} isHomePage={true}/>)}
+          {symbol && (
+            < StockChart
+              selectedInstance={selectedInstance.value}
+              microStrategy='heikfilter-4hours-trades'
+              symbol={symbol.value}
+              indicators={indicators}
+              strategy={strategy}
+              isHomePage={true}
+              chartColumn={chartColumn.value}
+            />)}
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          {symbol && (< StockChart selectedInstance={selectedInstance.value} microStrategy='heikfilter-12hours-trades' symbol={symbol.value} indicators={indicators} strategy={strategy} isHomePage={true}/>)}
+          {symbol && (
+            < StockChart
+              selectedInstance={selectedInstance.value}
+              microStrategy='heikfilter-12hours-trades'
+              symbol={symbol.value}
+              indicators={indicators}
+              strategy={strategy}
+              isHomePage={true}
+              chartColumn={chartColumn.value}
+            />)}
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          {symbol && (< StockChart selectedInstance={selectedInstance.value} microStrategy='heikfilter-1day-trades' symbol={symbol.value} indicators={indicators} strategy={strategy} isHomePage={true}/>)}
+          {symbol && (
+          < StockChart
+            selectedInstance={selectedInstance.value}
+            microStrategy='heikfilter-1day-trades'
+            symbol={symbol.value}
+            indicators={indicators}
+            strategy={strategy}
+            isHomePage={true}
+            chartColumn={chartColumn.value}
+          />)}
         </div>
       </div>
     )
