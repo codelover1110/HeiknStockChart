@@ -23,36 +23,36 @@ const StockChart = (props) => {
         multiSymbol,
         microStrategy,
         selectedInstance,
+        selectedTradeDB,
     } = props;
-    // const [tablePrefix, setTablePrefix] = useState('')
     const [dbname, setDbname] = useState('')
 	const [chartData, setChartData] = useState(null)
 	const [dealData, setDealData] = useState([])
     
     useEffect(() => {
-        if (selectedInstance !== 'stress_test') {
+        if (selectedInstance === 'live_trading') {
             setChartData(null)    
         }
     }, [selectedInstance])
 
     useEffect(() => {
-        const initDbNamebyMicroStrategy = () => {
-            if (microStrategy === 'heikfilter-2mins-trades') {
+        const initDbNamebySelectedTradeDB = () => {
+            if (selectedTradeDB === 'heikfilter-2mins-trades') {
                 setDbname('backtest_2_minute');
-            } else if(microStrategy === 'heikfilter-12mins-trades') {
+            } else if(selectedTradeDB === 'heikfilter-12mins-trades') {
                 setDbname('backtest_12_minute');
-            } else if(microStrategy === 'heikfilter-1hour-trades') {
+            } else if(selectedTradeDB === 'heikfilter-1hour-trades') {
                 setDbname('backtest_1_hour');
-            } else if(microStrategy === 'heikfilter-4hours-trades') {
+            } else if(selectedTradeDB === 'heikfilter-4hours-trades') {
                 setDbname('backtest_4_hour');
-            } else if(microStrategy === 'heikfilter-12hours-trades') {
+            } else if(selectedTradeDB === 'heikfilter-12hours-trades') {
                 setDbname('backtest_12_hour');
-            } else if(microStrategy === 'heikfilter-1day-trades') {
+            } else if(selectedTradeDB === 'heikfilter-1day-trades') {
                 setDbname('backtest_1_day');
             }
         }
-        initDbNamebyMicroStrategy();
-    }, [microStrategy])
+        initDbNamebySelectedTradeDB();
+    }, [selectedTradeDB])
 
     useEffect(() => {
         setChartData(null)      
@@ -65,11 +65,6 @@ const StockChart = (props) => {
     }, [selectedInstance, dbname, viewType, symbol, multiSymbol, microStrategy])
 
     const get_data = (symbol) => {
-        console.log('test!!!', selectedInstance, dbname)
-        if (selectedInstance !== 'stress_test') {
-            return
-        }
-
         if (!dbname) {
             return;
         }

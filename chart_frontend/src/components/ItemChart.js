@@ -26,7 +26,7 @@ const TutorialsList = (props) => {
     const [selectedOptionTable, setSelectedOptionTable] = useState(null)
     const [symbol, setSymbol] = useState(initSymbol)
     const [multiSymbol, setMultiSymbol] = useState([initSymbol])
-    const [strategy, setStrategy] = useState(initStrategy ? initStrategy : null)
+    const [strategy, setStrategy] = useState(initStrategy ? initStrategy : {})
     const [symbolList, setSymbolList] = useState([])
     const [microStrategy, setMicroStrategy] = useState(initMicroStrategy ? initMicroStrategy: null)
     const [indicators, setIndicators] = useState(initIndicators)
@@ -45,12 +45,17 @@ const TutorialsList = (props) => {
       { value: 'optimization ', label: 'Optimization' },
     ]    
 
-    const [optionsMicroStrategy, setOptionsMicroStrategy] = useState([])
+    const [optionsMicroStrategy, setOptionsMicroStrategy] = useState([
+      { value: 'heikfilter-2mins-trades', label: '2-Mins-Trades' },
+      { value: 'heikfilter-12mins-trades', label: '12-Mins-Trades' },
+      { value: 'heikfilter-1hour-trades', label: '1-Hour-Trades' },
+      { value: 'heikfilter-2hour-trades', label: '2-Hour-Trades' },
+      { value: 'heikfilter-4hours-trades', label: '4-Hours-Trades' },
+      { value: 'heikfilter-12hours-trades', label: '12-Hours-Trades' },
+    ])
     
     const optionsStratgy = [
-        { value: 'heikfilter', label: 'heikfilter' },
-        { value: 'Strategy2', label: 'Strategy2' },
-        { value: 'Strategy3', label: 'Strategy3' },
+      { value: 'heikfilter', label: 'heikfilter' },
     ]
 
     const optionsIndicator = [
@@ -182,8 +187,7 @@ const TutorialsList = (props) => {
                             />
                         </div>)
                     }
-                    {(selectedInstance.value !== 'forward_test') && 
-                     (selectedInstance.value !== 'live_trading') &&
+                    {(selectedInstance.value !== 'live_trading') &&
                      (<div className="select-option">
                           <Select
                           value={strategy}
@@ -193,8 +197,7 @@ const TutorialsList = (props) => {
                           />
                       </div>)
                     }
-                    {selectedInstance.value !== 'forward_test' && 
-                     selectedInstance.value !== 'live_trading' && 
+                    {selectedInstance.value !== 'live_trading' && 
                      (<div className="select-option">
                         <Select
                           name="filters"
