@@ -75,7 +75,13 @@ const optionCreator = (chartData, isAverage) => {
       colors: ["#fff"]
     },
     xaxis: {
-      categories: getSymbols(chartData)
+      categories: getSymbols(chartData),
+      labels: {
+        show: true,
+        style: {
+            colors: '#FFFFFF',
+        },
+      },
     },
     yaxis: {
       labels: {

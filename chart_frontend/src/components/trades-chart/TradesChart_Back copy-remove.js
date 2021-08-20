@@ -436,15 +436,15 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 		// };
 
 		const start = xAccessor(last(data));
-		const periodIndex = this.props.period === '1D2M' 
+		const periodIndex = this.props.period === 'heikfilter-2mins-trades' 
 			? 15
-			: this.props.period === '4D12M'
+			: this.props.period === 'heikfilter-12mins-trades'
 			? 30
-			: this.props.period === '30D1H'
+			: this.props.period === 'heikfilter-1hour-trades'
 			? 90
-			: this.props.period === '90D4H'
+			: this.props.period === 'heikfilter-4hours-trades'
 			? 200
-			: this.props.period === '90D12H'
+			: this.props.period === 'heikfilter-12hours-trades'
 			? 200 : 1000
 		
 		// const end = xAccessor(data[Math.max(0, data.length - periodIndex)]);

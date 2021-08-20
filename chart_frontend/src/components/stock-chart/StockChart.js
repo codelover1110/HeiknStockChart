@@ -14,6 +14,7 @@ import { TypeChooser } from "react-stockcharts/lib/helper";
 
 const StockChart = (props) => {
     const { 
+        selectedInstance,
         viewType,
         microStrategy,
         symbol,
@@ -21,7 +22,6 @@ const StockChart = (props) => {
         strategy,
         isHomePage,
         multiSymbol,
-        tradeResultFile,
     } = props;
     // const [tablePrefix, setTablePrefix] = useState('')
     const [dbname, setDbname] = useState('')
@@ -29,18 +29,24 @@ const StockChart = (props) => {
 	const [dealData, setDealData] = useState([])
     
     useEffect(() => {
+        if (selectedInstance !== 'stress_test') {
+            setChartData(null)    
+        }
+    }, [selectedInstance])
+
+    useEffect(() => {
         const initDbNamebyMicroStrategy = () => {
-            if (microStrategy === '1D2M') {
+            if (microStrategy === 'heikfilter-2mins-trades') {
                 setDbname('backtest_2_minute');
-            } else if(microStrategy === '4D12M') {
+            } else if(microStrategy === 'heikfilter-12mins-trades') {
                 setDbname('backtest_12_minute');
-            } else if(microStrategy === '30D1H') {
+            } else if(microStrategy === 'heikfilter-1hour-trades') {
                 setDbname('backtest_1_hour');
-            } else if(microStrategy === '90D4H') {
+            } else if(microStrategy === 'heikfilter-4hours-trades') {
                 setDbname('backtest_4_hour');
-            } else if(microStrategy === '90D12H') {
+            } else if(microStrategy === 'heikfilter-12hours-trades') {
                 setDbname('backtest_12_hour');
-            } else if(microStrategy === '1Y1D') {
+            } else if(microStrategy === 'heikfilter-1day-trades') {
                 setDbname('backtest_1_day');
             }
         }
@@ -55,9 +61,14 @@ const StockChart = (props) => {
         if (symbol || multiSymbol.length) {
 			get_data(symbol)
 		}
-    }, [dbname, viewType, symbol, multiSymbol, tradeResultFile])
+    }, [selectedInstance, dbname, viewType, symbol, multiSymbol, microStrategy])
 
     const get_data = (symbol) => {
+        console.log('test!!!', selectedInstance, dbname)
+        if (selectedInstance !== 'stress_test') {
+            return
+        }
+
         if (!dbname) {
             return;
         }
@@ -85,7 +96,7 @@ const StockChart = (props) => {
             })
         } else {
             const symbols = multiSymbol.map((symbol) => symbol.value);
-            if (!symbols.length | !tradeResultFile) {
+            if (!symbols.length | !microStrategy) {
                 return;
             }
             const requestOptions = {
@@ -93,7 +104,7 @@ const StockChart = (props) => {
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
                     'symbols': symbols,
-                    'table_name': tradeResultFile,
+                    'table_name': microStrategy,
                 })
             };
             fetch(process.env.REACT_APP_BACKEND_URL+'/api/get_backtesting_data', requestOptions)
@@ -109,6 +120,11 @@ const StockChart = (props) => {
 			{
 				chartData == null ? <div>Loading...</div> :
 					<>
+                        <div className="select-wrape">
+                            <div>
+								<strong>{microStrategy} [NASDAQ]</strong>
+							</div>
+						</div>
 						<TypeChooser >
                             {type => {
                                 return (

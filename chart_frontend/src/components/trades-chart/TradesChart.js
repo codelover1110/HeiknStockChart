@@ -489,7 +489,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 			y: ({ yScale, datum }) => { return yScale(datum.low) - this.calculateTooltipOffset0() },
 			fill: "#006517",
 			path: buyPath,
-			tooltip: (e) => `Buy: ${e.low}`,
+			tooltip: (e) => `Buy: ${e.price}`,
 		};
 
 		const shortAnnotationProps = {
@@ -497,19 +497,19 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 			y: ({ yScale, datum }) => { return yScale(datum.high) - this.calculateTooltipOffset1()},
 			fill: "#FF0000",
 			path: sellPath,
-			tooltip: (e) => `Sell: ${e.high}`,
+			tooltip: (e) => `Sell: ${e.price}`,
 		};
 
 		const start = xAccessor(last(data));
-		const periodIndex = this.props.period === '1D2M' 
+		const periodIndex = this.props.period === 'heikfilter-2mins-trades' 
 			? 15
-			: this.props.period === '4D12M'
+			: this.props.period === 'heikfilter-12mins-trades'
 			? 30
-			: this.props.period === '30D1H'
+			: this.props.period === 'heikfilter-1hour-trades'
 			? 90
-			: this.props.period === '90D4H'
+			: this.props.period === 'heikfilter-4hours-trades'
 			? 200
-			: this.props.period === '90D12H'
+			: this.props.period === 'heikfilter-12hours-trades'
 			? 200 : 1000
 		
 		// const end = xAccessor(data[Math.max(0, data.length - periodIndex)]);
@@ -584,29 +584,14 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 						fill={d => d.close > d.open ? "#6BA583" : "#DB0000"}
 					/>
 
-					<EdgeIndicator itemType="last" orient="right" edgeAt="right"
-						yAccessor={d => d.close} fill={d => d.close > d.open ? "#6BA583" : "#FF0000"}/>
+					{/* <EdgeIndicator itemType="last" orient="right" edgeAt="right"
+						yAccessor={d => d.close} fill={d => d.close > d.open ? "#6BA583" : "#FF0000"}/> */}
 
-					<OHLCTooltip origin={[-40, 0]}/>
-					<MovingAverageTooltip
-						onClick={e => console.log(e)}
-						origin={[-38, 15]}
-						options={[
-							{
-								yAccessor: ema20.accessor(),
-								type: "EMA",
-								stroke: ema20.stroke(),
-								windowSize: ema20.options().windowSize,
-							},
-							{
-								yAccessor: ema50.accessor(),
-								type: "EMA",
-								stroke: ema50.stroke(),
-								windowSize: ema50.options().windowSize,
-							},
-						]}
-						/>
-
+					<OHLCTooltip 
+						origin={[-40, 0]}
+						{...xDisplayFormatProps}
+					/>
+					
 					<Annotate with={SvgPathAnnotation} when={d => d.longShort === "LONG"}
 						usingProps={longAnnotationProps} />
 					<Annotate with={SvgPathAnnotation} when={d => d.longShort === "SHORT"}

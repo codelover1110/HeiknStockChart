@@ -7,7 +7,7 @@ import StockChart from "./stock-chart/StockChart"
 import { useHistory } from "react-router-dom";
 
 const TutorialsList = (props) => {
-    const { instance, viewType, initMicroStrategy, initIndicators, initSymbol } = props.location.state
+    const { instance, viewType, initStrategy, initMicroStrategy, initIndicators, initSymbol } = props.location.state
     
     const history = useHistory();
     const [isGetSymbolList, setIsGetSymbolList] = useState(false)
@@ -23,13 +23,12 @@ const TutorialsList = (props) => {
       : { value: 'charting', label: 'Charting' }
     );
 
-    const [tradeResultFile, setTradeResultFile] = useState('heikfilter-1hour-trades')
     const [selectedOptionTable, setSelectedOptionTable] = useState(null)
     const [symbol, setSymbol] = useState(initSymbol)
     const [multiSymbol, setMultiSymbol] = useState([initSymbol])
-    const [strategy, setStrategy] = useState(null)
+    const [strategy, setStrategy] = useState(initStrategy ? initStrategy : null)
     const [symbolList, setSymbolList] = useState([])
-    const [microStrategy, setMicroStrategy] = useState(initMicroStrategy)
+    const [microStrategy, setMicroStrategy] = useState(initMicroStrategy ? initMicroStrategy: null)
     const [indicators, setIndicators] = useState(initIndicators)
     const [apiFlag, setApiFlag] = useState(false)
 
@@ -46,22 +45,13 @@ const TutorialsList = (props) => {
       { value: 'optimization ', label: 'Optimization' },
     ]    
 
-    const [optionsTradeResult, setOptionsTradeResult] = useState([])
+    const [optionsMicroStrategy, setOptionsMicroStrategy] = useState([])
     
     const optionsStratgy = [
         { value: 'heikfilter', label: 'heikfilter' },
         { value: 'Strategy2', label: 'Strategy2' },
         { value: 'Strategy3', label: 'Strategy3' },
     ]
-
-    // const optionsTable = [
-    //     { value: '1D2M', label: '1D_2m' },
-    //     { value: '4D12M', label: '4D_12m' },
-    //     { value: '30D1H', label: '30D_1h' },
-    //     { value: '90D4H', label: '90D_4h' },
-    //     { value: '90D12H', label: '90D_12h' },
-    //     { value: '1Y1D', label: '1Y_1D' }
-    // ]
 
     const optionsIndicator = [
         {
@@ -89,13 +79,6 @@ const TutorialsList = (props) => {
         }
     
     })
-
-    const handleChangeTable = (value) => {
-        setSelectedOptionTable(value)
-        if (value) {
-            setMicroStrategy(value)
-        }
-    }
 
     const get_tables = () => {
         fetch(process.env.REACT_APP_BACKEND_URL + "/api/tables")
@@ -134,14 +117,16 @@ const TutorialsList = (props) => {
         if (e) {
           setStrategy(e)
             if (e.value === 'heikfilter') {
-                setOptionsTradeResult([
-                    { value: 'heikfilter-1hour-trades', label: '1-Hour-Trades' },
+              setOptionsMicroStrategy([
                     { value: 'heikfilter-2mins-trades', label: '2-Mins-Trades' },
                     { value: 'heikfilter-12mins-trades', label: '12-Mins-Trades' },
+                    { value: 'heikfilter-1hour-trades', label: '1-Hour-Trades' },
+                    { value: 'heikfilter-2hour-trades', label: '2-Hour-Trades' },
                     { value: 'heikfilter-4hours-trades', label: '4-Hours-Trades' },
+                    { value: 'heikfilter-12hours-trades', label: '12-Hours-Trades' },
                 ])
             } else {
-                setOptionsTradeResult([])
+              setOptionsMicroStrategy([])
             }
         }
       }
@@ -150,8 +135,8 @@ const TutorialsList = (props) => {
         setIndicators(options);
     }
 
-    const handleTradeResultFileChange = (e) => {
-        setTradeResultFile(e);
+    const handleMicroStrategyChange = (e) => {
+        setMicroStrategy(e);
     }
 
     return (
@@ -197,7 +182,6 @@ const TutorialsList = (props) => {
                             />
                         </div>)
                     }
-                    {console.log("great ::: ", selectedInstance.value, (selectedInstance.value !== 'forward_test'), (selectedInstance.value !== 'live_trading'))}
                     {(selectedInstance.value !== 'forward_test') && 
                      (selectedInstance.value !== 'live_trading') &&
                      (<div className="select-option">
@@ -205,7 +189,7 @@ const TutorialsList = (props) => {
                           value={strategy}
                           onChange={handleStrategyChange}
                           options={optionsStratgy}
-                          placeholder="Strategy"
+                          placeholder="Macro Strategy"
                           />
                       </div>)
                     }
@@ -214,10 +198,10 @@ const TutorialsList = (props) => {
                      (<div className="select-option">
                         <Select
                           name="filters"
-                          placeholder="Trade Result File"
-                          value={tradeResultFile}
-                          onChange={handleTradeResultFileChange}
-                          options={optionsTradeResult}
+                          placeholder="Micro Strategy"
+                          value={microStrategy}
+                          onChange={handleMicroStrategyChange}
+                          options={optionsMicroStrategy}
                         />
                       </div>)
                     }
@@ -236,15 +220,15 @@ const TutorialsList = (props) => {
                 </div>
             </nav>
             <div className="graphs-container dark">
-                < StockChart 
-                    viewType={selectedViewType.value}
-                    microStrategy={microStrategy.value}
-                    symbol={symbol.value}
-                    multiSymbol={multiSymbol}
-                    indicators={indicators}
-                    strategy={strategy}
-                    isHomePage={false}
-                    tradeResultFile={tradeResultFile.value}
+                < StockChart
+                  selectedInstance ={selectedInstance.value}
+                  viewType={selectedViewType.value}
+                  microStrategy={microStrategy.value}
+                  symbol={symbol.value}
+                  multiSymbol={multiSymbol}
+                  indicators={indicators}
+                  strategy={strategy}
+                  isHomePage={false}
                 />
             </div>
         </div>

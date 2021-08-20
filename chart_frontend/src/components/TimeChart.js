@@ -9,8 +9,8 @@ import { useHistory } from "react-router-dom";
 const TutorialsList = () => {
   const history = useHistory();
   const [selectedOptionTable, setSelectedOptionTable] = useState(null)
-  const [selectedInstance, setSelectedInstance] = useState([{ value: 'stress_test', label: 'Stress Test' }]);
-  const [selectedViewType, setSelectedViewType] = useState([{ value: 'charting', label: 'Charting' }]);
+  const [selectedInstance, setSelectedInstance] = useState({ value: 'stress_test', label: 'Stress Test' });
+  const [selectedViewType, setSelectedViewType] = useState({ value: 'charting', label: 'Charting' });
   const [symbol, setSymbol] = useState(null);
   const [microStrategy, setMicroStrategy] = useState(null)
   const [strategy, setStrategy] = useState(null);
@@ -32,14 +32,7 @@ const TutorialsList = () => {
     { value: 'optimization ', label: 'Optimization' },
   ]
 
-  const optionsMicroStrategy = [
-    { value: '1D2M', label: '1D_2m' },
-    { value: '4D12M', label: '4D_12m' },
-    { value: '30D1H', label: '30D_1h' },
-    { value: '90D4H', label: '90D_4h' },
-    { value: '90D12H', label: '90D_12h' },
-    { value: '1Y1D', label: '1Y_1D' }
-  ] 
+  const [optionsMicroStrategy, setOptionsMicroStrategy] = useState([])
   
   const optionsStratgy = [
     { value: 'heikfilter', label: 'heikfilter' },
@@ -88,11 +81,13 @@ const TutorialsList = () => {
   }
   
   const handleViewTypeChange = (value) => {
-    setSelectedViewType(value)  
+    setSelectedViewType(value)
     if (value.value === 'performance') {
       const locationState = {
+        selectedInstance,
         viewType: value,
-        initMicroStrategy: { value: '1D2M', label: '1D_2m' },
+        initStrategy: strategy,
+        initMicroStrategy: { value: 'heikfilter-2mins-trades', label: '2-Mins-Trades' },
         initIndicators: indicators,
         initSymbol: symbol,
       }
@@ -105,20 +100,23 @@ const TutorialsList = () => {
     }
   }
 
-  const handleChangeTable = (value) => {
-    setSelectedOptionTable(value)
-    const locationState = {
-      initMicroStrategy: value,
-      initIndicators: indicators,
-      initSymbol: symbol,
-    }
-    if (value) {
-      history.push({
-        pathname: '/ItemChart',
-        state: locationState,
-      });
-    }
-  }
+  // const handleChangeTable = (value) => {
+  //   setSelectedOptionTable(value)
+  //   const locationState = {
+  //     selectedInstance,
+  //     selectedViewType,
+  //     strategy,
+  //     initMicroStrategy: value,
+  //     initIndicators: indicators,
+  //     initSymbol: symbol,
+  //   }
+  //   if (value) {
+  //     history.push({
+  //       pathname: '/ItemChart',
+  //       state: locationState,
+  //     });
+  //   }
+  // }
 
   const handlSymbolChange = (e) => {
     if (e) {
@@ -129,12 +127,39 @@ const TutorialsList = () => {
   const handleStrategy = (e) => {
     if (e) {
       setStrategy(e)
+      if (e.value === 'heikfilter') {
+        setOptionsMicroStrategy([
+          { value: 'heikfilter-2mins-trades', label: '2-Mins-Trades' },
+          { value: 'heikfilter-12mins-trades', label: '12-Mins-Trades' },
+          { value: 'heikfilter-1hour-trades', label: '1-Hour-Trades' },
+          { value: 'heikfilter-4hours-trades', label: '4-Hours-Trades' },
+          { value: 'heikfilter-12hours-trades', label: '12-Hours-Trades' },
+          { value: 'heikfilter-1day-trades', label: '1-Day-Trades' }
+        ])
+      } else {
+        setOptionsMicroStrategy([])
+    }
     }
   }
   
   const handleMicroStrategyChange = (e) => {
     if (e) {
       setMicroStrategy(e)
+    }
+
+    const locationState = {
+      selectedInstance,
+      selectedViewType,
+      initStrategy: strategy,
+      initMicroStrategy: e,
+      initIndicators: indicators,
+      initSymbol: symbol,
+    }
+    if (e) {
+      history.push({
+        pathname: '/ItemChart',
+        state: locationState,
+      });
     }
   }
   
@@ -183,22 +208,22 @@ const TutorialsList = () => {
         
       <div className={`row ${calculateHeightStyle()}`}>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          {symbol && (< StockChart microStrategy='1D2M' symbol={symbol.value} indicators={indicators} strategy={strategy} isHomePage={true}/>)}
+          {symbol && (< StockChart selectedInstance={selectedInstance.value} microStrategy='heikfilter-2mins-trades' symbol={symbol.value} indicators={indicators} strategy={strategy} isHomePage={true}/>)}
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          {symbol && (< StockChart microStrategy='4D12M' symbol={symbol.value} indicators={indicators} strategy={strategy} isHomePage={true}/>)}
+          {symbol && (< StockChart selectedInstance={selectedInstance.value} microStrategy='heikfilter-12mins-trades' symbol={symbol.value} indicators={indicators} strategy={strategy} isHomePage={true}/>)}
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          {symbol && (< StockChart microStrategy='30D1H' symbol={symbol.value} indicators={indicators} strategy={strategy} isHomePage={true}/>)}
+          {symbol && (< StockChart selectedInstance={selectedInstance.value} microStrategy='heikfilter-1hour-trades' symbol={symbol.value} indicators={indicators} strategy={strategy} isHomePage={true}/>)}
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          {symbol && (< StockChart microStrategy='90D4H' symbol={symbol.value} indicators={indicators} strategy={strategy} isHomePage={true}/>)}
+          {symbol && (< StockChart selectedInstance={selectedInstance.value} microStrategy='heikfilter-4hours-trades' symbol={symbol.value} indicators={indicators} strategy={strategy} isHomePage={true}/>)}
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          {symbol && (< StockChart microStrategy='90D12H' symbol={symbol.value} indicators={indicators} strategy={strategy} isHomePage={true}/>)}
+          {symbol && (< StockChart selectedInstance={selectedInstance.value} microStrategy='heikfilter-12hours-trades' symbol={symbol.value} indicators={indicators} strategy={strategy} isHomePage={true}/>)}
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          {symbol && (< StockChart microStrategy='1Y1D' symbol={symbol.value} indicators={indicators} strategy={strategy} isHomePage={true}/>)}
+          {symbol && (< StockChart selectedInstance={selectedInstance.value} microStrategy='heikfilter-1day-trades' symbol={symbol.value} indicators={indicators} strategy={strategy} isHomePage={true}/>)}
         </div>
       </div>
     )
@@ -238,22 +263,30 @@ const TutorialsList = () => {
               placeholder="Symbol"
             />
           </div>
-          <div className="select-option">
-            <Select
-              value={strategy}
-              onChange={handleStrategy}
-              options={optionsStratgy}
-              placeholder="Strategy"
-            />
-          </div>
-          <div className="select-option">
-            <Select
-              value={microStrategy}
-              onChange={handleMicroStrategyChange}
-              options={optionsMicroStrategy}
-              placeholder="Micro Strategy"
-            />
-          </div>
+          { (selectedInstance.value !== 'forward_test') && 
+            (selectedInstance.value !== 'live_trading') &&
+            (<div className="select-option">
+               <Select
+                value={strategy}
+                onChange={handleStrategy}
+                options={optionsStratgy}
+                placeholder="Macro Strategy"
+              />
+            </div>
+            )
+          }
+          { (selectedInstance.value !== 'forward_test') && 
+            (selectedInstance.value !== 'live_trading') &&
+            (<div className="select-option">
+              <Select
+                value={microStrategy}
+                onChange={handleMicroStrategyChange}
+                options={optionsMicroStrategy}
+                placeholder="Micro Strategy"
+              />
+            </div>
+            )
+          }
           <div className="select-multi-option">
             <Select
               name="filters"
