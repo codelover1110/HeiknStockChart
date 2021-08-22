@@ -235,57 +235,85 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 	calculateOffset (indicator, isFullChart) {
 		if (!this.props.isHomePage || isFullChart) {
 			if (indicator === 'MACD') {
-				if (this.isIncludeIndicators(indicator)) {
-					if (this.props.indicators.length > 1) {
-						return this.props.indicators.length * 100 + 50
+				if (this.isIncludeIndicators('VOLUME')) {
+					if (this.isIncludeIndicators(indicator)) {
+						if (this.props.indicators.length > 1) {
+							return this.props.indicators.length * 100 + 50
+						}
+						return 200;
 					}
-					return 200;
+				} else {
+					if (this.isIncludeIndicators(indicator)) {
+						if (this.props.indicators.length > 1) {
+							return this.props.indicators.length * 100 + 50
+						}
+						return 200;
+					}
 				}
 			}
 	
 			if (indicator === 'RSI') {
+				
 				if (this.isIncludeIndicators(indicator)) {
-					if (this.isIncludeIndicators('SMA')) {
-						return 350;
+					if (this.isIncludeIndicators('VOLUME')) {
+						if (this.isIncludeIndicators('SMA')) {
+							return 350;
+						}
+						return 250;
+					} else {
+						if (this.isIncludeIndicators('SMA')) {
+							return 250;
+						}
+						return 150;
 					}
-					return 250;
 				}
 			}
 	
 			if (indicator === 'SMA') {
-				return 250;
+				if (this.isIncludeIndicators('VOLUME')) {
+					return 250;
+				} else {
+					return 150;
+				}
 			}
 	
 			return 0	
 		}
 		if (indicator === 'MACD') {
 			if (this.isIncludeIndicators(indicator)) {
-				if (this.props.indicators.length > 1) {
-					return (this.props.indicators.length-1) * 50 + 20
+				if (this.isIncludeIndicators('VOLUME')) {
+					if (this.props.indicators.length > 1) {
+						return (this.props.indicators.length-1) * 50 + 50
+					}
+					return 80;
+				} else {
+					if (this.props.indicators.length > 1) {
+						return (this.props.indicators.length) * 50 + 50
+					}
+					return 80;
 				}
-				return 120;
 			}
 		}
 
 		if (indicator === 'RSI') {
 			if (this.isIncludeIndicators(indicator)) {
 				if (this.isIncludeIndicators('SMA')) {
-					return 110;
+					return 130;
 				}
-				return 60;
+				return 80;
 			}
 		}
 
 		if (indicator === 'SMA') {
-			return 50;
+			return 60;
 		}
 
-		return 0
+		return 10
 	}
 
 	calculateMainHeightOffset(isFullChart) {
 		if (this.props.isHomePage && !isFullChart) {
-			return 250
+			return 100 + (this.props.indicators.length - 1) * 50
 		}
 		if ( this.props.indicators ) {
 			if (this.props.indicators.length > 1) {
@@ -321,17 +349,17 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 		// return 0
 	}
 
-	computeAnnotation(dateLine) {
-		const deal = this.props.deals.filter(
-			dealLine => {
-				return dateLine.date.getTime() === dealLine.ddate.getTime()
-			}
-			);
+	// computeAnnotation(dateLine) {
+	// 	const deal = this.props.deals.filter(
+	// 		dealLine => {
+	// 			return dateLine.date.getTime() === dealLine.ddate.getTime()
+	// 		}
+	// 		);
 			
-		if (deal.length > 0) {
-			return deal[0].action;
-		}
-	}
+	// 	if (deal.length > 0) {
+	// 		return deal[0].action;
+	// 	}
+	// }
 
 	render() {
 
@@ -459,9 +487,9 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 
 		const { channels_1 } = this.state;
 
-		this.props.deals.forEach(deal => {
-			deal.ddate = new Date(dayjs(deal.ddate).format());
-		});	
+		// this.props.deals.forEach(deal => {
+		// 	deal.ddate = new Date(dayjs(deal.ddate).format());
+		// });	
 
 		initialData.forEach(line => {
 			line.date = dayjs(line.date).toDate();
@@ -565,8 +593,8 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 				<Chart id={1}
 					height={
 						(!this.props.isHomePage || isFullChart)
-						? this.isIncludeIndicators('VOLUME') ? 250 : 400
-						: this.props.indicators.length > 0 ? 100 : 300
+						? this.isIncludeIndicators('VOLUME') || this.props.indicators.length ? 250 : 400
+						: 300 - this.props.indicators.length * 50
 					}
 					yExtents={[d => [d.high, d.low], ema20.accessor(), ema50.accessor()]}
 					padding={{ top: 10, bottom: 20 }}
@@ -597,14 +625,20 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 						{...xDisplayFormatProps}
 					/>
 					
-					<Annotate with={SvgPathAnnotation} when={d => d.longShort === "LONG"}
+					<Annotate with={SvgPathAnnotation} when={ d => 
+						this.props.selectedInstance !== 'live_trading'  
+						&& d.strategy === this.props.microStrategy
+						&& d.longShort === "LONG" }
 						usingProps={longAnnotationProps} />
-					<Annotate with={SvgPathAnnotation} when={d => d.longShort === "SHORT"}
+					<Annotate with={SvgPathAnnotation} when={d => 
+						this.props.selectedInstance !== 'live_trading' 
+						&& d.strategy === this.props.microStrategy
+						&& d.longShort === "SHORT"}
 						usingProps={shortAnnotationProps} />
 
 				</Chart>
 				{this.isIncludeIndicators('VOLUME') && (
-					<Chart id={2} height={(!this.props.isHomePage || isFullChart) ? 100 : 70}
+					<Chart id={2} height={(!this.props.isHomePage || isFullChart) ? 100 : 50}
 						yExtents={[d => d.volume]}
 						origin={(w, h) => [0, h - this.calculateMainHeightOffset(isFullChart)]}
 						padding={{ top: 10, bottom: 10 }}
@@ -622,7 +656,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 				)}
 				{this.isIncludeIndicators('MACD') && (
 					<Chart id={3} 
-						height={(!this.props.isHomePage || isFullChart) ? 100 : 50}
+						height={(!this.props.isHomePage || isFullChart) ? 100 : 70}
 						yExtents={macdCalculator.accessor()}
 						origin={(w, h) => [0, h - this.calculateOffset('MACD', isFullChart)]} padding={{ top: 30, bottom: 10 }}
 					>
@@ -650,7 +684,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 				)}
 				{this.isIncludeIndicators('RSI') && (
 					<Chart id={4} 
-						height={(!this.props.isHomePage || isFullChart) ? 100 : 50}
+						height={(!this.props.isHomePage || isFullChart) ? 100 : 70}
 						yExtents={[0, d => elder.accessor()(d) && elder.accessor()(d).bearPower]}
 						origin={(w, h) => [0, h - this.calculateOffset('RSI', isFullChart)]}
 						padding={{ top: 40, bottom: 10 }}
@@ -682,7 +716,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 				)}
 				{this.isIncludeIndicators('SMA') && (
 					<Chart id={5} 
-						height={(!this.props.isHomePage || isFullChart) ? 100 : 50}
+						height={(!this.props.isHomePage || isFullChart) ? 100 : 70}
 						yExtents={[0, d => elder.accessor()(d) && elder.accessor()(d).bearPower]}
 						origin={(w, h) => [0, h - this.calculateOffset('SMA', isFullChart)]}
 						padding={{ top: 30, bottom: 10 }}

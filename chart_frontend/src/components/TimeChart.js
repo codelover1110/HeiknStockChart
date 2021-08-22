@@ -8,15 +8,16 @@ import { useHistory } from "react-router-dom";
 
 const TutorialsList = () => {
   const history = useHistory();
+  const [symbol, setSymbol] = useState(null);
+  const [indicators, setIndicators] = useState([]);
+  const [isShowMicro, setIsShowMicro] = useState(true);
+  const [symbolList, setSymbolList] = useState([])
+  const [isGetSymbolList, setIsGetSymbolList] = useState(false)
+  const [chartColumn, setChartColumn] = useState({ value: 6, label: '6' })
   const [selectedInstance, setSelectedInstance] = useState({ value: 'stress_test', label: 'Stress Test' });
   const [selectedViewType, setSelectedViewType] = useState({ value: 'charting', label: 'Charting' });
-  const [symbol, setSymbol] = useState(null);
-  const [microStrategy, setMicroStrategy] = useState({ value: 'heikfilter-2mins-trades', label: '2-Mins-Trades' })
+  const [microStrategy, setMicroStrategy] = useState({ value: 'heikfilter-2mins-trades', label: '2 mins' })
   const [strategy, setStrategy] = useState({ value: 'heikfilter', label: 'heikfilter' });
-  const [indicators, setIndicators] = useState([]);
-  const [isGetSymbolList, setIsGetSymbolList] = useState(false)
-  const [symbolList, setSymbolList] = useState([])
-  const [chartColumn, setChartColumn] = useState({ value: 6, label: '6' })
 
   const optionsInstance = [
     { value: 'stress_test', label: 'Stress Test' },
@@ -32,17 +33,17 @@ const TutorialsList = () => {
   ]
 
   const [optionsMicroStrategy, setOptionsMicroStrategy] = useState([
-    { value: 'heikfilter-2mins-trades', label: '2-Mins-Trades' },
-    { value: 'heikfilter-12mins-trades', label: '12-Mins-Trades' },
-    { value: 'heikfilter-1hour-trades', label: '1-Hour-Trades' },
-    { value: 'heikfilter-2hour-trades', label: '2-Hour-Trades' },
-    { value: 'heikfilter-4hours-trades', label: '4-Hours-Trades' },
-    { value: 'heikfilter-12hours-trades', label: '12-Hours-Trades' },
+    { value: 'heikfilter-2mins-trades', label: '2 mins' },
+    { value: 'heikfilter-2mins-4hours-trades', label: '2 mins>4 hours' },
+    { value: 'heikfilter-2mins-12mins-4hours-trades', label: '2 mins>12 mins>4 hours' },
+    { value: 'heikfilter-12mins-trades', label: '12 mins' },
+    { value: 'heikfilter-12mins-4hours-trades', label: '12 mins>4 hours' },
+    { value: 'heikfilter-4hours-trades', label: '4 hours' },
   ])
   
-  const optionsStratgy = [
+  const [optionsStratgy, setOptionsStrategy] = useState([
     { value: 'heikfilter', label: 'heikfilter' },
-  ]
+  ])
 
   const optionsIndicator = [
     {
@@ -79,9 +80,29 @@ const TutorialsList = () => {
       get_tables();    
     }  
   }, [])
+  
+  useEffect(() => {
+    console.log("selectedInstance::", selectedInstance)
+    if(selectedInstance.value === 'live_trading') {
+      get_tables();    
+    }  
+  }, [selectedInstance])
 
   const handleInstanceChange = (value) => {
-    setSelectedInstance(value)  
+    setSelectedInstance(value) 
+    if (value.value === 'live_trading') {
+      setIsShowMicro(false);
+      setStrategy({ value: 'no_strategy', label: 'No Strategy' });
+      setOptionsStrategy([
+        { value: 'no_strategy', label: 'No Srategy' },
+      ])
+      return
+    }
+    setStrategy({ value: 'heikfilter-2mins-trades', label: '2 mins' });
+    setOptionsStrategy([
+      { value: 'heikfilter', label: 'heikfilter' },
+    ])
+    setIsShowMicro(true);
   }
   
   const handleViewTypeChange = (value) => {
@@ -91,7 +112,7 @@ const TutorialsList = () => {
         selectedInstance,
         viewType: value,
         initStrategy: strategy,
-        initMicroStrategy: { value: 'heikfilter-2mins-trades', label: '2-Mins-Trades' },
+        initMicroStrategy: { value: 'heikfilter-2mins-trades', label: '2 mins' },
         initIndicators: indicators,
         initSymbol: symbol,
       }
@@ -115,12 +136,12 @@ const TutorialsList = () => {
       setStrategy(e)
       if (e.value === 'heikfilter') {
         setOptionsMicroStrategy([
-          { value: 'heikfilter-2mins-trades', label: '2-Mins-Trades' },
-          { value: 'heikfilter-12mins-trades', label: '12-Mins-Trades' },
-          { value: 'heikfilter-1hour-trades', label: '1-Hour-Trades' },
-          { value: 'heikfilter-4hours-trades', label: '4-Hours-Trades' },
-          { value: 'heikfilter-12hours-trades', label: '12-Hours-Trades' },
-          { value: 'heikfilter-1day-trades', label: '1-Day-Trades' }
+          { value: 'heikfilter-2mins-trades', label: '2 mins' },
+          { value: 'heikfilter-2mins-4hours-trades', label: '2 mins>4 hours' },
+          { value: 'heikfilter-2mins-12mins-4hours-trades', label: '2 mins>12 mins>4 hours' },
+          { value: 'heikfilter-12mins-trades', label: '12 mins' },
+          { value: 'heikfilter-12mins-4hours-trades', label: '12 mins>4 hours' },
+          { value: 'heikfilter-4hours-trades', label: '4 hours' },
         ])
       } else {
         setOptionsMicroStrategy([])
@@ -132,21 +153,20 @@ const TutorialsList = () => {
     if (e) {
       setMicroStrategy(e)
     }
-
-    const locationState = {
-      selectedInstance,
-      selectedViewType,
-      initStrategy: strategy,
-      initMicroStrategy: e,
-      initIndicators: indicators,
-      initSymbol: symbol,
-    }
-    if (e) {
-      history.push({
-        pathname: '/ItemChart',
-        state: locationState,
-      });
-    }
+    // const locationState = {
+    //   selectedInstance,
+    //   selectedViewType,
+    //   initStrategy: strategy,
+    //   initMicroStrategy: e,
+    //   initIndicators: indicators,
+    //   initSymbol: symbol,
+    // }
+    // if (e) {
+    //   history.push({
+    //     pathname: '/ItemChart',
+    //     state: locationState,
+    //   });
+    // }
   }
   
   const handleIndicatorsChange = (options) => {
@@ -154,7 +174,14 @@ const TutorialsList = () => {
   }
 
   const get_tables = () => {
-		fetch(process.env.REACT_APP_BACKEND_URL + "/api/tables")
+    const requestOptions = {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        'strategy': strategy.value
+      })
+    };
+    fetch(process.env.REACT_APP_BACKEND_URL + "/api/tables", requestOptions)
 				.then(response => response.json())
 				.then(data => {
 					let temp_data = []
@@ -198,6 +225,7 @@ const TutorialsList = () => {
             < StockChart 
               selectedInstance={selectedInstance.value}
               selectedTradeDB='heikfilter-2mins-trades'
+              chartPeriod='20D 2min'
               symbol={symbol.value}
               indicators={indicators}
               strategy={strategy}
@@ -212,6 +240,7 @@ const TutorialsList = () => {
           < StockChart 
             selectedInstance={selectedInstance.value}
             selectedTradeDB='heikfilter-12mins-trades'
+            chartPeriod='20D 12min'
             symbol={symbol.value}
             indicators={indicators}
             strategy={strategy}
@@ -225,6 +254,7 @@ const TutorialsList = () => {
             < StockChart
               selectedInstance={selectedInstance.value}
               selectedTradeDB='heikfilter-1hour-trades'
+              chartPeriod='30D 1hour'
               symbol={symbol.value}
               indicators={indicators}
               strategy={strategy}
@@ -238,6 +268,7 @@ const TutorialsList = () => {
             < StockChart
               selectedInstance={selectedInstance.value}
               selectedTradeDB='heikfilter-4hours-trades'
+              chartPeriod='90D 4hour'
               symbol={symbol.value}
               indicators={indicators}
               strategy={strategy}
@@ -251,6 +282,7 @@ const TutorialsList = () => {
             < StockChart
               selectedInstance={selectedInstance.value}
               selectedTradeDB='heikfilter-12hours-trades'
+              chartPeriod='90D 12hour'
               symbol={symbol.value}
               indicators={indicators}
               strategy={strategy}
@@ -264,6 +296,7 @@ const TutorialsList = () => {
           < StockChart
             selectedInstance={selectedInstance.value}
             selectedTradeDB='heikfilter-1day-trades'
+            chartPeriod='1Y 1day'
             symbol={symbol.value}
             indicators={indicators}
             strategy={strategy}
@@ -303,21 +336,23 @@ const TutorialsList = () => {
             />
           </div>
           <div className="select-option">
-               <Select
+              <Select
                 value={strategy}
                 onChange={handleStrategy}
                 options={optionsStratgy}
                 placeholder="Macro Strategy"
               />
             </div>
-          <div className="select-option">
-            <Select
-              value={microStrategy}
-              onChange={handleMicroStrategyChange}
-              options={optionsMicroStrategy}
-              placeholder="Micro Strategy"
-            />
-          </div>
+          {isShowMicro && (
+            <div className="select-option">
+              <Select
+                value={microStrategy}
+                onChange={handleMicroStrategyChange}
+                options={optionsMicroStrategy}
+                placeholder="Micro Strategy"
+              />
+            </div>  
+          )}
           <div className="select-option">
             <Select
               value={symbol}

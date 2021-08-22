@@ -46,12 +46,12 @@ const TutorialsList = (props) => {
     ]    
 
     const [optionsMicroStrategy, setOptionsMicroStrategy] = useState([
-      { value: 'heikfilter-2mins-trades', label: '2-Mins-Trades' },
-      { value: 'heikfilter-12mins-trades', label: '12-Mins-Trades' },
-      { value: 'heikfilter-1hour-trades', label: '1-Hour-Trades' },
-      { value: 'heikfilter-2hour-trades', label: '2-Hour-Trades' },
-      { value: 'heikfilter-4hours-trades', label: '4-Hours-Trades' },
-      { value: 'heikfilter-12hours-trades', label: '12-Hours-Trades' },
+      { value: 'heikfilter-2mins-trades', label: '2 mins' },
+      { value: 'heikfilter-2mins-4hours-trades', label: '2 mins>4 hours' },
+      { value: 'heikfilter-2mins-12mins-4hours-trades', label: '2 mins>12 mins>4 hours' },
+      { value: 'heikfilter-12mins-trades', label: '12 mins' },
+      { value: 'heikfilter-12mins-4hours-trades', label: '12 mins>4 hours' },
+      { value: 'heikfilter-4hours-trades', label: '4 hours' }
     ])
     
     const optionsStratgy = [
@@ -86,18 +86,25 @@ const TutorialsList = (props) => {
     })
 
     const get_tables = () => {
-        fetch(process.env.REACT_APP_BACKEND_URL + "/api/tables")
-            .then(response => response.json())
-            .then(data => {
-                let temp_data = []
-                data.tables.map((x) => {
-                    temp_data.push({
-                        value: x,
-                        label: x
-                    });
-                })
-                setSymbolList(temp_data)
-            })
+      const requestOptions = {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          'strategy': strategy.value
+        })
+      };
+      fetch(process.env.REACT_APP_BACKEND_URL + "/api/tables", requestOptions)
+          .then(response => response.json())
+          .then(data => {
+              let temp_data = []
+              data.tables.map((x) => {
+                  temp_data.push({
+                      value: x,
+                      label: x
+                  });
+              })
+              setSymbolList(temp_data)
+          })
     }
 
     const handleInstanceChange = (e) => {
@@ -106,6 +113,11 @@ const TutorialsList = (props) => {
     
     const handleViewTypeChange = (e) => {
         setSelectedViewType(e)
+        if (e.value === 'charting') {
+          history.push({
+            pathname: '/'
+          });
+        }
     }
 
     const handlSymbolChange = (e) => {
@@ -123,12 +135,12 @@ const TutorialsList = (props) => {
           setStrategy(e)
             if (e.value === 'heikfilter') {
               setOptionsMicroStrategy([
-                    { value: 'heikfilter-2mins-trades', label: '2-Mins-Trades' },
-                    { value: 'heikfilter-12mins-trades', label: '12-Mins-Trades' },
-                    { value: 'heikfilter-1hour-trades', label: '1-Hour-Trades' },
-                    { value: 'heikfilter-2hour-trades', label: '2-Hour-Trades' },
-                    { value: 'heikfilter-4hours-trades', label: '4-Hours-Trades' },
-                    { value: 'heikfilter-12hours-trades', label: '12-Hours-Trades' },
+                    { value: 'heikfilter-2mins-trades', label: '2 mins' },
+                    { value: 'heikfilter-2mins-4hours-trades', label: '2 mins>4 hours' },
+                    { value: 'heikfilter-2mins-12mins-4hours-trades', label: '2 mins>12 mins>4 hours' },
+                    { value: 'heikfilter-12mins-trades', label: '12 mins' },
+                    { value: 'heikfilter-12mins-4hours-trades', label: '12 mins>4 hours' },
+                    { value: 'heikfilter-4hours-trades', label: '4 hours' },
                 ])
             } else {
               setOptionsMicroStrategy([])

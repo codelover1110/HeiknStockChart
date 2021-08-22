@@ -24,10 +24,11 @@ const StockChart = (props) => {
         microStrategy,
         selectedInstance,
         selectedTradeDB,
+        chartPeriod
     } = props;
     const [dbname, setDbname] = useState('')
 	const [chartData, setChartData] = useState(null)
-	const [dealData, setDealData] = useState([])
+	// const [dealData, setDealData] = useState([])
     
     useEffect(() => {
         if (selectedInstance === 'live_trading') {
@@ -65,11 +66,10 @@ const StockChart = (props) => {
     }, [selectedInstance, dbname, viewType, symbol, multiSymbol, microStrategy])
 
     const get_data = (symbol) => {
-        if (!dbname) {
-            return;
-        }
-
         if (viewType !== 'performance') {
+            if (!dbname) {
+                return;
+            }
             const requestOptions = {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -88,7 +88,7 @@ const StockChart = (props) => {
                     x.date = converDate
                 })
                 setChartData(data['chart_data'])
-                setDealData(data['deals'])
+                // setDealData(data['deals'])
             })
         } else {
             const symbols = multiSymbol.map((symbol) => symbol.value);
@@ -118,7 +118,7 @@ const StockChart = (props) => {
                 <>
                     <div className="select-wrape">
                         <div>
-                            <strong>{microStrategy} [NASDAQ]</strong>
+                            <strong>{chartPeriod} [NASDAQ]</strong>
                         </div>
                     </div>
                     <TypeChooser >
@@ -128,12 +128,13 @@ const StockChart = (props) => {
                                 ? <Chart
                                     type={type}
                                     data={chartData}
-                                    deals={dealData}
+                                    // deals={dealData}
                                     strategy={strategy}
                                     isHomePage={isHomePage}
                                     indicators={indicators}
                                     chartColumn={chartColumn}
                                     microStrategy={microStrategy}
+                                    selectedInstance={selectedInstance}
                                 />
                                 : <PerformanceChart type={type} data={chartData} multiSymbol={multiSymbol.map((symbol) => symbol.value)}/>
                             )
