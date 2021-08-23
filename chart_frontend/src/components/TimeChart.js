@@ -45,7 +45,7 @@ const TutorialsList = () => {
     { value: 'heikfilter', label: 'heikfilter' },
   ])
 
-  const optionsIndicator = [
+  const [optionsIndicator, setOptionsIndicator] = useState([
     {
       value: 'VOLUME', label: 'VOLUME',
     },
@@ -53,12 +53,12 @@ const TutorialsList = () => {
       value: 'RSI', label: 'RSI',
     },
     {
-      value: 'MACD', label: 'MACD',
+      value: 'HEIK1', label: 'HEIK1',
     },
     {
-      value: 'SMA', label: 'SMA',
+      value: 'HEIK2', label: 'HEIK2',
     }
-  ]
+  ]);
 
   const optionsColumn = [
     {
@@ -82,7 +82,6 @@ const TutorialsList = () => {
   }, [])
   
   useEffect(() => {
-    console.log("selectedInstance::", selectedInstance)
     if(selectedInstance.value === 'live_trading') {
       get_tables();    
     }  
@@ -197,6 +196,43 @@ const TutorialsList = () => {
 	}
 
   const handleChartsColumnChange = (option) => {
+    if (option.value === 4 || option.value === 6) {
+      setOptionsIndicator([
+        {
+          value: 'VOLUME', label: 'VOLUME',
+        },
+        {
+          value: 'RSI', label: 'RSI',
+        },
+        {
+          value: 'HEIK1', label: 'HEIK1',
+        },
+        {
+          value: 'HEIK2', label: 'HEIK2',
+        }
+      ])
+    } else {
+      setOptionsIndicator([
+        {
+          value: 'VOLUME', label: 'VOLUME',
+        },
+        {
+          value: 'RSI', label: 'RSI',
+        },
+        {
+          value: 'RSI2', label: 'RSI2',
+        },
+        {
+          value: 'RSI3', label: 'RSI3',
+        },
+        {
+          value: 'HEIK1', label: 'HEIK1',
+        },
+        {
+          value: 'HEIK2', label: 'HEIK2',
+        }
+      ])
+    }
     setChartColumn(option)
   }
 
@@ -381,12 +417,17 @@ const TutorialsList = () => {
           </div>
         </div>
       </nav>
-      <div className="graphs-container dark">
-        {(chartColumn.value === 1) && displayChart()}
-        {(chartColumn.value === 2) && displayChart()}
-        {(chartColumn.value === 4) && displayChart()}
-        {(chartColumn.value === 6) && displayChart()}
-      </div>
+      {selectedInstance.value === 'optimization' || selectedInstance.value === 'forward_test' 
+        ? (<div className="development-in-content dark">
+          In development
+        </div>)
+        : (<div className="graphs-container dark">
+          {(chartColumn.value === 1) && displayChart()}
+          {(chartColumn.value === 2) && displayChart()}
+          {(chartColumn.value === 4) && displayChart()}
+          {(chartColumn.value === 6) && displayChart()}
+        </div>)
+      }
     </div>
   );
 };

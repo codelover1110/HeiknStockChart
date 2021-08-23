@@ -229,57 +229,38 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 				index = this.props.indicators.length
 			}
 		}
-		return 500 + index * 1 * 100
+		return 500 + index * 100
 	}
 
 	calculateOffset (indicator, isFullChart) {
 		if (!this.props.isHomePage || isFullChart) {
-			if (indicator === 'MACD') {
-				if (this.isIncludeIndicators('VOLUME')) {
-					if (this.isIncludeIndicators(indicator)) {
-						if (this.props.indicators.length > 1) {
-							return this.props.indicators.length * 100 + 50
-						}
-						return 200;
-					}
-				} else {
-					if (this.isIncludeIndicators(indicator)) {
-						if (this.props.indicators.length > 1) {
-							return this.props.indicators.length * 100 + 50
-						}
-						return 200;
-					}
-				}
-			}
-	
 			if (indicator === 'RSI') {
-				
-				if (this.isIncludeIndicators(indicator)) {
-					if (this.isIncludeIndicators('VOLUME')) {
-						if (this.isIncludeIndicators('SMA')) {
-							return 350;
-						}
-						return 250;
-					} else {
-						if (this.isIncludeIndicators('SMA')) {
-							return 250;
-						}
-						return 150;
-					}
-				}
+				const filter = this.props.indicators.filter(indicator => ['RSI2', 'RSI3', 'HEIK1', 'HEIK2'].includes(indicator.value))
+				return 300 + filter.length * 70;
 			}
 	
-			if (indicator === 'SMA') {
-				if (this.isIncludeIndicators('VOLUME')) {
-					return 250;
-				} else {
-					return 150;
-				}
+			if (indicator === 'RSI2') {
+				const filter = this.props.indicators.filter(indicator => ['RSI3', 'HEIK1', 'HEIK2'].includes(indicator.value))
+				return 300 + filter.length * 70;
+			}
+
+			if (indicator === 'RSI3') {
+				const filter = this.props.indicators.filter(indicator => ['HEIK1', 'HEIK2'].includes(indicator.value))
+				return 300 + filter.length * 70;
 			}
 	
+			if (indicator === 'HEIK1') {
+				const filter = this.props.indicators.filter(indicator => ['HEIK2'].includes(indicator.value))
+				return 300 + filter.length * 70;
+			}
+			
+			if (indicator === 'HEIK2') {
+				const filter = this.props.indicators.filter(indicator => [''].includes(indicator.value))
+				return 300 + filter.length * 70;
+			}
 			return 0	
 		}
-		if (indicator === 'MACD') {
+		if (indicator === 'RSI') {
 			if (this.isIncludeIndicators(indicator)) {
 				if (this.isIncludeIndicators('VOLUME')) {
 					if (this.props.indicators.length > 1) {
@@ -295,16 +276,16 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 			}
 		}
 
-		if (indicator === 'RSI') {
+		if (indicator === 'HEIK1') {
 			if (this.isIncludeIndicators(indicator)) {
-				if (this.isIncludeIndicators('SMA')) {
+				if (this.isIncludeIndicators('HEIK2')) {
 					return 130;
 				}
 				return 80;
 			}
 		}
 
-		if (indicator === 'SMA') {
+		if (indicator === 'HEIK2') {
 			return 60;
 		}
 
@@ -501,7 +482,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 
 		const [yAxisLabelX, yAxisLabelY] = [width - margin.left - 40, margin.top + (height - margin.top - margin.bottom) / 2];
 		
-		const calculatedData = macdCalculator((elder(ha(rsiCalculator(atr14(initialData))))));
+		const calculatedData = macdCalculator((ha(atr14(initialData))));
 		
 		const xScaleProvider = discontinuousTimeScaleProvider
 			.inputDateAccessor(d => d.date);
@@ -522,7 +503,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 			y: ({ yScale, datum }) => { return yScale(datum.low) - this.calculateTooltipOffset0(isFullChart) },
 			fill: "#006517",
 			path: buyPath,
-			tooltip: (e) => `Buy: ${e.price}`,
+			tooltip: (e) => `Buy: ${e.price}, Date: ${e.trade_date.replace('T', ' ')}`,
 		};
 
 		const shortAnnotationProps = {
@@ -530,7 +511,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 			y: ({ yScale, datum }) => { return yScale(datum.high) - this.calculateTooltipOffset1(isFullChart)},
 			fill: "#FF0000",
 			path: sellPath,
-			tooltip: (e) => `Sell: ${e.price}`,
+			tooltip: (e) => `Sell: ${e.price}, Date: ${e.trade_date.replace('T', ' ')}`,
 		};
 
 		const start = xAccessor(last(data));
@@ -654,7 +635,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 						<BarSeries yAccessor={d => d.volume} fill={d => d.close > d.open ? "#6BA583" : "#FF0000"} />
 					</Chart>
 				)}
-				{this.isIncludeIndicators('MACD') && (
+				{/* {this.isIncludeIndicators('MACD') && (
 					<Chart id={3} 
 						height={(!this.props.isHomePage || isFullChart) ? 100 : 70}
 						yExtents={macdCalculator.accessor()}
@@ -681,11 +662,12 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 							appearance={macdAppearance}
 						/>
 					</Chart>
-				)}
+				)} */}
 				{this.isIncludeIndicators('RSI') && (
-					<Chart id={4} 
-						height={(!this.props.isHomePage || isFullChart) ? 100 : 70}
-						yExtents={[0, d => elder.accessor()(d) && elder.accessor()(d).bearPower]}
+					<Chart id={3} 
+						// height={(!this.props.isHomePage || isFullChart) ? 100 : 70}
+						height={70}
+						yExtents={[0, d => d.rsi.bearPower]}
 						origin={(w, h) => [0, h - this.calculateOffset('RSI', isFullChart)]}
 						padding={{ top: 40, bottom: 10 }}
 					>
@@ -700,13 +682,14 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 							orient="right"
 							displayFormat={format(".2f")} />
 						<BarSeries
-							yAccessor={d => elder.accessor()(d) && elder.accessor()(d).bearPower}
+							// yAccessor={d => { console.log(d); return elder.accessor()(d) && elder.accessor()(d).bearPower}}
+							yAccessor={d => d.rsi.bearPower}
 							baseAt={(xScale, yScale, d) => yScale(0)}
 							fill={d => d.side === 'buy' ? '#800080' : d.side === 'sell' ? '#FFA500' : d.side === 'hold' ? '#00FF00' : '#FF0000'} />
 						<StraightLine yValue={0} />
 
 						<SingleValueTooltip
-							yAccessor={d => elder.accessor()(d) && elder.accessor()(d).bearPower}
+							yAccessor={d => d.rsi.bearPower}
 							yLabel="RSI - Bear power"
 							yDisplayFormat={format(".2f")}
 							appearance={rsiAppearance}
@@ -714,7 +697,143 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 							origin={[-40, this.props.isHompage ? 40 : 25]}/>
 					</Chart>
 				)}
-				{this.isIncludeIndicators('SMA') && (
+				{this.isIncludeIndicators('RSI2') && (
+					<Chart id={4} 
+						// height={(!this.props.isHomePage || isFullChart) ? 100 : 70}
+						height={70}
+						yExtents={[0, d => d.rsi2.bearPower]}
+						origin={(w, h) => [0, h - this.calculateOffset('RSI2', isFullChart)]}
+						padding={{ top: 40, bottom: 10 }}
+					>
+						<XAxis axisAt="bottom" orient="bottom" stroke="white" tickStroke="white" />
+						<YAxis axisAt="right" orient="right" stroke="white" tickStroke="white" ticks={4} tickFormat={format(".2f")}/>
+						<MouseCoordinateX
+							at="bottom"
+							orient="bottom"
+							displayFormat={timeFormat("%Y-%m-%d")} />
+						<MouseCoordinateY
+							at="right"
+							orient="right"
+							displayFormat={format(".2f")} />
+						<BarSeries
+							// yAccessor={d => { console.log(d); return elder.accessor()(d) && elder.accessor()(d).bearPower}}
+							yAccessor={d => d.rsi2.bearPower}
+							baseAt={(xScale, yScale, d) => yScale(0)}
+							fill={d => d.side === 'buy' ? '#800080' : d.side === 'sell' ? '#FFA500' : d.side === 'hold' ? '#00FF00' : '#FF0000'} />
+						<StraightLine yValue={0} />
+
+						<SingleValueTooltip
+							yAccessor={d => d.rsi2.bearPower}
+							yLabel="RSI2 - Bear power"
+							yDisplayFormat={format(".2f")}
+							appearance={rsiAppearance}
+							{...SMATooltipProps}
+							origin={[-40, this.props.isHompage ? 40 : 25]}/>
+					</Chart>
+				)}
+				{this.isIncludeIndicators('RSI3') && (
+					<Chart id={5} 
+						// height={(!this.props.isHomePage || isFullChart) ? 100 : 70}
+						height={70}
+						yExtents={[0, d => d.rsi2.bearPower]}
+						origin={(w, h) => [0, h - this.calculateOffset('RSI3', isFullChart)]}
+						padding={{ top: 40, bottom: 10 }}
+					>
+						<XAxis axisAt="bottom" orient="bottom" stroke="white" tickStroke="white" />
+						<YAxis axisAt="right" orient="right" stroke="white" tickStroke="white" ticks={4} tickFormat={format(".2f")}/>
+						<MouseCoordinateX
+							at="bottom"
+							orient="bottom"
+							displayFormat={timeFormat("%Y-%m-%d")} />
+						<MouseCoordinateY
+							at="right"
+							orient="right"
+							displayFormat={format(".2f")} />
+						<BarSeries
+							// yAccessor={d => { console.log(d); return elder.accessor()(d) && elder.accessor()(d).bearPower}}
+							yAccessor={d => d.rsi3.bearPower}
+							baseAt={(xScale, yScale, d) => yScale(0)}
+							fill={d => d.side === 'buy' ? '#800080' : d.side === 'sell' ? '#FFA500' : d.side === 'hold' ? '#00FF00' : '#FF0000'} />
+						<StraightLine yValue={0} />
+
+						<SingleValueTooltip
+							yAccessor={d => d.rsi3.bearPower}
+							yLabel="RSI3 - Bear power"
+							yDisplayFormat={format(".2f")}
+							appearance={rsiAppearance}
+							{...SMATooltipProps}
+							origin={[-40, this.props.isHompage ? 40 : 25]}/>
+					</Chart>
+				)}
+				{this.isIncludeIndicators('HEIK1') && (
+					<Chart id={6} 
+						// height={(!this.props.isHomePage || isFullChart) ? 100 : 70}
+						height={70}
+						yExtents={[0, d => d.heik.bearPower]}
+						origin={(w, h) => [0, h - this.calculateOffset('HEIK1', isFullChart)]}
+						padding={{ top: 40, bottom: 10 }}
+					>
+						<XAxis axisAt="bottom" orient="bottom" stroke="white" tickStroke="white" />
+						<YAxis axisAt="right" orient="right" stroke="white" tickStroke="white" ticks={4} tickFormat={format(".2f")}/>
+						<MouseCoordinateX
+							at="bottom"
+							orient="bottom"
+							displayFormat={timeFormat("%Y-%m-%d")} />
+						<MouseCoordinateY
+							at="right"
+							orient="right"
+							displayFormat={format(".2f")} />
+						<BarSeries
+							// yAccessor={d => { console.log(d); return elder.accessor()(d) && elder.accessor()(d).bearPower}}
+							yAccessor={d => d.heik.bearPower}
+							baseAt={(xScale, yScale, d) => yScale(0)}
+							fill={d => d.side === 'buy' ? '#800080' : d.side === 'sell' ? '#FFA500' : d.side === 'hold' ? '#00FF00' : '#FF0000'} />
+						<StraightLine yValue={0} />
+
+						<SingleValueTooltip
+							yAccessor={d => d.heik.bearPower}
+							yLabel="HEIK1 - Bear power"
+							yDisplayFormat={format(".2f")}
+							appearance={rsiAppearance}
+							{...SMATooltipProps}
+							origin={[-40, this.props.isHompage ? 40 : 25]}/>
+					</Chart>
+				)}
+				{this.isIncludeIndicators('HEIK2') && (
+					<Chart id={7} 
+						// height={(!this.props.isHomePage || isFullChart) ? 100 : 70}
+						height={70}
+						yExtents={[0, d => d.heik2.bearPower]}
+						origin={(w, h) => [0, h - this.calculateOffset('HEIK2', isFullChart)]}
+						padding={{ top: 40, bottom: 10 }}
+					>
+						<XAxis axisAt="bottom" orient="bottom" stroke="white" tickStroke="white" />
+						<YAxis axisAt="right" orient="right" stroke="white" tickStroke="white" ticks={4} tickFormat={format(".2f")}/>
+						<MouseCoordinateX
+							at="bottom"
+							orient="bottom"
+							displayFormat={timeFormat("%Y-%m-%d")} />
+						<MouseCoordinateY
+							at="right"
+							orient="right"
+							displayFormat={format(".2f")} />
+						<BarSeries
+							// yAccessor={d => { console.log(d); return elder.accessor()(d) && elder.accessor()(d).bearPower}}
+							yAccessor={d => d.heik2.bearPower}
+							baseAt={(xScale, yScale, d) => yScale(0)}
+							fill={d => d.side === 'buy' ? '#800080' : d.side === 'sell' ? '#FFA500' : d.side === 'hold' ? '#00FF00' : '#FF0000'} />
+						<StraightLine yValue={0} />
+
+						<SingleValueTooltip
+							yAccessor={d => d.heik2.bearPower}
+							yLabel="HEIK2 - Bear power"
+							yDisplayFormat={format(".2f")}
+							appearance={rsiAppearance}
+							{...SMATooltipProps}
+							origin={[-40, this.props.isHompage ? 40 : 25]}/>
+					</Chart>
+				)}
+				{/* {this.isIncludeIndicators('SMA') && (
 					<Chart id={5} 
 						height={(!this.props.isHomePage || isFullChart) ? 100 : 70}
 						yExtents={[0, d => elder.accessor()(d) && elder.accessor()(d).bearPower]}
@@ -745,7 +864,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 							{...SMATooltipProps}
 						/>
 					</Chart>
-				)}
+				)} */}
 				<CrossHairCursor />
 				<DrawingObjectSelector
 					enabled={!this.state.enableInteractiveObject}

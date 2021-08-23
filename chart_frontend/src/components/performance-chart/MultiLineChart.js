@@ -52,7 +52,7 @@ export class MultiLineChart extends React.Component {
             style: {
                 colors: '#FFFFFF',
             },
-            formatter: (value) => { return Math.round(value) },
+            formatter: (value) => value,
           },
           axisBorder: {
             show: true,

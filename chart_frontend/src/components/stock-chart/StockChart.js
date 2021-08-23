@@ -76,7 +76,7 @@ const StockChart = (props) => {
                 body: JSON.stringify({
                     'db_name': dbname,
                     'symbol': symbol,
-                    'table_name': symbol,
+                    'strategy': microStrategy,
                 })
             };
             fetch(process.env.REACT_APP_BACKEND_URL+'/api/get_data', requestOptions)
