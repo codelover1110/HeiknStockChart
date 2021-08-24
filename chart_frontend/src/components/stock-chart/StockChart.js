@@ -106,6 +106,7 @@ const StockChart = (props) => {
             fetch(process.env.REACT_APP_BACKEND_URL+'/api/get_backtesting_data', requestOptions)
                 .then(response => response.json())
                 .then(data => {
+                    console.log(data['chart_data'])
                     setChartData(data['chart_data'])
                 })
         }

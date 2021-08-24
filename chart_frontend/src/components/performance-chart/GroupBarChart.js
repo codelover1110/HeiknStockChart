@@ -2,11 +2,11 @@ import React, { useState, useEffect } from "react";
 import ReactApexChart from "react-apexcharts";
 
 const getWiningData = (chartData, isAverage) => {
-  return chartData.map((d) => isAverage ? d.avgWinning : d.winning )
+  return chartData.map((d) => isAverage ? d.avgWinning / 100 : d.winning )
 }
 
 const getLosingData = (chartData, isAverage) => {
-  return chartData.map((d) => isAverage ? d.avgLosing : d.losing)
+  return chartData.map((d) => isAverage ? d.avgLosing / 100 : d.losing)
 }
 
 const getSymbols = (chartData) => {
@@ -42,7 +42,7 @@ const optionCreator = (chartData, isAverage) => {
     },
     colors: ["#2e88ff", `rgba(0,65,163, ${1 ? 0.5 : 1})`],
     title: {
-      text: isAverage ? "Wining & Losing Average" : "Wining & Losing",
+      text: isAverage ? "Winning & Losing Avg Percent" : "Wining & Losing",
       align: "left",
       offsetX: 8,
       offsetY: -2,
@@ -89,7 +89,7 @@ const optionCreator = (chartData, isAverage) => {
         style: {
             colors: '#FFFFFF',
         },
-        formatter: (value) => { return Math.round(value) },
+        formatter: (value) => value,
       },
       axisBorder: {
         show: true,

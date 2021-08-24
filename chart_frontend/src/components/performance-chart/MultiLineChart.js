@@ -20,10 +20,10 @@ export class MultiLineChart extends React.Component {
           enabled: false
         },
         stroke: {
-          curve: 'straight'
+          curve: 'smooth'
         },
         title: {
-          text: props.isPercent ? 'Percent' : 'Efficiency',
+          text: props.isPercent ? 'Percent Gain/Lost' : 'Efficiency',
           align: 'left',
           style: {
             fontSize:  '18px',
@@ -57,6 +57,8 @@ export class MultiLineChart extends React.Component {
           axisBorder: {
             show: true,
           },
+          min: this.getMinValue(),
+          max: this.getMaxValue(),
         },
         legend: {
           show: true,
@@ -105,7 +107,9 @@ export class MultiLineChart extends React.Component {
               style: {
                   colors: '#FFFFFF',
               },
-              formatter: (value) => { return Math.round(value) },
+              formatter: (value) => value,
+              min: this.getMinValue(),
+              max: this.getMaxValue(),
             },
             axisBorder: {
               show: true,
@@ -116,6 +120,29 @@ export class MultiLineChart extends React.Component {
     }
   }
 
+  getMinValue() {
+    let series = [];
+    this.props.chartData.map((data) => {
+      for (const property in data) {
+        const rows = data[property].map(o => this.props.isPercent ? o.percent : o.efficiency)
+        series.push(Math.min(...rows))
+      }
+    })
+    const min = Math.min(...series)
+    return min;
+  }
+  
+  getMaxValue() {
+    let series = [];
+    this.props.chartData.map((data) => {
+      for (const property in data) {
+        const rows = data[property].map(o => this.props.isPercent ? o.percent : o.efficiency)
+        series.push(Math.max(...rows))
+      }
+    })
+    const max = Math.max(...series)
+    return max;
+  }
 
   getCategories() {
     const categories = this.props.chartData.map((data) => {

@@ -14,15 +14,15 @@ const TutorialsList = () => {
   const [symbolList, setSymbolList] = useState([])
   const [isGetSymbolList, setIsGetSymbolList] = useState(false)
   const [chartColumn, setChartColumn] = useState({ value: 6, label: '6' })
-  const [selectedInstance, setSelectedInstance] = useState({ value: 'stress_test', label: 'Stress Test' });
+  const [selectedInstance, setSelectedInstance] = useState({ value: 'forward_test', label: 'Forward Test' });
   const [selectedViewType, setSelectedViewType] = useState({ value: 'charting', label: 'Charting' });
   const [microStrategy, setMicroStrategy] = useState({ value: 'heikfilter-2mins-trades', label: '2 mins' })
   const [strategy, setStrategy] = useState({ value: 'heikfilter', label: 'heikfilter' });
 
   const optionsInstance = [
-    { value: 'stress_test', label: 'Stress Test' },
-    { value: 'optimization', label: 'Optimization' },
     { value: 'forward_test', label: 'Forward Test' },
+    { value: 'optimization', label: 'Optimization' },
+    { value: 'stress_test', label: 'Stress Test' },
     { value: 'live_trading', label: 'Live Trading' },
   ]
   
@@ -417,7 +417,7 @@ const TutorialsList = () => {
           </div>
         </div>
       </nav>
-      {selectedInstance.value === 'optimization' || selectedInstance.value === 'forward_test' 
+      {selectedInstance.value === 'optimization' || selectedInstance.value === 'stress_test' 
         ? (<div className="development-in-content dark">
           In development
         </div>)

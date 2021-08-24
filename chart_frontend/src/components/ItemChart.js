@@ -15,7 +15,7 @@ const TutorialsList = (props) => {
     const [selectedInstance, setSelectedInstance] = useState(
       instance 
       ? instance
-      : { value: 'stress_test', label: 'Stress Test' }
+      : { value: 'forward_test', label: 'Forward Test' }
     );
     const [selectedViewType, setSelectedViewType] = useState(
       viewType
@@ -33,9 +33,9 @@ const TutorialsList = (props) => {
     const [apiFlag, setApiFlag] = useState(false)
 
     const optionsInstance = [
-      { value: 'stress_test', label: 'Stress Test' },
-      { value: 'optimization', label: 'Optimization' },
       { value: 'forward_test', label: 'Forward Test' },
+      { value: 'optimization', label: 'Optimization' },
+      { value: 'stress_test', label: 'Stress Test' },
       { value: 'live_trading', label: 'Live Trading' },
     ]
       
