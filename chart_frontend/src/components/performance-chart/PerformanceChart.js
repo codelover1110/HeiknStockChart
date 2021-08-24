@@ -180,14 +180,13 @@ class BubbleChart extends React.Component {
 		return (
 			<div>
 				<MultiLineChart chartData={mainData.percentEfficiency} isPercent={true}/>
-				<MultiLineChart chartData={mainData.percentEfficiency} isPercent={false}/>
 				<TypeChooser>
 					{type => <GroupApexBar type={type} data={mainData.winningLosing} isAverage={false}/>}
 				</TypeChooser>
 				<TypeChooser>
 					{type => <GroupApexBar type={type} data={mainData.winningLosingAvg} isAverage={true}/>}
 				</TypeChooser>
-				
+				<MultiLineChart chartData={mainData.percentEfficiency} isPercent={false}/>
 			</div>
 		);
 	}

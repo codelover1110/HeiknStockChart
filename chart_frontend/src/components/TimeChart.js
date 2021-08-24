@@ -21,7 +21,6 @@ const TutorialsList = () => {
 
   const optionsInstance = [
     { value: 'forward_test', label: 'Forward Test' },
-    { value: 'optimization', label: 'Optimization' },
     { value: 'stress_test', label: 'Stress Test' },
     { value: 'live_trading', label: 'Live Trading' },
   ]

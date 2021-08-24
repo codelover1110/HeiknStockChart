@@ -40,7 +40,7 @@ const optionCreator = (chartData, isAverage) => {
         }
       }
     },
-    colors: ["#2e88ff", `rgba(0,65,163, ${1 ? 0.5 : 1})`],
+    colors: ["#00ff00", `rgba(255,0,0, ${1 ? 0.5 : 1})`],
     title: {
       text: isAverage ? "Winning & Losing Avg Percent" : "Wining & Losing",
       align: "left",
@@ -66,12 +66,12 @@ const optionCreator = (chartData, isAverage) => {
       offsetY: -20,
       style: {
         fontSize: "12px",
-        colors: ["#2e88ff", "#0041a3"]
+        colors: ["#FFFFFF", "#FFFFFF"]
       }
     },
     stroke: {
       show: true,
-      width: 2,
+      width: 1,
       colors: ["#fff"]
     },
     xaxis: {
@@ -82,6 +82,9 @@ const optionCreator = (chartData, isAverage) => {
             colors: '#FFFFFF',
         },
       },
+    },
+    grid: {
+      show: false
     },
     yaxis: {
       labels: {
