@@ -2,7 +2,7 @@
   position: relative;
   top: 0;
   height: 100vh;
-
+  overflow-y: hidden;
   &.wrapper-full-page{
     min-height: 100vh;
     height: auto;

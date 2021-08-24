@@ -54,10 +54,8 @@ function Sidebar(props) {
       }
     };
   });
-  const linkOnClick = () => {
-    document.documentElement.classList.remove("nav-open");
-  };
-  const { routes, rtlActive, logo, handleSidebarChange } = props;
+  
+  const { routes, selectedInstance, handleSidebarChange, handleInstanceChange } = props;
   
   return (
     <BackgroundColorContext.Consumer>
@@ -75,19 +73,17 @@ function Sidebar(props) {
                 return (
                   <li
                     className={
-                      activeRoute(prop.path) + (prop.pro ? " active-pro" : "")
+                      prop.instance === selectedInstance ? "active-instance hunter-select-instance" : "hunter-select-instance"
                     }
                     key={key}
+                    onClick={() => handleInstanceChange(prop.instance)}
                   >
-                    <NavLink
-                      to={prop.layout + prop.path}
+                    <div
                       className="nav-link"
-                      activeClassName="active"
-                      onClick={props.toggleSidebar}
                     >
                       <i className={prop.icon} />
-                      <p>{rtlActive ? prop.rtlName : prop.name}</p>
-                    </NavLink>
+                      <p>{prop.name}</p>
+                    </div>
                   </li>
                 );
               })}

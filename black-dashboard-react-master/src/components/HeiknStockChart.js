@@ -15,26 +15,22 @@ import {
   Nav,
 } from "reactstrap";
 
-const HeiknStockChart = () => {
+const HeiknStockChart = (props) => {
+
+  const { selectedInstance } = props
+
   const history = useHistory();
   const [symbol, setSymbol] = useState(null);
   const [indicators, setIndicators] = useState([]);
   const [isShowMicro, setIsShowMicro] = useState(true);
   const [symbolList, setSymbolList] = useState([])
   const [isGetSymbolList, setIsGetSymbolList] = useState(false)
-  const [collapseOpen, setcollapseOpen] = React.useState(false)
+  const [collapseOpen,] = React.useState(false)
   const [chartColumn, setChartColumn] = useState({ value: 6, label: '6' })
-  const [selectedInstance, setSelectedInstance] = useState({ value: 'forward_test', label: 'Forward Test' });
   const [selectedViewType, setSelectedViewType] = useState({ value: 'charting', label: 'Charting' });
   const [microStrategy, setMicroStrategy] = useState({ value: 'heikfilter-2mins-trades', label: '2 mins' })
   const [strategy, setStrategy] = useState({ value: 'heikfilter', label: 'heikfilter' });
 
-  const optionsInstance = [
-    { value: 'forward_test', label: 'Forward Test' },
-    { value: 'stress_test', label: 'Stress Test' },
-    { value: 'live_trading', label: 'Live Trading' },
-  ]
-  
   const optionsViewTypes = [
     { value: 'charting', label: 'Charting' },
     { value: 'performance', label: 'Performance' },
@@ -91,28 +87,27 @@ const HeiknStockChart = () => {
   }, [])
   
   useEffect(() => {
-    if(selectedInstance.value === 'live_trading') {
+    const handleInstanceChange = (value) => {
+      if (value === 'live_trading') {
+        setIsShowMicro(false);
+        setStrategy({ value: 'no_strategy', label: 'No Strategy' });
+        setOptionsStrategy([
+          { value: 'no_strategy', label: 'No Srategy' },
+        ])
+        return
+      }
+      setStrategy({ value: 'heikfilter-2mins-trades', label: '2 mins' });
+      setOptionsStrategy([
+        { value: 'heikfilter', label: 'heikfilter' },
+      ])
+      setIsShowMicro(true);
+    }
+    handleInstanceChange()
+    if(selectedInstance === 'live_trading') {
       get_tables();    
     }  
   }, [selectedInstance])
 
-  const handleInstanceChange = (value) => {
-    setSelectedInstance(value) 
-    if (value.value === 'live_trading') {
-      setIsShowMicro(false);
-      setStrategy({ value: 'no_strategy', label: 'No Strategy' });
-      setOptionsStrategy([
-        { value: 'no_strategy', label: 'No Srategy' },
-      ])
-      return
-    }
-    setStrategy({ value: 'heikfilter-2mins-trades', label: '2 mins' });
-    setOptionsStrategy([
-      { value: 'heikfilter', label: 'heikfilter' },
-    ])
-    setIsShowMicro(true);
-  }
-  
   const handleViewTypeChange = (value) => {
     setSelectedViewType(value)
     if (value.value === 'performance') {
@@ -161,20 +156,6 @@ const HeiknStockChart = () => {
     if (e) {
       setMicroStrategy(e)
     }
-    // const locationState = {
-    //   selectedInstance,
-    //   selectedViewType,
-    //   initStrategy: strategy,
-    //   initMicroStrategy: e,
-    //   initIndicators: indicators,
-    //   initSymbol: symbol,
-    // }
-    // if (e) {
-    //   history.push({
-    //     pathname: '/ItemChart',
-    //     state: locationState,
-    //   });
-    // }
   }
   
   const handleIndicatorsChange = (options) => {
@@ -189,7 +170,7 @@ const HeiknStockChart = () => {
         'strategy': strategy.value
       })
     };
-    console.log("process.env=========================================>", process.env)
+    
     fetch(process.env.REACT_APP_BACKEND_URL + "/api/tables", requestOptions)
 				.then(response => response.json())
 				.then(data => {
@@ -269,7 +250,7 @@ const HeiknStockChart = () => {
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
           {symbol && (
             < StockChart 
-              selectedInstance={selectedInstance.value}
+              selectedInstance={selectedInstance}
               selectedTradeDB='heikfilter-2mins-trades'
               chartPeriod='20D 2min'
               symbol={symbol.value}
@@ -284,7 +265,7 @@ const HeiknStockChart = () => {
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
           {symbol && (
           < StockChart 
-            selectedInstance={selectedInstance.value}
+            selectedInstance={selectedInstance}
             selectedTradeDB='heikfilter-12mins-trades'
             chartPeriod='20D 12min'
             symbol={symbol.value}
@@ -298,7 +279,7 @@ const HeiknStockChart = () => {
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
           {symbol && (
             < StockChart
-              selectedInstance={selectedInstance.value}
+              selectedInstance={selectedInstance}
               selectedTradeDB='heikfilter-1hour-trades'
               chartPeriod='30D 1hour'
               symbol={symbol.value}
@@ -312,7 +293,7 @@ const HeiknStockChart = () => {
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
           {symbol && (
             < StockChart
-              selectedInstance={selectedInstance.value}
+              selectedInstance={selectedInstance}
               selectedTradeDB='heikfilter-4hours-trades'
               chartPeriod='90D 4hour'
               symbol={symbol.value}
@@ -326,7 +307,7 @@ const HeiknStockChart = () => {
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
           {symbol && (
             < StockChart
-              selectedInstance={selectedInstance.value}
+              selectedInstance={selectedInstance}
               selectedTradeDB='heikfilter-12hours-trades'
               chartPeriod='90D 12hour'
               symbol={symbol.value}
@@ -340,7 +321,7 @@ const HeiknStockChart = () => {
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
           {symbol && (
           < StockChart
-            selectedInstance={selectedInstance.value}
+            selectedInstance={selectedInstance}
             selectedTradeDB='heikfilter-1day-trades'
             chartPeriod='1Y 1day'
             symbol={symbol.value}
@@ -367,14 +348,6 @@ const HeiknStockChart = () => {
           <li className="nav-item">
             <Link to={"/chart"} className="nav-link"></Link>
           </li>
-          <div className="select-option">
-            <Select
-              value={selectedInstance}
-              onChange={handleInstanceChange}
-              options={optionsInstance}
-              placeholder="Instance"
-            />
-          </div>
           <div className="select-option">
             <Select
               value={selectedViewType}
@@ -464,7 +437,7 @@ const HeiknStockChart = () => {
             </Nav>
           </Collapse>    
       </nav>
-      {selectedInstance.value === 'optimization' || selectedInstance.value === 'stress_test' 
+      {selectedInstance === 'stress_test' 
         ? (<div className="development-in-content dark">
           In development
         </div>)

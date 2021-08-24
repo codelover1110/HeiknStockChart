@@ -17,20 +17,19 @@
 */
 var routes = [
   {
-    name: "Stress test",
-    icon: "tim-icons icon-chart-pie-36",
-  },
-  {
-    name: "Optimization",
-    icon: "tim-icons  icon-atom",
-  },
-  {
     name: "Forward test",
+    icon: "tim-icons icon-chart-pie-36",
+    instance: "forward_test"
+  },
+  {
+    name: "Stress test",
     icon: "tim-icons icon-attach-87",
+    instance: "stress_test"
   },
   {
     name: "Live trading",
     icon: "tim-icons icon-badge",
+    instance: "live_trading"
   }
 ]
 // var routes = [

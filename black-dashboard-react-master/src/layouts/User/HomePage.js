@@ -34,12 +34,11 @@ import HeiknStockChart from "components/HeiknStockChart"
 var ps;
 
 function HomePage(props) {
-  const [isShowSidebar, setShowSidebar] = React.useState(true);
+  const [isShowSidebar, setShowSidebar] = React.useState(false);
+  const [selectedInstance, setSelectedInstance] = React.useState('forward_test');
   const location = useLocation();
   const mainPanelRef = React.useRef(null);
-  const [sidebarOpened, setsidebarOpened] = React.useState(
-    document.documentElement.className.indexOf("nav-open") !== -1
-  );
+  
   React.useEffect(() => {
     if (navigator.platform.indexOf("Win") > -1) {
       document.documentElement.className += " perfect-scrollbar-on";
@@ -74,28 +73,21 @@ function HomePage(props) {
       mainPanelRef.current.scrollTop = 0;
     }
   }, [location]);
-  // this function opens and closes the sidebar on small devices
-  const toggleSidebar = () => {
-    document.documentElement.classList.toggle("nav-open");
-    setsidebarOpened(!sidebarOpened);
-  };
+  
   
   const handleSidebarChange = () => {
     setShowSidebar(!isShowSidebar);
   };
-  const getBrandText = (path) => {
-    for (let i = 0; i < routes.length; i++) {
-      if (location.pathname.indexOf(routes[i].layout + routes[i].path) !== -1) {
-        return routes[i].name;
-      }
-    }
-    return "Brand";
-  };
+
+  const handleInstanceChange = (instance) => {
+    setSelectedInstance(instance)
+  }
+  
   return (
     <BackgroundColorContext.Consumer>
       {({ color, changeColor }) => (
         <React.Fragment>
-          <div className="wrapper">
+          <div className="wrapper hunter-wrapper">
           {!isShowSidebar && (
             <Button
               className ={"show-sidebar-toggle-area show-sidebar-icon"}
@@ -107,7 +99,9 @@ function HomePage(props) {
           {isShowSidebar && (
               <Sidebar
                 routes={routes}
+                selectedInstance={selectedInstance}
                 handleSidebarChange={handleSidebarChange}
+                handleInstanceChange={handleInstanceChange}
               />
             )}
             <div className={`main-panel ${!isShowSidebar ? 'full-width' : ''}`} ref={mainPanelRef} data={color}>
@@ -116,7 +110,7 @@ function HomePage(props) {
                 toggleSidebar={toggleSidebar}
                 sidebarOpened={sidebarOpened}
               /> */}
-              <HeiknStockChart />
+              <HeiknStockChart selectedInstance={selectedInstance} />
             </div>
           </div>
         </React.Fragment>
