@@ -2,11 +2,11 @@ import React, { useState, useEffect } from "react";
 import ReactApexChart from "react-apexcharts";
 
 const getWiningData = (chartData, isAverage) => {
-  return chartData.map((d) => isAverage ? d.avgWinning / 100 : d.winning )
+  return chartData.map((d) => isAverage ? d.avgWinning  : d.winning )
 }
 
 const getLosingData = (chartData, isAverage) => {
-  return chartData.map((d) => isAverage ? d.avgLosing / 100 : d.losing)
+  return chartData.map((d) => isAverage ? d.avgLosing : d.losing)
 }
 
 const getSymbols = (chartData) => {

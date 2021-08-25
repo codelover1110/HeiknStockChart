@@ -22,14 +22,14 @@ const TutorialsList = () => {
   const optionsInstance = [
     { value: 'forward_test', label: 'Forward Test' },
     { value: 'stress_test', label: 'Stress Test' },
+    { value: 'optimization', label: 'Optimization' },
     { value: 'live_trading', label: 'Live Trading' },
   ]
   
-  const optionsViewTypes = [
+  const [optionsViewTypes, setOptionsViewTypes] = useState([
     { value: 'charting', label: 'Charting' },
     { value: 'performance', label: 'Performance' },
-    { value: 'optimization ', label: 'Optimization' },
-  ]
+  ])
 
   const [optionsMicroStrategy, setOptionsMicroStrategy] = useState([
     { value: 'heikfilter-2mins-trades', label: '2 mins' },
@@ -87,6 +87,21 @@ const TutorialsList = () => {
   }, [selectedInstance])
 
   const handleInstanceChange = (value) => {
+    if (value.value === 'stress_test'
+      || value.value === 'forward_test'
+      || value.value === 'live_trading'
+    ) {
+      setOptionsViewTypes([
+        { value: 'charting', label: 'Charting' },
+        { value: 'performance', label: 'Performance' },
+      ])
+    } else {
+      setOptionsViewTypes([
+        { value: 'charting', label: 'Charting' },
+        { value: 'performance', label: 'Performance' },
+        { value: 'optimization ', label: 'Optimization' },
+      ])
+    }
     setSelectedInstance(value) 
     if (value.value === 'live_trading') {
       setIsShowMicro(false);

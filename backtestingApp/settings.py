@@ -16,7 +16,6 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
@@ -33,8 +32,11 @@ CORS_ORIGIN_WHITELIST = (
     'http://localhost:8081',
     'http://localhost:8080',
     'http://127.0.0.1:8081',
+    'http://127.0.0.1:80',
     'https://caats.ngrok.io',
-    'https://675eb930ade5.ngrok.io'
+    'http://localhost:8000',
+    'https://493a48cf7dda.ngrok.io',
+    'http://backtesttrading.eastus.cloudapp.azure.com:8000'
 )
 
 
@@ -87,13 +89,25 @@ WSGI_APPLICATION = 'backtestingApp.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-DATABASES = {
-    'default': {
-        'ENGINE': 'djongo',
-        'NAME': 'db-name',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'djongo',
+#         'NAME': 'db-name',
+#     }
+# }
 
+DATABASES = {
+  'default': {  
+    'ENGINE':   'djongo',
+    'NAME':     'test',
+    'CLIENT': {
+      'host': 'mongodb://hunter:STOCKdb123@cluster0-shard-00-00.agmoz.mongodb.net:27017,cluster0-shard-00-01.agmoz.mongodb.net:27017,cluster0-shard-00-02.agmoz.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-f8c9fs-shard-0&authSource=admin&retryWrites=true&w=majority',
+      'port': 27017,
+      'username': 'hunter',
+      'password': 'STOCKdb123',
+    } 
+  },
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators

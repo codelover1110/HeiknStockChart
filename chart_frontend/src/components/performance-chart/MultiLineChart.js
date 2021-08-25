@@ -64,6 +64,7 @@ export class MultiLineChart extends React.Component {
           },
           min: this.getMinValue(),
           max: this.getMaxValue(),
+          max: 0.8
         },
         legend: {
           show: true,
@@ -134,7 +135,7 @@ export class MultiLineChart extends React.Component {
       }
     })
     const min = Math.min(...series)
-    return min;
+    return min.toFixed(3);
   }
   
   getMaxValue() {
@@ -146,7 +147,8 @@ export class MultiLineChart extends React.Component {
       }
     })
     const max = Math.max(...series)
-    return max;
+    console.log("max======================>", max.toFixed(3))
+    return max.toFixed(3) + 0.1;
   }
 
   getCategories() {

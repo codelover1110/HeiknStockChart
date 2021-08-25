@@ -503,7 +503,10 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 			y: ({ yScale, datum }) => { return yScale(datum.low) - this.calculateTooltipOffset0(isFullChart) },
 			fill: "#006517",
 			path: buyPath,
-			tooltip: (e) => `Buy: ${e.price}, Date: ${e.trade_date.replace('T', ' ')}`,
+			tooltip: (e) => {
+				const contents = e.trades.map((trade) => `${trade.longShort === 'LONG' ? 'Buy:' : 'Sell:'} Price: ${trade.price} Date: ${trade.trade_date.replace('T', ' ')}\n`)
+				return contents
+			},
 		};
 
 		const shortAnnotationProps = {
@@ -511,7 +514,10 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 			y: ({ yScale, datum }) => { return yScale(datum.high) - this.calculateTooltipOffset1(isFullChart)},
 			fill: "#FF0000",
 			path: sellPath,
-			tooltip: (e) => `Sell: ${e.price}, Date: ${e.trade_date.replace('T', ' ')}`,
+			tooltip: (e) => {
+				const contents = e.trades.map((trade) => `${trade.longShort === 'LONG' ? 'Buy:' : 'Sell:'} Price: ${trade.price} Trade Date: ${trade.trade_date.replace('T', ' ')}\n`)
+				return contents
+			}
 		};
 
 		const start = xAccessor(last(data));
@@ -607,14 +613,18 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 					/>
 					
 					<Annotate with={SvgPathAnnotation} when={ d => 
-						this.props.selectedInstance !== 'live_trading'  
-						&& d.strategy === this.props.microStrategy
-						&& d.longShort === "LONG" }
+						{
+							return this.props.selectedInstance !== 'live_trading'  
+							&& d.trades
+							&& d.trades[0].strategy === this.props.microStrategy
+							&& d.trades[0].longShort === "LONG" 
+						}}
 						usingProps={longAnnotationProps} />
 					<Annotate with={SvgPathAnnotation} when={d => 
 						this.props.selectedInstance !== 'live_trading' 
-						&& d.strategy === this.props.microStrategy
-						&& d.longShort === "SHORT"}
+						&& d.trades
+						&& d.trades[0].strategy === this.props.microStrategy
+						&& d.trades[0].longShort === "SHORT" }
 						usingProps={shortAnnotationProps} />
 
 				</Chart>
@@ -920,7 +930,6 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 
 CandleStickChartWithEquidistantChannel.propTypes = {
 	data: PropTypes.array.isRequired,
-	deals: PropTypes.array.isRequired,
 	width: PropTypes.number.isRequired,
 	ratio: PropTypes.number.isRequired,
 	type: PropTypes.oneOf(["svg", "hybrid"]).isRequired
