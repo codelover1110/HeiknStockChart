@@ -57,7 +57,7 @@ export class MultiLineChart extends React.Component {
             style: {
                 colors: '#FFFFFF',
             },
-            formatter: (value) => value,
+            formatter: (value) => value.toFixed(2),
           },
           axisBorder: {
             show: true,
@@ -85,6 +85,7 @@ export class MultiLineChart extends React.Component {
           data: data[property].map((o) => this.props.isPercent ? o.percent : o.efficiency)
         })
       }
+      return null
     })
     return series
   }
@@ -101,7 +102,7 @@ export class MultiLineChart extends React.Component {
               style: {
                   colors: '#FFFFFF',
               },
-              formatter: (val, opt) =>
+              formatter: (val) =>
                 moment.utc(val).format("MM/DD hh:mm")
             },
             datetimeUTC: true,
@@ -132,6 +133,8 @@ export class MultiLineChart extends React.Component {
         const rows = data[property].map(o => this.props.isPercent ? o.percent : o.efficiency)
         series.push(Math.min(...rows))
       }
+
+      return null
     })
     const min = Math.min(...series)
     return min;
@@ -144,6 +147,7 @@ export class MultiLineChart extends React.Component {
         const rows = data[property].map(o => this.props.isPercent ? o.percent : o.efficiency)
         series.push(Math.max(...rows))
       }
+      return null
     })
     const max = Math.max(...series)
     return max;

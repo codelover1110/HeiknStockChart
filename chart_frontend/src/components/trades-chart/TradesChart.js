@@ -3,7 +3,6 @@ import React from "react";
 import PropTypes from "prop-types";
 
 import { withStyles } from "@material-ui/core";
-import * as d3 from "d3";
 import { format } from "d3-format";
 import dayjs from "dayjs";
 import { timeFormat } from "d3-time-format";
@@ -12,56 +11,35 @@ import { ChartCanvas, Chart } from "react-stockcharts";
 import {
 	BarSeries,
 	CandlestickSeries,
-	LineSeries,
-	MACDSeries,
 	StraightLine,
-	RSISeries,
 } from "react-stockcharts/lib/series";
 import { XAxis, YAxis } from "react-stockcharts/lib/axes";
 import {
 	CrossHairCursor,
-	EdgeIndicator,
-	CurrentCoordinate,
 	MouseCoordinateX,
 	MouseCoordinateY,
 } from "react-stockcharts/lib/coordinates";
 
 import { discontinuousTimeScaleProvider } from "react-stockcharts/lib/scale";
 import {
-	MovingAverageTooltip,
 	OHLCTooltip,
 	ToolTipText,
-	MACDTooltip,
 	SingleValueTooltip,
-	RSITooltip,
 } from "react-stockcharts/lib/tooltip";
-import { atr, elderRay, ema, macd, heikinAshi, rsi } from "react-stockcharts/lib/indicator";
+import { atr, ema, macd, heikinAshi } from "react-stockcharts/lib/indicator";
 import { fitWidth } from "react-stockcharts/lib/helper";
-import { EquidistantChannel, DrawingObjectSelector } from "react-stockcharts/lib/interactive";
+import { DrawingObjectSelector } from "react-stockcharts/lib/interactive";
 import { last, toObject } from "react-stockcharts/lib/utils";
 import {
 	saveInteractiveNodes,
 	getInteractiveNodes,
 } from "../Interactiveutils";
 import {
-	Label,
 	Annotate,
-	LabelAnnotation,
 	SvgPathAnnotation,
 	buyPath,
 	sellPath,
 } from "react-stockcharts/lib/annotation";
-import algo from "react-stockcharts/lib/algorithm";
-
-const macdAppearance = {
-	stroke: {
-		macd: "#FF0000",
-		signal: "#00F300",
-	},
-	fill: {
-		divergence: "#4682B4"
-	},
-};
 
 const rsiAppearance = {
 	stroke: {
@@ -114,7 +92,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 		document.removeEventListener("keyup", this.onKeyPress);
 	}
 
-	handleEvents = (type, moreProps, state) => {
+	handleEvents = (type) => {
 		if (type === "zoom") {
 		  this.handleZoom();
 		}
@@ -149,12 +127,6 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 			dateText: dateElem,
 			status: e.datum.action,
 		});
-		// this.setState({
-		// 	x: +e.xScale(e.datum.date),
-		// 	y: +e.yScale(e.datum.high) - 24,
-		// 	valueText: e.datum.high,
-		// 	dateText: dateElem
-		// });
 	}
 
 	handleSelection(interactives) {
@@ -214,6 +186,9 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 				this.setState({
 					enableInteractiveObject: true
 				});
+				break;
+			}
+			default: {
 				break;
 			}
 		}
@@ -356,93 +331,67 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 			.merge((d, c) => { d.ema50 = c; })
 			.accessor(d => d.ema50);
 
-		const buySell = algo()
-			.windowSize(2)
-			.accumulator(([prev, now]) => {
-				const { ema20: prevShortTerm, ema50: prevLongTerm } = prev;
-				const { ema20: nowShortTerm, ema50: nowLongTerm } = now;
-				if (prevShortTerm < prevLongTerm && nowShortTerm > nowLongTerm) return "LONG";
-				if (prevShortTerm > prevLongTerm && nowShortTerm < nowLongTerm) return "SHORT";
-			})
-			.merge((d, c) => { d.longShort = c; });
-
-		const actionStateNames = {
-			buy: "BUY",
-			sell: "SELL"
-		};
-
-		const longFillProps = {
-			stroke: "#22a46e",
-			fill: "#22a46e",
-			className: this.props.classes.deal_green_shadowed
-		  };
-	  
-		  const shortFillProps = {
-			stroke: "#cc4060",
-			fill: "#cc4060",
-			className: this.props.classes.deal_red_shadowed
-		  };
-	  
-		  const fontProps = {
-			fontFamily: "Material Icons",
-			fontSize: 24,
-			fontWeight: "normal",
-			opacity: 1,
-			onClick: this.addTextLable
-		  };
-	  
-		const yOpenProps = {
-		y: ({ yScale, datum }) => yScale(datum.high * 1.04 - 100)
-		};
-	  
-		const yCloseProps = {
-		y: ({ yScale, datum }) => yScale(datum.high * 1.04 - 100)
-		};
-	  
-		const buyTooltipProps = {
-			tooltip: (o) => {
-				return `Buy: ${o.date} \n Price: ${o.price}`
-			}
-		}
 		
-		const sellTooltipProps = {
-			tooltip: (o) => {
-				return `Sell: ${o.date}\nPrice: ${o.price}`
-			}
-		}
-
-		const buy = {
-			...longFillProps,
-			...fontProps,
-			...yOpenProps,
-			text: "\u25B2",
-			...buyTooltipProps,
-			rotate: 180
-		};
+		// const longFillProps = {
+		// 	stroke: "#22a46e",
+		// 	fill: "#22a46e",
+		// 	className: this.props.classes.deal_green_shadowed
+		//   };
 	  
-		  const sell = {
-			...shortFillProps,
-			...fontProps,
-			...yCloseProps,
-			...sellTooltipProps,
-			text: "\u25B2",
-			rotate: 180
-		};
+		//   const shortFillProps = {
+		// 	stroke: "#cc4060",
+		// 	fill: "#cc4060",
+		// 	className: this.props.classes.deal_red_shadowed
+		//   };
+	  
+		//   const fontProps = {
+		// 	fontFamily: "Material Icons",
+		// 	fontSize: 24,
+		// 	fontWeight: "normal",
+		// 	opacity: 1,
+		// 	onClick: this.addTextLable
+		//   };
+	  
+		// const yOpenProps = {
+		// y: ({ yScale, datum }) => yScale(datum.high * 1.04 - 100)
+		// };
+	  
+		// const yCloseProps = {
+		// y: ({ yScale, datum }) => yScale(datum.high * 1.04 - 100)
+		// };
+	  
+		// const buyTooltipProps = {
+		// 	tooltip: (o) => {
+		// 		return `Buy: ${o.date} \n Price: ${o.price}`
+		// 	}
+		// }
+		
+		// const sellTooltipProps = {
+		// 	tooltip: (o) => {
+		// 		return `Sell: ${o.date}\nPrice: ${o.price}`
+		// 	}
+		// }
 
-		const elder = elderRay();
+		// const buy = {
+		// 	...longFillProps,
+		// 	...fontProps,
+		// 	...yOpenProps,
+		// 	text: "\u25B2",
+		// 	...buyTooltipProps,
+		// 	rotate: 180
+		// };
+	  
+		//   const sell = {
+		// 	...shortFillProps,
+		// 	...fontProps,
+		// 	...yCloseProps,
+		// 	...sellTooltipProps,
+		// 	text: "\u25B2",
+		// 	rotate: 180
+		// };
+
 		const ha = heikinAshi();
-		const ema26 = ema()
-			.id(0)
-			.options({ windowSize: 26 })
-			.merge((d, c) => { d.ema26 = c; })
-			.accessor(d => d.ema26);
-
-		const ema12 = ema()
-			.id(1)
-			.options({ windowSize: 12 })
-			.merge((d, c) => { d.ema12 = c; })
-			.accessor(d => d.ema12);
-
+		
 		const macdCalculator = macd()
 			.options({
 				fast: 12,
@@ -452,35 +401,24 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 			.merge((d, c) => { d.macd = c; })
 			.accessor(d => d.macd);
 
-		const rsiCalculator = rsi()
-		.options({ windowSize: 14 })
-		.merge((d, c) => {d.rsi = c;})
-		.accessor(d => d.rsi);
-			
 		const atr14 = atr()
 		.options({ windowSize: 14 })
 		.merge((d, c) => {d.atr14 = c;})
 		.accessor(d => d.atr14);	
 
-		const { type, data: initialData, width, ratio, indicators, chartColumn } = this.props;
+		const { type, data: initialData, width, ratio, chartColumn } = this.props;
 
 		const isFullChart = (chartColumn === 1 || chartColumn === 2);
-
-		const { channels_1 } = this.state;
-
-		// this.props.deals.forEach(deal => {
-		// 	deal.ddate = new Date(dayjs(deal.ddate).format());
-		// });	
 
 		initialData.forEach(line => {
 			line.date = dayjs(line.date).toDate();
 		  });
 
-		const margin = { left: 80, right: 80, top: 30, bottom: 50 };  
+		// const margin = { left: 80, right: 80, top: 30, bottom: 50 };  
 
-		const height = 400;
+		// const height = 400;
 
-		const [yAxisLabelX, yAxisLabelY] = [width - margin.left - 40, margin.top + (height - margin.top - margin.bottom) / 2];
+		// const [yAxisLabelX, yAxisLabelY] = [width - margin.left - 40, margin.top + (height - margin.top - margin.bottom) / 2];
 		
 		const calculatedData = macdCalculator((ha(atr14(initialData))));
 		
@@ -503,7 +441,10 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 			y: ({ yScale, datum }) => { return yScale(datum.low) - this.calculateTooltipOffset0(isFullChart) },
 			fill: "#006517",
 			path: buyPath,
-			tooltip: (e) => `Buy: ${e.price}, Date: ${e.trade_date.replace('T', ' ')}`,
+			tooltip: (e) => {
+				const contents = e.trades.map((trade) => `${trade.longShort === 'LONG' ? 'Buy:' : 'Sell:'} Price: ${trade.price} Date: ${trade.trade_date.replace('T', ' ')}\n`)
+				return contents
+			},
 		};
 
 		const shortAnnotationProps = {
@@ -511,25 +452,27 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 			y: ({ yScale, datum }) => { return yScale(datum.high) - this.calculateTooltipOffset1(isFullChart)},
 			fill: "#FF0000",
 			path: sellPath,
-			tooltip: (e) => `Sell: ${e.price}, Date: ${e.trade_date.replace('T', ' ')}`,
+			tooltip: (e) => {
+				const contents = e.trades.map((trade) => `${trade.longShort === 'LONG' ? 'Buy:' : 'Sell:'} Price: ${trade.price} Trade Date: ${trade.trade_date.replace('T', ' ')}\n`)
+				return contents
+			}
 		};
 
 		const start = xAccessor(last(data));
-		const periodIndex = this.props.period === 'heikfilter-2mins-trades' 
-			? 15
-			: this.props.period === 'heikfilter-12mins-trades'
-			? 30
-			: this.props.period === 'heikfilter-1hour-trades'
-			? 90
-			: this.props.period === 'heikfilter-4hours-trades'
-			? 200
-			: this.props.period === 'heikfilter-12hours-trades'
-			? 200 : 1000
+		// const periodIndex = this.props.period === 'heikfilter-2mins-trades' 
+		// 	? 15
+		// 	: this.props.period === 'heikfilter-12mins-trades'
+		// 	? 30
+		// 	: this.props.period === 'heikfilter-1hour-trades'
+		// 	? 90
+		// 	: this.props.period === 'heikfilter-4hours-trades'
+		// 	? 200
+		// 	: this.props.period === 'heikfilter-12hours-trades'
+		// 	? 200 : 1000
 		
 		// const end = xAccessor(data[Math.max(0, data.length - periodIndex)]);
 		const end = xAccessor(data[Math.max(0, data.length - 150)]);
 		const xExtents = [start, end];
-		// console.log("this.props.data.length", this.props.data[1000].date)
 		// const xExtents = [
 		// 	this.props.data[0].date,
 		// 	this.props.data[this.props.data.length-1].date
@@ -539,16 +482,35 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 		
 		const xDisplayFormatProps = {
 			xDisplayFormat: timeFormat("%Y-%m-%d-%H-%M-%S"),
-		}
-
-		const RSIStrokeDashArray = {
-			opacity: {
-				top: 0,
-				middle: 0,
-				bottom: 0
+			ohlcFormat: () => "",
+			volumeFormat: () => "",
+			percentFormat: () => "",
+			displayTexts: {
+				d: "Date: ",
 			},
-		};
 
+		}
+		const xDisplayFormatProps1 = {
+			xDisplayFormat: timeFormat(""),
+			displayTexts: {
+				o: " O: ",
+				h: " H: ",
+				l: " L: ",
+				c: " C: ",
+				v: " Vol: ",
+				na: "n/a"
+			},
+		}
+		const xDisplayFormatProps2 = {
+			xDisplayFormat: timeFormat(""),
+			ohlcFormat: () => "",
+			volumeFormat: () => this.props.symbol,
+			percentFormat: () => "",
+			displayTexts: {
+				v: " Symbol: ",
+			},
+		}
+		
 		const SMATooltipProps = {
 			valueFill: '#ffffff'
 		}
@@ -598,23 +560,34 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 						fill={d => d.close > d.open ? "#6BA583" : "#DB0000"}
 					/>
 
-					{/* <EdgeIndicator itemType="last" orient="right" edgeAt="right"
-						yAccessor={d => d.close} fill={d => d.close > d.open ? "#6BA583" : "#FF0000"}/> */}
-
 					<OHLCTooltip 
-						origin={[-40, 0]}
+						origin={[-50, -10]}
 						{...xDisplayFormatProps}
 					/>
 					
+					<OHLCTooltip 
+						origin={[-50, 20]}
+						{...xDisplayFormatProps1}
+					/>
+					
+					<OHLCTooltip 
+						origin={[100, -5]}
+						{...xDisplayFormatProps2}
+					/>
+					
 					<Annotate with={SvgPathAnnotation} when={ d => 
-						this.props.selectedInstance !== 'live_trading'  
-						&& d.strategy === this.props.microStrategy
-						&& d.longShort === "LONG" }
+						{
+							return this.props.selectedInstance !== 'live_trading'  
+							&& d.trades
+							&& d.trades[0].strategy === this.props.microStrategy
+							&& d.trades[0].longShort === "LONG" 
+						}}
 						usingProps={longAnnotationProps} />
 					<Annotate with={SvgPathAnnotation} when={d => 
 						this.props.selectedInstance !== 'live_trading' 
-						&& d.strategy === this.props.microStrategy
-						&& d.longShort === "SHORT"}
+						&& d.trades
+						&& d.trades[0].strategy === this.props.microStrategy
+						&& d.trades[0].longShort === "SHORT" }
 						usingProps={shortAnnotationProps} />
 
 				</Chart>
@@ -635,34 +608,6 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 						<BarSeries yAccessor={d => d.volume} fill={d => d.close > d.open ? "#6BA583" : "#FF0000"} />
 					</Chart>
 				)}
-				{/* {this.isIncludeIndicators('MACD') && (
-					<Chart id={3} 
-						height={(!this.props.isHomePage || isFullChart) ? 100 : 70}
-						yExtents={macdCalculator.accessor()}
-						origin={(w, h) => [0, h - this.calculateOffset('MACD', isFullChart)]} padding={{ top: 30, bottom: 10 }}
-					>
-						<XAxis axisAt="bottom" orient="bottom" stroke="white" tickStroke="white" />
-						<YAxis axisAt="right" orient="right" ticks={2} stroke="white" tickStroke="white" />
-
-						<MouseCoordinateX
-							at="bottom"
-							orient="bottom"
-							displayFormat={timeFormat("%Y-%m-%d")} />
-						<MouseCoordinateY
-							at="right"
-							orient="right"
-							displayFormat={format(".2f")} />
-
-						<MACDSeries yAccessor={d => d.macd}
-							{...macdAppearance} />
-						<MACDTooltip
-							origin={[-38, this.props.isHompage ? 20 : 30]}
-							yAccessor={d => d.macd}
-							options={macdCalculator.options()}
-							appearance={macdAppearance}
-						/>
-					</Chart>
-				)} */}
 				{this.isIncludeIndicators('RSI') && (
 					<Chart id={3} 
 						// height={(!this.props.isHomePage || isFullChart) ? 100 : 70}
@@ -682,7 +627,6 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 							orient="right"
 							displayFormat={format(".2f")} />
 						<BarSeries
-							// yAccessor={d => { console.log(d); return elder.accessor()(d) && elder.accessor()(d).bearPower}}
 							yAccessor={d => d.rsi.bearPower}
 							baseAt={(xScale, yScale, d) => yScale(0)}
 							fill={d => d.side === 'buy' ? '#800080' : d.side === 'sell' ? '#FFA500' : d.side === 'hold' ? '#00FF00' : '#FF0000'} />
@@ -716,7 +660,6 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 							orient="right"
 							displayFormat={format(".2f")} />
 						<BarSeries
-							// yAccessor={d => { console.log(d); return elder.accessor()(d) && elder.accessor()(d).bearPower}}
 							yAccessor={d => d.rsi2.bearPower}
 							baseAt={(xScale, yScale, d) => yScale(0)}
 							fill={d => d.side === 'buy' ? '#800080' : d.side === 'sell' ? '#FFA500' : d.side === 'hold' ? '#00FF00' : '#FF0000'} />
@@ -750,9 +693,8 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 							orient="right"
 							displayFormat={format(".2f")} />
 						<BarSeries
-							// yAccessor={d => { console.log(d); return elder.accessor()(d) && elder.accessor()(d).bearPower}}
 							yAccessor={d => d.rsi3.bearPower}
-							baseAt={(xScale, yScale, d) => yScale(0)}
+							baseAt={(yScale) => yScale(0)}
 							fill={d => d.side === 'buy' ? '#800080' : d.side === 'sell' ? '#FFA500' : d.side === 'hold' ? '#00FF00' : '#FF0000'} />
 						<StraightLine yValue={0} />
 
@@ -784,9 +726,8 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 							orient="right"
 							displayFormat={format(".2f")} />
 						<BarSeries
-							// yAccessor={d => { console.log(d); return elder.accessor()(d) && elder.accessor()(d).bearPower}}
 							yAccessor={d => d.heik.bearPower}
-							baseAt={(xScale, yScale, d) => yScale(0)}
+							baseAt={(yScale) => yScale(0)}
 							fill={d => d.side === 'buy' ? '#800080' : d.side === 'sell' ? '#FFA500' : d.side === 'hold' ? '#00FF00' : '#FF0000'} />
 						<StraightLine yValue={0} />
 
@@ -820,7 +761,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 						<BarSeries
 							// yAccessor={d => { console.log(d); return elder.accessor()(d) && elder.accessor()(d).bearPower}}
 							yAccessor={d => d.heik2.bearPower}
-							baseAt={(xScale, yScale, d) => yScale(0)}
+							baseAt={(yScale) => yScale(0)}
 							fill={d => d.side === 'buy' ? '#800080' : d.side === 'sell' ? '#FFA500' : d.side === 'hold' ? '#00FF00' : '#FF0000'} />
 						<StraightLine yValue={0} />
 
@@ -833,38 +774,6 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 							origin={[-40, this.props.isHompage ? 40 : 25]}/>
 					</Chart>
 				)}
-				{/* {this.isIncludeIndicators('SMA') && (
-					<Chart id={5} 
-						height={(!this.props.isHomePage || isFullChart) ? 100 : 70}
-						yExtents={[0, d => elder.accessor()(d) && elder.accessor()(d).bearPower]}
-						origin={(w, h) => [0, h - this.calculateOffset('SMA', isFullChart)]}
-						padding={{ top: 30, bottom: 10 }}
-					>
-						<XAxis axisAt="bottom" orient="bottom" stroke="white" tickStroke="white"/>
-						<YAxis axisAt="right" orient="right" stroke="white" tickStroke="white" ticks={4} tickFormat={format(".2f")}/>
-						<MouseCoordinateX
-							at="bottom"
-							orient="bottom"
-							displayFormat={timeFormat("%Y-%m-%d")} />
-						<MouseCoordinateY
-							at="right"
-							orient="right"
-							displayFormat={format(".2f")} />
-						<BarSeries
-							yAccessor={d => elder.accessor()(d) && elder.accessor()(d).bearPower}
-							baseAt={(xScale, yScale, d) => yScale(0)}
-							fill="#FF0000" />
-						<StraightLine yValue={0} />
-
-						<SingleValueTooltip
-							yAccessor={d => elder.accessor()(d) && elder.accessor()(d).bearPower}
-							yLabel="SMA - Bear power"
-							yDisplayFormat={format(".2f")}
-							origin={[-40, this.props.isHompage ? 30 : 20]}
-							{...SMATooltipProps}
-						/>
-					</Chart>
-				)} */}
 				<CrossHairCursor />
 				<DrawingObjectSelector
 					enabled={!this.state.enableInteractiveObject}
@@ -920,7 +829,6 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 
 CandleStickChartWithEquidistantChannel.propTypes = {
 	data: PropTypes.array.isRequired,
-	deals: PropTypes.array.isRequired,
 	width: PropTypes.number.isRequired,
 	ratio: PropTypes.number.isRequired,
 	type: PropTypes.oneOf(["svg", "hybrid"]).isRequired

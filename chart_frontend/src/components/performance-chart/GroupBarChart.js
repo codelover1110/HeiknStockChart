@@ -65,9 +65,15 @@ const optionCreator = (chartData, isAverage) => {
       enabled: true,
       offsetY: -20,
       style: {
-        fontSize: "12px",
+        fontSize: "16px",
         colors: ["#FFFFFF", "#FFFFFF"]
-      }
+      },
+      formatter: (value, opts) => {
+        if (opts.seriesIndex !== 0) {
+          return `- ${value}`
+        }
+        return value;
+      },
     },
     stroke: {
       show: true,
@@ -149,7 +155,7 @@ export default function GroupApexBar(props) {
         data: getLosingData(chartData, isAverage)
       }
     ])
-  }, [chartData])
+  }, [chartData, isAverage])
 
   return (
     <div id="chart">

@@ -1,29 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Select from 'react-select'
-import _ from "underscore";
 import "react-datetime/css/react-datetime.css";
 import StockChart from "./stock-chart/StockChart"
 import { useHistory } from "react-router-dom";
 
-const TutorialsList = (props) => {
-    const { instance, viewType, initStrategy, initMicroStrategy, initIndicators, initSymbol } = props.location.state
+const HeiknStockChartItem = (props) => {
     
+    const { selectedInstance, handleChartRedirect } = props
     const history = useHistory();
-    const [isGetSymbolList, setIsGetSymbolList] = useState(false)
+    const { viewType, initStrategy, initMicroStrategy, initIndicators, initSymbol } = history.location.state
     
-    const [selectedInstance, setSelectedInstance] = useState(
-      instance 
-      ? instance
-      : { value: 'forward_test', label: 'Forward Test' }
-    );
     const [selectedViewType, setSelectedViewType] = useState(
       viewType
       ? viewType
       : { value: 'charting', label: 'Charting' }
     );
 
-    const [selectedOptionTable, setSelectedOptionTable] = useState(null)
     const [symbol, setSymbol] = useState(initSymbol)
     const [multiSymbol, setMultiSymbol] = useState([initSymbol])
     const [strategy, setStrategy] = useState(initStrategy ? initStrategy : {})
@@ -32,18 +25,10 @@ const TutorialsList = (props) => {
     const [indicators, setIndicators] = useState(initIndicators)
     const [apiFlag, setApiFlag] = useState(false)
 
-    const optionsInstance = [
-      { value: 'forward_test', label: 'Forward Test' },
-      // { value: 'optimization', label: 'Optimization' },
-      { value: 'stress_test', label: 'Stress Test' },
-      { value: 'live_trading', label: 'Live Trading' },
-    ]
-      
-    const optionsViewTypes = [
+    const [optionsViewTypes, setOptionsViewTypes] = useState([
       { value: 'charting', label: 'Charting' },
       { value: 'performance', label: 'Performance' },
-      { value: 'optimization ', label: 'Optimization' },
-    ]    
+    ])    
 
     const [optionsMicroStrategy, setOptionsMicroStrategy] = useState([
       { value: 'heikfilter-2mins-trades', label: '2 mins' },
@@ -74,49 +59,53 @@ const TutorialsList = (props) => {
     ]
     
     useEffect(() => {
-        if (!apiFlag) {
-            setSelectedOptionTable(microStrategy)
-            setMicroStrategy(microStrategy)
-            if (!isGetSymbolList) {
-                get_tables();
-            }
-            setApiFlag(true)
-        }
-    
-    })
+      if (selectedInstance.value === 'optimization') {
+        setOptionsViewTypes([
+          { value: 'optimization', label: 'Optimization' },
+        ])
+      } else {
+        setOptionsViewTypes([
+          { value: 'charting', label: 'Charting' },
+          { value: 'performance', label: 'Performance' },
+        ])
+      }
+    }, [selectedInstance])
 
-    const get_tables = () => {
-      const requestOptions = {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-          'strategy': strategy.value
-        })
-      };
-      fetch(process.env.REACT_APP_BACKEND_URL + "/api/tables", requestOptions)
-          .then(response => response.json())
-          .then(data => {
-              let temp_data = []
-              data.tables.map((x) => {
-                  temp_data.push({
-                      value: x,
-                      label: x
-                  });
-              })
-              setSymbolList(temp_data)
+    useEffect(() => {
+      const get_tables = () => {
+        const requestOptions = {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            'strategy': strategy.value
           })
-    }
+        };
+        fetch(process.env.REACT_APP_BACKEND_URL + "/api/tables", requestOptions)
+            .then(response => response.json())
+            .then(data => {
+                let temp_data = []
+                data.tables.map((x) => {
+                    temp_data.push({
+                        value: x,
+                        label: x
+                    });
+                    return null
+                })
+                setSymbolList(temp_data)
+            })
+      }
+      
+      if (!apiFlag) {
+          setMicroStrategy(microStrategy)
+          get_tables();
+          setApiFlag(true)
+      }
+    }, [setMicroStrategy, apiFlag, microStrategy, setApiFlag, strategy.value])
 
-    const handleInstanceChange = (e) => {
-      setSelectedInstance(e)
-    }
-    
     const handleViewTypeChange = (e) => {
         setSelectedViewType(e)
         if (e.value === 'charting') {
-          history.push({
-            pathname: '/'
-          });
+          handleChartRedirect(true)
         }
     }
 
@@ -157,23 +146,17 @@ const TutorialsList = (props) => {
     }
 
     return (
-        <div>
-            <nav className="navbar navbar-expand navbar-dark bg-dark">
-                <a href="/chart" className="navbar-brand">
-                    Hunter Violette - HeikinAshi
-                </a>
+      <div className="hunter-chart-container">
+            <nav className="navbar navbar-expand navbar-dark bg-dark hunter-nav-bar">
+                <div className="logo-title">
+                  <a href="/chart" className="hunter-navbar-brand">
+                      Hunter Violette - HeikinAshi
+                  </a>
+                </div>
                 <div className="navbar-nav mr-auto">
                     <li className="nav-item">
                         <Link to={"/chart"} className="nav-link"></Link>
                     </li>
-                    <div className="select-option">
-                      <Select
-                        value={selectedInstance}
-                        onChange={handleInstanceChange}
-                        options={optionsInstance}
-                        placeholder="Instance"
-                      />
-                    </div>
                     <div className="select-option">
                       <Select
                         value={selectedViewType}
@@ -251,4 +234,4 @@ const TutorialsList = (props) => {
     );
 };
 
-export default TutorialsList;
+export default HeiknStockChartItem;

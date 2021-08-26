@@ -1,4 +1,4 @@
-import { isNotDefined, isDefined } from "react-stockcharts/lib/utils";
+import { isNotDefined } from "react-stockcharts/lib/utils";
 
 export function saveInteractiveNode(chartId) {
 	return node => {
@@ -26,7 +26,7 @@ export function saveInteractiveNodes(type, chartId) {
 		if (isNotDefined(this.interactiveNodes)) {
 			this.interactiveNodes = {};
 		}
-		const key = `${type}_${chartId}`;
+		// const key = `${type}_${chartId}`;
 		// // if (isDefined(node) || isDefined(this.interactiveNodes[key])) {
 		// // 	// console.error(node, key)
 		// // 	// console.log(this.interactiveNodes)
