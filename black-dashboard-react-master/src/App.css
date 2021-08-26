@@ -5,8 +5,6 @@
 
 .select-wrape {
   display: flex;
-  /* width: 200px; */
-  /* height: 30px; */
 }
 
 .select-wrape .Select {
@@ -22,9 +20,12 @@
   font-size: 20px;
   padding: 20px;
 }
+
 .graphs-container {
-  height: calc(100vh - 56px);
+  position: relative;
+  height: 100%;
   padding: 20px;
+  padding-top: 66px;
   overflow-y: scroll;
 }
 
@@ -166,4 +167,15 @@
 }
 .active-instance .nav-link p{
   font-weight: bold;    
+}
+
+.hunter-nav-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.hunter-chart-container {
+  width: 100%;
+  height: 100%;
 }

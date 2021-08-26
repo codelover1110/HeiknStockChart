@@ -2,15 +2,6 @@ import React, { useState, useEffect } from "react";
 import Chart from '../trades-chart/TradesChart';
 import PerformanceChart from '../performance-chart/PerformanceChart'
 import { TypeChooser } from "react-stockcharts/lib/helper";
-// import ScatterMock from '../demo/ScatterMock'
-// import GroupDataMock from '../demo/GroupMockData'
-// import CandleChart from "../candle-chart/CandleChart";
-// import Chart from '../Chart';
-// import { CandleData, Deals, Signal } from "../demo/Demo";
-// import MockData from '../demo/mock.json'
-// import Chart from '../TestChart';
-// import { tsvParse } from  "d3-dsv";
-// import { timeParse } from "d3-time-format";
 
 const StockChart = (props) => {
     const { 

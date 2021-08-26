@@ -495,7 +495,6 @@ class CandleChart extends React.Component {
 
 CandleChart.propTypes = {
   data: PropTypes.array.isRequired,
-  deals: PropTypes.array.isRequired,
   signal: PropTypes.object.isRequired,
   width: PropTypes.number.isRequired,
   ratio: PropTypes.number.isRequired,

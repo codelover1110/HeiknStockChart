@@ -105,11 +105,6 @@ function HomePage(props) {
               />
             )}
             <div className={`main-panel ${!isShowSidebar ? 'full-width' : ''}`} ref={mainPanelRef} data={color}>
-              {/* <AdminNavbar
-                brandText={getBrandText(location.pathname)}
-                toggleSidebar={toggleSidebar}
-                sidebarOpened={sidebarOpened}
-              /> */}
               <HeiknStockChart selectedInstance={selectedInstance} />
             </div>
           </div>

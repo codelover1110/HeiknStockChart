@@ -337,8 +337,8 @@ const HeiknStockChart = (props) => {
   }
 
   return (
-    <div>
-      <nav className="navbar navbar-expand navbar-dark bg-dark">
+    <div className="hunter-chart-container">
+      <nav className="navbar navbar-expand navbar-dark bg-dark hunter-nav-bar">
         <div className="logo-title">
           <a href="/chart" className="hunter-navbar-brand">
               Hunter Violette - HeikinAshi
