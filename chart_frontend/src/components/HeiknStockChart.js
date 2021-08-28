@@ -55,12 +55,12 @@ const HeiknStockChart = (props) => {
     {
       value: 'RSI', label: 'RSI',
     },
-    {
-      value: 'HEIK1', label: 'HEIK1',
-    },
-    {
-      value: 'HEIK2', label: 'HEIK2',
-    }
+    // {
+    //   value: 'HEIK1', label: 'HEIK1',
+    // },
+    // {
+    //   value: 'HEIK2', label: 'HEIK2',
+    // }
   ]);
 
   const optionsColumn = [
@@ -100,7 +100,7 @@ const HeiknStockChart = (props) => {
       ])
       setIsShowMicro(true);
     }
-    handleInstanceChange()
+    handleInstanceChange(selectedInstance)
     if(selectedInstance === 'live_trading') {
       get_tables();    
     }
@@ -204,12 +204,12 @@ const HeiknStockChart = (props) => {
         {
           value: 'RSI', label: 'RSI',
         },
-        {
-          value: 'HEIK1', label: 'HEIK1',
-        },
-        {
-          value: 'HEIK2', label: 'HEIK2',
-        }
+        // {
+        //   value: 'HEIK1', label: 'HEIK1',
+        // },
+        // {
+        //   value: 'HEIK2', label: 'HEIK2',
+        // }
       ])
     } else {
       setOptionsIndicator([
@@ -225,12 +225,12 @@ const HeiknStockChart = (props) => {
         {
           value: 'RSI3', label: 'RSI3',
         },
-        {
-          value: 'HEIK1', label: 'HEIK1',
-        },
-        {
-          value: 'HEIK2', label: 'HEIK2',
-        }
+        // {
+        //   value: 'HEIK1', label: 'HEIK1',
+        // },
+        // {
+        //   value: 'HEIK2', label: 'HEIK2',
+        // }
       ])
     }
     setChartColumn(option)
@@ -426,7 +426,6 @@ const HeiknStockChart = (props) => {
                       src={require("assets/img/anime3.png").default}
                     />
                   </div>
-                  <b className="caret d-none d-lg-block d-xl-block" />
                   <p className="d-lg-none">Log out</p>
                 </DropdownToggle>
                 <DropdownMenu className="dropdown-navbar" right tag="ul">

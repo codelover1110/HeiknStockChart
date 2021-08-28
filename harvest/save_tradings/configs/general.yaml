@@ -1,7 +1,0 @@
-refreshtime: "30s"
-strategy: "heikfilter"
-marketOpen: "09:32:00"
-marketClose: "15:58:00"
-botStartup: "09:25:00"
-gatewayReset: "23:45:00"
-startingCashPerAccount: "50000"

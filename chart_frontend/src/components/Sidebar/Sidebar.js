@@ -1,6 +1,6 @@
 /*eslint-disable*/
 import React from "react";
-import { NavLink, Link, useLocation } from "react-router-dom";
+import { NavLink, Link, useLocation, useHistory } from "react-router-dom";
 // nodejs library to set properties for components
 import { PropTypes } from "prop-types";
 
@@ -17,12 +17,9 @@ import {
 var ps;
 
 function Sidebar(props) {
-  const location = useLocation();
+  const history = useHistory();
   const sidebarRef = React.useRef(null);
   // verifies if routeName is the one active (in browser input)
-  const activeRoute = (routeName) => {
-    return location.pathname === routeName ? "active" : "";
-  };
   React.useEffect(() => {
     if (navigator.platform.indexOf("Win") > -1) {
       ps = new PerfectScrollbar(sidebarRef.current, {
@@ -59,7 +56,22 @@ function Sidebar(props) {
                       prop.instance === selectedInstance ? "active-instance hunter-select-instance" : "hunter-select-instance"
                     }
                     key={key}
-                    onClick={() => handleInstanceChange(prop.instance)}
+                    onClick={() => {
+                      handleInstanceChange(prop.instance)
+                      const locationState = {
+                        initInstance: prop.instance
+                        
+                      }
+                      if (prop.pathname) {
+                        history.push({
+                          pathname: prop.pathname,
+                          state: prop.instance === 'stress_test'
+                          || prop.instance === 'optimization'
+                          || prop.instance === 'live_trading'
+                          ?  locationState: null
+                        })
+                      }
+                    }}
                   >
                     <div
                       className="nav-link"

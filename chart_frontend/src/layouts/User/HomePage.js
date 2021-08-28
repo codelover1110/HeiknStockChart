@@ -1,5 +1,5 @@
 import React from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useHistory } from "react-router-dom";
 import {
   Button
 } from "reactstrap";
@@ -17,9 +17,14 @@ import HeiknStockChartItem from "components/ItemChart"
 var ps;
 
 function HomePage() {
+  const history = useHistory();
+  const initInstance = history.location.state ? history.location.state.initInstance : null;
+  console.log('initInstance========', initInstance)
   const [isHomePage, setIsHomePage] = React.useState(true);
   const [isShowSidebar, setShowSidebar] = React.useState(false);
-  const [selectedInstance, setSelectedInstance] = React.useState('forward_test');
+  const [selectedInstance, setSelectedInstance] = React.useState(
+    initInstance ? initInstance : 'forward_test'
+  );
   const location = useLocation();
   const mainPanelRef = React.useRef(null);
   
