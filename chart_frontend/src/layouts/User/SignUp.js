@@ -2,16 +2,16 @@ import React, { useState } from "react";
 import {
     BrowserRouter as Router,
     useHistory,
-    useLocation
   } from "react-router-dom";
 import { useAuth } from 'contexts/authContext'
 import { validateEmail } from 'utils/helper'
 
-const Login = () => {
+const SignUp = () => {
     let auth = useAuth();
     let history = useHistory();
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [confirmPassword, setConfirmPassword] = useState('')
 
     const handleEmailChange = (e) => {
         setEmail(e.target.value)
@@ -38,7 +38,7 @@ const Login = () => {
         <div className={"login-form"}>
             <form>
 
-                <h3>Log In</h3>
+                <h3>Sign Up</h3>
 
                 <div className="form-group">
                     <label>Email</label>
@@ -58,6 +58,17 @@ const Login = () => {
                         className="form-control hunter-form-control"
                         placeholder="Enter password"
                         value={password}
+                        onChange={(e) => { handlePasswordChange(e)}}
+                    />
+                </div>
+                
+                <div className="form-group">
+                    <label>Confirm Password</label>
+                    <input
+                        type="password"
+                        className="form-control hunter-form-control"
+                        placeholder="Enter confirm password"
+                        value={confirmPassword}
                         onChange={(e) => { handlePasswordChange(e)}}
                     />
                 </div>
@@ -83,4 +94,4 @@ const Login = () => {
     );
 }
 
-export default Login
+export default SignUp

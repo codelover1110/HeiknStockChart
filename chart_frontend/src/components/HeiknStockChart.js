@@ -13,9 +13,11 @@ import {
   NavLink,
   Nav,
 } from "reactstrap";
+import { useAuth } from 'contexts/authContext';
 
 const HeiknStockChart = (props) => {
 
+  const auth = useAuth();
   const { selectedInstance, handleChartRedirect } = props
 
   const history = useHistory();
@@ -252,6 +254,11 @@ const HeiknStockChart = (props) => {
     return 4
   }
 
+  const handleSignout = () => {
+    auth.signout()
+    history.push('/login')
+  }
+
   const displayChart = () => {
     return (
         
@@ -437,7 +444,9 @@ const HeiknStockChart = (props) => {
                   </NavLink>
                   <DropdownItem divider tag="li" />
                   <NavLink tag="li">
-                    <DropdownItem className="nav-item">Log out</DropdownItem>
+                    <DropdownItem className="nav-item" onClick={() => {
+                      handleSignout()
+                    }}>Log out</DropdownItem>
                   </NavLink>
                 </DropdownMenu>
               </UncontrolledDropdown>
