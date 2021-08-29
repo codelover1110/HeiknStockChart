@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import "react-datetime/css/react-datetime.css";
 import {
@@ -35,7 +35,7 @@ const DataTable = () => {
         .then(response => response.json())
         .then(data => {
             let trades_data = []
-            data.trades_data.map((x) => {
+            data.trades_data.foreach((x) => {
               trades_data.push({
                 'symbol': x.symbol,
                 'strategy': x.strategy_name,

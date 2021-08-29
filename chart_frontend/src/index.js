@@ -22,6 +22,7 @@ import BackgroundColorWrapper from "./components/BackgroundColorWrapper/Backgrou
 import ProvideAuth from 'contexts/authContext'
 import PrivateRoute from 'layouts/Auth/PrivateRoute'
 import SignUp from 'layouts/User/SignUp'
+import Verify from 'layouts/User/Verify'
 
 ReactDOM.render(
   <ThemeContextWrapper>
@@ -34,6 +35,7 @@ ReactDOM.render(
             </PrivateRoute>
             <Route path="/login" render={(props) => <Login {...props} />} />
             <Route path="/signup" render={(props) => <SignUp {...props} />} />
+            <Route path="/verify" render={(props) => <Verify {...props} />} />
             <PrivateRoute path="/tradedata">
               <TradeData />
             </PrivateRoute>

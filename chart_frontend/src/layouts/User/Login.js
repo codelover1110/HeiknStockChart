@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import {
-    BrowserRouter as Router,
     useHistory,
-    useLocation
-  } from "react-router-dom";
+} from "react-router-dom";
 import { useAuth } from 'contexts/authContext'
 import { validateEmail } from 'utils/helper'
 
 const Login = () => {
     let auth = useAuth();
     let history = useHistory();
+    const [error, setError] = useState(-1)
+    const [message, setMessage] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
 
@@ -21,31 +21,49 @@ const Login = () => {
         setPassword(e.target.value)
     }
     
-    const login = () => {
+    const login = async () => {
         if (!email.length || !password.length) {
-            alert('Email or password is wrong')
+            setError(1)
+            setMessage('Email or password is wrong')
             return
         }
-        if (!validateEmail(email)){
-            alert('Invalid email')
+        // if (!validateEmail(email)){
+        //     alert('Invalid email')
+        //     return
+        // }
+        const res = await auth.authUser.signin(email, password)
+        if (res.success) {
+            const historyState = {
+                userId: res.user_id
+            }
+            history.push({
+                pathname: '/verify',
+                state: historyState
+            })
+        } else {
+            setError(1)
+            setMessage(res.error)
             return
         }
-        auth.signin(email, password)
-        history.push('/');
+    }
+
+    const handleModalClose = () => {
+        setError(-1);
+        setMessage('');
     }
 
     return (
         <div className={"login-form"}>
-            <form>
+            <div>
 
                 <h3>Log In</h3>
 
                 <div className="form-group">
-                    <label>Email</label>
+                    <label>User Name</label>
                     <input
-                        type="email"
+                        type="text"
                         className="form-control hunter-form-control"
-                        placeholder="Enter email"
+                        placeholder="Enter user name"
                         value={email}
                         onChange={(e) => { handleEmailChange(e)}}
                     />
@@ -83,7 +101,17 @@ const Login = () => {
                         Forgot <a href="/">password?</a>
                     </p>
                 </div>
-            </form>
+            </div>
+            {error !== -1 && 
+                <div className="alert alert-primary" role="alert">
+                    <div className="alert-container">
+                        <div className="alert-content">
+                            {message}
+                        </div>
+                        <button type="button" className="btn btn-primary modal-close-button hunter-modal-small-button" onClick={() => { handleModalClose() }}>Close</button>
+                    </div>
+                </div>   
+            }
         </div>
     );
 }

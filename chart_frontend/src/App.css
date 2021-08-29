@@ -238,3 +238,23 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
 .hunter-signin-button {
   margin: 10px 0px !important;
 }
+
+.alert-container {
+  padding: 10px 0px;
+}
+
+.modal-close-button {
+  margin-top: 30px;
+  color: #fff;
+}
+
+.alert-content {
+  text-align: center;
+}
+
+.hunter-modal-small-button {
+  height: 30px;
+  display: flex;
+  align-items: center;
+  margin: 10px auto;
+}

@@ -1,15 +1,13 @@
 import React, { useState } from "react";
-import {
-    BrowserRouter as Router,
-    useHistory,
-  } from "react-router-dom";
 import { useAuth } from 'contexts/authContext'
 import { validateEmail } from 'utils/helper'
 
 const SignUp = () => {
     let auth = useAuth();
-    let history = useHistory();
+    const [username, setUserName] = useState('')
     const [email, setEmail] = useState('')
+    const [error, setError] = useState(-1)
+    const [message, setMessage] = useState()
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
 
@@ -25,29 +23,69 @@ const SignUp = () => {
         setConfirmPassword(e.target.value)
     }
     
-    const signup = () => {
-        if (!email.length || !password.length) {
-            alert('Email or password is wrong')
+    const handleUserNameChange = (e) => {
+        setUserName(e.target.value)
+    }
+
+    const signup = async () => {
+        if (!username.length) {
+            setError(1)
+            setMessage('user name is wrong')
+            return
+        }
+        if (!email.length) {
+            setError(1)
+            setMessage('user email is wrong')
+            return
+        }
+        if (!password.length || !confirmPassword.length) {
+            setError(1)
+            setMessage('password or confirm password is wrong')
             return
         }
         if (password !== confirmPassword) {
-            alert('password and confirm password is not matched')
+            setError(1)
+            setMessage('password and confirm password is not matched')
             return
         }
         if (!validateEmail(email)){
-            alert('Invalid email')
+            setError(1)
+            setMessage('Invalid email')
             return
         }
-        auth.signup(email, password)
-        history.push('/');
+        const res = await auth.authUser.signup(username, email, password, confirmPassword)
+        if (res.success) {
+            setError(0)
+            setMessage('Sign Up is successed')
+        } else {
+            setError(1)
+            setMessage(res.error)
+            return
+        }
+    }
+
+    const handleModalClose = () => {
+        setError(-1);
+        setMessage('');
     }
 
     return (
         <div className={"login-form"}>
-            <form>
+            <div>
 
                 <h3>Sign Up</h3>
 
+                <div className="form-group">
+                    <label>Name</label>
+                    <input
+                        type="name"
+                        className="form-control hunter-form-control"
+                        placeholder="Enter user name"
+                        value={username}
+                        onChange={(e) => { handleUserNameChange(e)}}
+                    />
+                </div>
+                
                 <div className="form-group">
                     <label>Email</label>
                     <input
@@ -92,7 +130,17 @@ const SignUp = () => {
                         <a href="/signin">Sign In?</a>
                     </p>
                 </div>
-            </form>
+            </div>
+            {error !== -1 && 
+                <div className="alert alert-primary" role="alert">
+                    <div className="alert-container">
+                        <div className="alert-content">
+                            {message}
+                        </div>
+                        <button type="button" className="btn btn-primary modal-close-button hunter-modal-small-button" onClick={() => { handleModalClose() }}>Close</button>
+                    </div>
+                </div>   
+            }
         </div>
     );
 }
