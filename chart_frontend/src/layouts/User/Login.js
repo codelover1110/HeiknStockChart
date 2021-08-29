@@ -70,14 +70,19 @@ const Login = () => {
                 </div>
 
                 <button
-                    className="btn btn-dark btn-lg btn-block"
+                    className="btn btn-dark btn-lg btn-block hunter-signin-button"
                     onClick={login}
                 >
                     Sign in
                 </button>
-                <p className="forgot-password text-right">
-                    Forgot <a href="/">password?</a>
-                </p>
+                <div className="form-group hunter-form-signup-area">
+                    <p className="sign-up-area text-left">
+                        <a href="/signup">Sign Up?</a>
+                    </p>
+                    <p className="forgot-password text-right">
+                        Forgot <a href="/">password?</a>
+                    </p>
+                </div>
             </form>
         </div>
     );

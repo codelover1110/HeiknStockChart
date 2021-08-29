@@ -21,16 +21,24 @@ const SignUp = () => {
         setPassword(e.target.value)
     }
     
-    const login = () => {
+    const handleConfirmPasswordChange = (e) => {
+        setConfirmPassword(e.target.value)
+    }
+    
+    const signup = () => {
         if (!email.length || !password.length) {
             alert('Email or password is wrong')
+            return
+        }
+        if (password !== confirmPassword) {
+            alert('password and confirm password is not matched')
             return
         }
         if (!validateEmail(email)){
             alert('Invalid email')
             return
         }
-        auth.signin(email, password)
+        auth.signup(email, password)
         history.push('/');
     }
 
@@ -69,26 +77,21 @@ const SignUp = () => {
                         className="form-control hunter-form-control"
                         placeholder="Enter confirm password"
                         value={confirmPassword}
-                        onChange={(e) => { handlePasswordChange(e)}}
+                        onChange={(e) => { handleConfirmPasswordChange(e)}}
                     />
                 </div>
 
-                <div className="form-group">
-                    <div className="custom-control custom-checkbox">
-                        <input type="checkbox" className="custom-control-input" id="customCheck1" />
-                        <label className="custom-control-label" htmlFor="customCheck1">Remember me</label>
-                    </div>
-                </div>
-
                 <button
-                    className="btn btn-dark btn-lg btn-block"
-                    onClick={login}
+                    className="btn btn-dark btn-lg btn-block hunter-signin-button"
+                    onClick={signup}
                 >
-                    Sign in
+                    Sign up
                 </button>
-                <p className="forgot-password text-right">
-                    Forgot <a href="/">password?</a>
-                </p>
+                <div className="form-group">
+                    <p className="sign-up-area text-right">
+                        <a href="/signin">Sign In?</a>
+                    </p>
+                </div>
             </form>
         </div>
     );

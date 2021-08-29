@@ -228,3 +228,13 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
   left: 150px;
   top: 28px;
 }
+
+.hunter-form-signup-area {
+  display: flex;  
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.hunter-signin-button {
+  margin: 10px 0px !important;
+}
