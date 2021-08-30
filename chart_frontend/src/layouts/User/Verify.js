@@ -9,6 +9,7 @@ const Verify = () => {
     let history = useHistory();
     const [code, setCode] = useState('')
     const [error, setError] = useState(-1)
+    const [isLoading, setIsLoading] = useState(false)
     const [message, setMessage] = useState('')
     const userId = history.location.state ? history.location.state.userId : null
     
@@ -28,7 +29,9 @@ const Verify = () => {
             setMessage('confirmation code is empty')
             return
         }
+        setIsLoading(true)
         const res = await auth.authUser.verify(userId, code)
+        setIsLoading(false)
         if (res.verify) {
             history.push('/');
         } else {
@@ -64,6 +67,9 @@ const Verify = () => {
                     className="btn btn-dark btn-lg btn-block hunter-signin-button"
                     onClick={verify}
                 >
+                    {isLoading && (
+                        <span className="spinner-border spinner-border-sm hunter-spinner-button" role="status" aria-hidden="true"></span>
+                    )}
                     Verify
                 </button>
             </div>

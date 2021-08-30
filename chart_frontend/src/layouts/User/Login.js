@@ -9,6 +9,7 @@ const Login = () => {
     let auth = useAuth();
     let history = useHistory();
     const [error, setError] = useState(-1)
+    const [isLoading, setIsLoading] = useState(false)
     const [message, setMessage] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -31,7 +32,9 @@ const Login = () => {
         //     alert('Invalid email')
         //     return
         // }
+        setIsLoading(true)
         const res = await auth.authUser.signin(email, password)
+        setIsLoading(false)
         if (res.success) {
             const historyState = {
                 userId: res.user_id
@@ -91,6 +94,9 @@ const Login = () => {
                     className="btn btn-dark btn-lg btn-block hunter-signin-button"
                     onClick={login}
                 >
+                    {isLoading && (
+                        <span className="spinner-border spinner-border-sm hunter-spinner-button" role="status" aria-hidden="true"></span>
+                    )}
                     Sign in
                 </button>
                 <div className="form-group hunter-form-signup-area">

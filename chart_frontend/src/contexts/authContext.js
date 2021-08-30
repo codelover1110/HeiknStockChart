@@ -31,6 +31,7 @@ const authUser = {
         }
       })
   },
+
   async signup(username, email, password1, password2) {
     let formData = new FormData()  
     formData.append('username', username);
@@ -47,13 +48,12 @@ const authUser = {
           return response.json();
       })
       .then(res => {
-        if (!res.ok) {
-          throw new Error(res.error);
-        }
         if (res.success) {
           return {
             success: true
           }
+        } else {
+          throw new Error(res.error);
         }
       })
       .catch(err => {
@@ -94,7 +94,7 @@ const authUser = {
   signout() {
     authUser.isAuthenticated = false;
     sessionStorage.removeItem("auth-token")
-  }
+  },
 };
 
 export function useAuth() {
@@ -122,11 +122,11 @@ function useProvideAuth() {
   const signout = () => {
     authUser.signout()
   };
-
+  
   return {
     authUser,
     verify,
     signin,
-    signout
+    signout,
   };
 }

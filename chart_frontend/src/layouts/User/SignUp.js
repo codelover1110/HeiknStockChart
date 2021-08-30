@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import { useAuth } from 'contexts/authContext'
 import { validateEmail } from 'utils/helper'
+import { useHistory } from "react-router-dom";
 
 const SignUp = () => {
+    let history = useHistory();
     let auth = useAuth();
+    const [isLoading, setIsLoading] = useState(false)
     const [username, setUserName] = useState('')
     const [email, setEmail] = useState('')
     const [error, setError] = useState(-1)
@@ -53,10 +56,13 @@ const SignUp = () => {
             setMessage('Invalid email')
             return
         }
+        setIsLoading(true)
         const res = await auth.authUser.signup(username, email, password, confirmPassword)
+        setIsLoading(false)
         if (res.success) {
-            setError(0)
-            setMessage('Sign Up is successed')
+            // setError(0)
+            // setMessage('Sign Up is successed')
+            history.push('/login')
         } else {
             setError(1)
             setMessage(res.error)
@@ -123,7 +129,12 @@ const SignUp = () => {
                     className="btn btn-dark btn-lg btn-block hunter-signin-button"
                     onClick={signup}
                 >
+                    {console.log(auth.authUser.isLoading, "auth.authUser.isLoading")}
+                    {isLoading && (
+                        <span className="spinner-border spinner-border-sm hunter-spinner-button" role="status" aria-hidden="true"></span>
+                    )}
                     Sign up
+                    
                 </button>
                 <div className="form-group">
                     <p className="sign-up-area text-right">
