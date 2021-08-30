@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import "react-datetime/css/react-datetime.css";
 import {
@@ -10,9 +10,13 @@ import {
   NavLink,
   Nav,
 } from "reactstrap";
+import { useHistory } from "react-router-dom";
 import { MDBDataTableV5 } from 'mdbreact';
+import { useAuth } from 'contexts/authContext';
 
 const DataTable = () => {
+  const auth = useAuth();
+  const history = useHistory();
 
   useEffect(() => {
     get_trades()
@@ -31,7 +35,7 @@ const DataTable = () => {
         .then(response => response.json())
         .then(data => {
             let trades_data = []
-            data.trades_data.map((x) => {
+            data.trades_data.foreach((x) => {
               trades_data.push({
                 'symbol': x.symbol,
                 'strategy': x.strategy_name,
@@ -96,6 +100,12 @@ const DataTable = () => {
   });
 
   const [collapseOpen,] = React.useState(false)
+
+  const handleSignout = () => {
+    auth.signout()
+    history.push('/login')
+  }
+
   return (
     <div className="hunter-chart-container">
       <nav className="navbar navbar-expand navbar-dark bg-dark hunter-nav-bar">
@@ -135,7 +145,7 @@ const DataTable = () => {
                   </NavLink>
                   <DropdownItem divider tag="li" />
                   <NavLink tag="li">
-                    <DropdownItem className="nav-item">Log out</DropdownItem>
+                    <DropdownItem className="nav-item" onClick={() => {handleSignout()}}>Log out</DropdownItem>
                   </NavLink>
                 </DropdownMenu>
               </UncontrolledDropdown>
@@ -146,7 +156,7 @@ const DataTable = () => {
       <div className="col-sm-12 hunter-data-table-container">
         <MDBDataTableV5 
           hover
-          entriesOptions={[10, 20, 25]}
+          entriesOptions={[10]}
           entries={10}
           pagesAmount={4}
           data={datatable}
@@ -156,7 +166,7 @@ const DataTable = () => {
           noBottomColumns={true}
           small={true}
           striped={true}
-          scrollY={true}
+          // scrollY={true}
         />;
       </div>
     </div>

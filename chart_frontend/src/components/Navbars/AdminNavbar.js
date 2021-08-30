@@ -17,8 +17,12 @@ import {
   Modal,
   ModalHeader,
 } from "reactstrap";
+import { useHistory } from "react-router-dom";
+import { useAuth } from 'contexts/authContext';
 
 function AdminNavbar() {
+  const auth = useAuth();
+  const history = useHistory();
   const [collapseOpen] = React.useState(false);
   const [modalSearch, setmodalSearch] = React.useState(false);
   const [color, setcolor] = React.useState("navbar-transparent");
@@ -37,10 +41,17 @@ function AdminNavbar() {
       setcolor("navbar-transparent");
     }
   };
+  
   // this function is to open the Search modal
   const toggleModalSearch = () => {
     setmodalSearch(!modalSearch);
   };
+
+  const handleSignout = () => {
+    auth.signout()
+    history.push('/login')
+  }
+
   return (
     <>
       <Navbar className={classNames("navbar-absolute", color)} expand="lg">
@@ -72,7 +83,7 @@ function AdminNavbar() {
                   </NavLink>
                   <DropdownItem divider tag="li" />
                   <NavLink tag="li">
-                    <DropdownItem className="nav-item">Log out</DropdownItem>
+                    <DropdownItem className="nav-item" onClick={() => {handleSignout()}}>Log out</DropdownItem>
                   </NavLink>
                 </DropdownMenu>
               </UncontrolledDropdown>

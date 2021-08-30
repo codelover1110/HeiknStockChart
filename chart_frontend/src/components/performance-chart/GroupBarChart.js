@@ -42,7 +42,7 @@ const optionCreator = (chartData, isAverage) => {
     },
     colors: ["#00ff00", `rgba(255,0,0, ${1 ? 0.5 : 1})`],
     title: {
-      text: isAverage ? "Winning & Losing Avg Percent" : "Wining & Losing",
+      text: isAverage ? "Winning & Losing Avg Percent" : "Wining & Losing Trades",
       align: "left",
       offsetX: 8,
       offsetY: -2,
@@ -69,10 +69,7 @@ const optionCreator = (chartData, isAverage) => {
         colors: ["#FFFFFF", "#FFFFFF"]
       },
       formatter: (value, opts) => {
-        if (opts.seriesIndex !== 0) {
-          return `- ${value}`
-        }
-        return value;
+        return value.toFixed(5);
       },
     },
     stroke: {
@@ -98,7 +95,7 @@ const optionCreator = (chartData, isAverage) => {
         style: {
             colors: '#FFFFFF',
         },
-        formatter: (value) => value,
+        formatter: (value) => { return value.toFixed(5) },
       },
       axisBorder: {
         show: true,

@@ -19,18 +19,32 @@ import "assets/css/nucleo-icons.css";
 
 import ThemeContextWrapper from "./components/ThemeWrapper/ThemeWrapper";
 import BackgroundColorWrapper from "./components/BackgroundColorWrapper/BackgroundColorWrapper";
+import ProvideAuth from 'contexts/authContext'
+import PrivateRoute from 'layouts/Auth/PrivateRoute'
+import SignUp from 'layouts/User/SignUp'
+import Verify from 'layouts/User/Verify'
 
 ReactDOM.render(
   <ThemeContextWrapper>
     <BackgroundColorWrapper>
-      <BrowserRouter>
-        <Switch>
-          <Route path="/admin" render={(props) => <AdminLayout {...props} />} />
-          <Route path="/login" render={(props) => <Login {...props} />} />
-          <Route path="/tradedata" render={(props) => <TradeData {...props} />} />
-          <Route path="/" render={(props) => <HomePage {...props} />} />
-        </Switch>
-      </BrowserRouter>
+      <ProvideAuth>
+        <BrowserRouter>
+          <Switch>
+            <PrivateRoute path="/admin">
+              <AdminLayout />
+            </PrivateRoute>
+            <Route path="/login" render={(props) => <Login {...props} />} />
+            <Route path="/signup" render={(props) => <SignUp {...props} />} />
+            <Route path="/verify" render={(props) => <Verify {...props} />} />
+            <PrivateRoute path="/tradedata">
+              <TradeData />
+            </PrivateRoute>
+            <PrivateRoute path="/">
+              <HomePage />
+            </PrivateRoute>
+          </Switch>
+        </BrowserRouter>
+      </ProvideAuth>
     </BackgroundColorWrapper>
   </ThemeContextWrapper>,
   document.getElementById("root")

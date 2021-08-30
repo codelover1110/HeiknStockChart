@@ -19,7 +19,6 @@ var ps;
 function HomePage() {
   const history = useHistory();
   const initInstance = history.location.state ? history.location.state.initInstance : null;
-  console.log('initInstance========', initInstance)
   const [isHomePage, setIsHomePage] = React.useState(true);
   const [isShowSidebar, setShowSidebar] = React.useState(false);
   const [selectedInstance, setSelectedInstance] = React.useState(

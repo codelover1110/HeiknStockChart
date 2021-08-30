@@ -204,16 +204,16 @@ const HeiknStockChartItem = (props) => {
                       </div>)
                     }
                     {selectedViewType.value !== 'performance' && 
-                        (<div className="select-multi-option">
-                            <Select
-                                name="filters"
-                                placeholder="Indicators"
-                                value={indicators}
-                                onChange={handleIndicatorsChange}
-                                options={optionsIndicator}
-                                isMulti={true}
-                            />
-                        </div>)
+                      (<div className="select-multi-option">
+                        <Select
+                          name="filters"
+                          placeholder="Indicators"
+                          value={indicators}
+                          onChange={handleIndicatorsChange}
+                          options={optionsIndicator}
+                          isMulti={true}
+                        />
+                      </div>)
                     }
                 </div>
             </nav>

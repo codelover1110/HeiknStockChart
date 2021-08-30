@@ -657,6 +657,7 @@ body, html, .App, #root, .outer {
 }
 
 .login-form h3 {
+  text-align: center;
   color: #303030;
   letter-spacing: 2px;
 }
