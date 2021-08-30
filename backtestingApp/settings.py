@@ -51,8 +51,15 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'chartApis.apps.ChartapisConfig',
-    'corsheaders'
+    'corsheaders',
+    'codes',
+    'users',
+    'crispy_forms'
 ]
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+LOGIN_URL = '/login/'
+AUTH_USER_MODEL = 'users.CustomUser'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -71,7 +78,8 @@ ROOT_URLCONF = 'backtestingApp.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'chart_frontend')],
+        'DIRS': [os.path.join(BASE_DIR, 'chart_frontend'), BASE_DIR / 'templates'],
+        # 'DIRS': [os.path.join(BASE_DIR, 'chart_frontend')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -97,16 +105,20 @@ WSGI_APPLICATION = 'backtestingApp.wsgi.application'
 # }
 
 DATABASES = {
-  'default': {  
-    'ENGINE':   'djongo',
-    'NAME':     'test',
-    'CLIENT': {
-      'host': 'mongodb://hunter:STOCKdb123@cluster0-shard-00-00.agmoz.mongodb.net:27017,cluster0-shard-00-01.agmoz.mongodb.net:27017,cluster0-shard-00-02.agmoz.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-f8c9fs-shard-0&authSource=admin&retryWrites=true&w=majority',
-      'port': 27017,
-      'username': 'hunter',
-      'password': 'STOCKdb123',
-    } 
-  },
+#   'default': {  
+#     'ENGINE':   'djongo',
+#     'NAME':     'test',
+#     'CLIENT': {
+#       'host': 'mongodb://hunter:STOCKdb123@cluster0-shard-00-00.agmoz.mongodb.net:27017,cluster0-shard-00-01.agmoz.mongodb.net:27017,cluster0-shard-00-02.agmoz.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-f8c9fs-shard-0&authSource=admin&retryWrites=true&w=majority',
+#       'port': 27017,
+#       'username': 'hunter',
+#       'password': 'STOCKdb123',
+#     } 
+#   },
+  'default': {
+    'ENGINE': 'django.db.backends.sqlite3',
+    'NAME': BASE_DIR / 'db.sqlite3',
+  }
 }
 
 # Password validation
@@ -162,3 +174,12 @@ STATICFILES_DIRS = (
 )
 
 CORS_ORIGIN_ALLOW_ALL = True
+
+# email send: gmail
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'bigmlpiter@gmail.com'
+EMAIL_HOST_PASSWORD = 'Piterpiter'
+

@@ -146,7 +146,7 @@ const DataTable = () => {
       <div className="col-sm-12 hunter-data-table-container">
         <MDBDataTableV5 
           hover
-          entriesOptions={[10]}
+          entriesOptions={[10, 20, 25]}
           entries={10}
           pagesAmount={4}
           data={datatable}
@@ -156,7 +156,7 @@ const DataTable = () => {
           noBottomColumns={true}
           small={true}
           striped={true}
-          // scrollY={true}
+          scrollY={true}
         />;
       </div>
     </div>
