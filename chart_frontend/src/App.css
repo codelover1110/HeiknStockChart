@@ -265,3 +265,26 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
   align-items: center;
   margin: 10px auto;
 }
+
+.hunter-search-filter-area {
+  display: flex;
+  width: 100%;
+}
+
+.hunter-search-filter-area .select-option {
+  margin-right: 30px;
+  margin-bottom: 10px;
+}
+
+.hunter-date-time-picker {
+  width: 300px;
+  margin-right: 30px;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+}
+
+.hunter-date-time-picker .hunter-input {
+  border-radius: 5px !important;
+  margin-left: 5px;
+}
