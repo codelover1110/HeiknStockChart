@@ -30,7 +30,7 @@ var routes = [
     pathname: '/scanner'
   },
   {
-    name: "Trade data",
+    name: "Data Tables",
     icon: "tim-icons icon-chart-bar-32",
     instance: "trade_data",
     pathname: "/tradedata"
