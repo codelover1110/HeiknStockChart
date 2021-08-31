@@ -35,7 +35,7 @@ function Sidebar(props) {
     };
   });
   
-  const { routes, selectedInstance, handleSidebarChange, handleInstanceChange } = props;
+  const { isAdminPage, routes, selectedInstance, handleSidebarChange, handleInstanceChange } = props;
   
   return (
     <BackgroundColorContext.Consumer>
@@ -47,42 +47,70 @@ function Sidebar(props) {
                 <i className="tim-icons icon-align-left-2" onClick={handleSidebarChange}/>
               </div>
             </div>
-            <Nav>
-              {routes.map((prop, key) => {
-                if (prop.redirect) return null;
-                return (
-                  <li
-                    className={
-                      prop.instance === selectedInstance ? "active-instance hunter-select-instance" : "hunter-select-instance"
-                    }
-                    key={key}
-                    onClick={() => {
-                      handleInstanceChange(prop.instance)
-                      const locationState = {
-                        initInstance: prop.instance
-                        
+            {isAdminPage ? (
+              <Nav>
+                {routes.map((prop, key) => {
+                  return (
+                    <li
+                      className={
+                        prop.instance === selectedInstance ? "active-instance hunter-select-instance" : "hunter-select-instance"
                       }
-                      if (prop.pathname) {
-                        history.push({
-                          pathname: prop.pathname,
-                          state: prop.instance === 'stress_test'
-                          || prop.instance === 'optimization'
-                          || prop.instance === 'live_trading'
-                          ?  locationState: null
-                        })
-                      }
-                    }}
-                  >
-                    <div
-                      className="nav-link"
+                      key={key}
+                      onClick={() => {
+                        handleInstanceChange(prop.instance)
+                        if (prop.pathname) {
+                          history.push({
+                            pathname: prop.pathname
+                          })
+                        }
+                      }}
                     >
-                      <i className={prop.icon} />
-                      <p>{prop.name}</p>
-                    </div>
-                  </li>
-                );
-              })}
-            </Nav>
+                      <div
+                        className="nav-link"
+                      >
+                        <i className={prop.icon} />
+                        <p>{prop.name}</p>
+                      </div>
+                    </li>
+                  );
+                })}
+              </Nav>  
+            ) : (
+              <Nav>
+                {routes.map((prop, key) => {
+                  return (
+                    <li
+                      className={
+                        prop.instance === selectedInstance ? "active-instance hunter-select-instance" : "hunter-select-instance"
+                      }
+                      key={key}
+                      onClick={() => {
+                        handleInstanceChange(prop.instance)
+                        const locationState = {
+                          initInstance: prop.instance
+                        }
+                        if (prop.pathname) {
+                          history.push({
+                            pathname: prop.pathname,
+                            state: prop.instance === 'stress_test'
+                            || prop.instance === 'optimization'
+                            || prop.instance === 'live_trading'
+                            ?  locationState: null
+                          })
+                        }
+                      }}
+                    >
+                      <div
+                        className="nav-link"
+                      >
+                        <i className={prop.icon} />
+                        <p>{prop.name}</p>
+                      </div>
+                    </li>
+                  );
+                })}
+              </Nav>
+            )}
           </div>
         </div>
       )}

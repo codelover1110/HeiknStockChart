@@ -1,5 +1,5 @@
 import React from "react";
-import { Route, Switch, useLocation } from "react-router-dom";
+import { Route, useLocation } from "react-router-dom";
 import {
   Button
 } from "reactstrap";
@@ -16,7 +16,7 @@ import { BackgroundColorContext } from "contexts/BackgroundColorContext";
 
 var ps;
 
-function Admin() {
+function UserManage() {
   const [isShowSidebar, setShowSidebar] = React.useState(true);
   const location = useLocation();
   const mainPanelRef = React.useRef(null);
@@ -123,9 +123,11 @@ function Admin() {
                 toggleSidebar={toggleSidebar}
                 sidebarOpened={sidebarOpened}
               />
-              <Switch>
-                {getRoutes(adminRoutes)}
-              </Switch>
+              <div className="hunter-page-container">
+                <div className="hunter-page-title">
+                  <h3>User Manage</h3>
+                </div>
+              </div>
             </div>
           </div>
         </React.Fragment>
@@ -134,4 +136,4 @@ function Admin() {
   );
 }
 
-export default Admin;
+export default UserManage;

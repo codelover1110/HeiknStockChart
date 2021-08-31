@@ -1,4 +1,4 @@
-var routes = [
+export var routes = [
   {
     name: "Forward test",
     icon: "tim-icons icon-chart-pie-36",
@@ -36,4 +36,19 @@ var routes = [
     pathname: "/tradedata"
   },
 ]
-export default routes;
+
+export var adminRoutes = [
+  {
+    name: "User Manage",
+    icon: "tim-icons icon-chart-pie-36",
+    instance: "usermanage",
+    pathname: '/admin/usermanage'
+  },
+  {
+    name: "Link Manage",
+    icon: "tim-icons icon-attach-87",
+    instance: "linkmanage",
+    pathname: '/admin/linkmanage'
+  },
+]
+
