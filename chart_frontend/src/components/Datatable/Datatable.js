@@ -134,6 +134,10 @@ const DataTable = () => {
     setTradeEndDate(e.target.value)
   }
 
+  const handlePageRowsChange = (e) => {
+    console.log("e===================================>", e)
+  }
+
   return (
     <div className="hunter-chart-container">
       <nav className="navbar navbar-expand navbar-dark bg-dark hunter-nav-bar">
@@ -207,34 +211,35 @@ const DataTable = () => {
               placeholder="Micro Strategy"
             />
           </div>
-          <div class='input-group date hunter-date-time-picker' id='datetimepicker1'>
+          <div className='input-group date hunter-date-time-picker' id='datetimepicker1'>
           <span>Trade Start Time:</span>
             <input 
               type='date'
-              class="form-control hunter-input"
+              className="form-control hunter-input"
               value={tradeStartDate}
               onChange={handleTradeStartDateChange}
             />
-            <span class="input-group-addon">
-            <span class="glyphicon glyphicon-calendar"></span>
+            <span className="input-group-addon">
+            <span className="glyphicon glyphicon-calendar"></span>
             </span>
           </div>
-          <div class='input-group date hunter-date-time-picker' id='datetimepicker2'>
+          <div className='input-group date hunter-date-time-picker' id='datetimepicker2'>
             <span>Trade End Time:</span> 
             <input 
               type='date'
-              class="form-control hunter-input"
+              className="form-control hunter-input"
               value={tradeEndDate}
               onChange={handleTradeEndDateChange}
             />
-            <span class="input-group-addon">
-            <span class="glyphicon glyphicon-calendar"></span>
+            <span className="input-group-addon">
+            <span className="glyphicon glyphicon-calendar"></span>
             </span>
           </div>
         </div>
         <MDBDataTableV5 
           hover
-          entriesOptions={[10]}
+          maxHeight="500px"
+          entriesOptions={[10, 25, 50, 100]}
           entries={10}
           pagesAmount={4}
           data={datatable}
@@ -244,7 +249,7 @@ const DataTable = () => {
           noBottomColumns={true}
           small={true}
           striped={true}
-          // scrollY={true}
+          scrollY={true}
         />;
       </div>
     </div>

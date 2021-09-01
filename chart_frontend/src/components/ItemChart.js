@@ -4,6 +4,7 @@ import Select from 'react-select'
 import "react-datetime/css/react-datetime.css";
 import StockChart from "./stock-chart/StockChart"
 import { useHistory } from "react-router-dom";
+import disableScroll from 'disable-scroll';
 
 const HeiknStockChartItem = (props) => {
     
@@ -57,6 +58,13 @@ const HeiknStockChartItem = (props) => {
           value: 'SMA', label: 'SMA',
         }
     ]
+
+    useEffect(() => {
+      disableScroll.on();
+      return () => {
+        disableScroll.off();
+      }
+    })
     
     useEffect(() => {
       if (selectedInstance.value === 'optimization') {
@@ -81,68 +89,68 @@ const HeiknStockChartItem = (props) => {
           })
         };
         fetch(process.env.REACT_APP_BACKEND_URL + "/api/tables", requestOptions)
-            .then(response => response.json())
-            .then(data => {
-                let temp_data = []
-                data.tables.map((x) => {
-                    temp_data.push({
-                        value: x,
-                        label: x
-                    });
-                    return null
-                })
-                setSymbolList(temp_data)
+          .then(response => response.json())
+          .then(data => {
+            let temp_data = []
+            data.tables.map((x) => {
+                temp_data.push({
+                    value: x,
+                    label: x
+                });
+                return null
             })
+            setSymbolList(temp_data)
+          })
       }
       
       if (!apiFlag) {
-          setMicroStrategy(microStrategy)
-          get_tables();
-          setApiFlag(true)
+        setMicroStrategy(microStrategy)
+        get_tables();
+        setApiFlag(true)
       }
     }, [setMicroStrategy, apiFlag, microStrategy, setApiFlag, strategy.value])
 
     const handleViewTypeChange = (e) => {
-        setSelectedViewType(e)
-        if (e.value === 'charting') {
-          handleChartRedirect(true)
-        }
+      setSelectedViewType(e)
+      if (e.value === 'charting') {
+        handleChartRedirect(true)
+      }
     }
 
     const handlSymbolChange = (e) => {
-        if (e) {
-            setSymbol(e)
-        }
+      if (e) {
+        setSymbol(e)
+      }
     }
     
     const handlMultiSymbolChange = (e) => {
-        setMultiSymbol(e)
+      setMultiSymbol(e)
     }
 
     const handleStrategyChange = (e) => {
-        if (e) {
-          setStrategy(e)
-            if (e.value === 'heikfilter') {
-              setOptionsMicroStrategy([
-                    { value: 'heikfilter-2mins-trades', label: '2 mins' },
-                    { value: 'heikfilter-2mins-4hours-trades', label: '2 mins>4 hours' },
-                    { value: 'heikfilter-2mins-12mins-4hours-trades', label: '2 mins>12 mins>4 hours' },
-                    { value: 'heikfilter-12mins-trades', label: '12 mins' },
-                    { value: 'heikfilter-12mins-4hours-trades', label: '12 mins>4 hours' },
-                    { value: 'heikfilter-4hours-trades', label: '4 hours' },
-                ])
-            } else {
-              setOptionsMicroStrategy([])
-            }
+      if (e) {
+        setStrategy(e)
+        if (e.value === 'heikfilter') {
+          setOptionsMicroStrategy([
+            { value: 'heikfilter-2mins-trades', label: '2 mins' },
+            { value: 'heikfilter-2mins-4hours-trades', label: '2 mins>4 hours' },
+            { value: 'heikfilter-2mins-12mins-4hours-trades', label: '2 mins>12 mins>4 hours' },
+            { value: 'heikfilter-12mins-trades', label: '12 mins' },
+            { value: 'heikfilter-12mins-4hours-trades', label: '12 mins>4 hours' },
+            { value: 'heikfilter-4hours-trades', label: '4 hours' },
+          ])
+        } else {
+          setOptionsMicroStrategy([])
         }
       }
+    }
 
     const handleIndicatorsChange = (options) => {
-        setIndicators(options);
+      setIndicators(options);
     }
 
     const handleMicroStrategyChange = (e) => {
-        setMicroStrategy(e);
+      setMicroStrategy(e);
     }
 
     return (
@@ -218,16 +226,16 @@ const HeiknStockChartItem = (props) => {
                 </div>
             </nav>
             <div className="graphs-container dark">
-                < StockChart
-                  selectedInstance ={selectedInstance.value}
-                  viewType={selectedViewType.value}
-                  microStrategy={microStrategy.value}
-                  symbol={symbol.value}
-                  multiSymbol={multiSymbol}
-                  indicators={indicators}
-                  strategy={strategy}
-                  isHomePage={false}
-                />
+              < StockChart
+                selectedInstance ={selectedInstance.value}
+                viewType={selectedViewType.value}
+                microStrategy={microStrategy.value}
+                symbol={symbol.value}
+                multiSymbol={multiSymbol}
+                indicators={indicators}
+                strategy={strategy}
+                isHomePage={false}
+              />
             </div>
         </div>
 
