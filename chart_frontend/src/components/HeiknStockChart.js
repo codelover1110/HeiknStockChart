@@ -14,12 +14,12 @@ import {
   Nav,
 } from "reactstrap";
 import { useAuth } from 'contexts/authContext';
+import disableScroll from 'disable-scroll';
 
 const HeiknStockChart = (props) => {
 
   const auth = useAuth();
   const { selectedInstance, handleChartRedirect } = props
-
   const history = useHistory();
   const [symbol, setSymbol] = useState(null);
   const [indicators, setIndicators] = useState([]);
@@ -31,7 +31,7 @@ const HeiknStockChart = (props) => {
   const [selectedViewType, setSelectedViewType] = useState({ value: 'charting', label: 'Charting' });
   const [microStrategy, setMicroStrategy] = useState({ value: 'heikfilter-2mins-trades', label: '2 mins' })
   const [strategy, setStrategy] = useState({ value: 'heikfilter', label: 'heikfilter' });
-
+  
   const [optionsViewTypes, setOptionsViewTypes] = useState([
     { value: 'charting', label: 'Charting' },
     { value: 'performance', label: 'Performance' },
@@ -57,6 +57,12 @@ const HeiknStockChart = (props) => {
     {
       value: 'RSI', label: 'RSI',
     },
+    // {
+    //   value: 'HEIK1', label: 'HEIK1',
+    // },
+    // {
+    //   value: 'HEIK2', label: 'HEIK2',
+    // }
   ]);
 
   const optionsColumn = [
@@ -75,9 +81,13 @@ const HeiknStockChart = (props) => {
   ]
 
   useEffect(() => {
+    disableScroll.on();
     if(!isGetSymbolList) {
       get_tables();    
     }  
+    return () => {
+      disableScroll.off();
+    }
   }, [])
   
   useEffect(() => {
@@ -255,7 +265,6 @@ const HeiknStockChart = (props) => {
 
   const displayChart = () => {
     return (
-        
       <div className={`row ${calculateHeightStyle()}`}>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
           {symbol && (
@@ -410,7 +419,6 @@ const HeiknStockChart = (props) => {
               placeholder="Columns"
             />
           </div>
-          
         </div>
         <Collapse navbar isOpen={collapseOpen}>
             <Nav className="ml-auto" navbar>
