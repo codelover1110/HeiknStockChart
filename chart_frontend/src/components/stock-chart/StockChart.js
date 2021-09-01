@@ -15,7 +15,9 @@ const StockChart = (props) => {
         microStrategy,
         selectedInstance,
         selectedTradeDB,
-        chartPeriod
+        chartPeriod,
+        startDate,
+        endDate
     } = props;
     const [dbname, setDbname] = useState('')
 	const [chartData, setChartData] = useState(null)
@@ -86,6 +88,8 @@ const StockChart = (props) => {
                     body: JSON.stringify({
                         'symbols': symbols,
                         'table_name': microStrategy,
+                        'start_date': startDate,
+                        'end_date': endDate,
                     })
                 };
                 fetch(process.env.REACT_APP_BACKEND_URL+'/api/get_backtesting_data', requestOptions)
@@ -99,7 +103,7 @@ const StockChart = (props) => {
         if (symbol || multiSymbol.length) {
 			get_data(symbol)
 		}
-    }, [selectedInstance, dbname, viewType, symbol, multiSymbol, microStrategy])
+    }, [selectedInstance, dbname, viewType, symbol, multiSymbol, microStrategy, startDate, endDate])
 
     return (
 		<>

@@ -25,6 +25,7 @@ import ProvideAuth from 'contexts/authContext'
 import PrivateRoute from 'layouts/Auth/PrivateRoute'
 import SignUp from 'layouts/User/SignUp'
 import Verify from 'layouts/User/Verify'
+import ForgotPassword from 'layouts/User/ForgotPassword'
 
 ReactDOM.render(
   <ThemeContextWrapper>
@@ -44,6 +45,7 @@ ReactDOM.render(
             <Route path="/login" render={(props) => <Login {...props} />} />
             <Route path="/signup" render={(props) => <SignUp {...props} />} />
             <Route path="/verify" render={(props) => <Verify {...props} />} />
+            <Route path="/forgot_password" render={(props) => <ForgotPassword {...props} />} />
             <PrivateRoute path="/tradedata">
               <TradeData />
             </PrivateRoute>

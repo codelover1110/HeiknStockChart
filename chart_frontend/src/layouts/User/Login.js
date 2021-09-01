@@ -104,9 +104,9 @@ const Login = () => {
                     <p className="sign-up-area text-left">
                         <a href="/signup">Sign Up?</a>
                     </p>
-                    {/* <p className="forgot-password text-right">
-                        Forgot <a href="/">password?</a>
-                    </p> */}
+                    <p className="forgot-password text-right">
+                        Forgot <a href="/forgot_password">password?</a>
+                    </p>
                 </div>
             </div>
             {error !== -1 && 

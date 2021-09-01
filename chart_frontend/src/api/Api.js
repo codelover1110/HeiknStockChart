@@ -78,5 +78,34 @@ export const createSignUpLink = async (roles) => {
 }
 
 export const sendSignUpLink = async (email, link) => {
+  const requestOptions = {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      email,
+      link
+    })
+  };
   
+  return await fetch(process.env.REACT_APP_BACKEND_URL + "/api/send-signup-link", requestOptions)
+    .then(response => response.json())
+    .then(data => {
+      return true
+    })  
+}
+
+export const forgotPassword = async (email) => {
+  const requestOptions = {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      email
+    })
+  };
+  
+  return await fetch(process.env.REACT_APP_BACKEND_URL + "/api/forgot-password", requestOptions)
+    .then(response => response.json())
+    .then(data => {
+      return true
+    })    
 }

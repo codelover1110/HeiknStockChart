@@ -278,6 +278,8 @@ const HeiknStockChart = (props) => {
               isHomePage={true}
               chartColumn={chartColumn.value}
               microStrategy={microStrategy.value}
+              startDate={null}
+              endDate={null}
             />
           )}
         </div>
@@ -293,6 +295,8 @@ const HeiknStockChart = (props) => {
             isHomePage={true}
             chartColumn={chartColumn.value}
             microStrategy={microStrategy.value}
+            startDate={null}
+            endDate={null}
           />)}
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
@@ -307,6 +311,8 @@ const HeiknStockChart = (props) => {
               isHomePage={true}
               chartColumn={chartColumn.value}
               microStrategy={microStrategy.value}
+              startDate={null}
+              endDate={null}
             />)}
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
@@ -321,6 +327,8 @@ const HeiknStockChart = (props) => {
               isHomePage={true}
               chartColumn={chartColumn.value}
               microStrategy={microStrategy.value}
+              startDate={null}
+              endDate={null}
             />)}
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
@@ -335,6 +343,8 @@ const HeiknStockChart = (props) => {
               isHomePage={true}
               chartColumn={chartColumn.value}
               microStrategy={microStrategy.value}
+              startDate={null}
+              endDate={null}
             />)}
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
@@ -349,6 +359,8 @@ const HeiknStockChart = (props) => {
             isHomePage={true}
             chartColumn={chartColumn.value}
             microStrategy={microStrategy.value}
+            startDate={null}
+            endDate={null}
           />)}
         </div>
       </div>
