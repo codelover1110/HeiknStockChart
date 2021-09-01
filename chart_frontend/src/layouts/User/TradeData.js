@@ -6,7 +6,7 @@ import {
 import Sidebar from "components/Sidebar/Sidebar.js";
 import DataTable from "components/Datatable/Datatable"
 
-import routes from "routes.js";
+import { routes } from "routes.js";
 
 import { BackgroundColorContext } from "contexts/BackgroundColorContext";
 
@@ -21,8 +21,7 @@ function TradeData() {
   const handleInstanceChange = (instance) => {
     setSelectedInstance(instance)
   }
-
-
+  
   return (
     <BackgroundColorContext.Consumer>
       {({ color }) => (
@@ -38,6 +37,7 @@ function TradeData() {
           )}
           {isShowSidebar && (
               <Sidebar
+                isAdminPage={false}
                 routes={routes}
                 selectedInstance={selectedInstance}
                 handleSidebarChange={handleSidebarChange}

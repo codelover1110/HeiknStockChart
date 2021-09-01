@@ -57,12 +57,6 @@ const HeiknStockChart = (props) => {
     {
       value: 'RSI', label: 'RSI',
     },
-    // {
-    //   value: 'HEIK1', label: 'HEIK1',
-    // },
-    // {
-    //   value: 'HEIK2', label: 'HEIK2',
-    // }
   ]);
 
   const optionsColumn = [

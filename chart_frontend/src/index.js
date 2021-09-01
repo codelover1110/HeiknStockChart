@@ -5,6 +5,8 @@ import { BrowserRouter, Route, Switch } from "react-router-dom";
 import HomePage from "layouts/User/HomePage"
 import Login from "layouts/User/Login"
 import AdminLayout from "layouts/Admin/Admin.js";
+import UserManage from "layouts/Admin/UserManage.js";
+import LinkManage from "layouts/Admin/LinkManage";
 import TradeData from "layouts/User/TradeData";
 
 import "assets/scss/black-dashboard-react.scss";
@@ -30,6 +32,12 @@ ReactDOM.render(
       <ProvideAuth>
         <BrowserRouter>
           <Switch>
+            <PrivateRoute path="/admin/usermanage">
+              <UserManage />
+            </PrivateRoute>
+            <PrivateRoute path="/admin/linkmanage">
+              <LinkManage />
+            </PrivateRoute>
             <PrivateRoute path="/admin">
               <AdminLayout />
             </PrivateRoute>

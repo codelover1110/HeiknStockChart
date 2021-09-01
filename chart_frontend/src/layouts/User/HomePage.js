@@ -8,7 +8,7 @@ import PerfectScrollbar from "perfect-scrollbar";
 
 import Sidebar from "components/Sidebar/Sidebar.js";
 
-import routes from "routes.js";
+import { routes } from "routes.js";
 
 import { BackgroundColorContext } from "contexts/BackgroundColorContext";
 import HeiknStockChart from "components/HeiknStockChart"
@@ -91,6 +91,7 @@ function HomePage() {
           )}
           {isShowSidebar && (
               <Sidebar
+                isAdminPage={false}
                 routes={routes}
                 selectedInstance={selectedInstance}
                 handleSidebarChange={handleSidebarChange}

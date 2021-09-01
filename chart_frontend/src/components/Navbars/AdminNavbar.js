@@ -53,10 +53,14 @@ function AdminNavbar() {
   }
 
   return (
-    <>
+    <nav className="navbar navbar-expand navbar-dark bg-dark hunter-nav-bar">
+      <div className="logo-title">
+        <a href="/chart" className="hunter-navbar-brand">
+            Hunter Violette - HeikinAshi
+        </a>
+      </div>
       <Navbar className={classNames("navbar-absolute", color)} expand="lg">
         <Container fluid>
-          
           <Collapse navbar isOpen={collapseOpen}>
             <Nav className="ml-auto" navbar>
               <UncontrolledDropdown nav>
@@ -108,7 +112,7 @@ function AdminNavbar() {
           </button>
         </ModalHeader>
       </Modal>
-    </>
+    </nav>
   );
 }
 

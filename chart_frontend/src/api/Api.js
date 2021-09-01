@@ -52,3 +52,31 @@ export const getAllSymbols = async () => {
       return temp_data
     })
 }
+
+export const createSignUpLink = async (roles) => {
+  const requestOptions = {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      roles
+    })
+  };
+  
+  return await fetch(process.env.REACT_APP_BACKEND_URL + "/api/create-signup-link", requestOptions)
+    .then(response => response.json())
+    .then(data => {
+      let temp_data = []
+      data.tables.map((x) => {
+        temp_data.push({
+          value: x,
+          label: x
+        });
+        return null
+      })
+      return temp_data
+    })  
+}
+
+export const sendSignUpLink = async (email, link) => {
+  
+}
