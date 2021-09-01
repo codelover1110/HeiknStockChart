@@ -25,6 +25,8 @@ const HeiknStockChartItem = (props) => {
     const [microStrategy, setMicroStrategy] = useState(initMicroStrategy ? initMicroStrategy: null)
     const [indicators, setIndicators] = useState(initIndicators)
     const [apiFlag, setApiFlag] = useState(false)
+    const [tradeStartDate, setTradeStartDate] = useState(null)
+    const [tradeEndDate, setTradeEndDate] = useState(null)
 
     const [optionsViewTypes, setOptionsViewTypes] = useState([
       { value: 'charting', label: 'Charting' },
@@ -153,92 +155,125 @@ const HeiknStockChartItem = (props) => {
       setMicroStrategy(e);
     }
 
+    const handleTradeStartDateChange = (e) => {
+      setTradeStartDate(e.target.value)
+    }
+    
+    const handleTradeEndDateChange = (e) => {
+      setTradeEndDate(e.target.value)
+    }
+
     return (
       <div className="hunter-chart-container">
-            <nav className="navbar navbar-expand navbar-dark bg-dark hunter-nav-bar">
-                <div className="logo-title">
-                  <a href="/chart" className="hunter-navbar-brand">
-                      Hunter Violette - HeikinAshi
-                  </a>
-                </div>
-                <div className="navbar-nav mr-auto">
-                    <li className="nav-item">
-                        <Link to={"/chart"} className="nav-link"></Link>
-                    </li>
-                    <div className="select-option">
-                      <Select
-                        value={selectedViewType}
-                        onChange={handleViewTypeChange}
-                        options={optionsViewTypes}
-                        placeholder="Charting"
-                      />
-                    </div>
-                    {selectedViewType.value !== 'performance'
-                      ? (<div className="select-option">
-                        <Select
-                            value={symbol}
-                            onChange={handlSymbolChange}
-                            options={symbolList}
-                        />
-                          </div>)
-                      : (<div className="select-multi-option">
-                            <Select
-                                value={multiSymbol}
-                                onChange={handlMultiSymbolChange}
-                                options={symbolList}
-                                isMulti={true}
-                            />
-                        </div>)
-                    }
-                    {(selectedInstance.value !== 'live_trading') &&
-                     (<div className="select-option">
-                          <Select
-                          value={strategy}
-                          onChange={handleStrategyChange}
-                          options={optionsStratgy}
-                          placeholder="Macro Strategy"
-                          />
-                      </div>)
-                    }
-                    {selectedInstance.value !== 'live_trading' && 
-                     (<div className="select-option">
-                        <Select
-                          name="filters"
-                          placeholder="Micro Strategy"
-                          value={microStrategy}
-                          onChange={handleMicroStrategyChange}
-                          options={optionsMicroStrategy}
-                        />
-                      </div>)
-                    }
-                    {selectedViewType.value !== 'performance' && 
-                      (<div className="select-multi-option">
-                        <Select
-                          name="filters"
-                          placeholder="Indicators"
-                          value={indicators}
-                          onChange={handleIndicatorsChange}
-                          options={optionsIndicator}
-                          isMulti={true}
-                        />
-                      </div>)
-                    }
-                </div>
-            </nav>
-            <div className="graphs-container dark">
-              < StockChart
-                selectedInstance ={selectedInstance.value}
-                viewType={selectedViewType.value}
-                microStrategy={microStrategy.value}
-                symbol={symbol.value}
-                multiSymbol={multiSymbol}
-                indicators={indicators}
-                strategy={strategy}
-                isHomePage={false}
+        <nav className="navbar navbar-expand navbar-dark bg-dark hunter-nav-bar">
+          <div className="logo-title">
+            <a href="/chart" className="hunter-navbar-brand">
+                Hunter Violette - HeikinAshi
+            </a>
+          </div>
+          <div className="navbar-nav mr-auto">
+            <li className="nav-item">
+                <Link to={"/chart"} className="nav-link"></Link>
+            </li>
+            <div className="select-option">
+              <Select
+                value={selectedViewType}
+                onChange={handleViewTypeChange}
+                options={optionsViewTypes}
+                placeholder="Charting"
               />
             </div>
+            {selectedViewType.value !== 'performance'
+              ? (<div className="select-option">
+                <Select
+                    value={symbol}
+                    onChange={handlSymbolChange}
+                    options={symbolList}
+                />
+                  </div>)
+              : (<div className="select-multi-option">
+                    <Select
+                        value={multiSymbol}
+                        onChange={handlMultiSymbolChange}
+                        options={symbolList}
+                        isMulti={true}
+                    />
+                </div>)
+            }
+            {(selectedInstance.value !== 'live_trading') &&
+              (<div className="select-option">
+                  <Select
+                  value={strategy}
+                  onChange={handleStrategyChange}
+                  options={optionsStratgy}
+                  placeholder="Macro Strategy"
+                  />
+              </div>)
+            }
+            {selectedInstance.value !== 'live_trading' && 
+              (<div className="select-option">
+                <Select
+                  name="filters"
+                  placeholder="Micro Strategy"
+                  value={microStrategy}
+                  onChange={handleMicroStrategyChange}
+                  options={optionsMicroStrategy}
+                />
+              </div>)
+            }
+            {selectedViewType.value !== 'performance' && 
+              (<div className="select-multi-option">
+                <Select
+                  name="filters"
+                  placeholder="Indicators"
+                  value={indicators}
+                  onChange={handleIndicatorsChange}
+                  options={optionsIndicator}
+                  isMulti={true}
+                />
+              </div>)
+            }
+            <div className='input-group date hunter-performance-chart hunter-date-time-picker' id='datetimepicker1'>
+              <span> Start: </span> 
+                <input 
+                  type='date'
+                  className="form-control hunter-input"
+                  value={tradeStartDate}
+                  onChange={handleTradeStartDateChange}
+                />
+                <span className="input-group-addon">
+                <span className="glyphicon glyphicon-calendar"></span>
+              </span>
+            </div>
+            <div className='input-group date hunter-performance-chart hunter-date-time-picker' id='datetimepicker2'>
+              <span> End: </span> 
+              <input 
+                type='date'
+                className="form-control hunter-input"
+                value={tradeEndDate}
+                onChange={handleTradeEndDateChange}
+              />
+              <span className="input-group-addon">
+              <span className="glyphicon glyphicon-calendar"></span>
+              </span>
+            </div>
+          </div>
+        </nav>
+        <div className="graphs-container dark">
+          < StockChart
+            selectedInstance ={selectedInstance.value}
+            viewType={selectedViewType.value}
+            microStrategy={microStrategy.value}
+            symbol={symbol.value}
+            multiSymbol={multiSymbol}
+            indicators={indicators}
+            strategy={strategy}
+            isHomePage={false}
+            startDate={tradeStartDate}
+            endDate={tradeEndDate}
+          />
         </div>
-
+      </div>
     );
 };
 

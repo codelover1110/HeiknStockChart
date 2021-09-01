@@ -337,3 +337,15 @@ div.mdb-datatable div.mdb-datatable-filter {
 .hunter-modal .select-multi-option {
   margin-right: 0px;
 }
+
+.dataTables_scrollHeadInner {
+  padding-right: 0px !important;
+}
+
+.hunter-mb-3 {
+  margin-bottom: 30px;
+}
+
+.hunter-performance-chart.hunter-date-time-picker {
+  max-width: 220px;
+}

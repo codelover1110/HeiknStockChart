@@ -134,10 +134,6 @@ const DataTable = () => {
     setTradeEndDate(e.target.value)
   }
 
-  const handlePageRowsChange = (e) => {
-    console.log("e===================================>", e)
-  }
-
   return (
     <div className="hunter-chart-container">
       <nav className="navbar navbar-expand navbar-dark bg-dark hunter-nav-bar">
@@ -212,15 +208,15 @@ const DataTable = () => {
             />
           </div>
           <div className='input-group date hunter-date-time-picker' id='datetimepicker1'>
-          <span>Trade Start Time:</span>
-            <input 
-              type='date'
-              className="form-control hunter-input"
-              value={tradeStartDate}
-              onChange={handleTradeStartDateChange}
-            />
-            <span className="input-group-addon">
-            <span className="glyphicon glyphicon-calendar"></span>
+            <span>Trade Start Time:</span>
+              <input 
+                type='date'
+                className="form-control hunter-input"
+                value={tradeStartDate}
+                onChange={handleTradeStartDateChange}
+              />
+              <span className="input-group-addon">
+              <span className="glyphicon glyphicon-calendar"></span>
             </span>
           </div>
           <div className='input-group date hunter-date-time-picker' id='datetimepicker2'>
