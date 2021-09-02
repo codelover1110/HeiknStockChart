@@ -63,7 +63,8 @@ const StockChart = (props) => {
                     body: JSON.stringify({
                         'db_name': dbname,
                         'symbol': symbol,
-                        'strategy': microStrategy,
+                        'macro': strategy.value,
+                        'micro': microStrategy,
                     })
                 };
                 fetch(process.env.REACT_APP_BACKEND_URL+'/api/get_data', requestOptions)
@@ -87,7 +88,7 @@ const StockChart = (props) => {
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
                         'symbols': symbols,
-                        'table_name': microStrategy,
+                        'table_name': `${strategy.value}-${microStrategy}-trades`,
                         'start_date': startDate,
                         'end_date': endDate,
                     })
@@ -103,7 +104,7 @@ const StockChart = (props) => {
         if (symbol || multiSymbol.length) {
 			get_data(symbol)
 		}
-    }, [selectedInstance, dbname, viewType, symbol, multiSymbol, microStrategy, startDate, endDate])
+    }, [selectedInstance, dbname, viewType, symbol, multiSymbol, microStrategy, startDate, endDate, strategy.value])
 
     return (
 		<>

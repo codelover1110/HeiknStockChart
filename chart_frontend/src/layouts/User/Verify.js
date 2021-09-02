@@ -21,7 +21,7 @@ const Verify = () => {
         if (!userId) {
             history.push('/login')
         }
-    }, [userId])
+    }, [userId, history])
 
     const verify = async () => {
         if (!code.length) {

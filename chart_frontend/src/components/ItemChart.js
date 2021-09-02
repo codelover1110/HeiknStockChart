@@ -5,6 +5,7 @@ import "react-datetime/css/react-datetime.css";
 import StockChart from "./stock-chart/StockChart"
 import { useHistory } from "react-router-dom";
 import disableScroll from 'disable-scroll';
+import { getStrategyOptions } from "api/Api";
 
 const HeiknStockChartItem = (props) => {
     
@@ -33,14 +34,7 @@ const HeiknStockChartItem = (props) => {
       { value: 'performance', label: 'Performance' },
     ])    
 
-    const [optionsMicroStrategy, setOptionsMicroStrategy] = useState([
-      { value: 'heikfilter-2mins-trades', label: '2 mins' },
-      { value: 'heikfilter-2mins-4hours-trades', label: '2 mins>4 hours' },
-      { value: 'heikfilter-2mins-12mins-4hours-trades', label: '2 mins>12 mins>4 hours' },
-      { value: 'heikfilter-12mins-trades', label: '12 mins' },
-      { value: 'heikfilter-12mins-4hours-trades', label: '12 mins>4 hours' },
-      { value: 'heikfilter-4hours-trades', label: '4 hours' }
-    ])
+    const [optionsMicroStrategy, setOptionsMicroStrategy] = useState([])
     
     const optionsStratgy = [
       { value: 'heikfilter', label: 'heikfilter' },
@@ -62,11 +56,25 @@ const HeiknStockChartItem = (props) => {
     ]
 
     useEffect(() => {
+      const getStrategies = async () => {
+        let options = await getStrategyOptions();
+        let newOptions = []
+        if (options.micro_strategy.length) {
+          options.micro_strategy.forEach((option) => {
+            newOptions.push({
+              value: option._id,
+              label: option._id
+            })
+          })
+          setOptionsMicroStrategy(newOptions)
+        }
+      }
+      getStrategies();
       disableScroll.on();
       return () => {
         disableScroll.off();
       }
-    })
+    }, [])
     
     useEffect(() => {
       if (selectedInstance.value === 'optimization') {
@@ -129,18 +137,21 @@ const HeiknStockChartItem = (props) => {
       setMultiSymbol(e)
     }
 
-    const handleStrategyChange = (e) => {
+    const handleStrategyChange = async (e) => {
       if (e) {
         setStrategy(e)
         if (e.value === 'heikfilter') {
-          setOptionsMicroStrategy([
-            { value: 'heikfilter-2mins-trades', label: '2 mins' },
-            { value: 'heikfilter-2mins-4hours-trades', label: '2 mins>4 hours' },
-            { value: 'heikfilter-2mins-12mins-4hours-trades', label: '2 mins>12 mins>4 hours' },
-            { value: 'heikfilter-12mins-trades', label: '12 mins' },
-            { value: 'heikfilter-12mins-4hours-trades', label: '12 mins>4 hours' },
-            { value: 'heikfilter-4hours-trades', label: '4 hours' },
-          ])
+          let options = await getStrategyOptions();
+          let newOptions = []
+          if (options.micro_strategy.length) {
+            options.micro_strategy.forEach((option) => {
+              newOptions.push({
+                value: option._id,
+                label: option._id
+              })
+            })
+            setOptionsMicroStrategy(newOptions)
+          }
         } else {
           setOptionsMicroStrategy([])
         }

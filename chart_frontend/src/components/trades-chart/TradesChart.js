@@ -577,16 +577,17 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 					
 					<Annotate with={SvgPathAnnotation} when={ d => 
 						{
+							console.log("this.props.strategy + this.props.microStrategy", `${this.props.strategy.value}-${this.props.microStrategy}-trades`)
 							return this.props.selectedInstance !== 'live_trading'  
 							&& d.trades
-							&& d.trades[0].strategy === this.props.microStrategy
+							&& d.trades[0].strategy === `${this.props.strategy.value}-${this.props.microStrategy}-trades`
 							&& d.trades[0].longShort === "LONG" 
 						}}
 						usingProps={longAnnotationProps} />
 					<Annotate with={SvgPathAnnotation} when={d => 
 						this.props.selectedInstance !== 'live_trading' 
 						&& d.trades
-						&& d.trades[0].strategy === this.props.microStrategy
+						&& d.trades[0].strategy === `${this.props.strategy.value}-${this.props.microStrategy}-trades`
 						&& d.trades[0].longShort === "SHORT" }
 						usingProps={shortAnnotationProps} />
 

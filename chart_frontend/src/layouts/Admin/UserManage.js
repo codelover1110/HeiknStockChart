@@ -1,5 +1,5 @@
 import React from "react";
-import { Route, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import {
   Button
 } from "reactstrap";
@@ -68,21 +68,23 @@ function UserManage() {
   const handleSidebarChange = () => {
     setShowSidebar(!isShowSidebar);
   };
-  const getRoutes = (routes) => {
-    return routes.map((prop, key) => {
-      if (prop.layout === "/admin") {
-        return (
-          <Route
-            path={prop.layout + prop.path}
-            component={prop.component}
-            key={key}
-          />
-        );
-      } else {
-        return null;
-      }
-    });
-  };
+  
+  // const getRoutes = (routes) => {
+  //   return routes.map((prop, key) => {
+  //     if (prop.layout === "/admin") {
+  //       return (
+  //         <Route
+  //           path={prop.layout + prop.path}
+  //           component={prop.component}
+  //           key={key}
+  //         />
+  //       );
+  //     } else {
+  //       return null;
+  //     }
+  //   });
+  // };
+
   const getBrandText = (path) => {
     for (let i = 0; i < adminRoutes.length; i++) {
       if (location.pathname.indexOf(adminRoutes[i].layout + adminRoutes[i].path) !== -1) {

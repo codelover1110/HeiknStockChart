@@ -14,8 +14,7 @@ import {
 import { useHistory } from "react-router-dom";
 import { MDBDataTableV5 } from 'mdbreact';
 import { useAuth } from 'contexts/authContext';
-import { getAllSymbols, filterTradesData } from 'api/Api'
-
+import { getAllSymbols, filterTradesData, getStrategyOptions } from 'api/Api'
 
 const DataTable = () => {
   const auth = useAuth();
@@ -23,7 +22,7 @@ const DataTable = () => {
   const [collapseOpen,] = React.useState(false)
   const [symbol, setSymbol] = React.useState([])
   const [macroStrategy, setMacroStrategy] = useState({ value: 'heikfilter', label: 'heikfilter' });
-  const [microStrategy, setMicrostrategy] = useState({ value: '2mins-trades', label: '2 mins' })
+  const [microStrategy, setMicrostrategy] = useState({ value: '2mins', label: '2mins' })
   const [tradeStartDate, setTradeStartDate] = useState('2021-01-01')
   const [tradeEndDate, setTradeEndDate] = useState('2021-08-31')
 
@@ -31,14 +30,7 @@ const DataTable = () => {
     { value: 'heikfilter', label: 'heikfilter' },
   ])
 
-  const [optionsMicroStrategy,] = useState([
-    { value: '2mins-trades', label: '2 mins' },
-    { value: '2mins-4hours-trades', label: '2 mins>4 hours' },
-    { value: '2mins-12mins-4hours-trades', label: '2 mins>12 mins>4 hours' },
-    { value: '12mins-trades', label: '12 mins' },
-    { value: '12mins-4hours-trades', label: '12 mins>4 hours' },
-    { value: '4hours-trades', label: '4 hours' },
-  ])
+  const [optionsMicroStrategy, setOptionsMicroStrategy] = useState([])
   
   const [optionsSymbol, setOptionsSymbol] = useState([])
 
@@ -88,6 +80,23 @@ const DataTable = () => {
     rows: [
     ],
   });
+
+  useEffect(() => {
+    const getStrategies = async () => {
+      let options = await getStrategyOptions();
+      let newOptions = []
+      if (options.micro_strategy.length) {
+        options.micro_strategy.forEach((option) => {
+          newOptions.push({
+            value: option._id,
+            label: option._id
+          })
+        })
+        setOptionsMicroStrategy(newOptions)
+      }
+    }
+    getStrategies();
+  }, [])
 
   useEffect(() => {
     const get_trades = async (symbol, macroStrat, microStrat, tradeStartDate, tradeEndDate) => {

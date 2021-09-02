@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from "react";
-import { Route, useLocation } from "react-router-dom";
+import React, { useState } from "react";
+import { useLocation } from "react-router-dom";
 import Select from 'react-select'
 import {
   Button
@@ -112,21 +112,21 @@ function LinkManage() {
     setShowSidebar(!isShowSidebar);
   };
 
-  const getRoutes = (routes) => {
-    return routes.map((prop, key) => {
-      if (prop.layout === "/admin") {
-        return (
-          <Route
-            path={prop.layout + prop.path}
-            component={prop.component}
-            key={key}
-          />
-        );
-      } else {
-        return null;
-      }
-    });
-  };
+  // const getRoutes = (routes) => {
+  //   return routes.map((prop, key) => {
+  //     if (prop.layout === "/admin") {
+  //       return (
+  //         <Route
+  //           path={prop.layout + prop.path}
+  //           component={prop.component}
+  //           key={key}
+  //         />
+  //       );
+  //     } else {
+  //       return null;
+  //     }
+  //   });
+  // };
 
   const getBrandText = (path) => {
     for (let i = 0; i < adminRoutes.length; i++) {

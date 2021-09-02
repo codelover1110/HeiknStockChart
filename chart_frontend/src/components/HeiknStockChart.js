@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Select from 'react-select'
 import "react-datetime/css/react-datetime.css";
@@ -15,6 +15,7 @@ import {
 } from "reactstrap";
 import { useAuth } from 'contexts/authContext';
 import disableScroll from 'disable-scroll';
+import { getStrategyOptions } from "api/Api";
 
 const HeiknStockChart = (props) => {
 
@@ -29,7 +30,7 @@ const HeiknStockChart = (props) => {
   const [collapseOpen,] = React.useState(false)
   const [chartColumn, setChartColumn] = useState({ value: 6, label: '6' })
   const [selectedViewType, setSelectedViewType] = useState({ value: 'charting', label: 'Charting' });
-  const [microStrategy, setMicroStrategy] = useState({ value: 'heikfilter-2mins-trades', label: '2 mins' })
+  const [microStrategy, setMicroStrategy] = useState({ value: '2mins', label: '2mins' })
   const [strategy, setStrategy] = useState({ value: 'heikfilter', label: 'heikfilter' });
   
   const [optionsViewTypes, setOptionsViewTypes] = useState([
@@ -37,14 +38,7 @@ const HeiknStockChart = (props) => {
     { value: 'performance', label: 'Performance' },
   ])
 
-  const [optionsMicroStrategy, setOptionsMicroStrategy] = useState([
-    { value: 'heikfilter-2mins-trades', label: '2 mins' },
-    { value: 'heikfilter-2mins-4hours-trades', label: '2 mins>4 hours' },
-    { value: 'heikfilter-2mins-12mins-4hours-trades', label: '2 mins>12 mins>4 hours' },
-    { value: 'heikfilter-12mins-trades', label: '12 mins' },
-    { value: 'heikfilter-12mins-4hours-trades', label: '12 mins>4 hours' },
-    { value: 'heikfilter-4hours-trades', label: '4 hours' },
-  ])
+  const [optionsMicroStrategy, setOptionsMicroStrategy] = useState([])
   
   const [optionsStratgy, setOptionsStrategy] = useState([
     { value: 'heikfilter', label: 'heikfilter' },
@@ -80,15 +74,57 @@ const HeiknStockChart = (props) => {
     }
   ]
 
+  const get_tables = useCallback(
+    () => {
+      const requestOptions = {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          'strategy': strategy.value
+        })
+      };
+      
+      fetch(process.env.REACT_APP_BACKEND_URL + "/api/tables", requestOptions)
+        .then(response => response.json())
+        .then(data => {
+          let temp_data = []
+          data.tables.map((x) => {
+            temp_data.push({
+              value: x,
+              label: x
+            });
+            return null
+          })
+          setSymbolList(temp_data)
+          setSymbol(temp_data[0])
+        })
+    },
+    [strategy.value],
+  )
+
   useEffect(() => {
+    const getStrategies = async () => {
+      let options = await getStrategyOptions();
+      let newOptions = []
+      if (options.micro_strategy.length) {
+        options.micro_strategy.forEach((option) => {
+          newOptions.push({
+            value: option._id,
+            label: option._id
+          })
+        })
+        setOptionsMicroStrategy(newOptions)
+      }
+    }
     disableScroll.on();
     if(!isGetSymbolList) {
-      get_tables();    
+      get_tables();
+      getStrategies();
     }  
     return () => {
       disableScroll.off();
     }
-  }, [])
+  }, [get_tables, isGetSymbolList])
   
   useEffect(() => {
     const handleInstanceChange = (value) => {
@@ -120,7 +156,7 @@ const HeiknStockChart = (props) => {
         { value: 'performance', label: 'Performance' },
       ])
     }
-  }, [selectedInstance])
+  }, [selectedInstance, get_tables])
 
   const handleViewTypeChange = (value) => {
     setSelectedViewType(value)
@@ -129,7 +165,7 @@ const HeiknStockChart = (props) => {
         selectedInstance,
         viewType: value,
         initStrategy: strategy,
-        initMicroStrategy: { value: 'heikfilter-2mins-trades', label: '2 mins' },
+        initMicroStrategy: { value: '2mins', label: '2mins' },
         initIndicators: indicators,
         initSymbol: symbol,
       }
@@ -148,18 +184,21 @@ const HeiknStockChart = (props) => {
     }
   }
 
-  const handleStrategy = (e) => {
+  const handleStrategy = async (e) => {
     if (e) {
       setStrategy(e)
       if (e.value === 'heikfilter') {
-        setOptionsMicroStrategy([
-          { value: 'heikfilter-2mins-trades', label: '2 mins' },
-          { value: 'heikfilter-2mins-4hours-trades', label: '2 mins>4 hours' },
-          { value: 'heikfilter-2mins-12mins-4hours-trades', label: '2 mins>12 mins>4 hours' },
-          { value: 'heikfilter-12mins-trades', label: '12 mins' },
-          { value: 'heikfilter-12mins-4hours-trades', label: '12 mins>4 hours' },
-          { value: 'heikfilter-4hours-trades', label: '4 hours' },
-        ])
+        let options = await getStrategyOptions();
+        let newOptions = []
+        if (options.micro_strategy.length) {
+          options.micro_strategy.forEach((option) => {
+            newOptions.push({
+              value: option._id,
+              label: option._id
+            })
+          })
+          setOptionsMicroStrategy(newOptions)
+        }
       } else {
         setOptionsMicroStrategy([])
     }
@@ -175,31 +214,6 @@ const HeiknStockChart = (props) => {
   const handleIndicatorsChange = (options) => {
     setIndicators(options);
   }
-
-  const get_tables = () => {
-    const requestOptions = {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        'strategy': strategy.value
-      })
-    };
-    
-    fetch(process.env.REACT_APP_BACKEND_URL + "/api/tables", requestOptions)
-				.then(response => response.json())
-				.then(data => {
-					let temp_data = []
-					data.tables.map((x) => {
-						temp_data.push({
-							value: x,
-							label: x
-						});
-            return null
-					})
-					setSymbolList(temp_data)
-          setSymbol(temp_data[0])
-				})
-	}
 
   const handleChartsColumnChange = (option) => {
     if (option.value === 4 || option.value === 6) {

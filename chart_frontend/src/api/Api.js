@@ -15,7 +15,7 @@ export const filterTradesData = async (symbol, macroStrategy, microStrategy, tra
     .then(response => response.json())
     .then(data => {
       let trades_data = []
-      data.trades_data.map((x) => {
+      data.trades_data.forEach((x) => {
         trades_data.push({
           'symbol': x.symbol,
           'strategy': x.strategy_name,
@@ -116,4 +116,12 @@ export const forgotPassword = async (email) => {
     .then(data => {
       return true
     })    
+}
+
+export const getStrategyOptions = async () => {
+  return await fetch(process.env.REACT_APP_BACKEND_URL + "/api/get_strategies")
+    .then(response => response.json())
+    .then(data => {
+      return data
+    })
 }

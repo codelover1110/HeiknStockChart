@@ -3,7 +3,7 @@ import {
     useHistory,
 } from "react-router-dom";
 import { useAuth } from 'contexts/authContext'
-import { validateEmail } from 'utils/helper'
+// import { validateEmail } from 'utils/helper'
 
 const Login = () => {
     let auth = useAuth();

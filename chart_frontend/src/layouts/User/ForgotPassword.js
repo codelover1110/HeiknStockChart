@@ -19,7 +19,7 @@ const ForgotPassword = () => {
       return
     }
     setIsLoading(true)
-    const res = await forgotPassword(email)
+    await forgotPassword(email)
     setIsLoading(false)
     setError(0)
     setMessage('Password is sent to your email')
