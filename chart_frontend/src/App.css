@@ -349,3 +349,7 @@ div.mdb-datatable div.mdb-datatable-filter {
 .hunter-performance-chart.hunter-date-time-picker {
   max-width: 220px;
 }
+
+.hunter-flex-button {
+  display: flex;
+}

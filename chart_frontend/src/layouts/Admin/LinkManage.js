@@ -18,6 +18,7 @@ import { MDBBtn, MDBTable, MDBTableBody, MDBTableHead  } from 'mdbreact';
 import Modal from 'react-bootstrap/Modal'
 import { createSignUpLink, sendSignUpLink } from 'api/Api'
 import { validateEmail } from 'utils/helper'
+import { getActiveLinks } from 'api/Api'
 
 var ps;
 
@@ -32,9 +33,9 @@ function LinkManage() {
     document.documentElement.className.indexOf("nav-open") !== -1
   );
   const [selectedInstance, setSelectedInstance] = React.useState('linkmanage');
-  const [toEmail, setToEmail] = useState('')
-  const [link, setLink] = useState('')
+  const [selectedLink, setSelectedLink] = useState('')
   const [email, setEmail] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
   
   const optionsRole = [
     { value: 'forward_test', label: 'Forward Test' },
@@ -64,6 +65,29 @@ function LinkManage() {
       }
     };
   });
+
+  React.useEffect(() => {
+    const fetchActiveLinks = async () => {
+      let links = await getActiveLinks();
+      const linklist = links.map(link => {
+        return {
+          id: link.id,
+          link: link.link,
+          roles: link.role,
+          action: <MDBBtn color="blue" size="sm" onClick={
+            () => {
+              setSelectedLink(link.link)
+              showSendEmailModal()
+            }}
+          >Send</MDBBtn>
+        }
+      })
+      setLinkList(linklist)
+    }
+    
+    fetchActiveLinks()
+
+  }, [])
 
   React.useEffect(() => {
     if (navigator.platform.indexOf("Win") > -1) {
@@ -131,8 +155,33 @@ function LinkManage() {
   }
 
   const handleLinkCreate = async () => {
-    const roleValues = roles.map(role => role.value )
-    await createSignUpLink(roleValues);
+    let roleValues = ''
+    let coma = ''
+    roles.forEach(role => {
+      roleValues = roleValues + coma + role.value
+      coma = ','
+    })
+    
+    setIsLoading(true)
+    let links = await createSignUpLink(roleValues);
+    setIsLoading(false)
+
+    const linklist = links.map(link => {
+      return {
+        id: link.id,
+        link: link.link,
+        roles: link.role,
+        action: <MDBBtn color="blue" size="sm" onClick={
+          () => {
+            setSelectedLink(link.link)
+            showSendEmailModal()
+          }}
+        >Send</MDBBtn>
+      }
+    })
+
+    setLinkList(linklist)
+    setShowCreateLinkModal(false)  
   }
   
   const showSendEmailModal = async () => {
@@ -149,7 +198,14 @@ function LinkManage() {
       return
     }
 
-    await sendSignUpLink(email, link);
+    setIsLoading(true)
+    await sendSignUpLink(email, selectedLink);
+    setIsLoading(false)
+
+    alert(`sent to ${email} successfully!`)
+
+    setEmail('')
+    setIsShowSendModal(false);
   }
 
   const columns= [
@@ -171,14 +227,7 @@ function LinkManage() {
     }
   ];
   
-  const links = [
-    {
-      'id': 1,
-      'link': 'http://localhost:3000/signup/admin123456789',
-      'roles': 'Forward Test',
-      'action': <MDBBtn color="blue" size="sm" onClick={() => {showSendEmailModal()}}>Send</MDBBtn>
-    },
-  ]
+  const [linklist, setLinkList] = useState()
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value)
@@ -244,7 +293,10 @@ function LinkManage() {
                 </div>
               </Modal.Body>
               <Modal.Footer className="hunter-modal-footer">
-                <Button variant="primary" onClick={handleLinkToEmailSend}>
+                <Button variant="primary" onClick={handleLinkToEmailSend} className="hunter-flex-button">
+                  {isLoading && (
+                    <span className="spinner-border spinner-border-sm hunter-spinner-button" role="status" aria-hidden="true"></span>
+                  )}
                   Send
                 </Button>
               </Modal.Footer>
@@ -265,7 +317,7 @@ function LinkManage() {
                   </div>
                   <MDBTable btn>
                     <MDBTableHead columns={columns} color="dark"/>
-                    <MDBTableBody rows={links} className="hunter-mdb-table-body"/>
+                    <MDBTableBody rows={linklist} className="hunter-mdb-table-body"/>
                   </MDBTable>
                 </div>
               </div>

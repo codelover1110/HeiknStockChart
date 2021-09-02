@@ -58,23 +58,31 @@ export const createSignUpLink = async (roles) => {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
-      roles
+      roles: roles,
+      link: process.env.REACT_APP_BACKEND_URL + '/signup/'
     })
   };
-  
-  return await fetch(process.env.REACT_APP_BACKEND_URL + "/api/create-signup-link", requestOptions)
+  let res = []
+  await fetch(process.env.REACT_APP_BACKEND_URL + "/links", requestOptions)
+    .then(response => response.json())
+    .then(async data => {
+      if (data.success === "create link") {
+        await fetch(process.env.REACT_APP_BACKEND_URL + "/links")
+        .then(response => response.json())
+        .then(data => {
+          res = data
+        })
+      }
+    })  
+  return res
+}
+
+export const getActiveLinks = async () => {
+  return await fetch(process.env.REACT_APP_BACKEND_URL + "/links")
     .then(response => response.json())
     .then(data => {
-      let temp_data = []
-      data.tables.map((x) => {
-        temp_data.push({
-          value: x,
-          label: x
-        });
-        return null
-      })
-      return temp_data
-    })  
+      return data;
+    })
 }
 
 export const sendSignUpLink = async (email, link) => {
@@ -87,7 +95,7 @@ export const sendSignUpLink = async (email, link) => {
     })
   };
   
-  return await fetch(process.env.REACT_APP_BACKEND_URL + "/api/send-signup-link", requestOptions)
+  return await fetch(process.env.REACT_APP_BACKEND_URL + "/send-signup-link", requestOptions)
     .then(response => response.json())
     .then(data => {
       return true
