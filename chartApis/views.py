@@ -1,52 +1,25 @@
 from django.shortcuts import render
-
 from django.http.response import JsonResponse
-from numpy.core.arrayprint import printoptions
-from numpy.core.fromnumeric import resize
-from pymongo.message import update
+from django.views.decorators.csrf import csrf_exempt
+
 from rest_framework.parsers import JSONParser 
 from rest_framework import status
-from rest_framework.decorators import api_view
-from datetime import datetime, timedelta
-import os
-from django.views.decorators.csrf import csrf_exempt
-from configparser import ConfigParser
 
 import pymongo
-from datetime import datetime
-import pandas as pd 
-import os
-import requests
-import time
-import io
-import csv
-
-
-
-import numpy as np
-import pandas as pd
-pd.options.mode.chained_assignment = None  # default='warn'
-from datetime import datetime,date
-
+from datetime import datetime, timedelta
 from ib_insync import *
 import numpy as np
 import pandas as pd
 pd.options.mode.chained_assignment = None  # default='warn'
-from datetime import datetime,date
-import matplotlib.pyplot as plt
-from tksheet import Sheet
-import tkinter as tk
-from django.conf import settings
+
 from .lib.heikfilter import HA, Filter
+from .models import get_strategies_names, get_stock_candles_for_strategy, get_strategy_name_only
+from .common import get_chat_data_from_candles, join_append, get_chat_available_stratgies
 
 # mongoclient = pymongo.MongoClient("mongodb://localhost:27017")
 mongoclient = pymongo.MongoClient("mongodb://hunter:STOCKdb123@cluster0-shard-00-00.vcom7.mongodb.net:27017,cluster0-shard-00-01.vcom7.mongodb.net:27017,cluster0-shard-00-02.vcom7.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-7w6acj-shard-0&authSource=admin&retryWrites=true&w=majority")
 # mongoclient = pymongo.MongoClient("mongodb://hunter:STOCKdb123@cluster0-shard-00-00.agmoz.mongodb.net:27017,cluster0-shard-00-01.agmoz.mongodb.net:27017,cluster0-shard-00-02.agmoz.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-f8c9fs-shard-0&authSource=admin&retryWrites=true&w=majority")
 
-
-
-# Create your views here.
-# @api_view(['GET', 'PUT', 'DELETE'])
 
 def get_last_put_date():
     masterdb = mongoclient["backtest_tables"]
@@ -153,70 +126,6 @@ def define_start_date(candle_name):
 
     return datetime.strptime(str(start_time), '%Y-%m-%d'), datetime.strptime(str(cur_date), '%Y-%m-%d')
 
-def join(candles, strategy_trades, strategy_name):
-    candle_len = len(candles)
-    candle_cursor = 0
-    insert_candles = []
-    for trades_data in strategy_trades:
-        trade_date = trades_data['date']
-        for idx in range(candle_cursor, candle_len):
-            candle = candles[idx]
-            if candle['date'] > trade_date and idx != 0:
-                update_candle = candles[idx-1]
-                if 'price' not in update_candle.keys():
-                    # print ("type:::", type(trades_data['price']), trades_data['price'])
-                    update_candle['price'] = round(float(trades_data['price']), 2)
-                    update_candle['quantity'] = round(float(trades_data['quantity']), 2)
-                    update_candle['side'] = trades_data['side']
-                    update_candle['trade_date'] = trade_date
-                    update_candle['strategy'] = strategy_name
-                else:
-                    insert_candle = update_candle.copy()
-                    insert_candle['date'] = trade_date
-                    insert_candle['price'] = round(float(trades_data['price']), 2)
-                    insert_candle['quantity'] = round(float(trades_data['quantity']), 2)
-                    insert_candle['side'] = trades_data['side']
-                    insert_candle['trade_date'] = trade_date
-                    insert_candle['strategy'] = strategy_name
-                    insert_candles.append(insert_candle)
-                candle_cursor = idx
-                break
-    candles.extend(insert_candles)
-    # print (insert_candles)
-    candles.sort(key = lambda x: x['date'])
-
-    return candles
-
-def join_append(candles, strategy_trades, strategy_name):
-    candle_len = len(candles)
-    candle_cursor = 0
-    for trades_data in strategy_trades:
-        trade_date = trades_data['date']
-        for idx in range(candle_cursor, candle_len):
-            candle = candles[idx]
-            if candle['date'] > trade_date and idx != 0:
-                update_candle = candles[idx-1]
-                if trades_data['side'] == 'BUY':
-                    side_type = 'LONG'
-                elif trades_data['side'] == 'SELL':
-                    side_type = 'SHORT'
-                trade_item = dict()
-                trade_item['longShort'] = side_type
-                trade_item['trade_date'] = trade_date
-                trade_item['price'] = round(float(trades_data['price']), 2)
-                trade_item['strategy'] = strategy_name
-                trade_item['quantity'] = round(float(trades_data['quantity']), 2)
-                if 'trades' not in update_candle.keys():
-                    update_candle['trades'] = [trade_item]
-                else:
-                    trades = update_candle['trades']
-                    trades.append(trade_item)
-                    update_candle['trades'] = trades
-                candle_cursor = idx
-                break
-
-    return candles
-
 def fill_missing_candles(chat_candles, candle_name, strategy_name):
     db_names = ['backtest_2_minute', '', 'backtest_12_minute', '', 'backtest_1_hour', 'backtest_4_hour', 'backtest_12_hour', 'backtest_1_day']
     strategy_names = [
@@ -253,6 +162,36 @@ def fill_missing_candles(chat_candles, candle_name, strategy_name):
 
     return chat_candles
 
+def fill_missing_candles__(chat_candles, candle_name, strategy_name):
+    db_names = ['backtest_2_minute', 'backtest_12_minute', 'backtest_1_hour', 'backtest_4_hour', 'backtest_12_hour', 'backtest_1_day']
+    strategy_names = get_strategy_name_only()
+    macro_name = strategy_name.split('-')[0]
+    macro_strategies = []
+    for strtg in strategy_names:
+        if macro_name in strtg:
+            macro_strategies.append(strtg)
+    available_strategies = get_chat_available_stratgies(candle_name, macro_strategies)
+    if strategy_name in available_strategies:
+        insert_candles = []
+        for candle in chat_candles:
+            try:
+                trades = candle['trades']
+                if len(trades) > 1:
+                    single_trades = trades[0]
+                    candle['trades'] = [single_trades]
+                    for trade_idx in range(1, len(trades)):
+                        new_candle_trades = trades[trade_idx]
+                        new_candle = candle.copy()
+                        new_candle['trades'] = [new_candle_trades]
+                        new_candle['date'] = new_candle_trades['trade_date']
+                        insert_candles.append(new_candle)
+            except:
+                pass
+        chat_candles.extend(insert_candles)
+        chat_candles.sort(key = lambda x: x['date'])
+
+    return chat_candles
+
 def fetch_data(stock, candle_name, strategy_name):
     print ('stock:{}, candle_name: {}, strategy_name:{}'.format(stock, candle_name, strategy_name))
     start_date, end_date = define_start_date(candle_name)
@@ -271,6 +210,30 @@ def fetch_data(stock, candle_name, strategy_name):
     strategy_trades = list(trade_result.sort('date', pymongo.ASCENDING))
 
     # res = join(candles, strategy_trades, strategy_name)
+    return candles, strategy_trades
+
+def fetch_stock_strategy_candles(candle_name, symbol, macro, micro):
+    start_date, end_date = define_start_date(candle_name)
+    
+    # get candles
+    masterdb = mongoclient[candle_name]
+    ob_table = masterdb[symbol]  # 'AMNZ'
+    candle_result = ob_table.find({'date': {'$gte': start_date, '$lt': end_date}})
+    candles = list(candle_result.sort('date', pymongo.ASCENDING))
+    print ('-------------- candles count: ', len(candles))
+
+    find_trades_query = {
+        'date': {'$gte': start_date, '$lt': end_date},
+        'micro_strategy': micro,
+        'macro_strategy': macro,
+        'symbol': symbol
+    }
+    masterdb = mongoclient['backtesting_trades']
+    ob_table = masterdb['trades'] 
+    trade_result = ob_table.find(find_trades_query)
+    strategy_trades = list(trade_result.sort('date', pymongo.ASCENDING))
+    print ('-------------- trade count: ', len(strategy_trades))
+
     return candles, strategy_trades
 
 def calc_winningLosing(symbols, db_data):
@@ -426,30 +389,67 @@ def get_data(request):
         request_data = JSONParser().parse(request)
         db_name = request_data['db_name']
         symbol = request_data['symbol']
-        masterdb = mongoclient[db_name]
-        # table_name = request_data['table_name']
-        # ob_table = masterdb[table_name]
         strategy = request_data['strategy']
-        # list_db_data = get_view_data(ob_table, db_name)
         candles, strategy_trades = fetch_data(symbol, db_name, strategy)
-        # print(list_db_data)
-        # convert to pandas dataframe:
         df = util.df(candles)
         df = Filter(df)
-        
         chat_candles = get_chat_data(df)
         verdict = join_append(chat_candles, strategy_trades, strategy)
         verdict = fill_missing_candles(verdict, db_name, strategy)
+        # fill_missing_candles__(verdict, db_name, strategy)
         
     return JsonResponse({'chart_data': verdict}, status=status.HTTP_201_CREATED)
 
 @csrf_exempt 
 def get_data_trades(request):
-    masterdb = mongoclient["backtesting_trades"]
-    db_collection = masterdb['all_trades']
-    trades_data = list(db_collection.find({}, {'_id': False}).sort('date', pymongo.ASCENDING))
-    return JsonResponse({'trades_data': trades_data}, status=status.HTTP_201_CREATED)
+    if request.method == 'POST':
+        request_data = JSONParser().parse(request)
+        if not 'symbol' in request_data:
+            symbol = ''
+        else:
+            symbol = request_data['symbol']
+        macroStrategy = request_data['macroStrategy']
+        microStrategy = request_data['microStrategy']
+        masterdb = mongoclient["backtesting_trades"]
+        db_collection = masterdb['all_trades']
+        query_obj = {}
+        if symbol != '':
+            query_obj['symbol'] = {"$regex": "^"+symbol.upper()}
+        if macroStrategy != '':
+            query_obj['strategy_name'] = {"$regex": "^"+macroStrategy.lower()}
+        if microStrategy != '':
+            query_obj['strategy_name'] = {"$regex": microStrategy.lower()}
+        if macroStrategy != '' and microStrategy != '':
+            query_obj['strategy_name'] = {"$regex": macroStrategy.lower() + '-' + microStrategy.lower()}
+        
+        startDate = datetime.strptime(request_data['tradeStartDate'], '%Y-%m-%d')
+        endDate = datetime.strptime(request_data['tradeEndDate'], '%Y-%m-%d')
+        query_obj['date'] = {"$gte": startDate, "$lt": endDate}
 
+        trades_data = list(db_collection.find(query_obj, {'_id': False}).sort('date', pymongo.ASCENDING))
+        return JsonResponse({'trades_data': trades_data}, status=status.HTTP_201_CREATED)
+
+@csrf_exempt
+def get_strategies(request):
+    strategies = get_strategies_names()
+    return JsonResponse(strategies, status=status.HTTP_201_CREATED)
+
+@csrf_exempt
+def get_stock_strategy_candles(request):
+    request_data = JSONParser().parse(request)
+    db_name = request_data['db_name']
+    symbol = request_data['symbol']
+    macro = request_data['macro']
+    micro = request_data['micro']
+
+    strategy = '{}-{}-trades'.format(macro, micro)
+    candles, strategy_trades = get_stock_candles_for_strategy(db_name, symbol, macro, micro)
+    chat_candles = get_chat_data_from_candles(candles)
+    verdict = join_append(chat_candles, strategy_trades, strategy)
+    verdict = fill_missing_candles__(verdict, db_name, strategy)
+    
+    return JsonResponse({'chart_data': verdict}, status=status.HTTP_201_CREATED)
+    
 
 def index(request):
     return render(request, "build/index.html")

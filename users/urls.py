@@ -1,0 +1,7 @@
+from django.conf.urls import url 
+from . import views
+
+urlpatterns = [
+    url(r'^links/?$', views.SignupLinkRoleView.as_view()),
+    url(r'^send-email/?$', views.send_link_to_email),
+]

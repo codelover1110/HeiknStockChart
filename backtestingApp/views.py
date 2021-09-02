@@ -53,4 +53,3 @@ def verify_view(request):
         code.save()
         return JsonResponse({'verify': True}, status=status.HTTP_201_CREATED)
     return JsonResponse({'verify': False}, status=status.HTTP_201_CREATED)
-

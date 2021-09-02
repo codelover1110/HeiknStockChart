@@ -6,7 +6,7 @@ from twilio.rest import Client
 
 
 
-def send_sms_phone(user_code, phone_number):
+def send_phone(user_code, phone_number):
     account_sid = ''
     auth_token = ''
     
@@ -25,5 +25,5 @@ def send_email(user_code, user_email):
     message = user_code
     email_from = settings.EMAIL_HOST_USER
     recipient_list = [user_email,]
-    print (' +++++++++++ verification code for {}: {}'.format(user_email, user_code))
+    print (' +++++ verification code for {}: {}'.format(user_email, user_code))
     send_mail(subject, message, email_from, recipient_list )

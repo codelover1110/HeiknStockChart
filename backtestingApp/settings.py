@@ -65,7 +65,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',    
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -79,7 +79,6 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [os.path.join(BASE_DIR, 'chart_frontend'), BASE_DIR / 'templates'],
-        # 'DIRS': [os.path.join(BASE_DIR, 'chart_frontend')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -115,10 +114,10 @@ DATABASES = {
 #       'password': 'STOCKdb123',
 #     } 
 #   },
-  'default': {
-    'ENGINE': 'django.db.backends.sqlite3',
-    'NAME': BASE_DIR / 'db.sqlite3',
-  }
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 }
 
 # Password validation
@@ -175,11 +174,20 @@ STATICFILES_DIRS = (
 
 CORS_ORIGIN_ALLOW_ALL = True
 
+
 # email send: gmail
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_USE_TLS = True
+# EMAIL_PORT = 587
+# EMAIL_HOST_USER = 'bigmlpiter@gmail.com'
+# EMAIL_HOST_PASSWORD = 'Piterpiter'
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_USE_TLS = True
-EMAIL_PORT = 587
+EMAIL_PORT = '587'
 EMAIL_HOST_USER = 'bigmlpiter@gmail.com'
-EMAIL_HOST_PASSWORD = 'Piterpiter'
+EMAIL_HOST_PASSWORD = 'lwkxryjyflksuwni'
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
 
