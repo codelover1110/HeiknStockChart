@@ -5,6 +5,7 @@ import { useHistory } from "react-router-dom";
 
 const SignUp = () => {
     let history = useHistory();
+
     let auth = useAuth();
     const [isLoading, setIsLoading] = useState(false)
     const [username, setUserName] = useState('')
@@ -13,6 +14,7 @@ const SignUp = () => {
     const [message, setMessage] = useState()
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
+    const [pathname] = useState(history.location.pathname)
 
     const handleEmailChange = (e) => {
         setEmail(e.target.value)
@@ -56,9 +58,11 @@ const SignUp = () => {
             setMessage('Invalid email')
             return
         }
+        
         setIsLoading(true)
-        const res = await auth.authUser.signup(username, email, password, confirmPassword)
+        const res = await auth.authUser.signup(username, email, password, confirmPassword, pathname)
         setIsLoading(false)
+
         if (res.success) {
             // setError(0)
             // setMessage('Sign Up is successed')
