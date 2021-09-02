@@ -88,7 +88,6 @@ def Filter(df):
     length1 = 5
     length2 = 2
     length3 = 9
-
     df["diff"] = df["c"].diff()
     df["absdiff"] = abs(df["c"].diff())
 

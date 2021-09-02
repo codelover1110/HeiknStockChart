@@ -437,6 +437,7 @@ def get_strategies(request):
 @csrf_exempt
 def get_stock_strategy_candles(request):
     request_data = JSONParser().parse(request)
+    print(request_data)
     db_name = request_data['db_name']
     symbol = request_data['symbol']
     macro = request_data['macro']

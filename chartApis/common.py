@@ -7,7 +7,7 @@ from .lib.heikfilter import HA, Filter
 
 def define_start_date(candle_name):
     cur_date = datetime.now().date()
-
+    
     if candle_name == 'backtest_2_minute':
         start_time = cur_date - timedelta(days=20)
     elif candle_name == 'backtest_12_minute':
@@ -149,11 +149,11 @@ def get_chat_available_stratgies(candle_name, all_strategies):
     candle_interval = 0        # minute
     interval_num = candle_name.split('_')[1]
     if interval_unit in 'minutes':
-        candle_interval = interval_num
+        candle_interval = int(interval_num)
     elif interval_unit in 'hours':
-        candle_interval = interval_num * 60
+        candle_interval = int(interval_num) * 60
     elif interval_unit in 'days':
-        candle_interval = interval_num * 60 * 60
+        candle_interval = int(interval_num) * 60 * 60
 
     result = []
     for strategy_name in all_strategies:

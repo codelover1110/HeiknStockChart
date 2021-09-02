@@ -7,7 +7,7 @@ mongoclient = pymongo.MongoClient("mongodb://hunter:STOCKdb123@cluster0-shard-00
 # mongoclient = pymongo.MongoClient("mongodb://hunter:STOCKdb123@cluster0-shard-00-00.agmoz.mongodb.net:27017,cluster0-shard-00-01.agmoz.mongodb.net:27017,cluster0-shard-00-02.agmoz.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-f8c9fs-shard-0&authSource=admin&retryWrites=true&w=majority")
 
 BACKTESTING_TRADES = 'backtesting_trades'
-ALL_TRADES_HISTORY = 'trades'
+ALL_TRADES_HISTORY = 'trade-history'
 ############################################
 ## get all macro and micro strategy names ##
 ############################################
@@ -69,11 +69,12 @@ def get_stock_candles_for_strategy(candle_name, symbol, macro, micro):
     find_trades_query = {
         'date': {'$gte': start_date, '$lt': end_date},
         'micro_strategy': micro,
-        'macro_strategy': macro,
+        # 'macro_strategy': macro,
         'symbol': symbol
     }
+    print(find_trades_query)
     masterdb = mongoclient['backtesting_trades']
-    ob_table = masterdb['trades'] 
+    ob_table = masterdb['trade-history'] 
     trade_result = ob_table.find(find_trades_query)
     strategy_trades = list(trade_result.sort('date', pymongo.ASCENDING))
     print ('-------------- trade count: ', len(strategy_trades))
