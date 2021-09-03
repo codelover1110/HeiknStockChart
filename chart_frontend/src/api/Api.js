@@ -107,11 +107,12 @@ export const forgotPassword = async (email) => {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
-      email
+      email,
+      url: process.env.REACT_APP_BACKEND_URL
     })
   };
   
-  return await fetch(process.env.REACT_APP_BACKEND_URL + "/api/forgot-password", requestOptions)
+  return await fetch(process.env.REACT_APP_BACKEND_URL + "/password_reset/", requestOptions)
     .then(response => response.json())
     .then(data => {
       return true
@@ -124,4 +125,22 @@ export const getStrategyOptions = async () => {
     .then(data => {
       return data
     })
+}
+
+export const passwordConfirmReset = async (password1, password2, pathname) => {
+  const requestOptions = {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      password1,
+      password2,
+      pathname: pathname
+    })
+  };
+  
+  return await fetch(process.env.REACT_APP_BACKEND_URL + "/password_reset_confirm/", requestOptions)
+    .then(response => response.json())
+    .then(data => {
+      return data
+    })    
 }
