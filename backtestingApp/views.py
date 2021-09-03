@@ -20,26 +20,28 @@ import json
 @csrf_exempt 
 def signup_view(request):
     if request.method == 'POST':
+        print(request)
         request_data = JSONParser().parse(request)
         try:
-            signup_link = request_data['link']
-            if SingupLinkRole.objects.filter(link=signup_link).exists():
-                pk = SingupLinkRole.objects.get(link=signup_link).pk
-                obj = SingupLinkRole.objects.get(pk=pk)
-                if not obj.expired:
-                    CustomUser.objects.create_user(
-                        username=request_data['username'],
-                        email=request_data['email'],
-                        password=request_data['password1'],
-                        first_name="",
-                        last_name="",
-                        role=obj.role,
-                        is_active=True,
-                    )
-                    obj.expired = True
-                    obj.save()
-                    return JsonResponse({'success': 'success'}, status=status.HTTP_201_CREATED)
-            return JsonResponse({'error': 'error', 'content': 'Invalid link'}, status=status.HTTP_409_CONFLICT)
+            # signup_link = request_data['signup_path']
+            # if SingupLinkRole.objects.filter(link=signup_link).exists():
+            #     pk = SingupLinkRole.objects.get(link=signup_link).pk
+            #     obj = SingupLinkRole.objects.get(pk=pk)
+            #     if not obj.expired:
+            CustomUser.objects.create_user(
+                username=request_data['username'],
+                email=request_data['email'],
+                password=request_data['password1'],
+                first_name="",
+                last_name="",
+                role="",
+                # role=obj.role,
+                is_active=True,
+            )
+            # obj.expired = True
+            # obj.save()
+            return JsonResponse({'success': 'success'}, status=status.HTTP_201_CREATED)
+            # return JsonResponse({'error': 'error', 'content': 'Invalid link'}, status=status.HTTP_409_CONFLICT)
         except Exception as e:
             print (e, type(e))
             return JsonResponse({'error': 'error', 'content': e}, status=status.HTTP_409_CONFLICT)

@@ -33,17 +33,19 @@ const authUser = {
   },
 
   async signup(username, email, password1, password2, pathname) {
-    let formData = new FormData()
-    formData.append('username', username);
-    formData.append('email', email);
-    formData.append('first_name', "");
-    formData.append('last_name', "");
-    formData.append('password1', password1);
-    formData.append('password2', password2);
-    formData.append('signup_path', process.env.REACT_APP_BACKEND_URL + pathname);
+    let formData = {
+      username: username,
+      email: email,
+      first_name: "",
+      last_name: "",
+      password1: password1,
+      password2: password2,
+      signup_path: process.env.REACT_APP_BACKEND_URL + pathname
+    }
+    
     return await fetch(process.env.REACT_APP_BACKEND_URL + '/signup/', {
       method: "POST",
-      body: formData
+      body: JSON.stringify(formData)
     })
       .then(response => {
           return response.json();
