@@ -27,6 +27,7 @@ import SignUp from 'layouts/User/SignUp'
 import Verify from 'layouts/User/Verify'
 import ForgotPassword from 'layouts/User/ForgotPassword'
 import PasswordResetConfirm from 'layouts/User/PasswordResetConfirm'
+import TradeScanner from 'layouts/User/TradeScanner'
 
 ReactDOM.render(
   <ThemeContextWrapper>
@@ -48,6 +49,9 @@ ReactDOM.render(
             <Route path="/verify" render={(props) => <Verify {...props} />} />
             <Route path="/forgot_password" render={(props) => <ForgotPassword {...props} />} />
             <Route path="/password-reset-confirm/:uuid/:token" render={(props) => <PasswordResetConfirm {...props} />} />
+            <PrivateRoute path="/scanner">
+              <TradeScanner />
+            </PrivateRoute>
             <PrivateRoute path="/tradedata">
               <TradeData />
             </PrivateRoute>

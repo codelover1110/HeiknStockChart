@@ -51,12 +51,12 @@ const HeiknStockChart = (props) => {
     {
       value: 'RSI', label: 'RSI',
     },
-    // {
-    //   value: 'HEIK1', label: 'HEIK1',
-    // },
-    // {
-    //   value: 'HEIK2', label: 'HEIK2',
-    // }
+    {
+      value: 'HEIK1', label: 'HEIK1',
+    },
+    {
+      value: 'HEIK2', label: 'HEIK2',
+    }
   ]);
 
   const optionsColumn = [
@@ -217,6 +217,7 @@ const HeiknStockChart = (props) => {
 
   const handleChartsColumnChange = (option) => {
     if (option.value === 4 || option.value === 6) {
+      setIndicators([])
       setOptionsIndicator([
         {
           value: 'VOLUME', label: 'VOLUME',
@@ -224,14 +225,15 @@ const HeiknStockChart = (props) => {
         {
           value: 'RSI', label: 'RSI',
         },
-        // {
-        //   value: 'HEIK1', label: 'HEIK1',
-        // },
-        // {
-        //   value: 'HEIK2', label: 'HEIK2',
-        // }
+        {
+          value: 'HEIK1', label: 'HEIK1',
+        },
+        {
+          value: 'HEIK2', label: 'HEIK2',
+        }
       ])
     } else {
+      setIndicators([])
       setOptionsIndicator([
         {
           value: 'VOLUME', label: 'VOLUME',
@@ -245,12 +247,12 @@ const HeiknStockChart = (props) => {
         {
           value: 'RSI3', label: 'RSI3',
         },
-        // {
-        //   value: 'HEIK1', label: 'HEIK1',
-        // },
-        // {
-        //   value: 'HEIK2', label: 'HEIK2',
-        // }
+        {
+          value: 'HEIK1', label: 'HEIK1',
+        },
+        {
+          value: 'HEIK2', label: 'HEIK2',
+        }
       ])
     }
     setChartColumn(option)
@@ -464,12 +466,12 @@ const HeiknStockChart = (props) => {
                   <p className="d-lg-none">Log out</p>
                 </DropdownToggle>
                 <DropdownMenu className="dropdown-navbar" right tag="ul">
-                  <NavLink tag="li">
+                  {/* <NavLink tag="li">
                     <DropdownItem className="nav-item">Profile</DropdownItem>
                   </NavLink>
                   <NavLink tag="li">
                     <DropdownItem className="nav-item">Settings</DropdownItem>
-                  </NavLink>
+                  </NavLink> */}
                   <DropdownItem divider tag="li" />
                   <NavLink tag="li">
                     <DropdownItem className="nav-item" onClick={() => {

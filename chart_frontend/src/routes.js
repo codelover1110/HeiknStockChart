@@ -38,12 +38,12 @@ export var routes = [
 ]
 
 export var adminRoutes = [
-  {
-    name: "User Manage",
-    icon: "tim-icons icon-chart-pie-36",
-    instance: "usermanage",
-    pathname: '/admin/usermanage'
-  },
+  // {
+  //   name: "User Manage",
+  //   icon: "tim-icons icon-chart-pie-36",
+  //   instance: "usermanage",
+  //   pathname: '/admin/usermanage'
+  // },
   {
     name: "Link Manage",
     icon: "tim-icons icon-attach-87",

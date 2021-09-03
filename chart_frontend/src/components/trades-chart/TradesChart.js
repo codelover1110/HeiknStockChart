@@ -577,7 +577,6 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 					
 					<Annotate with={SvgPathAnnotation} when={ d => 
 						{
-							console.log("this.props.strategy + this.props.microStrategy", `${this.props.strategy.value}-${this.props.microStrategy}-trades`)
 							return this.props.selectedInstance !== 'live_trading'  
 							&& d.trades
 							&& d.trades[0].strategy === `${this.props.strategy.value}-${this.props.microStrategy}-trades`
@@ -679,7 +678,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 					<Chart id={5} 
 						// height={(!this.props.isHomePage || isFullChart) ? 100 : 70}
 						height={70}
-						yExtents={[0, d => d.rsi2.bearPower]}
+						yExtents={[0, d => d.rsi3.bearPower]}
 						origin={(w, h) => [0, h - this.calculateOffset('RSI3', isFullChart)]}
 						padding={{ top: 40, bottom: 10 }}
 					>
@@ -695,7 +694,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 							displayFormat={format(".2f")} />
 						<BarSeries
 							yAccessor={d => d.rsi3.bearPower}
-							baseAt={(yScale) => yScale(0)}
+							baseAt={(xScale, yScale, d) => yScale(0)}
 							fill={d => d.side === 'buy' ? '#800080' : d.side === 'sell' ? '#FFA500' : d.side === 'hold' ? '#00FF00' : '#FF0000'} />
 						<StraightLine yValue={0} />
 
@@ -728,7 +727,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 							displayFormat={format(".2f")} />
 						<BarSeries
 							yAccessor={d => d.heik.bearPower}
-							baseAt={(yScale) => yScale(0)}
+							baseAt={(xScale, yScale, d) => yScale(0)}
 							fill={d => d.side === 'buy' ? '#800080' : d.side === 'sell' ? '#FFA500' : d.side === 'hold' ? '#00FF00' : '#FF0000'} />
 						<StraightLine yValue={0} />
 
@@ -742,6 +741,105 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 					</Chart>
 				)}
 				{this.isIncludeIndicators('HEIK2') && (
+					<Chart id={7} 
+						// height={(!this.props.isHomePage || isFullChart) ? 100 : 70}
+						height={70}
+						yExtents={[0, d => d.heik2.bearPower]}
+						origin={(w, h) => [0, h - this.calculateOffset('HEIK2', isFullChart)]}
+						padding={{ top: 40, bottom: 10 }}
+					>
+						<XAxis axisAt="bottom" orient="bottom" stroke="white" tickStroke="white" />
+						<YAxis axisAt="right" orient="right" stroke="white" tickStroke="white" ticks={4} tickFormat={format(".2f")}/>
+						<MouseCoordinateX
+							at="bottom"
+							orient="bottom"
+							displayFormat={timeFormat("%Y-%m-%d")} />
+						<MouseCoordinateY
+							at="right"
+							orient="right"
+							displayFormat={format(".2f")} />
+						<BarSeries
+							yAccessor={d => d.heik2.bearPower}
+							baseAt={(xScale, yScale, d) => yScale(0)}
+							fill={d => d.side === 'buy' ? '#800080' : d.side === 'sell' ? '#FFA500' : d.side === 'hold' ? '#00FF00' : '#FF0000'} />
+						<StraightLine yValue={0} />
+
+						<SingleValueTooltip
+							yAccessor={d => d.heik2.bearPower}
+							yLabel="HEIK2 - Bear power"
+							yDisplayFormat={format(".2f")}
+							appearance={rsiAppearance}
+							{...SMATooltipProps}
+							origin={[-40, this.props.isHompage ? 40 : 25]}/>
+					</Chart>
+				)}
+				{/* {this.isIncludeIndicators('RSI3') && (
+					<Chart id={5} 
+						// height={(!this.props.isHomePage || isFullChart) ? 100 : 70}
+						height={70}
+						yExtents={[0, d => d.rsi2.bearPower]}
+						origin={(w, h) => [0, h - this.calculateOffset('RSI3', isFullChart)]}
+						padding={{ top: 40, bottom: 10 }}
+					>
+						<XAxis axisAt="bottom" orient="bottom" stroke="white" tickStroke="white" />
+						<YAxis axisAt="right" orient="right" stroke="white" tickStroke="white" ticks={4} tickFormat={format(".2f")}/>
+						<MouseCoordinateX
+							at="bottom"
+							orient="bottom"
+							displayFormat={timeFormat("%Y-%m-%d")} />
+						<MouseCoordinateY
+							at="right"
+							orient="right"
+							displayFormat={format(".2f")} />
+						<BarSeries
+							yAccessor={d => d.rsi3.bearPower}
+							baseAt={(yScale) => yScale(0)}
+							fill={d => d.side === 'buy' ? '#800080' : d.side === 'sell' ? '#FFA500' : d.side === 'hold' ? '#00FF00' : '#FF0000'} />
+						<StraightLine yValue={0} />
+
+						<SingleValueTooltip
+							yAccessor={d => d.rsi3.bearPower}
+							yLabel="RSI3 - Bear power"
+							yDisplayFormat={format(".2f")}
+							appearance={rsiAppearance}
+							{...SMATooltipProps}
+							origin={[-40, this.props.isHompage ? 40 : 25]}/>
+					</Chart>
+				)} */}
+				{/* {this.isIncludeIndicators('HEIK1') && (
+					<Chart id={6} 
+						// height={(!this.props.isHomePage || isFullChart) ? 100 : 70}
+						height={70}
+						yExtents={[0, d => {console.log(d); return d.heik.bearPower}]}
+						origin={(w, h) => [0, h - this.calculateOffset('HEIK1', isFullChart)]}
+						padding={{ top: 40, bottom: 10 }}
+					>
+						<XAxis axisAt="bottom" orient="bottom" stroke="white" tickStroke="white" />
+						<YAxis axisAt="right" orient="right" stroke="white" tickStroke="white" ticks={4} tickFormat={format(".2f")}/>
+						<MouseCoordinateX
+							at="bottom"
+							orient="bottom"
+							displayFormat={timeFormat("%Y-%m-%d")} />
+						<MouseCoordinateY
+							at="right"
+							orient="right"
+							displayFormat={format(".2f")} />
+						<BarSeries
+							yAccessor={d => d.heik.bearPower}
+							baseAt={(yScale) => yScale(0)}
+							fill={d => d.side === 'buy' ? '#800080' : d.side === 'sell' ? '#FFA500' : d.side === 'hold' ? '#00FF00' : '#FF0000'} />
+						<StraightLine yValue={0} />
+
+						<SingleValueTooltip
+							yAccessor={d => d.heik.bearPower}
+							yLabel="HEIK1 - Bear power"
+							yDisplayFormat={format(".2f")}
+							appearance={rsiAppearance}
+							{...SMATooltipProps}
+							origin={[-40, this.props.isHompage ? 40 : 25]}/>
+					</Chart>
+				)} */}
+				{/* {this.isIncludeIndicators('HEIK2') && (
 					<Chart id={7} 
 						// height={(!this.props.isHomePage || isFullChart) ? 100 : 70}
 						height={70}
@@ -774,7 +872,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 							{...SMATooltipProps}
 							origin={[-40, this.props.isHompage ? 40 : 25]}/>
 					</Chart>
-				)}
+				)} */}
 				<CrossHairCursor />
 				<DrawingObjectSelector
 					enabled={!this.state.enableInteractiveObject}

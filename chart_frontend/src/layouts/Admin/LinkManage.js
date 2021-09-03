@@ -42,6 +42,7 @@ function LinkManage() {
     { value: 'stress_test', label: 'Stress Test' },
     { value: 'optimization', label: 'Optimization' },
     { value: 'live_trade', label: 'Live Trade' },
+    { value: 'scanner', label: 'Scanner' },
   ]
   
   React.useEffect(() => {
