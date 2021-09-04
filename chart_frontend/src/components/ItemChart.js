@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Select from 'react-select'
 import "react-datetime/css/react-datetime.css";
 import StockChart from "./stock-chart/StockChart"
 import { useHistory } from "react-router-dom";
 import disableScroll from 'disable-scroll';
-import { getStrategyOptions } from "api/Api";
 
 const HeiknStockChartItem = (props) => {
     
@@ -28,6 +27,7 @@ const HeiknStockChartItem = (props) => {
     const [apiFlag, setApiFlag] = useState(false)
     const [tradeStartDate, setTradeStartDate] = useState(null)
     const [tradeEndDate, setTradeEndDate] = useState(null)
+    const [strategyList, setStrategyList] = useState([]);
 
     const [optionsViewTypes, setOptionsViewTypes] = useState([
       { value: 'charting', label: 'Charting' },
@@ -36,9 +36,7 @@ const HeiknStockChartItem = (props) => {
 
     const [optionsMicroStrategy, setOptionsMicroStrategy] = useState([])
     
-    const optionsStratgy = [
-      { value: 'heikfilter', label: 'heikfilter' },
-    ]
+    const [optionsStratgy, setOptionsStrategy] = useState([])
 
     const optionsIndicator = [
         {
@@ -55,26 +53,58 @@ const HeiknStockChartItem = (props) => {
         }
     ]
 
+    const getStrategyList = useCallback(
+      () => {
+        fetch(process.env.REACT_APP_BACKEND_URL + "/api/get_strategy_list")
+          .then(response => response.json())
+          .then(data => {
+            setStrategyList(data.result);
+            const strategyOptions = data.result.map((o => {
+              return {
+                value: o.macro,
+                label: o.macro,
+              }
+            }))
+            setStrategy({
+              value: 'heikfilter',
+              label: 'heikfilter'
+            });
+            setOptionsStrategy(strategyOptions);
+            if (data.result.length) {
+              data.result.forEach((item) => {
+                if (item.macro === 'heikfilter') {
+                  const microStrategyOptions = item.micro.map(o => {
+                    return {
+                      value: o,
+                      label: o,
+                    }
+                  })
+                  setOptionsMicroStrategy( microStrategyOptions )
+                  setMicroStrategy(microStrategyOptions[0])
+  
+                  const symbolOptions = item.symbols.map(o => {
+                    return {
+                      value: o,
+                      label: o,
+                    }
+                  })
+                  setSymbolList(symbolOptions)
+                  setSymbol(symbolOptions[0])
+                }
+              })
+            }
+          })   
+      },
+      [],
+    )
+
     useEffect(() => {
-      const getStrategies = async () => {
-        let options = await getStrategyOptions();
-        let newOptions = []
-        if (options.micro_strategy.length) {
-          options.micro_strategy.forEach((option) => {
-            newOptions.push({
-              value: option._id,
-              label: option._id
-            })
-          })
-          setOptionsMicroStrategy(newOptions)
-        }
-      }
-      getStrategies();
+      getStrategyList();
       disableScroll.on();
       return () => {
         disableScroll.off();
       }
-    }, [])
+    }, [getStrategyList])
     
     useEffect(() => {
       if (selectedInstance.value === 'optimization') {
@@ -140,20 +170,32 @@ const HeiknStockChartItem = (props) => {
     const handleStrategyChange = async (e) => {
       if (e) {
         setStrategy(e)
-        if (e.value === 'heikfilter') {
-          let options = await getStrategyOptions();
-          let newOptions = []
-          if (options.micro_strategy.length) {
-            options.micro_strategy.forEach((option) => {
-              newOptions.push({
-                value: option._id,
-                label: option._id
+        if (strategyList.length) {
+          strategyList.forEach((item) => {
+            if (item.macro === e.value) {
+              const microStrategyOptions = item.micro.map(o => {
+                return {
+                  value: o,
+                  label: o,
+                }
               })
-            })
-            setOptionsMicroStrategy(newOptions)
-          }
-        } else {
-          setOptionsMicroStrategy([])
+              setOptionsMicroStrategy( microStrategyOptions )
+
+              setMicroStrategy({
+                value: '2mins',
+                label: '2mins'
+              })
+
+              const symbolOptions = item.symbols.map(o => {
+                return {
+                  value: o,
+                  label: o,
+                }
+              })
+              setSymbolList(symbolOptions)
+              setSymbol(symbolOptions[0])
+            }
+          })
         }
       }
     }

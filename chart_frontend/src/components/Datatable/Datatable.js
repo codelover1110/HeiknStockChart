@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useCallback, useState, useEffect, useMemo } from "react";
 import Select from 'react-select'
 import { Link } from "react-router-dom";
 import "react-datetime/css/react-datetime.css";
@@ -21,14 +21,14 @@ const DataTable = () => {
   const history = useHistory();
   const [collapseOpen,] = React.useState(false)
   const [symbol, setSymbol] = React.useState([])
-  const [macroStrategy, setMacroStrategy] = useState({ value: 'heikfilter', label: 'heikfilter' });
-  const [microStrategy, setMicrostrategy] = useState({ value: '2mins', label: '2mins' })
+  const [macroStrategy, setMacroStrategy] = useState();
+  const [microStrategy, setMicroStrategy] = useState()
   const [tradeStartDate, setTradeStartDate] = useState('2021-01-01')
   const [tradeEndDate, setTradeEndDate] = useState('2021-08-31')
-
-  const [optionsMacroStrategy,] = useState([
-    { value: 'heikfilter', label: 'heikfilter' },
-  ])
+  const [strategyList, setStrategyList] = useState([]);
+  
+  const [optionsStrategy, setOptionsStrategy] = useState([])
+  // const [optionsMacroStrategy, setOptionsMacroStrategy] = useState([])
 
   const [optionsMicroStrategy, setOptionsMicroStrategy] = useState([])
   
@@ -81,22 +81,68 @@ const DataTable = () => {
     ],
   });
 
+  const getStrategyList = useCallback(
+    () => {
+      fetch(process.env.REACT_APP_BACKEND_URL + "/api/get_strategy_list")
+        .then(response => response.json())
+        .then(data => {
+          setStrategyList(data.result);
+          const strategyOptions = data.result.map((o => {
+            return {
+              value: o.macro,
+              label: o.macro,
+            }
+          }))
+          // setStrategy({
+          //   value: 'heikfilter',
+          //   label: 'heikfilter'
+          // });
+          setOptionsStrategy(strategyOptions);
+          if (data.result.length) {
+            data.result.forEach((item) => {
+              if (item.macro === 'heikfilter') {
+                const microStrategyOptions = item.micro.map(o => {
+                  return {
+                    value: o,
+                    label: o,
+                  }
+                })
+                setOptionsMicroStrategy( microStrategyOptions )
+                // setMicroStrategy(microStrategyOptions[0])
+
+                const symbolOptions = item.symbols.map(o => {
+                  return {
+                    value: o,
+                    label: o,
+                  }
+                })
+                setOptionsSymbol(symbolOptions)
+                // setSymbol(symbolOptions[0])
+              }
+            })
+          }
+        })   
+    },
+    [],
+  )
+
   useEffect(() => {
-    const getStrategies = async () => {
-      let options = await getStrategyOptions();
-      let newOptions = []
-      if (options.micro_strategy.length) {
-        options.micro_strategy.forEach((option) => {
-          newOptions.push({
-            value: option._id,
-            label: option._id
-          })
-        })
-        setOptionsMicroStrategy(newOptions)
-      }
-    }
-    getStrategies();
-  }, [])
+    // const getStrategies = async () => {
+    //   let options = await getStrategyOptions();
+    //   let newOptions = []
+    //   if (options.micro_strategy.length) {
+    //     options.micro_strategy.forEach((option) => {
+    //       newOptions.push({
+    //         value: option._id,
+    //         label: option._id
+    //       })
+    //     })
+    //     setOptionsMicroStrategy(newOptions)
+    //   }
+    // }
+    // getStrategies();
+    getStrategyList()
+  }, [getStrategyList])
 
   useEffect(() => {
     const get_trades = async (symbol, macroStrat, microStrat, tradeStartDate, tradeEndDate) => {
@@ -107,7 +153,11 @@ const DataTable = () => {
       })
     }
 
-    get_trades(symbol.value, macroStrategy.value, microStrategy.value, tradeStartDate, tradeEndDate)
+    get_trades(
+      symbol ? symbol.value : '',
+      macroStrategy ? macroStrategy.value : '',
+      microStrategy ? microStrategy.value : '', 
+      tradeStartDate, tradeEndDate)
   }, [symbol, macroStrategy, microStrategy, hearder_columns, tradeStartDate, tradeEndDate])
 
   useEffect(() => {
@@ -132,7 +182,7 @@ const DataTable = () => {
   }
   
   const handleMicroStrategy = (e) => {
-    setMicrostrategy(e)
+    setMicroStrategy(e)
   }
 
   const handleTradeStartDateChange = (e) => {
@@ -204,7 +254,7 @@ const DataTable = () => {
             <Select
               value={macroStrategy}
               onChange={handleMacroStrategy}
-              options={optionsMacroStrategy}
+              options={optionsStrategy}
               placeholder="Macro Strategy"
             />
           </div>

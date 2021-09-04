@@ -1,6 +1,6 @@
 /*eslint-disable*/
 import React from "react";
-import { NavLink, Link, useLocation, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 // nodejs library to set properties for components
 import { PropTypes } from "prop-types";
 
@@ -11,8 +11,9 @@ import PerfectScrollbar from "perfect-scrollbar";
 import { Nav, NavLink as ReactstrapNavLink } from "reactstrap";
 import {
   BackgroundColorContext,
-  backgroundColors,
 } from "contexts/BackgroundColorContext";
+
+import { Dropdown } from 'components/Dropdown/Dropdown'
 
 var ps;
 
@@ -35,6 +36,23 @@ function Sidebar(props) {
     };
   });
   
+  const handleClick = (instance, pathname) => {
+    console.log("instance, pathname", instance, pathname)
+    handleInstanceChange(instance)
+    const locationState = {
+      initInstance: instance
+    }
+    if (pathname) {
+      history.push({
+        pathname: pathname,
+        state: instance === 'stress_test'
+        || instance === 'optimization'
+        || instance === 'live_trading'
+        ?  locationState: null
+      })
+    }
+  }
+
   const { isAdminPage, routes, selectedInstance, handleSidebarChange, handleInstanceChange } = props;
   
   return (
@@ -84,28 +102,45 @@ function Sidebar(props) {
                         prop.instance === selectedInstance ? "active-instance hunter-select-instance" : "hunter-select-instance"
                       }
                       key={key}
-                      onClick={() => {
-                        handleInstanceChange(prop.instance)
-                        const locationState = {
-                          initInstance: prop.instance
-                        }
-                        if (prop.pathname) {
-                          history.push({
-                            pathname: prop.pathname,
-                            state: prop.instance === 'stress_test'
-                            || prop.instance === 'optimization'
-                            || prop.instance === 'live_trading'
-                            ?  locationState: null
-                          })
-                        }
-                      }}
                     >
-                      <div
-                        className="nav-link"
-                      >
-                        <i className={prop.icon} />
-                        <p>{prop.name}</p>
-                      </div>
+                      {prop.items ? (
+                        <div
+                          className="nav-link"
+                        >
+                          <Dropdown 
+                            title={prop.name}
+                            icon={prop.icon}
+                            items={prop.items}
+                            instance={prop.instance}
+                            handleClick={handleClick}
+                            isActive={prop.instance === selectedInstance}
+                            key={`${prop.instance}`}
+                          />
+                        </div>
+                      ) : (
+                        <div
+                          className="nav-link"
+                          onClick={() => {
+                            handleInstanceChange(prop.instance)
+                            const locationState = {
+                              initInstance: prop.instance
+                            }
+                            if (prop.pathname) {
+                              history.push({
+                                pathname: prop.pathname,
+                                state: prop.instance === 'stress_test'
+                                || prop.instance === 'optimization'
+                                || prop.instance === 'live_trading'
+                                ?  locationState: null
+                              })
+                            }
+                          }}
+                        >
+                          <i className={prop.icon} />
+                          <p className="hunter-ml-6" >{prop.name}</p>
+                        </div>
+                      )
+                    }
                     </li>
                   );
                 })}
