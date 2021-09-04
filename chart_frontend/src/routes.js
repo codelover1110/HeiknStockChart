@@ -3,25 +3,54 @@ export var routes = [
     name: "Forward test",
     icon: "tim-icons icon-chart-pie-36",
     instance: "forward_test",
-    pathname: '/'
+    items: [
+      {
+        id: 1,
+        label: 'System File Manager',
+        pathname: '/'
+      },
+      {
+        id: 0,
+        label: 'View',
+        pathname: '/'
+      }
+    ],
   },
   {
     name: "Stress test",
     icon: "tim-icons icon-attach-87",
     instance: "stress_test",
-    pathname: '/'
+    items: [
+      {
+        id: 0,
+        label: 'View',
+        pathname: '/'
+      }
+    ],
   },
   {
     name: "Optimization",
     icon: "tim-icons icon-atom",
     instance: "optimization",
-    pathname: '/'
+    items: [
+      {
+        id: 0,
+        label: 'View',
+        pathname: '/'
+      }
+    ],
   },
   {
     name: "Live trading",
     icon: "tim-icons icon-badge",
     instance: "live_trading",
-    pathname: '/'
+    items: [
+      {
+        id: 0,
+        label: 'View',
+        pathname: '/'
+      }
+    ],
   },
   {
     name: "Scanner",

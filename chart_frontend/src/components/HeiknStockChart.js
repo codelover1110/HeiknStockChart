@@ -15,7 +15,6 @@ import {
 } from "reactstrap";
 import { useAuth } from 'contexts/authContext';
 import disableScroll from 'disable-scroll';
-import { getStrategyOptions } from "api/Api";
 
 const HeiknStockChart = (props) => {
 
@@ -30,8 +29,9 @@ const HeiknStockChart = (props) => {
   const [collapseOpen,] = React.useState(false)
   const [chartColumn, setChartColumn] = useState({ value: 6, label: '6' })
   const [selectedViewType, setSelectedViewType] = useState({ value: 'charting', label: 'Charting' });
-  const [microStrategy, setMicroStrategy] = useState({ value: '2mins', label: '2mins' })
+  const [microStrategy, setMicroStrategy] = useState(null);
   const [strategy, setStrategy] = useState({ value: 'heikfilter', label: 'heikfilter' });
+  const [strategyList, setStrategyList] = useState([]);
   
   const [optionsViewTypes, setOptionsViewTypes] = useState([
     { value: 'charting', label: 'Charting' },
@@ -40,9 +40,7 @@ const HeiknStockChart = (props) => {
 
   const [optionsMicroStrategy, setOptionsMicroStrategy] = useState([])
   
-  const [optionsStratgy, setOptionsStrategy] = useState([
-    { value: 'heikfilter', label: 'heikfilter' },
-  ])
+  const [optionsStratgy, setOptionsStrategy] = useState([])
 
   const [optionsIndicator, setOptionsIndicator] = useState([
     {
@@ -74,13 +72,58 @@ const HeiknStockChart = (props) => {
     }
   ]
 
-  const get_tables = useCallback(
+  const getStrategyList = useCallback(
     () => {
+      fetch(process.env.REACT_APP_BACKEND_URL + "/api/get_strategy_list")
+        .then(response => response.json())
+        .then(data => {
+          setStrategyList(data.result);
+          const strategyOptions = data.result.map((o => {
+            return {
+              value: o.macro,
+              label: o.macro,
+            }
+          }))
+          setStrategy({
+            value: 'heikfilter',
+            label: 'heikfilter'
+          });
+          setOptionsStrategy(strategyOptions);
+          if (data.result.length) {
+            data.result.forEach((item) => {
+              if (item.macro === 'heikfilter') {
+                const microStrategyOptions = item.micro.map(o => {
+                  return {
+                    value: o,
+                    label: o,
+                  }
+                })
+                setOptionsMicroStrategy( microStrategyOptions )
+                setMicroStrategy(microStrategyOptions[0])
+
+                const symbolOptions = item.symbols.map(o => {
+                  return {
+                    value: o,
+                    label: o,
+                  }
+                })
+                setSymbolList(symbolOptions)
+                setSymbol(symbolOptions[0])
+              }
+            })
+          }
+        })   
+    },
+    [],
+  )
+
+  const get_tables = useCallback(
+    (strategy) => {
       const requestOptions = {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
-          'strategy': strategy.value
+          'strategy': strategy
         })
       };
       
@@ -99,32 +142,18 @@ const HeiknStockChart = (props) => {
           setSymbol(temp_data[0])
         })
     },
-    [strategy.value],
+    [],
   )
 
   useEffect(() => {
-    const getStrategies = async () => {
-      let options = await getStrategyOptions();
-      let newOptions = []
-      if (options.micro_strategy.length) {
-        options.micro_strategy.forEach((option) => {
-          newOptions.push({
-            value: option._id,
-            label: option._id
-          })
-        })
-        setOptionsMicroStrategy(newOptions)
-      }
-    }
     disableScroll.on();
     if(!isGetSymbolList) {
-      get_tables();
-      getStrategies();
+      getStrategyList();
     }  
     return () => {
       disableScroll.off();
     }
-  }, [get_tables, isGetSymbolList])
+  }, [getStrategyList, isGetSymbolList])
   
   useEffect(() => {
     const handleInstanceChange = (value) => {
@@ -136,15 +165,12 @@ const HeiknStockChart = (props) => {
         ])
         return
       }
-      setStrategy({ value: 'heikfilter', label: 'heikfilter' });
-      setOptionsStrategy([
-        { value: 'heikfilter', label: 'heikfilter' },
-      ])
+      getStrategyList()
       setIsShowMicro(true);
     }
     handleInstanceChange(selectedInstance)
     if(selectedInstance === 'live_trading') {
-      get_tables();    
+      get_tables('no_strategy');    
     }
     if (selectedInstance === 'optimization') {
       setOptionsViewTypes([
@@ -156,7 +182,7 @@ const HeiknStockChart = (props) => {
         { value: 'performance', label: 'Performance' },
       ])
     }
-  }, [selectedInstance, get_tables])
+  }, [selectedInstance])
 
   const handleViewTypeChange = (value) => {
     setSelectedViewType(value)
@@ -187,21 +213,33 @@ const HeiknStockChart = (props) => {
   const handleStrategy = async (e) => {
     if (e) {
       setStrategy(e)
-      if (e.value === 'heikfilter') {
-        let options = await getStrategyOptions();
-        let newOptions = []
-        if (options.micro_strategy.length) {
-          options.micro_strategy.forEach((option) => {
-            newOptions.push({
-              value: option._id,
-              label: option._id
+      if (strategyList.length) {
+        strategyList.forEach((item) => {
+          if (item.macro === e.value) {
+            const microStrategyOptions = item.micro.map(o => {
+              return {
+                value: o,
+                label: o,
+              }
             })
-          })
-          setOptionsMicroStrategy(newOptions)
-        }
-      } else {
-        setOptionsMicroStrategy([])
-    }
+            setOptionsMicroStrategy( microStrategyOptions )
+
+            setMicroStrategy({
+              value: '2mins',
+              label: '2mins'
+            })
+
+            const symbolOptions = item.symbols.map(o => {
+              return {
+                value: o,
+                label: o,
+              }
+            })
+            setSymbolList(symbolOptions)
+            setSymbol(symbolOptions[0])
+          }
+        })
+      }
     }
   }
   
@@ -283,7 +321,7 @@ const HeiknStockChart = (props) => {
     return (
       <div className={`row ${calculateHeightStyle()}`}>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          {symbol && (
+          {microStrategy && symbol && (
             < StockChart 
               selectedInstance={selectedInstance}
               selectedTradeDB='heikfilter-2mins-trades'
@@ -300,7 +338,7 @@ const HeiknStockChart = (props) => {
           )}
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          {symbol && (
+          {microStrategy && symbol && (
           < StockChart 
             selectedInstance={selectedInstance}
             selectedTradeDB='heikfilter-12mins-trades'
@@ -316,7 +354,7 @@ const HeiknStockChart = (props) => {
           />)}
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          {symbol && (
+          {microStrategy && symbol && (
             < StockChart
               selectedInstance={selectedInstance}
               selectedTradeDB='heikfilter-1hour-trades'
@@ -332,7 +370,7 @@ const HeiknStockChart = (props) => {
             />)}
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          {symbol && (
+          {microStrategy && symbol && (
             < StockChart
               selectedInstance={selectedInstance}
               selectedTradeDB='heikfilter-4hours-trades'
@@ -348,7 +386,7 @@ const HeiknStockChart = (props) => {
             />)}
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          {symbol && (
+          {microStrategy && symbol && (
             < StockChart
               selectedInstance={selectedInstance}
               selectedTradeDB='heikfilter-12hours-trades'
@@ -364,7 +402,7 @@ const HeiknStockChart = (props) => {
             />)}
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          {symbol && (
+          {microStrategy && symbol && (
           < StockChart
             selectedInstance={selectedInstance}
             selectedTradeDB='heikfilter-1day-trades'
