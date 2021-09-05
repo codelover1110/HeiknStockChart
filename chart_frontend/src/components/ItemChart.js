@@ -221,7 +221,7 @@ const HeiknStockChartItem = (props) => {
         <nav className="navbar navbar-expand navbar-dark bg-dark hunter-nav-bar">
           <div className="logo-title">
             <a href="/chart" className="hunter-navbar-brand">
-                Hunter Violette - HeikinAshi
+              Violette AM - Client Portal 
             </a>
           </div>
           <div className="navbar-nav mr-auto">

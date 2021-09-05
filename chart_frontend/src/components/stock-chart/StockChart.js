@@ -64,7 +64,7 @@ const StockChart = (props) => {
                         'db_name': dbname,
                         'symbol': symbol,
                         'macro': strategy.value,
-                        'micro': microStrategy,
+                        'micro': (selectedInstance !== 'live_trading') ? microStrategy : '',
                     })
                 };
                 fetch(process.env.REACT_APP_BACKEND_URL+'/api/get_data', requestOptions)

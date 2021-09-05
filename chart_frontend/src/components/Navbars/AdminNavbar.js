@@ -56,7 +56,7 @@ function AdminNavbar() {
     <nav className="navbar navbar-expand navbar-dark bg-dark hunter-nav-bar">
       <div className="logo-title">
         <a href="/chart" className="hunter-navbar-brand">
-            Hunter Violette - HeikinAshi
+          Violette AM - Client Portal
         </a>
       </div>
       <Navbar className={classNames("navbar-absolute", color)} expand="lg">
