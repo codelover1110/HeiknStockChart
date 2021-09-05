@@ -1,31 +1,30 @@
-export const filterPriceData = async (symbol, macroStrategy, microStrategy, tradeStartDate, tradeEndDate) => {
+export const filterPriceData = async (symbol, timeFrame, tradeStartDate, tradeEndDate) => {
   const requestOptions = {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
       'symbol': symbol,
-      'macroStrategy': macroStrategy,
-      'microStrategy': microStrategy,
-      'tradeStartDate': tradeStartDate,
-      'tradeEndDate': tradeEndDate
+      'time_frame': timeFrame,
+      'start': tradeStartDate,
+      'end': tradeEndDate
     })
   };
 
-  return await fetch(process.env.REACT_APP_BACKEND_URL + "/api/get_data_trades", requestOptions)
+  return await fetch(process.env.REACT_APP_BACKEND_URL + "/api/get_table_candles", requestOptions)
     .then(response => response.json())
     .then(data => {
-      let trades_data = []
-      data.trades_data.forEach((x) => {
-        trades_data.push({
-          'symbol': x.symbol,
-          'strategy': x.strategy_name,
-          'side': x.side,
-          'quantity': x.quantity,
+      const candles = []
+      data.candles.forEach((x) => {
+        candles.push({
+          'o': x.o,
+          'h': x.h,
+          'c': x.c,
+          'l': x.l,
+          'v': x.v,
           'date': x.date.replace('T', ' '),
-          'price': x.price
         })
       })
-      return trades_data
+      return candles
     })
 }
 

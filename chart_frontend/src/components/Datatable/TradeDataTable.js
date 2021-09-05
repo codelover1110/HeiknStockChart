@@ -14,7 +14,7 @@ import {
 import { useHistory } from "react-router-dom";
 import { MDBDataTableV5 } from 'mdbreact';
 import { useAuth } from 'contexts/authContext';
-import { getAllSymbols, filterTradesData, getStrategyOptions } from 'api/Api'
+import { getAllSymbols, filterTradesData } from 'api/Api'
 
 const TradeDataTable = () => {
   const auth = useAuth();
@@ -25,7 +25,7 @@ const TradeDataTable = () => {
   const [microStrategy, setMicroStrategy] = useState()
   const [tradeStartDate, setTradeStartDate] = useState('2021-01-01')
   const [tradeEndDate, setTradeEndDate] = useState('2021-08-31')
-  const [strategyList, setStrategyList] = useState([]);
+  // const [strategyList, setStrategyList] = useState([]);
   
   const [optionsStrategy, setOptionsStrategy] = useState([])
   // const [optionsMacroStrategy, setOptionsMacroStrategy] = useState([])
@@ -86,17 +86,12 @@ const TradeDataTable = () => {
       fetch(process.env.REACT_APP_BACKEND_URL + "/api/get_strategy_list")
         .then(response => response.json())
         .then(data => {
-          setStrategyList(data.result);
           const strategyOptions = data.result.map((o => {
             return {
               value: o.macro,
               label: o.macro,
             }
           }))
-          // setStrategy({
-          //   value: 'heikfilter',
-          //   label: 'heikfilter'
-          // });
           setOptionsStrategy(strategyOptions);
           if (data.result.length) {
             data.result.forEach((item) => {
@@ -198,7 +193,7 @@ const TradeDataTable = () => {
       <nav className="navbar navbar-expand navbar-dark bg-dark hunter-nav-bar">
         <div className="logo-title">
           <a href="/chart" className="hunter-navbar-brand">
-              Hunter Violette - HeikinAshi
+            Violette AM - Client Portal
           </a>
         </div>
         <div className="navbar-nav mr-auto">

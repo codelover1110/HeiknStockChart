@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Select from 'react-select'
 import { Link } from "react-router-dom";
 import "react-datetime/css/react-datetime.css";
@@ -20,58 +20,51 @@ const PriceDataTable = () => {
   const auth = useAuth();
   const history = useHistory();
   const [collapseOpen,] = React.useState(false)
-  const [symbol, setSymbol] = React.useState([])
-  const [macroStrategy, setMacroStrategy] = useState();
-  const [microStrategy, setMicroStrategy] = useState()
+  const [symbol, setSymbol] = React.useState({value: "GOOG", label: "GOOG"})
+  const [timeFrame, setTimeFrame] = useState({ value: "1", label: "1"});
   const [tradeStartDate, setTradeStartDate] = useState('2021-01-01')
   const [tradeEndDate, setTradeEndDate] = useState('2021-08-31')
-  const [strategyList, setStrategyList] = useState([]);
-  
-  const [optionsStrategy, setOptionsStrategy] = useState([])
-  // const [optionsMacroStrategy, setOptionsMacroStrategy] = useState([])
-
-  const [optionsMicroStrategy, setOptionsMicroStrategy] = useState([])
-  
   const [optionsSymbol, setOptionsSymbol] = useState([])
+  const [optionsTimeFrame] = useState([
+    { value: "1", label: "1" },
+    { value: "60", label: "60" }
+  ])
 
   const hearder_columns = useMemo(() => {
     return [
     {
-      label: 'Symbol',
-      field: 'symbol',
-      width: 150,
+      label: 'O',
+      field: 'o',
+      width: 200,
       attributes: {
         'aria-controls': 'DataTable',
         'aria-label': 'symbol',
       },
     },
     {
-      label: 'Strategy',
-      field: 'strategy',
+      label: 'H',
+      field: 'h',
       width: 200,
     },
     {
-      label: 'Trade Date',
-      field: 'date',
-      sort: 'date',
-      width: 150,
+      label: 'C',
+      field: 'c',
+      width: 200,
     },
     {
-      label: 'Side',
-      field: 'side',
-      width: 270,
+      label: 'L',
+      field: 'l',
+      width: 200,
     },  
     {
-      label: 'Quantity',
-      field: 'quantity',
-      sort: 'quantity',
-      width: 100,
+      label: 'V',
+      field: 'v',
+      width: 200,
     },   
     {
-      label: 'Price',
-      field: 'price',
+      label: 'Date',
+      field: 'date',
       sort: 'price',
-      width: 100,
     },
   ]}, [])
 
@@ -81,84 +74,20 @@ const PriceDataTable = () => {
     ],
   });
 
-  const getStrategyList = useCallback(
-    () => {
-      fetch(process.env.REACT_APP_BACKEND_URL + "/api/get_strategy_list")
-        .then(response => response.json())
-        .then(data => {
-          setStrategyList(data.result);
-          const strategyOptions = data.result.map((o => {
-            return {
-              value: o.macro,
-              label: o.macro,
-            }
-          }))
-          // setStrategy({
-          //   value: 'heikfilter',
-          //   label: 'heikfilter'
-          // });
-          setOptionsStrategy(strategyOptions);
-          if (data.result.length) {
-            data.result.forEach((item) => {
-              if (item.macro === 'heikfilter') {
-                const microStrategyOptions = item.micro.map(o => {
-                  return {
-                    value: o,
-                    label: o,
-                  }
-                })
-                setOptionsMicroStrategy( microStrategyOptions )
-                // setMicroStrategy(microStrategyOptions[0])
-
-                const symbolOptions = item.symbols.map(o => {
-                  return {
-                    value: o,
-                    label: o,
-                  }
-                })
-                setOptionsSymbol(symbolOptions)
-                // setSymbol(symbolOptions[0])
-              }
-            })
-          }
-        })   
-    },
-    [],
-  )
-
   useEffect(() => {
-    // const getStrategies = async () => {
-    //   let options = await getStrategyOptions();
-    //   let newOptions = []
-    //   if (options.micro_strategy.length) {
-    //     options.micro_strategy.forEach((option) => {
-    //       newOptions.push({
-    //         value: option._id,
-    //         label: option._id
-    //       })
-    //     })
-    //     setOptionsMicroStrategy(newOptions)
-    //   }
-    // }
-    // getStrategies();
-    getStrategyList()
-  }, [getStrategyList])
-
-  useEffect(() => {
-    const get_trades = async (symbol, macroStrat, microStrat, tradeStartDate, tradeEndDate) => {
-      const trades_data = await filterPriceData(symbol, macroStrat, microStrat, tradeStartDate, tradeEndDate);
+    const getPriceTrades = async (symbol, timeFrame, tradeStartDate, tradeEndDate) => {
+      const trades_data = await filterPriceData(symbol, timeFrame, tradeStartDate, tradeEndDate);
       setDatatable({
         columns: hearder_columns,
         rows: trades_data
       })
     }
 
-    get_trades(
-      symbol ? symbol.value : '',
-      macroStrategy ? macroStrategy.value : '',
-      microStrategy ? microStrategy.value : '', 
-      tradeStartDate, tradeEndDate)
-  }, [symbol, macroStrategy, microStrategy, hearder_columns, tradeStartDate, tradeEndDate])
+    console.log("tradeStartDate, tradeEndDate", tradeStartDate, tradeEndDate)
+
+    getPriceTrades(symbol.value, timeFrame.value, tradeStartDate, tradeEndDate)
+
+  }, [symbol, timeFrame, hearder_columns, tradeStartDate, tradeEndDate])
 
   useEffect(() => {
       const getSymbols = async () => {
@@ -177,14 +106,10 @@ const PriceDataTable = () => {
     setSymbol(e)
   }
   
-  const handleMacroStrategy = (e) => {
-    setMacroStrategy(e)
+  const handleTimeFrameChange = (e) => {
+    setTimeFrame(e)
   }
   
-  const handleMicroStrategy = (e) => {
-    setMicroStrategy(e)
-  }
-
   const handleTradeStartDateChange = (e) => {
     setTradeStartDate(e.target.value)
   }
@@ -198,7 +123,7 @@ const PriceDataTable = () => {
       <nav className="navbar navbar-expand navbar-dark bg-dark hunter-nav-bar">
         <div className="logo-title">
           <a href="/chart" className="hunter-navbar-brand">
-              Hunter Violette - HeikinAshi
+            Violette AM - Client Portal
           </a>
         </div>
         <div className="navbar-nav mr-auto">
@@ -255,18 +180,10 @@ const PriceDataTable = () => {
           </div>
           <div className="select-option">
             <Select
-              value={macroStrategy}
-              onChange={handleMacroStrategy}
-              options={optionsStrategy}
-              placeholder="Macro Strategy"
-            />
-          </div>
-          <div className="select-option">
-            <Select
-              value={microStrategy}
-              onChange={handleMicroStrategy}
-              options={optionsMicroStrategy}
-              placeholder="Micro Strategy"
+              value={timeFrame}
+              onChange={handleTimeFrameChange}
+              options={optionsTimeFrame}
+              placeholder="Time Frame"
             />
           </div>
           <div className='input-group date hunter-date-time-picker' id='datetimepicker1'>

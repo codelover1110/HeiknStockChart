@@ -182,7 +182,7 @@ const HeiknStockChart = (props) => {
         { value: 'performance', label: 'Performance' },
       ])
     }
-  }, [selectedInstance])
+  }, [selectedInstance, getStrategyList, get_tables])
 
   const handleViewTypeChange = (value) => {
     setSelectedViewType(value)
@@ -426,7 +426,7 @@ const HeiknStockChart = (props) => {
       <nav className="navbar navbar-expand navbar-dark bg-dark hunter-nav-bar">
         <div className="logo-title">
           <a href="/chart" className="hunter-navbar-brand">
-              Hunter Violette - HeikinAshi
+            Violette AM - Client Portal
           </a>
         </div>
         <div className="navbar-nav mr-auto">
