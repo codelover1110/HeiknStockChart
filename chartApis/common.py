@@ -4,26 +4,7 @@ from datetime import datetime, timedelta
 from ib_insync import util
 from pymongo.common import MIN_SUPPORTED_SERVER_VERSION
 from .lib.heikfilter import HA, Filter
-
-def define_start_date(candle_name):
-    cur_date = datetime.now().date()
-    
-    if candle_name == 'backtest_2_minute':
-        start_time = cur_date - timedelta(days=20)
-    elif candle_name == 'backtest_12_minute':
-        start_time = cur_date - timedelta(days=20)
-    elif candle_name == 'backtest_1_hour':
-        start_time = cur_date - timedelta(days=30)
-    elif candle_name == 'backtest_4_hour':
-        start_time = cur_date - timedelta(days=90)
-    elif candle_name == 'backtest_12_hour':
-        start_time = cur_date - timedelta(days=90)
-    elif candle_name == 'backtest_1_day':
-        start_time = cur_date - timedelta(days=365)
-    
-    cur_date = cur_date + timedelta(days=1)
-
-    return datetime.strptime(str(start_time), '%Y-%m-%d'), datetime.strptime(str(cur_date), '%Y-%m-%d')
+from .models import get_strategy_name_only
 
 def dataConverter(obj):
     if isinstance(obj, np.integer):
@@ -169,4 +150,145 @@ def get_chat_available_stratgies(candle_name, all_strategies):
     
     return result
 
+def calc_winningLosing(symbols, db_data):
+    wL = []   
+    for symbol in symbols:
+        winningLosing_temp = {
+            'symbol': symbol,
+            'winning': 0,
+            'losing': 0
+        }
+        pair_wL = {}
+        for db_collection in db_data:
+            side = db_collection['side']
+            if symbol == db_collection['symbol']:
+                pair_wL[side] = float(db_collection['price'])
+                if 'BUY' in pair_wL and 'SELL' in pair_wL:
+                    calc = pair_wL['SELL'] - pair_wL['BUY']
+                    if calc > 0:
+                        winningLosing_temp['winning'] =  winningLosing_temp['winning'] + 1
+                    else:
+                        winningLosing_temp['losing'] =  winningLosing_temp['losing'] + 1
+                    pair_wL = {}
+        wL.append(winningLosing_temp)
+    return wL
+
+def calc_percentEfficiency(symbols, db_data):
+    pE = []
+    wLA = []
+    lS = []
+    for symbol in symbols:
+        pair_pE = {}
+        sym_pE = []
+        winningT = []
+        losingT = []
+        for db_collection in db_data:
+            side = db_collection['side']
+            if symbol == db_collection['symbol']:
+                pair_pE[side] = {
+                    "price": float(db_collection['price']),
+                    "date": db_collection['date']
+                    }
+                if 'BUY' in pair_pE and 'SELL' in pair_pE:
+                    percent = float(pair_pE['SELL']['price']) * 100  / float(pair_pE['BUY']['price'])
+                    # percent = round(percent, 2)
+                    percent = percent - 100
+                    percent = round(percent, 3)
+                    if pair_pE['SELL']['date'].timestamp() - pair_pE['BUY']['date'].timestamp() > 0:
+                        entry = 'BUY'
+                        exit = 'SELL'
+                        exit_date = pair_pE['SELL']['date']
+                    else:
+                        entry = 'SELL'
+                        exit = 'BUY'
+                        exit_date = pair_pE['BUY']['date']
+
+                    sym_pE.append({
+                        'date': exit_date,
+                        'percent': percent,
+                        'entry': entry,
+                        'exit': exit,
+                        'efficiency': percent
+                    })
+                    pair_pE = {}
+                    print("percent", percent)
+                    if percent > 0:
+                        winningT.append(percent)
+                    else:
+                        losingT.append(percent)
+              
+
+        avgWinning = 0
+        avgLosing = 0
+        avgWinning = sum(winningT) / len(winningT) if len(winningT) > 0 else 0
+        avgWinning = round(avgWinning, 3)
+        avgLosing = sum(losingT) / len(losingT) if len(losingT) > 0 else 0
+        avgLosing = round(avgLosing, 3)
+        wLA.append({
+            "symbol": symbol,
+            "avgWinning": avgWinning,
+            "avgLosing": abs(avgLosing)
+        })
+
+        # Calculation Long and Short
+        short = 0
+        long = 0
+        if len(sym_pE) > 0 and sym_pE[-1]['entry'] == 'BUY':
+            long = sym_pE[-1]['percent']
+            short = 0
+        elif len(sym_pE) > 0 and sym_pE[-1]['entry'] == 'SELL':
+            long = 0
+            short = sym_pE[-1]['percent']
+        lS.append({
+            symbol: {
+                'long': long,
+                'short': short,
+            }
+        })
+        # Calculation efficiency
+        # for sym_item in sym_pE:
+        #     sym_item['efficiency'] = 0
+        #     if long > 0:
+        #         sym_item['efficiency'] = sym_item['percent'] * 100/long
+        #     elif short > 0:
+        #         sym_item['efficiency'] = sym_item['percent'] * 100/short
+
+        pE.append({
+            symbol: sym_pE
+        })
+    
+    return {
+        "pE": pE,
+        "wLA": wLA,
+        "lS": lS
+    }
+
+def fill_missing_candles__(chat_candles, candle_name, strategy_name):
+    strategy_names = get_strategy_name_only()
+    macro_name = strategy_name.split('-')[0]
+    macro_strategies = []
+    for strtg in strategy_names:
+        if macro_name in strtg:
+            macro_strategies.append(strtg)
+    available_strategies = get_chat_available_stratgies(candle_name, macro_strategies)
+    if strategy_name in available_strategies:
+        insert_candles = []
+        for candle in chat_candles:
+            try:
+                trades = candle['trades']
+                if len(trades) > 1:
+                    single_trades = trades[0]
+                    candle['trades'] = [single_trades]
+                    for trade_idx in range(1, len(trades)):
+                        new_candle_trades = trades[trade_idx]
+                        new_candle = candle.copy()
+                        new_candle['trades'] = [new_candle_trades]
+                        new_candle['date'] = new_candle_trades['trade_date']
+                        insert_candles.append(new_candle)
+            except:
+                pass
+        chat_candles.extend(insert_candles)
+        chat_candles.sort(key = lambda x: x['date'])
+
+    return chat_candles
 

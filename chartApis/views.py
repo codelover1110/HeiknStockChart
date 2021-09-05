@@ -12,352 +12,29 @@ import numpy as np
 import pandas as pd
 pd.options.mode.chained_assignment = None  # default='warn'
 
-from .lib.heikfilter import HA, Filter
-from .models import get_strategies_names, get_stock_candles_for_strategy, get_strategy_name_only
-from .common import get_chat_data_from_candles, join_append, get_chat_available_stratgies
+from .models import get_strategies_names, get_stock_candles_for_strategy,  get_micro_strategies, get_macro_strategies, get_strategy_symbols, get_backtesting_data_db, get_symbol_candles
+from .common import get_chat_data_from_candles, join_append, calc_percentEfficiency, calc_winningLosing, fill_missing_candles__
 
 # mongoclient = pymongo.MongoClient("mongodb://localhost:27017")
 mongoclient = pymongo.MongoClient("mongodb://hunter:STOCKdb123@cluster0-shard-00-00.vcom7.mongodb.net:27017,cluster0-shard-00-01.vcom7.mongodb.net:27017,cluster0-shard-00-02.vcom7.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-7w6acj-shard-0&authSource=admin&retryWrites=true&w=majority")
 # mongoclient = pymongo.MongoClient("mongodb://hunter:STOCKdb123@cluster0-shard-00-00.agmoz.mongodb.net:27017,cluster0-shard-00-01.agmoz.mongodb.net:27017,cluster0-shard-00-02.agmoz.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-f8c9fs-shard-0&authSource=admin&retryWrites=true&w=majority")
 
 
-def get_last_put_date():
-    masterdb = mongoclient["backtest_tables"]
-    ob_table = masterdb['last_date']
-    last_date_doc = ob_table.find_one()
-    if last_date_doc is not None:
-        return last_date_doc['last_candle_date']
-
-def get_view_data(ob_table, db_name):
-    last_put_date = datetime.strptime(get_last_put_date(), '%Y-%m-%d')
-    if db_name == 'backtest_12_minute':
-        start = last_put_date - timedelta(days=20)
-    elif db_name == 'backtest_2_minute':
-        start = last_put_date - timedelta(days=20)
-    elif db_name == 'backtest_1_hour':
-        start = last_put_date - timedelta(days=30)
-    elif db_name == 'backtest_4_hour':
-        start = last_put_date - timedelta(days=90)
-    elif db_name == 'backtest_12_hour':
-        start = last_put_date - timedelta(days=90)
-    else:
-        start = last_put_date - timedelta(days=365)
-    end = last_put_date + timedelta(days=1)
-    print ('start at: {}, end at: {}'.format(str(start), str(end)))
-    data_result = ob_table.find({
-        'date': {
-            '$gte': start,
-            '$lt': end
-        }
-    })
-    list_db_data = list(data_result.sort('date', pymongo.ASCENDING))
-
-    return list_db_data
-
-def dataConverter(obj):
-    if isinstance(obj, np.integer):
-        return int(obj)
-    elif isinstance(obj, np.floating):
-        return float(obj)
-    elif isinstance(obj, np.ndarray):
-        return obj.tolist()
-    elif isinstance(obj, datetime.datetime):
-        return obj.__str__()
-
-def get_chat_data(df):
-    hadf = HA(df) 
-    heik = (hadf["c"] - hadf["o"]).rolling(window=3).mean()
-    heik_diff = heik.diff()
-    df.replace(np.nan, 0)
-    result_data = []
-    for data in df.iloc:
-        if( data.rsi2 >= 0 and data.rsi3 >= 0):
-            side = "buy"
-        elif ( data.rsi2 <= 0 and heik_diff.iloc[-1] <= 0):
-            side = "sell"
-        elif ( data.rsi1 >= 0):
-            side = "hold"
-        else:
-            side = "wait"
-        rsi = dataConverter(np.nan_to_num(data.RSI))
-        rsi2 = dataConverter(np.nan_to_num(data.rsi2))
-        rsi3 = dataConverter(np.nan_to_num(data.rsi3))
-        heik = dataConverter(np.nan_to_num(data.rsi2))
-        heik2 = dataConverter(np.nan_to_num(data.rsi3))
-        # heik = dataConverter(np.nan_to_num(heik_diff.iloc[-1]))
-        # heik2 = dataConverter(np.nan_to_num(heik_diff.iloc[-2]))
-
-        result_data.append({
-            'close': float(data.c),
-            'date': data.date,
-            'high': float(data.h),
-            'low': float(data.l),
-            'open': float(data.o),
-            'percentChange': "",
-            'volume': int(data.v),
-            'RSI': rsi,
-            'side': side,
-            'rsi': {'bearPower': rsi, 'bullPower': rsi},
-            'rsi2': {'bearPower': rsi2, 'bullPower': rsi2},
-            'rsi3': {'bearPower': rsi3, 'bullPower': rsi3},
-            'heik': {'bearPower': heik, 'bullPower': heik},
-            'heik2': {'bearPower': heik2, 'bullPower': heik2},
-        })
-    
-    return result_data 
-
-def define_start_date(candle_name):
-    cur_date = datetime.now().date()
-
-    if candle_name == 'backtest_2_minute':
-        start_time = cur_date - timedelta(days=20)
-    elif candle_name == 'backtest_12_minute':
-        start_time = cur_date - timedelta(days=20)
-    elif candle_name == 'backtest_1_hour':
-        start_time = cur_date - timedelta(days=30)
-    elif candle_name == 'backtest_4_hour':
-        start_time = cur_date - timedelta(days=90)
-    elif candle_name == 'backtest_12_hour':
-        start_time = cur_date - timedelta(days=90)
-    elif candle_name == 'backtest_1_day':
-        start_time = cur_date - timedelta(days=365)
-    
-    cur_date = cur_date + timedelta(days=1)
-
-    return datetime.strptime(str(start_time), '%Y-%m-%d'), datetime.strptime(str(cur_date), '%Y-%m-%d')
-
-def fill_missing_candles(chat_candles, candle_name, strategy_name):
-    db_names = ['backtest_2_minute', '', 'backtest_12_minute', '', 'backtest_1_hour', 'backtest_4_hour', 'backtest_12_hour', 'backtest_1_day']
-    strategy_names = [
-                'heikfilter-2mins-trades',
-                'heikfilter-2mins-4hours-trades', 
-                'heikfilter-12mins-trades',
-                'heikfilter-12mins-4hours-trades',
-                'heikfilter-1hour-trades',
-                'heikfilter-4hours-trades',
-                'heikfilter-12hours-trades',
-                'heikfilter-1day-trades',
-            ]
-    for idx, db_name in enumerate(db_names):
-        if db_name == candle_name:
-            if strategy_name in strategy_names[idx:]:
-                insert_candles = []
-                for candle in chat_candles:
-                    try:
-                        trades = candle['trades']
-                        if len(trades) > 1:
-                            single_trades = trades[0]
-                            candle['trades'] = [single_trades]
-                            for trade_idx in range(1, len(trades)):
-                                new_candle_trades = trades[trade_idx]
-                                new_candle = candle.copy()
-                                new_candle['trades'] = [new_candle_trades]
-                                new_candle['date'] = new_candle_trades['trade_date']
-                                insert_candles.append(new_candle)
-                    except:
-                        pass
-                chat_candles.extend(insert_candles)
-                chat_candles.sort(key = lambda x: x['date'])
-                break
-
-    return chat_candles
-
-def fill_missing_candles__(chat_candles, candle_name, strategy_name):
-    db_names = ['backtest_2_minute', 'backtest_12_minute', 'backtest_1_hour', 'backtest_4_hour', 'backtest_12_hour', 'backtest_1_day']
-    strategy_names = get_strategy_name_only()
-    macro_name = strategy_name.split('-')[0]
-    macro_strategies = []
-    for strtg in strategy_names:
-        if macro_name in strtg:
-            macro_strategies.append(strtg)
-    available_strategies = get_chat_available_stratgies(candle_name, macro_strategies)
-    if strategy_name in available_strategies:
-        insert_candles = []
-        for candle in chat_candles:
-            try:
-                trades = candle['trades']
-                if len(trades) > 1:
-                    single_trades = trades[0]
-                    candle['trades'] = [single_trades]
-                    for trade_idx in range(1, len(trades)):
-                        new_candle_trades = trades[trade_idx]
-                        new_candle = candle.copy()
-                        new_candle['trades'] = [new_candle_trades]
-                        new_candle['date'] = new_candle_trades['trade_date']
-                        insert_candles.append(new_candle)
-            except:
-                pass
-        chat_candles.extend(insert_candles)
-        chat_candles.sort(key = lambda x: x['date'])
-
-    return chat_candles
-
-def fetch_data(stock, candle_name, strategy_name):
-    print ('stock:{}, candle_name: {}, strategy_name:{}'.format(stock, candle_name, strategy_name))
-    start_date, end_date = define_start_date(candle_name)
-    print(start_date, "||", end_date)
-    
-    # get candles
-    masterdb = mongoclient[candle_name]
-    ob_table = masterdb[stock]  # 'AMNZ'
-    candle_result = ob_table.find({'date': {'$gte': start_date, '$lt': end_date}})
-    candles = list(candle_result.sort('date', pymongo.ASCENDING))
-
-    # get strategy trades
-    masterdb = mongoclient['backtesting_trades']
-    ob_table = masterdb[strategy_name]  # 'AMNZ'
-    trade_result = ob_table.find({'date': {'$gte': start_date, '$lt': end_date}, 'symbol': stock})
-    strategy_trades = list(trade_result.sort('date', pymongo.ASCENDING))
-
-    # res = join(candles, strategy_trades, strategy_name)
-    return candles, strategy_trades
-
-def fetch_stock_strategy_candles(candle_name, symbol, macro, micro):
-    start_date, end_date = define_start_date(candle_name)
-    
-    # get candles
-    masterdb = mongoclient[candle_name]
-    ob_table = masterdb[symbol]  # 'AMNZ'
-    candle_result = ob_table.find({'date': {'$gte': start_date, '$lt': end_date}})
-    candles = list(candle_result.sort('date', pymongo.ASCENDING))
-    print ('-------------- candles count: ', len(candles))
-
-    find_trades_query = {
-        'date': {'$gte': start_date, '$lt': end_date},
-        'micro_strategy': micro,
-        'macro_strategy': macro,
-        'symbol': symbol
-    }
-    masterdb = mongoclient['backtesting_trades']
-    ob_table = masterdb['trades'] 
-    trade_result = ob_table.find(find_trades_query)
-    strategy_trades = list(trade_result.sort('date', pymongo.ASCENDING))
-    print ('-------------- trade count: ', len(strategy_trades))
-
-    return candles, strategy_trades
-
-def calc_winningLosing(symbols, db_data):
-    wL = []   
-    for symbol in symbols:
-        winningLosing_temp = {
-            'symbol': symbol,
-            'winning': 0,
-            'losing': 0
-        }
-        pair_wL = {}
-        for db_collection in db_data:
-            side = db_collection['side']
-            if symbol == db_collection['symbol']:
-                pair_wL[side] = float(db_collection['price'])
-                if 'BUY' in pair_wL and 'SELL' in pair_wL:
-                    calc = pair_wL['SELL'] - pair_wL['BUY']
-                    if calc > 0:
-                        winningLosing_temp['winning'] =  winningLosing_temp['winning'] + 1
-                    else:
-                        winningLosing_temp['losing'] =  winningLosing_temp['losing'] + 1
-                    pair_wL = {}
-        wL.append(winningLosing_temp)
-    return wL
-
-def calc_percentEfficiency(symbols, db_data):
-    pE = []
-    wLA = []
-    lS = []
-    for symbol in symbols:
-        pair_pE = {}
-        sym_pE = []
-        winningT = []
-        losingT = []
-        for db_collection in db_data:
-            side = db_collection['side']
-            if symbol == db_collection['symbol']:
-                pair_pE[side] = {
-                    "price": float(db_collection['price']),
-                    "date": db_collection['date']
-                    }
-                if 'BUY' in pair_pE and 'SELL' in pair_pE:
-                    percent = float(pair_pE['SELL']['price']) * 100  / float(pair_pE['BUY']['price'])
-                    # percent = round(percent, 2)
-                    percent = percent - 100
-                    percent = round(percent, 3)
-                    if pair_pE['SELL']['date'].timestamp() - pair_pE['BUY']['date'].timestamp() > 0:
-                        entry = 'BUY'
-                        exit = 'SELL'
-                        exit_date = pair_pE['SELL']['date']
-                    else:
-                        entry = 'SELL'
-                        exit = 'BUY'
-                        exit_date = pair_pE['BUY']['date']
-
-                    sym_pE.append({
-                        'date': exit_date,
-                        'percent': percent,
-                        'entry': entry,
-                        'exit': exit,
-                        'efficiency': percent
-                    })
-                    pair_pE = {}
-                    print("percent", percent)
-                    if percent > 0:
-                        winningT.append(percent)
-                    else:
-                        losingT.append(percent)
-              
-
-        avgWinning = 0
-        avgLosing = 0
-        avgWinning = sum(winningT) / len(winningT) if len(winningT) > 0 else 0
-        avgWinning = round(avgWinning, 3)
-        avgLosing = sum(losingT) / len(losingT) if len(losingT) > 0 else 0
-        avgLosing = round(avgLosing, 3)
-        wLA.append({
-            "symbol": symbol,
-            "avgWinning": avgWinning,
-            "avgLosing": abs(avgLosing)
-        })
-
-        # Calculation Long and Short
-        short = 0
-        long = 0
-        if len(sym_pE) > 0 and sym_pE[-1]['entry'] == 'BUY':
-            long = sym_pE[-1]['percent']
-            short = 0
-        elif len(sym_pE) > 0 and sym_pE[-1]['entry'] == 'SELL':
-            long = 0
-            short = sym_pE[-1]['percent']
-        lS.append({
-            symbol: {
-                'long': long,
-                'short': short,
-            }
-        })
-        # Calculation efficiency
-        # for sym_item in sym_pE:
-        #     sym_item['efficiency'] = 0
-        #     if long > 0:
-        #         sym_item['efficiency'] = sym_item['percent'] * 100/long
-        #     elif short > 0:
-        #         sym_item['efficiency'] = sym_item['percent'] * 100/short
-
-        pE.append({
-            symbol: sym_pE
-        })
-    
-    return {
-        "pE": pE,
-        "wLA": wLA,
-        "lS": lS
-    }
-
-@csrf_exempt 
+@csrf_exempt    
 def get_backtesting_data(request):
     if request.method == 'POST':
         request_data = JSONParser().parse(request)
         table_name = request_data['table_name']
         symbols = request_data['symbols']
-        masterdb = mongoclient["backtesting_trades"]
-        db_collection = masterdb[table_name]
-        list_db_data = list(db_collection.find().sort('date', pymongo.ASCENDING))
+        if True:
+            start_date = request_data['start_date']
+            end_date = request_data['end_date']
+            list_db_data = get_backtesting_data_db(table_name, start_date, end_date)
+        else:
+            masterdb = mongoclient["backtesting_trades"]
+            db_collection = masterdb[table_name]
+            list_db_data = list(db_collection.find().sort('date', pymongo.ASCENDING))
+        
         wL = calc_winningLosing(symbols, list_db_data)
         pE_wLA_lS = calc_percentEfficiency(symbols, list_db_data)
         bastestData = {
@@ -368,6 +45,7 @@ def get_backtesting_data(request):
         }
 
     return JsonResponse({'chart_data': bastestData}, status=status.HTTP_201_CREATED)
+
 
 @csrf_exempt 
 def get_table_list(request):
@@ -383,26 +61,10 @@ def get_table_list(request):
         tables_name.append(x['stock_name'])
     return JsonResponse({'tables': tables_name}, status=status.HTTP_201_CREATED)
 
-@csrf_exempt 
-def get_data(request):
-    if request.method == 'POST':
-        request_data = JSONParser().parse(request)
-        db_name = request_data['db_name']
-        symbol = request_data['symbol']
-        strategy = request_data['strategy']
-        candles, strategy_trades = fetch_data(symbol, db_name, strategy)
-        df = util.df(candles)
-        df = Filter(df)
-        chat_candles = get_chat_data(df)
-        verdict = join_append(chat_candles, strategy_trades, strategy)
-        verdict = fill_missing_candles(verdict, db_name, strategy)
-        # fill_missing_candles__(verdict, db_name, strategy)
-        
-    return JsonResponse({'chart_data': verdict}, status=status.HTTP_201_CREATED)
 
 @csrf_exempt 
 def get_data_trades(request):
-    if request.method == 'POST':
+    if request.method == 'POST':        
         request_data = JSONParser().parse(request)
         if not 'symbol' in request_data:
             symbol = ''
@@ -429,15 +91,54 @@ def get_data_trades(request):
         trades_data = list(db_collection.find(query_obj, {'_id': False}).sort('date', pymongo.ASCENDING))
         return JsonResponse({'trades_data': trades_data}, status=status.HTTP_201_CREATED)
 
+
+@csrf_exempt
+def get_table_candles(request):
+    if request.method == 'POST':
+        request_data = JSONParser().parse(request)
+        symbol = request_data['symbol']
+        start_date = request_data['start']
+        end_date = request_data['end']
+        time_frame = request_data['time_frame']
+
+        candles = get_symbol_candles(symbol, start_date, end_date, time_frame)
+        return JsonResponse({"candles": candles}, status=status.HTTP_201_CREATED)
+
 @csrf_exempt
 def get_strategies(request):
     strategies = get_strategies_names()
     return JsonResponse(strategies, status=status.HTTP_201_CREATED)
 
+
+@csrf_exempt
+def get_strategies_list(request):
+    strategies = []
+    macro_strtg = get_macro_strategies()
+    for macro in macro_strtg:
+        item = dict()
+        item['macro'] = macro
+        item['micro'] = get_micro_strategies(macro)
+        item['symbols'] = get_strategy_symbols(macro)
+        strategies.append(item)
+    return JsonResponse({"result": strategies}, status=status.HTTP_201_CREATED)    
+
+
+@csrf_exempt
+def get_micros(request):
+    if request.method == 'POST':
+        request_data = JSONParser().parse(request)
+        strategies = get_micro_strategies(request_data['macro'])
+        return JsonResponse({"micros": strategies}, status=status.HTTP_201_CREATED)
+
+
+@csrf_exempt
+def get_macros(request):
+    strategies = get_macro_strategies()
+    return JsonResponse({"macros": strategies}, status=status.HTTP_201_CREATED)
+
 @csrf_exempt
 def get_stock_strategy_candles(request):
     request_data = JSONParser().parse(request)
-    print(request_data)
     db_name = request_data['db_name']
     symbol = request_data['symbol']
     macro = request_data['macro']
@@ -450,8 +151,7 @@ def get_stock_strategy_candles(request):
     verdict = fill_missing_candles__(verdict, db_name, strategy)
     
     return JsonResponse({'chart_data': verdict}, status=status.HTTP_201_CREATED)
-    
+
 
 def index(request):
     return render(request, "build/index.html")
-
