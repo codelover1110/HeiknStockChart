@@ -25,8 +25,8 @@ const HeiknStockChartItem = (props) => {
     const [microStrategy, setMicroStrategy] = useState(initMicroStrategy ? initMicroStrategy: null)
     const [indicators, setIndicators] = useState(initIndicators)
     const [apiFlag, setApiFlag] = useState(false)
-    const [tradeStartDate, setTradeStartDate] = useState(null)
-    const [tradeEndDate, setTradeEndDate] = useState(null)
+    const [tradeStartDate, setTradeStartDate] = useState('')
+    const [tradeEndDate, setTradeEndDate] = useState('')
     const [strategyList, setStrategyList] = useState([]);
 
     const [optionsViewTypes, setOptionsViewTypes] = useState([

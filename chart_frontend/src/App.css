@@ -416,3 +416,9 @@ div.mdb-datatable div.mdb-datatable-filter {
 .hunter-dropdown .nav-link:hover{
   cursor: pointer;
 }
+
+.hunter-data-table-title {
+  font-size: 22px;
+  color: #FFFFFF;
+  margin-bottom: 15px;
+}

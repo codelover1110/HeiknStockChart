@@ -4,13 +4,13 @@ import {
 } from "reactstrap";
 
 import Sidebar from "components/Sidebar/Sidebar.js";
-import TradeDataTable from "components/Datatable/TradeDataTable"
+import PriceDataTable from "components/Datatable/PriceDataTable"
 
 import { routes } from "routes.js";
 
 import { BackgroundColorContext } from "contexts/BackgroundColorContext";
 
-function TradeData() {
+function PriceData() {
   const [isShowSidebar, setShowSidebar] = React.useState(false);
   const [selectedInstance, setSelectedInstance] = React.useState('trade_data');
   
@@ -39,14 +39,14 @@ function TradeData() {
               <Sidebar
                 isAdminPage={false}
                 routes={routes}
-                subInstance={'tradedatatable'}
+                subInstance={'pricedatatable'}
                 selectedInstance={selectedInstance}
                 handleSidebarChange={handleSidebarChange}
                 handleInstanceChange={handleInstanceChange}
               />
             )}
             <div className="col-sm-12">
-                <TradeDataTable />
+                <PriceDataTable />
             </div>
           </div>
         </React.Fragment>
@@ -55,4 +55,4 @@ function TradeData() {
   );
 }
 
-export default TradeData;
+export default PriceData;
