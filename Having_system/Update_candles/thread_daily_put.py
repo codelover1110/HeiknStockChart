@@ -35,8 +35,7 @@ class DailyPutThread(object):
                     market_end_time, 
                     get_only_market_time=False):
 
-        self.symbols = ['AMZN', 'AMD', 'MSFT', 'GOOG', 'ATVI']
-        # self.symbols = ['GOOG']
+        self.symbols = []
         self.market_start_time = market_start_time
         self.market_end_time = market_end_time
         self.get_only_market_time = get_only_market_time

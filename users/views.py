@@ -5,7 +5,7 @@ from django.shortcuts import render
 from rest_framework import generics, views
 from .serializer import SignupLinkRoleSerializer
 
-from .models import SingupLinkRole
+from .models import SingupLinkRole, CustomUser
 from django.http import JsonResponse
 from django.core import serializers
 
@@ -42,4 +42,26 @@ def send_link_to_email(request) :
         send_email(link, email)
         return JsonResponse({"success": "true"}, status=201)
     return JsonResponse({"success": "true"}, status=201)
+
+@csrf_exempt
+def get_all_user(request):
+    qs = CustomUser.objects.all().values()
+    return JsonResponse(list(qs), safe=False)
+
+@csrf_exempt
+def save_user(request):
+    if request.method == "POST":
+        request_data = JSONParser().parse(request)
+        pk = request_data['pk']
+        role = request_data['role']
+
+        user = CustomUser.objects.get(pk=pk)
+        if user is not None:
+            # user.set_role(role)
+            # user.save()
+            # print (user.values())
+            return JsonResponse({"success": "true", "message": "saved successfuly"}, status=201)
+        else:
+            return JsonResponse({"success": "false", "message": "user not exist"}, status=201)
+    return JsonResponse({"success": "false", 'message': 'invalid method'}, status=201)
      

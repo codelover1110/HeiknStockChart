@@ -21,14 +21,6 @@ mongoclient = pymongo.MongoClient('mongodb://user:-Hz2f$!YBXbDcKG@cluster0-shard
 # mclerper
 # mongoclient = pymongo.MongoClient("mongodb://hunter:STOCKdb123@cluster0-shard-00-00.agmoz.mongodb.net:27017,cluster0-shard-00-01.agmoz.mongodb.net:27017,cluster0-shard-00-02.agmoz.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-f8c9fs-shard-0&authSource=admin&retryWrites=true&w=majority")
 
-trader_symbols = [
-    'AMZN',
-    'AMD',
-    'MSFT',
-    'GOOG',
-    'ATVI'
-]
-
 intervals = [
     [2, 'minute'],
     [12, 'minute'],
@@ -68,59 +60,7 @@ def get_tables_name():
             data = {'stock_name': stock_name}
             ob_table.insert_one(data)
 
-def save_db():
-    symbols = get_symbols()
-    for idx, interval in enumerate(intervals):
-        db_name = 'backtesting_' + str(interval[0]) + '_' + interval[1]
-        masterdb = mongoclient[db_name]
-        for trade_symbol in trader_symbols:
-            candles = get_candles(trade_symbol, str(interval[0]), interval[1])
-            for candle in candles:
-                ob_table = masterdb[trade_symbol]
-                candle['date'] = datetime.fromtimestamp((candle['t']/1000))
-                year = int(candle['date'].strftime("%Y"))
-                month = int(candle['date'].strftime("%m"))
-                day = int(candle['date'].strftime("%d"))
-                mk_start = datetime(year, month, day, 9, 30)
-                mk_end = datetime(year, month, day, 16, 0)
-                print(mk_start < candle['date'] < mk_end)
-                if idx == 5 or idx == 4:
-                    query = {"date": candle["date"]}
-                    if ob_table.count_documents(query) > 0:
-                        pass
-                    else:
-                        print(candle)
-                        ob_table.insert_one(candle)
-                else:
-                    if mk_start <= candle['date'] <= mk_end:
-                        query = {"date": candle["date"]}
-                        if ob_table.count_documents(query) > 0:
-                            pass
-                        else:
-                            print(candle)
-                            ob_table.insert_one(candle)
-
-
-def monitoring():
-    intervals_test = [
-        [2, 'minute'],
-        [12, 'minute'],
-        [1, 'hour'],
-        [4, 'hour'],
-        [12, 'hour'],
-        [1, 'day']
-    ]
-    symbols = get_symbols()
-    for idx, interval in enumerate(intervals_test):
-        for trade_symbol in trader_symbols:
-            candles = get_candles(trade_symbol, str(interval[0]), interval[1])
-            print ('{}, trade_symbol:{}, candle_count:{}'.format(str(interval[0]) + ' ' + interval[1], trade_symbol, len(candles)))
-            for c_idx, candle in enumerate(candles):
-                # if c_idx > 3:
-                #     break
-                candle['date'] = datetime.fromtimestamp((candle['t']/1000))
-                
-DELTA_TIME = 1 # day
+DELTA_TIME = 30 # day
 class SymbolCandleThread(object):
     def __init__(self, 
                     symbol, 
@@ -405,17 +345,18 @@ if __name__ == "__main__":
 
     print ("++++++++++ put canldes +++++++++")
     # symbols = get_db_symbols()
-    symbols = ['AMZN', 'AMD', 'MSFT', 'GOOG', 'ATVI']
+    symbols = ['TSLA'] #, 'AMZN', 'AMD', 'MSFT', 'GOOG', 'ATVI']
     print (len(symbols), ' symbols: ', symbols)
-    interval = [2, 'minute']
-    start_date, end_date = define_start_date(interval)
+    interval = [1, 'day']
+    start_date, end_date = define_start_date(interval, whole_year=True)
     whole_start_time = datetime.strptime(start_date, '%Y-%m-%d')
     whole_end_time = datetime.strptime(end_date, '%Y-%m-%d')
     market_start_time = [9, 30]
     market_end_time = [16, 30]
-    get_only_market_time = True
+    get_only_market_time = False
     cur_date = datetime.now().date()
 
+    # create threads
     put_thread_list = []
     thread_cnt = 1
     for i in range(0, thread_cnt):
@@ -429,6 +370,7 @@ if __name__ == "__main__":
         sc_thread.start()
         put_thread_list.append(sc_thread)
 
+    # allocate symbols to threads
     symbol_idx = 0
     while symbol_idx < len(symbols):
         for sc_thread in put_thread_list:
@@ -440,6 +382,7 @@ if __name__ == "__main__":
                 symbol_idx += 1
         time.sleep(1)
 
+    # check threads
     while True:
         stop_cnt = 0
         for sc_thread in put_thread_list:
