@@ -7,6 +7,7 @@ import Login from "layouts/User/Login"
 import AdminLayout from "layouts/Admin/Admin.js";
 import UserManage from "layouts/Admin/UserManage.js";
 import LinkManage from "layouts/Admin/LinkManage";
+import PriceData from "layouts/User/PriceData";
 import TradeData from "layouts/User/TradeData";
 
 import "assets/scss/black-dashboard-react.scss";
@@ -52,7 +53,10 @@ ReactDOM.render(
             <PrivateRoute path="/scanner">
               <TradeScanner />
             </PrivateRoute>
-            <PrivateRoute path="/tradedata">
+            <PrivateRoute path="/pricedatatable">
+              <PriceData />
+            </PrivateRoute>
+            <PrivateRoute path="/tradedatatable">
               <TradeData />
             </PrivateRoute>
             <PrivateRoute path="/">

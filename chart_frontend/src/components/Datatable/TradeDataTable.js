@@ -16,7 +16,7 @@ import { MDBDataTableV5 } from 'mdbreact';
 import { useAuth } from 'contexts/authContext';
 import { getAllSymbols, filterTradesData, getStrategyOptions } from 'api/Api'
 
-const DataTable = () => {
+const TradeDataTable = () => {
   const auth = useAuth();
   const history = useHistory();
   const [collapseOpen,] = React.useState(false)
@@ -241,6 +241,9 @@ const DataTable = () => {
           </Collapse>    
       </nav>
       <div className="col-sm-12 hunter-data-table-container">
+        <div className="hunter-data-table-title">
+          Trade Data Table
+        </div>
         <div className="hunter-search-filter-area">
           <div className="select-option">
             <Select
@@ -311,4 +314,4 @@ const DataTable = () => {
   );
 };
 
-export default DataTable;
+export default TradeDataTable;

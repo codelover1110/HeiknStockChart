@@ -1,15 +1,9 @@
 import { useState } from 'react'
 
 export const Dropdown = (props) => {
-  const { items, title, icon, instance, handleClick, isActive } = props;
+  const { items, title, icon, instance, handleClick, isActive, subInstance } = props;
   const [isOpen, setOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(0);
-  
   const toggleDropdown = () => setOpen(!isOpen);
-  
-  const handleItemClick = (id) => {
-    setSelectedItem(id);
-  }
   
   return (
     <div className='hunter-dropdown'>
@@ -20,9 +14,8 @@ export const Dropdown = (props) => {
       </div>
       <div className={`hunter-dropdown-body ${isOpen && 'open'}`}>
         {items.map(item => (
-          <div className={`hunter-dropdown-item ${isActive && item.id === selectedItem && 'hunter-selected'}`}
+          <div className={`hunter-dropdown-item ${isActive && item.instance === subInstance && 'hunter-selected'}`}
             onClick={e => {
-              handleItemClick(item.id)
               handleClick(instance, item.pathname)
             }}
             id={item.id}

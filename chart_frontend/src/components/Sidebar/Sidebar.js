@@ -53,7 +53,7 @@ function Sidebar(props) {
     }
   }
 
-  const { isAdminPage, routes, selectedInstance, handleSidebarChange, handleInstanceChange } = props;
+  const { isAdminPage, routes, selectedInstance, handleSidebarChange, handleInstanceChange, subInstance } = props;
   
   return (
     <BackgroundColorContext.Consumer>
@@ -112,6 +112,7 @@ function Sidebar(props) {
                             icon={prop.icon}
                             items={prop.items}
                             instance={prop.instance}
+                            subInstance={subInstance}
                             handleClick={handleClick}
                             isActive={prop.instance === selectedInstance}
                             key={`${prop.instance}`}

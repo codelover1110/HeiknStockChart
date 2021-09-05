@@ -91,6 +91,7 @@ function HomePage() {
           )}
           {isShowSidebar && (
               <Sidebar
+                subInstance={'view'}
                 isAdminPage={false}
                 routes={routes}
                 selectedInstance={selectedInstance}

@@ -5,13 +5,15 @@ export var routes = [
     instance: "forward_test",
     items: [
       {
-        id: 1,
+        id: 0,
         label: 'System File Manager',
+        instance: "systemfilemanager",
         pathname: '/'
       },
       {
-        id: 0,
+        id: 1,
         label: 'View',
+        instance: "view",
         pathname: '/'
       }
     ],
@@ -24,6 +26,7 @@ export var routes = [
       {
         id: 0,
         label: 'View',
+        instance: "view",
         pathname: '/'
       }
     ],
@@ -36,6 +39,7 @@ export var routes = [
       {
         id: 0,
         label: 'View',
+        instance: "view",
         pathname: '/'
       }
     ],
@@ -48,6 +52,7 @@ export var routes = [
       {
         id: 0,
         label: 'View',
+        instance: "view",
         pathname: '/'
       }
     ],
@@ -62,7 +67,20 @@ export var routes = [
     name: "Data Tables",
     icon: "tim-icons icon-chart-bar-32",
     instance: "trade_data",
-    pathname: "/tradedata"
+    items: [
+      {
+        id: 0,
+        label: 'Price Data Table',
+        instance: "pricedatatable",
+        pathname: '/pricedatatable'
+      },
+      {
+        id: 1,
+        label: 'Trade Data Table',
+        instance: "tradedatatable",
+        pathname: '/tradedatatable'
+      }
+    ],
   },
 ]
 
