@@ -8,15 +8,22 @@ import dotenv
 
 dotenv_file = dotenv.find_dotenv()
 dotenv.load_dotenv(dotenv_file)
+DOUBLE_DB = True
 
-MONGO_URL = os.environ['MONGO_URL_BIGML']
+MONGO_URL = os.environ['MONGO_URL_HUNTER']
 MONGO_DATABASE = os.environ['MONGO_DATABASE']
 MONGO_COLLECTION = os.environ['MONGO_COLLECTION']
 
-LOG_FILE = 'logs/forward-testing/ts_rsi_heik_v1.csv'
+
+LOG_FILE = 'logs/ts_rsi_heik_v1.csv'
 MACRO_STRATEGY_NAME='ts_rsi_heik_v1'
 
 mongoclient = pymongo.MongoClient(MONGO_URL)
+
+if DOUBLE_DB:
+    MONGO_URL_1 = os.environ['MONGO_URL_BIGML']
+    mongoclient_1 = pymongo.MongoClient(MONGO_URL_1)
+
 global updating_time
 
 def insert_new_all(new_actions):
@@ -24,6 +31,10 @@ def insert_new_all(new_actions):
     save_time = None
     masterdb = mongoclient[MONGO_DATABASE]
     ob_table = masterdb[MONGO_COLLECTION]
+    
+    if DOUBLE_DB:
+        masterdb_1 = mongoclient_1[MONGO_DATABASE]
+        db_collection = masterdb_1[MONGO_COLLECTION]
 
     for idx, new_action in enumerate(new_actions):
         if idx > 30:
@@ -33,38 +44,17 @@ def insert_new_all(new_actions):
             pass
         else:
             ob_table.insert_one(new_action)
+        
+        if DOUBLE_DB:
+            if db_collection.count_documents(query) > 0:
+                pass
+            else:
+                db_collection.insert_one(new_action)
+
         updating_time = new_action['date']
         save_time = new_action['date']
         print("!!!!!!!!!!!!!!!!!!!!!!!!!!!", updating_time)
     return save_time
-
-def get_strategy_name(new_action):
-    time_frame = new_action['timeframe']
-    csv_file_name = ''
-    if '12 mins' == time_frame:
-        csv_file_name = 'heikfilter-12mins-trades'
-    elif '2 mins' == time_frame:
-        csv_file_name = 'heikfilter-2mins-trades'
-    elif '1 hour' == time_frame:
-        csv_file_name = 'heikfilter-1hour-trades'
-    elif '4 hours' == time_frame:
-        csv_file_name = 'heikfilter-4hours-trades'
-    elif '12 hours' == time_frame:
-        csv_file_name = 'heikfilter-12hours-trades'
-    elif '1 day' == time_frame:
-        csv_file_name = 'heikfilter-1day-trades'
-    elif '12 mins>1 hour' == time_frame:
-        csv_file_name = 'heikfilter-12mins-1hour-trades'
-    elif '12 mins>4 hours' == time_frame:
-        csv_file_name = 'heikfilter-12mins-4hours-trades'
-    elif '2 mins>4 hours' == time_frame:
-        csv_file_name = 'heikfilter-2mins-4hours-trades'
-    elif '2 mins>12 mins>4 hours' == time_frame:
-        csv_file_name = 'heikfilter-2mins-12mins-4hours-trades'
-    elif '2 mins>1 hour':
-        csv_file_name = 'heikfilter-2mins-1hour-trades'
-
-    return csv_file_name
 
 def get_new_actions(last_date_time_obj):
     new_actions = []

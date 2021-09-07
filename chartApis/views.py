@@ -12,8 +12,25 @@ import numpy as np
 import pandas as pd
 pd.options.mode.chained_assignment = None  # default='warn'
 
-from .models import get_strategies_names, get_stock_candles_for_strategy,  get_micro_strategies, get_macro_strategies, get_strategy_symbols, get_backtesting_data_db, get_symbol_candles
-from .common import get_chat_data_from_candles, join_append, calc_percentEfficiency, calc_winningLosing, fill_missing_candles__
+from .models import (
+            get_strategies_names, 
+            get_stock_candles_for_strategy,  
+            get_micro_strategies, 
+            get_macro_strategies, 
+            get_strategy_symbols, 
+            get_backtesting_data_db, 
+            get_symbol_candles,
+            put_script_file,
+            update_strartegy_file,
+            get_strategy_file,
+            get_strategy_list)
+
+from .common import (
+            get_chat_data_from_candles, 
+            join_append, 
+            calc_percentEfficiency, 
+            calc_winningLosing, 
+            fill_missing_candles__)
 
 # mongoclient = pymongo.MongoClient("mongodb://localhost:27017")
 mongoclient = pymongo.MongoClient("mongodb://hunter:STOCKdb123@cluster0-shard-00-00.vcom7.mongodb.net:27017,cluster0-shard-00-01.vcom7.mongodb.net:27017,cluster0-shard-00-02.vcom7.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-7w6acj-shard-0&authSource=admin&retryWrites=true&w=majority")
@@ -136,6 +153,7 @@ def get_macros(request):
     strategies = get_macro_strategies()
     return JsonResponse({"macros": strategies}, status=status.HTTP_201_CREATED)
 
+
 @csrf_exempt
 def get_stock_strategy_candles(request):
     request_data = JSONParser().parse(request)
@@ -143,7 +161,6 @@ def get_stock_strategy_candles(request):
     symbol = request_data['symbol']
     macro = request_data['macro']
     micro = request_data['micro']
-
     strategy = '{}-{}-trades'.format(macro, micro)
     candles, strategy_trades = get_stock_candles_for_strategy(db_name, symbol, macro, micro)
     chat_candles = get_chat_data_from_candles(candles)
@@ -151,6 +168,60 @@ def get_stock_strategy_candles(request):
     verdict = fill_missing_candles__(verdict, db_name, strategy)
     
     return JsonResponse({'chart_data': verdict}, status=status.HTTP_201_CREATED)
+
+
+@csrf_exempt
+def get_live_data(request):
+    request_data = JSONParser().parse(request)
+    db_name = request_data['db_name']
+    symbol = request_data['symbol']
+    macro = request_data['macro']
+    micro = request_data['micro']
+    strategy = '{}-{}-trades'.format(macro, micro)
+    candles, strategy_trades = get_stock_candles_for_strategy(db_name, symbol, macro, micro)
+    chat_candles = get_chat_data_from_candles(candles)
+    verdict = join_append(chat_candles, strategy_trades, strategy)
+    verdict = fill_missing_candles__(verdict, db_name, strategy)
+    
+    return JsonResponse({'chart_data': verdict}, status=status.HTTP_201_CREATED)
+
+
+# strategy management api
+@csrf_exempt
+def get_script_file(request):
+    if request.method == 'POST':
+        request_data = JSONParser().parse(request)
+        file_name = request_data['filename']
+        strtg = get_strategy_file(file_name)
+        return JsonResponse({'file_content': strtg}, status=status.HTTP_201_CREATED)
+
+@csrf_exempt
+def create_script_file(request):
+    if request.method == 'POST':
+        request_data = JSONParser().parse(request)
+        file_name = request_data['filename']
+        content = request_data['content']
+        if put_script_file(file_name, content):
+            return JsonResponse({'success': True, "message": "new strategy file is created"}, status=status.HTTP_201_CREATED)
+        else:
+            return JsonResponse({'success': False, "message": "file name already exist"}, status=status.HTTP_201_CREATED)
+
+@csrf_exempt
+def update_script_file(request):
+    if request.method == 'POST':
+        request_data = JSONParser().parse(request)
+        file_name = request_data['filename']
+        content = request_data['content']
+        if update_strartegy_file(file_name, content):
+            return JsonResponse({'success': True, "message": "strategy file is updated"}, status=status.HTTP_201_CREATED)
+        else:
+            return JsonResponse({'success': False, "message": "update failed"}, status=status.HTTP_201_CREATED)
+
+
+@csrf_exempt
+def get_script_list(request):
+    strategies = get_strategy_list()
+    return JsonResponse({'strategy_files': strategies}, status=status.HTTP_201_CREATED)
 
 
 def index(request):

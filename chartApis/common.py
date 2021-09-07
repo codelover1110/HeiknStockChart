@@ -211,7 +211,7 @@ def calc_percentEfficiency(symbols, db_data):
                         'efficiency': percent
                     })
                     pair_pE = {}
-                    print("percent", percent)
+                    # print("percent", percent)
                     if percent > 0:
                         winningT.append(percent)
                     else:
