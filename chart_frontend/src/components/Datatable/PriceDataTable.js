@@ -21,13 +21,14 @@ const PriceDataTable = () => {
   const history = useHistory();
   const [collapseOpen,] = React.useState(false)
   const [symbol, setSymbol] = React.useState({value: "GOOG", label: "GOOG"})
-  const [timeFrame, setTimeFrame] = useState({ value: "1", label: "1"});
+  const [timeFrame, setTimeFrame] = useState({ value: "1m", label: "1m"});
   const [tradeStartDate, setTradeStartDate] = useState('2021-01-01')
   const [tradeEndDate, setTradeEndDate] = useState('2021-08-31')
   const [optionsSymbol, setOptionsSymbol] = useState([])
   const [optionsTimeFrame] = useState([
-    { value: "1", label: "1" },
-    { value: "60", label: "60" }
+    { value: "1m", label: "1m" },
+    { value: "1h", label: "1h" },
+    { value: "1d", label: "1d" }
   ])
 
   const hearder_columns = useMemo(() => {
@@ -82,8 +83,6 @@ const PriceDataTable = () => {
         rows: trades_data
       })
     }
-
-    console.log("tradeStartDate, tradeEndDate", tradeStartDate, tradeEndDate)
 
     getPriceTrades(symbol.value, timeFrame.value, tradeStartDate, tradeEndDate)
 

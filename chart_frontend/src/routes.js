@@ -8,7 +8,7 @@ export var routes = [
         id: 0,
         label: 'System File Manager',
         instance: "systemfilemanager",
-        pathname: '/'
+        pathname: '/systemfilemanager'
       },
       {
         id: 1,

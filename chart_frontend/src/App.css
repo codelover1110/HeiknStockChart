@@ -422,3 +422,18 @@ div.mdb-datatable div.mdb-datatable-filter {
   color: #FFFFFF;
   margin-bottom: 15px;
 }
+
+.hunter-textedit-container {
+  width: 70%;
+  margin: 100px auto;
+}
+
+.public-DraftEditor-content {
+  min-height: 300px;
+}
+
+.display-flex-left {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}

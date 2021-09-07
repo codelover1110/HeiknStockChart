@@ -37,7 +37,6 @@ function Sidebar(props) {
   });
   
   const handleClick = (instance, pathname) => {
-    console.log("instance, pathname", instance, pathname)
     handleInstanceChange(instance)
     const locationState = {
       initInstance: instance

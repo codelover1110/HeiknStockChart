@@ -20,6 +20,7 @@ import 'mdbreact/dist/css/mdb.css';
 import "./App.css";
 import "assets/css/nucleo-icons.css";
 
+import FileManager from "components/SystemFileManager/FileManager";
 import ThemeContextWrapper from "./components/ThemeWrapper/ThemeWrapper";
 import BackgroundColorWrapper from "./components/BackgroundColorWrapper/BackgroundColorWrapper";
 import ProvideAuth from 'contexts/authContext'
@@ -50,6 +51,9 @@ ReactDOM.render(
             <Route path="/verify" render={(props) => <Verify {...props} />} />
             <Route path="/forgot_password" render={(props) => <ForgotPassword {...props} />} />
             <Route path="/password-reset-confirm/:uuid/:token" render={(props) => <PasswordResetConfirm {...props} />} />
+            <PrivateRoute path="/systemfilemanager">
+              <FileManager/>
+            </PrivateRoute>
             <PrivateRoute path="/scanner">
               <TradeScanner />
             </PrivateRoute>

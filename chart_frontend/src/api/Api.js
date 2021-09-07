@@ -174,3 +174,45 @@ export const passwordConfirmReset = async (password1, password2, pathname) => {
       return data
     })    
 }
+
+export const getScriptFileNames = async() => {
+  return await fetch(process.env.REACT_APP_BACKEND_URL + "/api/get_script_files")
+    .then(response => response.json())
+    .then(data => {
+      return data
+    })
+}
+
+export const createScriptFile = async(filename, content, isUpdate) => {
+  const requestOptions = {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      filename,
+      content,
+    })
+  };
+
+  const api = isUpdate ? '/api/update_script_file' : '/api/create_script_file';
+
+  return await fetch(process.env.REACT_APP_BACKEND_URL + api, requestOptions)
+    .then(response => response.json())
+    .then(data => {
+      return data
+    })
+}
+
+export const getScriptFile = async(filename) => {
+  const requestOptions = {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      filename,
+    })
+  };
+  return await fetch(process.env.REACT_APP_BACKEND_URL + "/api/get_script_file", requestOptions)
+    .then(response => response.json())
+    .then(data => {
+      return data
+    })
+}

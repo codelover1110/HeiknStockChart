@@ -133,7 +133,6 @@ const SignUp = () => {
                     className="btn btn-dark btn-lg btn-block hunter-signin-button"
                     onClick={signup}
                 >
-                    {console.log(auth.authUser.isLoading, "auth.authUser.isLoading")}
                     {isLoading && (
                         <span className="spinner-border spinner-border-sm hunter-spinner-button" role="status" aria-hidden="true"></span>
                     )}
