@@ -48,7 +48,7 @@ export const filterTradesData = async (symbol, macroStrategy, microStrategy, tra
       data.trades_data.forEach((x) => {
         trades_data.push({
           'symbol': x.symbol,
-          'strategy': x.strategy_name,
+          'strategy': `${x.macro_strategy} - ${x.micro_strategy}`,
           'side': x.side,
           'quantity': x.quantity,
           'date': x.date.replace('T', ' '),
