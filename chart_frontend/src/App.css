@@ -437,3 +437,8 @@ div.mdb-datatable div.mdb-datatable-filter {
   justify-content: flex-end;
   margin-top: 10px;
 }
+
+.hunter-user-manage-button-area {
+  display: flex;
+  justify-content: space-around;
+}

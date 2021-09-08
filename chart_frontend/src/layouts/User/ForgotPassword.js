@@ -21,7 +21,6 @@ const ForgotPassword = () => {
     setIsLoading(true)
     let result = await forgotPassword(email)
     setIsLoading(false)
-    console.log("CHECK========", result)
     if ( result.success ) {
       setError(0)
       setMessage('Password is sent to your email')

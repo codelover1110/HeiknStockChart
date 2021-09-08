@@ -216,3 +216,44 @@ export const getScriptFile = async(filename) => {
       return data
     })
 }
+
+/** User Management Api*/
+export const getUserList = async () => {
+  return await fetch(process.env.REACT_APP_BACKEND_URL + "/get_user_list")
+    .then(response => response.json())
+    .then(data => {
+      return data
+    })
+}
+
+export const updateUserRole = async (id, role) => {
+  const requestOptions = {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      id,
+      role
+    })
+  };
+  return await fetch(process.env.REACT_APP_BACKEND_URL + "/update_user_role", requestOptions)
+    .then(response => response.json())
+    .then(data => {
+      return data
+    })
+}
+
+export const deleteUser = async (id) => {
+  const requestOptions = {
+    method: 'PUT',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      id,
+    })
+  };
+
+  return await fetch(process.env.REACT_APP_BACKEND_URL + "/delete_user/", requestOptions)
+    .then(response => response.json())
+    .then(data => {
+      return data
+    })
+}
