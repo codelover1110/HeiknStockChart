@@ -88,12 +88,13 @@ const StockChart = (props) => {
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
                         'symbols': symbols,
-                        'table_name': `${strategy.value}-${microStrategy}-trades`,
+                        "macro": strategy.value,
+                        "micro": microStrategy,
                         'start_date': startDate,
                         'end_date': endDate,
                     })
                 };
-                fetch(process.env.REACT_APP_BACKEND_URL+'/api/get_backtesting_data', requestOptions)
+                fetch(process.env.REACT_APP_BACKEND_URL+'/api/get_backtesting_result', requestOptions)
                     .then(response => response.json())
                     .then(data => {
                         setChartData(data['chart_data'])

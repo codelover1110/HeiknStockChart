@@ -21,7 +21,7 @@ const HeiknStockChart = (props) => {
   const auth = useAuth();
   const { selectedInstance, handleChartRedirect } = props
   const history = useHistory();
-  const [symbol, setSymbol] = useState(null);
+  const [symbol, setSymbol] = useState({ value: 'MSFT', label: 'MSFT' });
   const [indicators, setIndicators] = useState([]);
   const [isShowMicro, setIsShowMicro] = useState(true);
   const [symbolList, setSymbolList] = useState([])
@@ -29,7 +29,7 @@ const HeiknStockChart = (props) => {
   const [collapseOpen,] = React.useState(false)
   const [chartColumn, setChartColumn] = useState({ value: 6, label: '6' })
   const [selectedViewType, setSelectedViewType] = useState({ value: 'charting', label: 'Charting' });
-  const [microStrategy, setMicroStrategy] = useState(null);
+  const [microStrategy, setMicroStrategy] = useState({ value: '2mins', label: '2mins' });
   const [strategy, setStrategy] = useState({ value: 'heikfilter', label: 'heikfilter' });
   const [strategyList, setStrategyList] = useState([]);
   
@@ -84,10 +84,10 @@ const HeiknStockChart = (props) => {
               label: o.macro,
             }
           }))
-          setStrategy({
-            value: 'heikfilter',
-            label: 'heikfilter'
-          });
+          // setStrategy({
+          //   value: 'heikfilter',
+          //   label: 'heikfilter'
+          // });
           setOptionsStrategy(strategyOptions);
           if (data.result.length) {
             data.result.forEach((item) => {
@@ -99,7 +99,7 @@ const HeiknStockChart = (props) => {
                   }
                 })
                 setOptionsMicroStrategy( microStrategyOptions )
-                setMicroStrategy(microStrategyOptions[0])
+                // setMicroStrategy(microStrategyOptions[0])
 
                 const symbolOptions = item.symbols.map(o => {
                   return {
@@ -108,7 +108,7 @@ const HeiknStockChart = (props) => {
                   }
                 })
                 setSymbolList(symbolOptions)
-                setSymbol(symbolOptions[0])
+                // setSymbol(symbolOptions[0])
               }
             })
           }
@@ -212,7 +212,6 @@ const HeiknStockChart = (props) => {
 
   const handleStrategy = async (e) => {
     if (e) {
-      setStrategy(e)
       if (strategyList.length) {
         strategyList.forEach((item) => {
           if (item.macro === e.value) {
@@ -236,10 +235,12 @@ const HeiknStockChart = (props) => {
               }
             })
             setSymbolList(symbolOptions)
-            setSymbol(symbolOptions[0])
+            // setSymbol(symbolOptions[0])
+            setSymbol({value: 'MSFT', label: 'MSFT'})
           }
         })
       }
+      setStrategy(e)
     }
   }
   

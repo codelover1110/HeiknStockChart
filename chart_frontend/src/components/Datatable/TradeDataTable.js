@@ -25,10 +25,10 @@ const TradeDataTable = () => {
   const [microStrategy, setMicroStrategy] = useState()
   const [tradeStartDate, setTradeStartDate] = useState('2021-01-01')
   const [tradeEndDate, setTradeEndDate] = useState('2021-08-31')
-  // const [strategyList, setStrategyList] = useState([]);
+  const [strategyList, setStrategyList] = useState([]);
   
   const [optionsStrategy, setOptionsStrategy] = useState([])
-  // const [optionsMacroStrategy, setOptionsMacroStrategy] = useState([])
+  const [optionsMacroStrategy, setOptionsMacroStrategy] = useState([])
 
   const [optionsMicroStrategy, setOptionsMicroStrategy] = useState([])
   
@@ -94,6 +94,7 @@ const TradeDataTable = () => {
           }))
           setOptionsStrategy(strategyOptions);
           if (data.result.length) {
+            setStrategyList(data.result);
             data.result.forEach((item) => {
               if (item.macro === 'heikfilter') {
                 const microStrategyOptions = item.micro.map(o => {
@@ -142,6 +143,7 @@ const TradeDataTable = () => {
   useEffect(() => {
     const get_trades = async (symbol, macroStrat, microStrat, tradeStartDate, tradeEndDate) => {
       const trades_data = await filterTradesData(symbol, macroStrat, microStrat, tradeStartDate, tradeEndDate);
+      console.log("trades_data..........", trades_data)
       setDatatable({
         columns: hearder_columns,
         rows: trades_data
@@ -173,7 +175,38 @@ const TradeDataTable = () => {
   }
   
   const handleMacroStrategy = (e) => {
-    setMacroStrategy(e)
+    if (e) {
+      if (strategyList.length) {
+        strategyList.forEach((item) => {
+          if (item.macro === e.value) {
+            const microStrategyOptions = item.micro.map(o => {
+              return {
+                value: o,
+                label: o,
+              }
+            })
+            setOptionsMicroStrategy( microStrategyOptions )
+
+            setMicroStrategy({
+              value: '2mins',
+              label: '2mins'
+            })
+
+            const symbolOptions = item.symbols.map(o => {
+              return {
+                value: o,
+                label: o,
+              }
+            })
+            setOptionsSymbol(symbolOptions)
+            // setSymbol(symbolOptions[0])
+            // setSymbol({value: 'MSFT', label: 'MSFT'})
+          }
+        })
+      }
+      setMacroStrategy(e)
+    }
+
   }
   
   const handleMicroStrategy = (e) => {

@@ -65,10 +65,10 @@ const HeiknStockChartItem = (props) => {
                 label: o.macro,
               }
             }))
-            setStrategy({
-              value: 'heikfilter',
-              label: 'heikfilter'
-            });
+            // setStrategy({
+            //   value: 'heikfilter',
+            //   label: 'heikfilter'
+            // });
             setOptionsStrategy(strategyOptions);
             if (data.result.length) {
               data.result.forEach((item) => {
@@ -80,7 +80,7 @@ const HeiknStockChartItem = (props) => {
                     }
                   })
                   setOptionsMicroStrategy( microStrategyOptions )
-                  setMicroStrategy(microStrategyOptions[0])
+                  // setMicroStrategy(microStrategyOptions[0])
   
                   const symbolOptions = item.symbols.map(o => {
                     return {
@@ -89,7 +89,7 @@ const HeiknStockChartItem = (props) => {
                     }
                   })
                   setSymbolList(symbolOptions)
-                  setSymbol(symbolOptions[0])
+                  // setSymbol(symbolOptions[0])
                 }
               })
             }
