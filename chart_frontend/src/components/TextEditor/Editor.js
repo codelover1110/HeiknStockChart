@@ -20,7 +20,6 @@ export default class TextEditor extends Component {
       textdata:["hello"],
       scriptfiles: [],
       scriptfile: null,
-      filename: null,
       selectedFileName: null,
       filename: '',
       file:[],

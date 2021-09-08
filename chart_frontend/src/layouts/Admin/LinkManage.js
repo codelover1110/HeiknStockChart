@@ -15,10 +15,9 @@ import { adminRoutes } from "routes.js";
 
 import { BackgroundColorContext } from "contexts/BackgroundColorContext";
 import { MDBBtn, MDBTable, MDBTableBody, MDBTableHead  } from 'mdbreact';
-import Modal from 'react-bootstrap/Modal'
-import { createSignUpLink, sendSignUpLink } from 'api/Api'
-import { validateEmail } from 'utils/helper'
-import { getActiveLinks } from 'api/Api'
+import Modal from 'react-bootstrap/Modal';
+import { createSignUpLink, getActiveLinks, sendSignUpLink } from 'api/Api';
+import { validateEmail } from 'utils/helper';
 
 var ps;
 
@@ -87,7 +86,6 @@ function LinkManage() {
     }
     
     fetchActiveLinks()
-
   }, [])
 
   React.useEffect(() => {
@@ -112,22 +110,6 @@ function LinkManage() {
   const handleSidebarChange = () => {
     setShowSidebar(!isShowSidebar);
   };
-
-  // const getRoutes = (routes) => {
-  //   return routes.map((prop, key) => {
-  //     if (prop.layout === "/admin") {
-  //       return (
-  //         <Route
-  //           path={prop.layout + prop.path}
-  //           component={prop.component}
-  //           key={key}
-  //         />
-  //       );
-  //     } else {
-  //       return null;
-  //     }
-  //   });
-  // };
 
   const getBrandText = (path) => {
     for (let i = 0; i < adminRoutes.length; i++) {
