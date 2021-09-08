@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-import os
 pd.options.mode.chained_assignment = None  # default='warn'
 from datetime import datetime,date
 import pandas_ta as ta
@@ -16,7 +15,7 @@ def Wilders(df,column,period):
     df =  df.ta.rma(length = period)
     return df
 
-def Filter(df, barSize, stock):
+def Filter(df, barSize=1, stock="AMZN"):
     """
     Implementation of strategy, given a dataframe with OHLC candle data,
     bucket stock into buy,sell,hold,wait
@@ -27,8 +26,10 @@ def Filter(df, barSize, stock):
     length2 = 3
     length3 = 9
 
-    df["diff"] = df["close"].diff()
-    df["absdiff"] = abs(df["close"].diff())
+    # df["diff"] = df["close"].diff()
+    # df["absdiff"] = abs(df["close"].diff())
+    df["diff"] = df["c"].diff()
+    df["absdiff"] = abs(df["c"].diff())
 
     df["NetChgAvg"] = Wilders(df,"diff",14)
     df["TotChgAvg"] = Wilders(df,"absdiff",14)
@@ -47,7 +48,9 @@ def Filter(df, barSize, stock):
     df = df.reset_index()
 
     # HA candle data frame using pandas-ta
-    hadf = ta.ha(df["open"], df["high"], df["low"], df["close"]) 
+    # hadf = ta.ha(df["open"], df["high"], df["low"], df["close"]) 
+    hadf = ta.ha(df["o"], df["h"], df["l"], df["c"]) 
+    return hadf
     # takes average of HA candles and then difference
     heik = (hadf["HA_close"] - hadf["HA_open"]).rolling(window=3).mean()
     heik_diff = heik.diff()
@@ -59,18 +62,18 @@ def Filter(df, barSize, stock):
     #print("heik-new")
     #print(pd.concat([df["date"],heik], axis = 1).iloc[-50:])
 
-    # logging values for debugging later
-    today = datetime.today().strftime("%Y-%m-%d")
-    with open(f"logs/heiklog-{today}.txt","a") as f:
-        f.write("============= \n")
-        f.write( datetime.now().strftime("%H:%M:%S") + "\n" )
-        f.write(f"Stock: {stock} \n")
-        f.write(f"Bar size: {barSize} \n")
-        f.write(f"RSI 1, 2, 3 \n")
-        f.write(f"{lastdf.rsi1}, {lastdf.rsi2}, {lastdf.rsi3} \n")
-        f.write(f"heik1, heik_diff \n")
-        f.write(f"{heik.iloc[-1]}, {heik_diff.iloc[-1]} \n")
-        f.write("============= \n")
+    # # logging values for debugging later
+    # today = datetime.today().strftime("%Y-%m-%d")
+    # with open(f"logs/heiklog-{today}.txt","a") as f:
+    #     f.write("============= \n")
+    #     f.write( datetime.now().strftime("%H:%M:%S") + "\n" )
+    #     f.write(f"Stock: {stock} \n")
+    #     f.write(f"Bar size: {barSize} \n")
+    #     f.write(f"RSI 1, 2, 3 \n")
+    #     f.write(f"{lastdf.rsi1}, {lastdf.rsi2}, {lastdf.rsi3} \n")
+    #     f.write(f"heik1, heik_diff \n")
+    #     f.write(f"{heik.iloc[-1]}, {heik_diff.iloc[-1]} \n")
+    #     f.write("============= \n")
 
 
     if( lastdf.rsi2 >= 0 and lastdf.rsi3 >= 0 and heik.iloc[-1] >=0 and heik_diff.iloc[-1] >= 0):

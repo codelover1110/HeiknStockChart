@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate, login
+from pymongo.uri_parser import parse_uri
 from codes.forms import CodeForm
 from users.models  import CustomUser
 from users.models import SingupLinkRole
@@ -85,13 +86,17 @@ def password_reset_view(request):
     print(request_data)
     email = request_data['email']
     url = request_data['url']
-    user = CustomUser.objects.get(email=email)
-    token_generator = default_token_generator
-    temp_key = token_generator.make_token(user)
-    uidb64 = uid_encoder(force_bytes(user.pk))
-    url= url + '/password-reset-confirm' + '/' + uidb64 + "/" + temp_key
-    send_email(url, email)
-    return JsonResponse({'success': True}, status=status.HTTP_201_CREATED)
+    try:
+        user = CustomUser.objects.get(email=email)
+        token_generator = default_token_generator
+        temp_key = token_generator.make_token(user)
+        uidb64 = uid_encoder(force_bytes(user.pk))
+        url= url + '/password-reset-confirm' + '/' + uidb64 + "/" + temp_key
+        send_email(url, email)
+        return JsonResponse({'success': True}, status=status.HTTP_201_CREATED)
+    except:
+        print("Really? True")
+        return JsonResponse({'success': False}, status=status.HTTP_201_CREATED)
 
 @csrf_exempt 
 def password_reset_confirm_view(request):

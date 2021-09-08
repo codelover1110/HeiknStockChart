@@ -10,8 +10,8 @@ STRATEGY_FILE = 'strategies'
 
 hunter_mongoclient = pymongo.MongoClient("mongodb://aliaksandr:BD20fc854X0LIfSv@cluster0-shard-00-00.35i8i.mongodb.net:27017,cluster0-shard-00-01.35i8i.mongodb.net:27017,cluster0-shard-00-02.35i8i.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-aoj781-shard-0&authSource=admin&retryWrites=true&w=majority")
 MARKET_DATA_DB = 'market_data'
-BACKTESTING_CANDLES = 'market_candles'  # 1 minute market data
-BACKTESTING_CANDLES_60 = 'market_candles_60'# 60 minutes market data
+BACKTESTING_CANDLES = 'market_stock_candles'  # 1 minute market data
+#  = 'market_candles_60'# 60 minutes market data
 
 ############################################
 ## get all macro and micro strategy names ##
@@ -137,6 +137,13 @@ def get_stock_candles_for_strategy(candle_name, symbol, macro, micro):
     ob_table = masterdb[symbol]  # 'AMNZ'
     candle_result = ob_table.find({'date': {'$gte': start_date, '$lt': end_date}})
     candles = list(candle_result.sort('date', pymongo.ASCENDING))
+    result_dates = []
+    result_candles = []
+    for candle in candles:
+        if candle['date'] not in result_dates:
+            result_candles.append(candle)
+            result_dates.append(candle['date'])
+    
     print ('-------------- db_name: {}, symbol {}, candles count: {}'.format(candle_name, symbol, len(candles)))
 
     if macro == 'no_strategy':
@@ -156,7 +163,7 @@ def get_stock_candles_for_strategy(candle_name, symbol, macro, micro):
     trade_result = ob_table.find(find_trades_query)
     strategy_trades = list(trade_result.sort('date', pymongo.ASCENDING))
 
-    return candles, strategy_trades
+    return result_candles, strategy_trades
 
 
 ############################
@@ -193,10 +200,13 @@ def get_backtesting_data_db(table_name, start_date, end_date):
 def get_symbol_candles(symbol, start_date, end_date, time_frame):
     if False:   # for 1 miniutes db
         masterdb = hunter_mongoclient[MARKET_DATA_DB]
-        if time_frame == '1':
-            db_collection = masterdb[BACKTESTING_CANDLES]
-        if time_frame == '60':
-            db_collection = masterdb[BACKTESTING_CANDLES_60]
+        db_collection = masterdb[BACKTESTING_CANDLES]
+        if time_frame == '1m':
+            interval = 1
+        elif time_frame == '1h':
+            interval = 60
+        elif time_frame == '1d':
+            interval = 24*60
 
         cur_date = datetime.now().date()
 
@@ -212,14 +222,15 @@ def get_symbol_candles(symbol, start_date, end_date, time_frame):
         end_date_obj = datetime.strptime(end_date, '%Y-%m-%d')
         query = {
             'date': {'$gte': start_date_obj, '$lt': end_date_obj},
-            'stock': symbol
+            'stock': symbol,
+            'interval': interval
         }
-        list_db_data = list(db_collection.find(query).sort('date', pymongo.ASCENDING))
+        list_db_data = list(db_collection.find(query, {'_id': False}).sort('date', pymongo.ASCENDING))
 
         return list_db_data
     else:   # for seperated db
         if time_frame == '1m':
-            masterdb = mongoclient["backtest_2_minute"]
+            masterdb = mongoclient["backtest_1_minute"]
         elif time_frame == '1h':
             masterdb = mongoclient["backtest_1_hour"]
         elif time_frame == '1d':
@@ -243,8 +254,15 @@ def get_symbol_candles(symbol, start_date, end_date, time_frame):
         query_obj = {}
         query_obj['date'] = {"$gte": start_date_obj, "$lt": end_date_obj}
         list_db_data = list(db_collection.find(query_obj, {'_id': False}).sort('date', pymongo.ASCENDING))
+        
+        result_dates = []
+        result = []
+        for candle in list_db_data:
+            if candle['date'] not in result_dates:
+                result.append(candle)
+                result_dates.append(candle['date'])
 
-        return list_db_data
+        return result
 
 
 def put_script_file(file_name, content, user_id=1, update_date=datetime.now()):

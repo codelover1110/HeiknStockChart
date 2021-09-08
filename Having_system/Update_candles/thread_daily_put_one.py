@@ -38,7 +38,7 @@ class DailyPutThread(object):
         self.market_start_time = market_start_time
         self.market_end_time = market_end_time
         self.get_only_market_time = get_only_market_time
-        self.update_states = [False, False]
+        self.update_states = [False, False, False]
         self.mutex = threading.Lock()
 
         self.thead_start_time = None         
@@ -60,7 +60,7 @@ class DailyPutThread(object):
         return self.update_states
 
     def set_thread_state(self):
-        self.update_states = [False, False]
+        self.update_states = [False, False, False]
 
     def __del__(self):
         self.min_1_thread.join()
@@ -83,7 +83,7 @@ class DailyPutThread(object):
         else:
             print("        -----------> last put date didn't updated <-----------")
 
-        self.update_states = [False, False]
+        self.update_states = [False, False, False]
 
     def get_last_put_date(self): 
         masterdb = mongoclient["backtest_tables"]
@@ -97,28 +97,21 @@ class DailyPutThread(object):
             ob_table.insert_one(data)
             return str(current_date)
 
-    def filter_new_candles(self, api_candles, db_candles):
+    def get_last_candle_date(symbol, last_update_date, interval_value):
+        db_name = 'market_data'
+        masterdb = mongoclient[db_name]
+        ob_table = masterdb['market_stock_candles']
+
+        start_date = last_update_date - timedelta(days=1)
+        end_date = datetime.now().date()
+        lastest_candles = ob_table.find({'date': {'$gte': start_date, '$lt': end_date}, 'stock': symbol, 'interval': interval_value})
+        candles = list(lastest_candles.sort('date', pymongo.ASCENDING))
+
+        last_candle_datetime = candles['date']
+        return last_candle_datetime
+   
+    def get_new_candles(self, symbol, interval, interval_unit, last_put_date, db_last_candle_date):
         new_candles = []
-        if len(db_candles) == 0:
-            for candle in api_candles:
-                candle['date'] = datetime.fromtimestamp((candle['t']/1000))
-                new_candles.append(candle)
-        else:
-            latest_db_candle = db_candles[-1]
-            latest_db_date = latest_db_candle['date']
-
-            for candle in api_candles:
-                candle_date = datetime.fromtimestamp((candle['t']/1000))
-                if latest_db_date < candle_date:
-                    candle['date'] = candle_date
-                    new_candles.append(candle)
-
-        # print ("        api_candles:", len(api_candles))
-        # print ("        db_candles:", len(db_candles))
-        # print ("        new_candles:", len(new_candles), "  (contains for no marketing time candles)")
-        return new_candles
-
-    def get_new_candles(self, symbol, interval, interval_unit, last_put_date):
         try:
             # get api candles
             current_date = datetime.now().date()
@@ -127,23 +120,12 @@ class DailyPutThread(object):
             datasets = requests.get(polygon_url).json()
             api_candles = datasets['results'] if 'results' in datasets else []
 
-            # get db candles
-            db_name = 'market_data'
-            masterdb = mongoclient[db_name]
-            ob_table = masterdb['market_candles']
-            
-            existing_start = datetime.strptime(last_put_date, '%Y-%m-%d')
-            existing_end = datetime.strptime(str(current_date+timedelta(days=1)), '%Y-%m-%d')
-            data_result = ob_table.find({
-                'date': {
-                    '$gte': existing_start,
-                    '$lt': existing_end
-                },
-                'stock': symbol
-            })
-            # print ('        from: {}, to: {}'.format(existing_start, existing_end))
-            db_candles = list(data_result.sort('date', pymongo.ASCENDING))
-            new_candles = self.filter_new_candles(api_candles, db_candles)
+            for candle in api_candles:
+                candle_date = datetime.fromtimestamp((candle['t']/1000))
+                if db_last_candle_date < candle_date:
+                    candle['date'] = candle_date
+                    new_candles.append(candle)
+
         except:
             print ("......error in get_new_candles......")
 
@@ -164,26 +146,31 @@ class DailyPutThread(object):
     def min_1_thread_func(self):
         interval_value = '1'
         interval_unit = 'minute'
+        int_value = 1
         while True:
             last_put_date = self.get_last_put_date()
             for idx, symbol in enumerate(self.symbols):
                 db_name = 'test_market_data'
                 masterdb = mongoclient[db_name]
-                ob_table = masterdb['market_candles']
+                ob_table = masterdb['market_stock_candles']
+                symbol_last_put_date = self.get_last_candle_date(symbol, last_put_date, int_value)
                 while True:
                     if not self.mutex.locked():
                         self.mutex.acquire()
-                        # print('====> symbol:{}-{}'.format(symbol, idx))
-                        new_candles = self.get_new_candles(symbol, interval_value, interval_unit, last_put_date)
+                        new_candles = self.get_new_candles(symbol, interval_value, interval_unit, last_put_date, symbol_last_put_date)
+                        put_candles = []
                         for idx, candle in enumerate(new_candles):
                             if self.get_only_market_time:
                                 if not self.check_candle_in_maket_time(candle):
                                     continue
-                            query = {"date": candle['date']}
-                            if ob_table.count_documents(query) > 0:
-                                pass
-                            else:
-                                ob_table.insert_one(candle)
+
+                            candle['date'] = datetime.fromtimestamp((candle['t']/1000))
+                            candle['interval'] = int(interval_value)
+                            candle['stock'] = symbol
+                            put_candles.append(candle)  
+
+                        # ob_table.insert_many(put_candles)
+                        print('1 minute ====> symbol:{}-{}, count:{}'.format(symbol, idx, len(put_candles)))
                         break
                     else:
                         time.sleep(0.01)
@@ -195,25 +182,31 @@ class DailyPutThread(object):
     def hour_1_thread_func(self):
         interval_value = '1'
         interval_unit = 'hour'
+        int_value = 1*60
         while True:
             last_put_date = self.get_last_put_date()
-            for symbol in self.symbols:
+            for idx, symbol in enumerate(self.symbols):
                 db_name = 'test_market_data'
                 masterdb = mongoclient[db_name]
-                ob_table = masterdb['market_candles']
+                ob_table = masterdb['market_stock_candles']
+                symbol_last_put_date = self.get_last_candle_date(symbol, last_put_date, int_value)
                 while True:
                     if not self.mutex.locked():
                         self.mutex.acquire()
-                        new_candles = self.get_new_candles(symbol, interval_value, interval_unit, last_put_date)
+                        new_candles = self.get_new_candles(symbol, interval_value, interval_unit, last_put_date, symbol_last_put_date)
+                        put_candles = []
                         for idx, candle in enumerate(new_candles):
                             if self.get_only_market_time:
                                 if not self.check_candle_in_maket_time(candle):
                                     continue
-                            query = {"date": candle['date']}
-                            if ob_table.count_documents(query) > 0:
-                                pass
-                            else:
-                                ob_table.insert_one(candle)
+
+                            candle['date'] = datetime.fromtimestamp((candle['t']/1000))
+                            candle['interval'] = int_value
+                            candle['stock'] = symbol
+                            put_candles.append(candle)  
+
+                        # ob_table.insert_many(put_candles)
+                        print('1 hour ====> symbol:{}-{}, count:{}'.format(symbol, idx, len(put_candles)))
                         break
                     else:
                         time.sleep(0.01)
@@ -221,12 +214,48 @@ class DailyPutThread(object):
             self.update_states[1] = True
 
             time.sleep(INTERVAL_1_HOUR_SLEEP_TIME)
+
+    def day_1_thread_func(self):
+        interval_value = '1'
+        interval_unit = 'day'
+        int_value = 24*60
+        while True:
+            last_put_date = self.get_last_put_date()
+            for idx, symbol in enumerate(self.symbols):
+                db_name = 'test_market_data'
+                masterdb = mongoclient[db_name]
+                ob_table = masterdb['market_stock_candles']
+                symbol_last_put_date = self.get_last_candle_date(symbol, last_put_date, int_value)
+                while True:
+                    if not self.mutex.locked():
+                        self.mutex.acquire()
+                        new_candles = self.get_new_candles(symbol, interval_value, interval_unit, last_put_date, symbol_last_put_date)
+                        put_candles = []
+                        for idx, candle in enumerate(new_candles):
+                            if self.get_only_market_time:
+                                if not self.check_candle_in_maket_time(candle):
+                                    continue
+
+                            candle['date'] = datetime.fromtimestamp((candle['t']/1000))
+                            candle['interval'] = int_value
+                            candle['stock'] = symbol
+                            put_candles.append(candle)  
+
+                        # ob_table.insert_many(put_candles)
+                        print('1 day ====> symbol:{}-{}, count:{}'.format(symbol, idx, len(put_candles)))
+                        break
+                    else:
+                        time.sleep(0.01)
+
+            self.update_states[2] = True
+
+            time.sleep(INTERVAL_1_HOUR_SLEEP_TIME)
       
 if __name__ == "__main__":
     market_start_time = [9, 30]
     market_end_time = [16, 30]
     get_only_market_time = True
-    thread_count = 10
+    thread_count = 1
     thread_list = []
 
     symbols = get_symbols()

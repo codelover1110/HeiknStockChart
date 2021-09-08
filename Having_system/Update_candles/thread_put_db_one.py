@@ -19,8 +19,9 @@ API_KEY = 'tuQt2ur25Y7hTdGYdqI2VrE4dueVA8Xk'
 # bigmlpiter
 # mongoclient = pymongo.MongoClient('mongodb://user:-Hz2f$!YBXbDcKG@cluster0-shard-00-00.vcom7.mongodb.net:27017,cluster0-shard-00-01.vcom7.mongodb.net:27017,cluster0-shard-00-02.vcom7.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-7w6acj-shard-0&authSource=admin&retryWrites=true&w=majority')
 # mclerper
-mongoclient = pymongo.MongoClient("mongodb://hunter:STOCKdb123@cluster0-shard-00-00.agmoz.mongodb.net:27017,cluster0-shard-00-01.agmoz.mongodb.net:27017,cluster0-shard-00-02.agmoz.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-f8c9fs-shard-0&authSource=admin&retryWrites=true&w=majority")
-
+# mongoclient = pymongo.MongoClient("mongodb://hunter:STOCKdb123@cluster0-shard-00-00.agmoz.mongodb.net:27017,cluster0-shard-00-01.agmoz.mongodb.net:27017,cluster0-shard-00-02.agmoz.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-f8c9fs-shard-0&authSource=admin&retryWrites=true&w=majority")
+# hunter
+mongoclient = pymongo.MongoClient("mongodb://aliaksandr:BD20fc854X0LIfSv@cluster0-shard-00-00.35i8i.mongodb.net:27017,cluster0-shard-00-01.35i8i.mongodb.net:27017,cluster0-shard-00-02.35i8i.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-aoj781-shard-0&authSource=admin&retryWrites=true&w=majority")
 intervals = [
     [2, 'minute'],
     [12, 'minute'],
@@ -85,7 +86,7 @@ class SymbolCandleThread(object):
         db_name = 'market_data'
         masterdb = mongoclient[db_name]
         # self.ob_table = masterdb[symbol]
-        self.ob_table = masterdb['market_candles']
+        self.ob_table = masterdb['market_stock_candles']
         self.current_date = self.whole_start_time
         self.working = True
 
@@ -110,7 +111,7 @@ class SymbolCandleThread(object):
         mk_start = datetime(year, month, day, self.market_start_time[0], self.market_start_time[1])
         mk_end = datetime(year, month, day, self.market_end_time[0], self.market_end_time[1])
         if mk_start <= candle['date'] <= mk_end:
-            candle['interval'] = self.interval[0]
+            candle['interval'] = 24*60
             candle['stock'] = self.symbol
             return True
         else:
@@ -157,7 +158,7 @@ class SymbolCandleThread(object):
                         continue
                 else:
                     candle['date'] = datetime.fromtimestamp((candle['t']/1000))
-                    candle['interval'] = self.interval[0]
+                    candle['interval'] = 24*60
                     candle['stock'] = self.symbol
                 self.candle_queue.put(candle)
                 if self.candle_queue.qsize() > 1000:
@@ -202,9 +203,8 @@ def get_db_symbols():
     return symbols
 
 def put_symbols_db():
-    default_symbols = ['AMZN', 'AMD', 'MSFT', 'GOOG', 'ATVI']
+    default_symbols = ['AMZN', 'AMD', 'MSFT', 'GOOG', 'ATVI', 'TSLA']
     symbols = get_symbols()
-    symbols = symbols[:1000]
     for sym in default_symbols:
         if sym not in symbols:
             symbols.append(sym)
@@ -325,13 +325,13 @@ if __name__ == "__main__":
     symbols = get_db_symbols()
     # symbols = ['AMZN', 'AMD', 'MSFT', 'GOOG', 'ATVI']
     print (len(symbols), ' symbols: ', symbols)
-    interval = [1, 'minute']
+    interval = [1, 'day']
     start_date, end_date = define_start_date(interval, whole_year=True)
     whole_start_time = datetime.strptime(start_date, '%Y-%m-%d')
     whole_end_time = datetime.strptime(end_date, '%Y-%m-%d')
     market_start_time = [9, 30]
     market_end_time = [16, 30]
-    get_only_market_time = True
+    get_only_market_time = False
     cur_date = datetime.now().date()
 
     put_thread_list = []

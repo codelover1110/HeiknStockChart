@@ -27,6 +27,7 @@ from .models import (
 
 from .common import (
             get_chat_data_from_candles, 
+            get_chat_data_rsi_heik_v1,
             join_append, 
             calc_percentEfficiency, 
             calc_winningLosing, 
@@ -179,7 +180,7 @@ def get_live_data(request):
     micro = request_data['micro']
     strategy = '{}-{}-trades'.format(macro, micro)
     candles, strategy_trades = get_stock_candles_for_strategy(db_name, symbol, macro, micro)
-    chat_candles = get_chat_data_from_candles(candles)
+    chat_candles = get_chat_data_rsi_heik_v1(candles)
     verdict = join_append(chat_candles, strategy_trades, strategy)
     verdict = fill_missing_candles__(verdict, db_name, strategy)
     

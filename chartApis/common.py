@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from ib_insync import util
 from pymongo.common import MIN_SUPPORTED_SERVER_VERSION
 from .lib.heikfilter import HA, Filter
+from .lib.ts_rsi_heik_v1 import Filter as rsi_heik_v1_fitler
 from .models import get_strategy_name_only
 
 def dataConverter(obj):
@@ -60,6 +61,53 @@ def get_chat_data_from_candles(candles):
         })
     
     return result_data 
+
+def get_chat_data_rsi_heik_v1(candles):
+    df = util.df(candles)
+    hadf = rsi_heik_v1_fitler(df)
+    heik = (hadf["HA_close"] - hadf["HA_open"]).rolling(window=3).mean()
+    heik_tmp = heik.copy()
+    lastdf = df.iloc[-1]
+    heik_diff = heik_tmp.diff()
+
+    df.replace(np.nan, 0)
+    result_data = []
+    for data in df.iloc:
+        # if( data.rsi2 >= 0 and data.rsi3 >= 0 and heik.iloc[-1] >=0 and heik_diff.iloc[-1] >= 0):
+        if( data.rsi2 >= 0 and data.rsi3 >= 0):
+            side = "buy"
+        elif ( data.rsi2 <= 0 and heik_diff.iloc[-1] <= 0):
+            side = "sell"
+        elif ( data.rsi1 >= 0):
+            side = "hold"
+        else:
+            side = "wait"
+        rsi = dataConverter(np.nan_to_num(data.RSI))
+        rsi2 = dataConverter(np.nan_to_num(data.rsi2))
+        rsi3 = dataConverter(np.nan_to_num(data.rsi3))
+        heik = dataConverter(np.nan_to_num(data.rsi2))
+        heik2 = dataConverter(np.nan_to_num(data.rsi3))
+        # heik = dataConverter(np.nan_to_num(heik_diff.iloc[-1]))
+        # heik2 = dataConverter(np.nan_to_num(heik_diff.iloc[-2]))
+
+        result_data.append({
+            'close': float(data.c),
+            'date': data.date,
+            'high': float(data.h),
+            'low': float(data.l),
+            'open': float(data.o),
+            'percentChange': "",
+            'volume': int(data.v),
+            'RSI': rsi,
+            'side': side,
+            'rsi': {'bearPower': rsi, 'bullPower': rsi},
+            'rsi2': {'bearPower': rsi2, 'bullPower': rsi2},
+            'rsi3': {'bearPower': rsi3, 'bullPower': rsi3},
+            'heik': {'bearPower': heik, 'bullPower': heik},
+            'heik2': {'bearPower': heik2, 'bullPower': heik2},
+        })
+
+    return result_data
 
 def join(candles, strategy_trades, strategy_name):
     candle_len = len(candles)

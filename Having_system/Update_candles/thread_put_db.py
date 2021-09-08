@@ -186,7 +186,6 @@ class SymbolCandleThread(object):
                 else:
                     candle['date'] = datetime.fromtimestamp((candle['t']/1000))
                 self.candle_queue.put(candle)
-                print ('    ', candle['date'])
                 if self.candle_queue.qsize() > 1000:
                     time.sleep(0.1)
             self.current_date += timedelta(days=DELTA_TIME)
@@ -344,21 +343,21 @@ if __name__ == "__main__":
     # put_symbols_db()
 
     print ("++++++++++ put canldes +++++++++")
-    # symbols = get_db_symbols()
-    symbols = ['TSLA'] #, 'AMZN', 'AMD', 'MSFT', 'GOOG', 'ATVI']
+    symbols = get_db_symbols()
+    # symbols = ['TSLA'] #, 'AMZN', 'AMD', 'MSFT', 'GOOG', 'ATVI']
     print (len(symbols), ' symbols: ', symbols)
-    interval = [1, 'day']
+    interval = [1, 'minute']
     start_date, end_date = define_start_date(interval, whole_year=True)
     whole_start_time = datetime.strptime(start_date, '%Y-%m-%d')
     whole_end_time = datetime.strptime(end_date, '%Y-%m-%d')
     market_start_time = [9, 30]
     market_end_time = [16, 30]
-    get_only_market_time = False
+    get_only_market_time = True
     cur_date = datetime.now().date()
 
     # create threads
     put_thread_list = []
-    thread_cnt = 1
+    thread_cnt = 10
     for i in range(0, thread_cnt):
         sc_thread = SymbolCandleThread('AMZN', 
             interval, 
@@ -394,8 +393,8 @@ if __name__ == "__main__":
             break
         time.sleep(1)
 
-    print ("+++++ put last candle udpate list +++++")
-    set_last_candle_date(str(cur_date))
+    # print ("+++++ put last candle udpate list +++++")
+    # set_last_candle_date(str(cur_date))
 
     #############################################################
 

@@ -1,42 +1,6 @@
-from django.shortcuts import render
-
-from django.http.response import JsonResponse
-from numpy.core.arrayprint import printoptions
-from numpy.core.fromnumeric import resize
-from pymongo.message import update
-from rest_framework.parsers import JSONParser 
-from rest_framework import status
-from rest_framework.decorators import api_view
-from datetime import datetime, timedelta
-import os
-from django.views.decorators.csrf import csrf_exempt
-from configparser import ConfigParser
-
-import pymongo
-from datetime import datetime
-import pandas as pd 
-import os
-import requests
-import time
-import io
-import csv
-
-
-
-import numpy as np
 import pandas as pd
 pd.options.mode.chained_assignment = None  # default='warn'
-from datetime import datetime,date
-
 from ib_insync import *
-import numpy as np
-import pandas as pd
-pd.options.mode.chained_assignment = None  # default='warn'
-from datetime import datetime,date
-import matplotlib.pyplot as plt
-from tksheet import Sheet
-import tkinter as tk
-from django.conf import settings
 
 
 def Wilders(df,column,period):
@@ -52,8 +16,6 @@ def Wilders(df,column,period):
         alpha=1.0 / period,
         adjust=False,
     ).mean()
-
- 
 
 def HA(df):
     """

@@ -145,7 +145,7 @@ export const forgotPassword = async (email) => {
   return await fetch(process.env.REACT_APP_BACKEND_URL + "/password_reset/", requestOptions)
     .then(response => response.json())
     .then(data => {
-      return true
+      return data
     })    
 }
 
