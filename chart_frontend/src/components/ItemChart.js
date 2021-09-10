@@ -28,7 +28,7 @@ const HeiknStockChartItem = (props) => {
     const [tradeStartDate, setTradeStartDate] = useState('')
     const [tradeEndDate, setTradeEndDate] = useState('')
     const [strategyList, setStrategyList] = useState([]);
-
+    
     const [optionsViewTypes, setOptionsViewTypes] = useState([
       { value: 'charting', label: 'Charting' },
       { value: 'performance', label: 'Performance' },
@@ -99,7 +99,10 @@ const HeiknStockChartItem = (props) => {
     )
 
     useEffect(() => {
-      getStrategyList();
+      const user = JSON.parse(localStorage.getItem('user-info'))
+      if (user.is_admin || user.role.length) {
+        getStrategyList();
+      }
       disableScroll.on();
       return () => {
         disableScroll.off();

@@ -32,6 +32,7 @@ const HeiknStockChart = (props) => {
   const [microStrategy, setMicroStrategy] = useState({ value: '2m', label: '2m' });
   const [strategy, setStrategy] = useState({ value: 'heikfilter', label: 'heikfilter' });
   const [strategyList, setStrategyList] = useState([]);
+  const [user] = useState(JSON.parse(localStorage.getItem('user-info')));
   
   const [optionsViewTypes, setOptionsViewTypes] = useState([
     { value: 'charting', label: 'Charting' },
@@ -147,13 +148,15 @@ const HeiknStockChart = (props) => {
 
   useEffect(() => {
     disableScroll.on();
-    if(!isGetSymbolList) {
-      getStrategyList();
-    }  
+    if (user.is_admin || user?.role.length) {
+      if(!isGetSymbolList) {
+        getStrategyList();
+      }  
+    }
     return () => {
       disableScroll.off();
     }
-  }, [getStrategyList, isGetSymbolList])
+  }, [getStrategyList, isGetSymbolList, user])
   
   useEffect(() => {
     const handleInstanceChange = (value) => {
@@ -167,6 +170,9 @@ const HeiknStockChart = (props) => {
       }
       getStrategyList()
       setIsShowMicro(true);
+    }
+    if (!user.is_admin && !user?.role.length) {
+      return;
     }
     handleInstanceChange(selectedInstance)
     if(selectedInstance === 'live_trading') {
@@ -182,7 +188,7 @@ const HeiknStockChart = (props) => {
         { value: 'performance', label: 'Performance' },
       ])
     }
-  }, [selectedInstance, getStrategyList, get_tables])
+  }, [selectedInstance, getStrategyList, get_tables, user.is_admin, user.role?.length])
 
   const handleViewTypeChange = (value) => {
     setSelectedViewType(value)
@@ -430,66 +436,68 @@ const HeiknStockChart = (props) => {
             Violette AM - Client Portal
           </a>
         </div>
-        <div className="navbar-nav mr-auto">
-          <li className="nav-item">
-            <Link to={"/chart"} className="nav-link"></Link>
-          </li>
-          <div className="select-option">
-            <Select
-              value={selectedViewType}
-              onChange={handleViewTypeChange}
-              options={optionsViewTypes}
-              placeholder="Charting"
-            />
-          </div>
-          <div className="select-option">
-              <Select
-                value={strategy}
-                onChange={handleStrategy}
-                options={optionsStratgy}
-                placeholder="Macro Strategy"
-              />
-            </div>
-          {isShowMicro && (
+        {(user.is_admin || (user.role?.length)) && (
+          <div className="navbar-nav mr-auto">
+            <li className="nav-item">
+              <Link to={"/chart"} className="nav-link"></Link>
+            </li>
             <div className="select-option">
               <Select
-                value={microStrategy}
-                onChange={handleMicroStrategyChange}
-                options={optionsMicroStrategy}
-                placeholder="Micro Strategy"
+                value={selectedViewType}
+                onChange={handleViewTypeChange}
+                options={optionsViewTypes}
+                placeholder="Charting"
               />
-            </div>  
-          )}
-          <div className="select-option">
-            <Select
-              value={symbol}
-              onChange={handlSymbolChange}
-              options={symbolList}
-              placeholder="Symbol"
-            />
+            </div>
+            <div className="select-option">
+                <Select
+                  value={strategy}
+                  onChange={handleStrategy}
+                  options={optionsStratgy}
+                  placeholder="Macro Strategy"
+                />
+              </div>
+            {isShowMicro && (
+              <div className="select-option">
+                <Select
+                  value={microStrategy}
+                  onChange={handleMicroStrategyChange}
+                  options={optionsMicroStrategy}
+                  placeholder="Micro Strategy"
+                />
+              </div>  
+            )}
+            <div className="select-option">
+              <Select
+                value={symbol}
+                onChange={handlSymbolChange}
+                options={symbolList}
+                placeholder="Symbol"
+              />
+            </div>
+            <div className="select-multi-option">
+              <Select
+                name="filters"
+                placeholder="Indicators"
+                value={indicators}
+                onChange={handleIndicatorsChange}
+                options={optionsIndicator}
+                isMulti={true}
+              />
+            </div>
+            <div className="select-option">
+              <Select
+                value={chartColumn}
+                onChange={handleChartsColumnChange}
+                options={optionsColumn}
+                placeholder="Columns"
+              />
+            </div>
           </div>
-          <div className="select-multi-option">
-            <Select
-              name="filters"
-              placeholder="Indicators"
-              value={indicators}
-              onChange={handleIndicatorsChange}
-              options={optionsIndicator}
-              isMulti={true}
-            />
-          </div>
-          <div className="select-option">
-            <Select
-              value={chartColumn}
-              onChange={handleChartsColumnChange}
-              options={optionsColumn}
-              placeholder="Columns"
-            />
-          </div>
-        </div>
+        )}
         <Collapse navbar isOpen={collapseOpen}>
             <Nav className="ml-auto" navbar>
-              <UncontrolledDropdown nav>
+              <UncontrolledDropdown>
                 <DropdownToggle
                   caret
                   color="default"
@@ -523,7 +531,11 @@ const HeiknStockChart = (props) => {
             </Nav>
           </Collapse>    
       </nav>
-      {selectedInstance === 'stress_test' || selectedInstance === 'optimization' 
+      {!user.is_admin && !user?.role.length
+        ? (<div className="development-in-content dark">
+            No Permission
+          </div>)
+        : selectedInstance === 'stress_test' || selectedInstance === 'optimization' 
         ? (<div className="development-in-content dark">
           In development
         </div>)

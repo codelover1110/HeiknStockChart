@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Route, Switch, useLocation } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import {
   Button
 } from "reactstrap";
@@ -17,6 +18,7 @@ import { BackgroundColorContext } from "contexts/BackgroundColorContext";
 var ps;
 
 function Admin() {
+  const history = useHistory();
   const [isShowSidebar, setShowSidebar] = React.useState(true);
   const location = useLocation();
   const mainPanelRef = React.useRef(null);
@@ -24,6 +26,13 @@ function Admin() {
     document.documentElement.className.indexOf("nav-open") !== -1
   );
   const [selectedInstance, setSelectedInstance] = React.useState('usermanage');
+  const [user] = useState(JSON.parse(localStorage.getItem('user-info')));
+
+    useEffect(() => {
+      if (!user.is_admin) {
+        history.push('/')
+      }
+    }, [user, history])
 
   React.useEffect(() => {
     if (navigator.platform.indexOf("Win") > -1) {

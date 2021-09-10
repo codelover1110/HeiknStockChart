@@ -15,6 +15,7 @@ import { useHistory } from "react-router-dom";
 import { MDBDataTableV5 } from 'mdbreact';
 import { useAuth } from 'contexts/authContext';
 import { getAllSymbols, filterTradesData } from 'api/Api'
+import { currentDateString } from 'utils/helper'
 
 const TradeDataTable = () => {
   const auth = useAuth();
@@ -24,7 +25,7 @@ const TradeDataTable = () => {
   const [macroStrategy, setMacroStrategy] = useState();
   const [microStrategy, setMicroStrategy] = useState()
   const [tradeStartDate, setTradeStartDate] = useState('2021-01-01')
-  const [tradeEndDate, setTradeEndDate] = useState('2021-08-31')
+  const [tradeEndDate, setTradeEndDate] = useState(currentDateString())
   const [strategyList, setStrategyList] = useState([]);
   
   const [optionsStrategy, setOptionsStrategy] = useState([])
@@ -143,7 +144,6 @@ const TradeDataTable = () => {
   useEffect(() => {
     const get_trades = async (symbol, macroStrat, microStrat, tradeStartDate, tradeEndDate) => {
       const trades_data = await filterTradesData(symbol, macroStrat, microStrat, tradeStartDate, tradeEndDate);
-      console.log("trades_data..........", trades_data)
       setDatatable({
         columns: hearder_columns,
         rows: trades_data
