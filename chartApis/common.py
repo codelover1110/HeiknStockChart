@@ -5,7 +5,7 @@ from ib_insync import util
 from pymongo.common import MIN_SUPPORTED_SERVER_VERSION
 from .lib.heikfilter import HA, Filter
 from .lib.ts_rsi_heik_v1 import Filter as rsi_heik_v1_fitler
-from .models import get_strategy_name_only
+from .models import get_strategy_name_only, get_micro_strategies
 
 def dataConverter(obj):
     if isinstance(obj, np.integer):
@@ -151,9 +151,9 @@ def join_append(candles, strategy_trades, strategy_name):
             candle = candles[idx]
             if candle['date'] > trade_date and idx != 0:
                 update_candle = candles[idx-1]
-                if trades_data['side'] == 'BUY':
+                if trades_data['side'].lower() == 'buy':
                     side_type = 'LONG'
-                elif trades_data['side'] == 'SELL':
+                elif trades_data['side'].lower() == 'sell':
                     side_type = 'SHORT'
                 trade_item = dict()
                 trade_item['longShort'] = side_type
@@ -172,7 +172,7 @@ def join_append(candles, strategy_trades, strategy_name):
 
     return candles
 
-def get_chat_available_stratgies(candle_name, all_strategies):
+def get_chat_available_stratgies(candle_name, micros):
     # get candle interval 
     interval_unit = candle_name.split('_')[-1]
     candle_interval = 0        # minute
@@ -182,19 +182,21 @@ def get_chat_available_stratgies(candle_name, all_strategies):
     elif interval_unit in 'hours':
         candle_interval = int(interval_num) * 60
     elif interval_unit in 'days':
-        candle_interval = int(interval_num) * 60 * 60
+        candle_interval = int(interval_num) * 24 * 60
 
     result = []
-    for strategy_name in all_strategies:
-        base_interval_str = strategy_name.split('-')[1]
+    for micro in micros:
+        base_interval_str = micro[0:3]
         base_interval = 0
-        if 'min' in base_interval_str:
-            base_interval = int(base_interval_str.split('min')[0])
-        if 'hour' in base_interval_str:
-            base_interval = int(base_interval_str.split('hour')[0]) * 60
+        if 'm' in base_interval_str:
+            base_interval = int(base_interval_str.split('m')[0])
+        elif 'h' in base_interval_str:
+            base_interval = int(base_interval_str.split('h')[0]) * 60
+        elif 'd' in base_interval_str:
+            base_interval = int(base_interval_str.split('d')[0]) * 24 * 60
         
         if base_interval >= candle_interval:
-            result.append(strategy_name)
+            result.append(micro)
     
     return result
 
@@ -311,15 +313,16 @@ def calc_percentEfficiency(symbols, db_data):
         "lS": lS
     }
 
-def fill_missing_candles__(chat_candles, candle_name, strategy_name):
-    strategy_names = get_strategy_name_only()
-    macro_name = strategy_name.split('-')[0]
-    macro_strategies = []
-    for strtg in strategy_names:
-        if macro_name in strtg:
-            macro_strategies.append(strtg)
-    available_strategies = get_chat_available_stratgies(candle_name, macro_strategies)
-    if strategy_name in available_strategies:
+def fill_missing_candles__(chat_candles, candle_name, macro, micro):
+    # strategy_names = get_strategy_name_only()
+    # macro_name = strategy_name.split('-')[0]
+    # macro_strategies = []
+    # for strtg in strategy_names:
+    #     if macro_name in strtg:
+    #         macro_strategies.append(strtg)
+    micros = get_micro_strategies(macro)
+    available_strategies = get_chat_available_stratgies(candle_name, micros)
+    if micro in available_strategies:
         insert_candles = []
         for candle in chat_candles:
             try:

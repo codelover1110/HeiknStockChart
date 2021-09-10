@@ -44,24 +44,48 @@ def send_link_to_email(request) :
     return JsonResponse({"success": "true"}, status=201)
 
 @csrf_exempt
-def get_all_user(request):
-    qs = CustomUser.objects.all().values()
-    return JsonResponse(list(qs), safe=False)
-
-@csrf_exempt
-def save_user(request):
+def update_user_role(request):
     if request.method == "POST":
-        request_data = JSONParser().parse(request)
-        pk = request_data['pk']
-        role = request_data['role']
-
+        req = JSONParser().parse(request)
+        pk = req['id']
+        
         user = CustomUser.objects.get(pk=pk)
         if user is not None:
-            # user.set_role(role)
-            # user.save()
-            # print (user.values())
-            return JsonResponse({"success": "true", "message": "saved successfuly"}, status=201)
+            if user.is_active == False:
+                return JsonResponse({"success": "false", "message": "Deleted user can't be updated!"}, status=201)
+            # user.is_superuser = req['is_superuser']
+            # user.username = req['username']
+            # user.first_name = req['first_name']
+            # user.last_name = req['last_name']
+            # user.email = req['email']
+            # user.phone_number = req['phone_number']
+            user.role = req['role']
+            user.save()
+            return JsonResponse({"success": "true", "message": "User role is updated successfuly!"}, status=201)
         else:
-            return JsonResponse({"success": "false", "message": "user not exist"}, status=201)
-    return JsonResponse({"success": "false", 'message': 'invalid method'}, status=201)
-     
+            return JsonResponse({"success": "false", "message": "User is not exist!"}, status=201)
+    return JsonResponse({"success": "false", 'message': 'Invalied request method!'}, status=201)
+
+
+@csrf_exempt
+def get_user_list(request):
+    all_users = list(CustomUser.objects.all().values())
+    result = []
+    for user in all_users:
+        if user['is_active'] is True and user['is_superuser'] is False:
+            result.append(user)
+    return JsonResponse(result, safe=False)
+
+
+
+@csrf_exempt
+def delete_user(request):
+    if request.method == 'PUT':
+        req = JSONParser().parse(request)
+        pk = req['id']
+        user = CustomUser.objects.get(pk=pk)
+        user.is_active = False
+        user.save()
+        return JsonResponse({"success": True, "message": "User is deleted!"}, status=201)
+    return JsonResponse({"success": "false", 'message': 'Invalied request method!'}, status=201)
+ 

@@ -325,7 +325,7 @@ if __name__ == "__main__":
     symbols = get_db_symbols()
     # symbols = ['AMZN', 'AMD', 'MSFT', 'GOOG', 'ATVI']
     print (len(symbols), ' symbols: ', symbols)
-    interval = [1, 'day']
+    interval = [1, 'minute']
     start_date, end_date = define_start_date(interval, whole_year=True)
     whole_start_time = datetime.strptime(start_date, '%Y-%m-%d')
     whole_end_time = datetime.strptime(end_date, '%Y-%m-%d')

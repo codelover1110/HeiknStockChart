@@ -16,9 +16,10 @@ try:
 except ImportError:
    import Queue as queue
 trigger_queue = queue.Queue()
+buy_list = []
 
 load_dotenv()
-MONGO_URL = os.getenv('MONGO_URL_BIGML')
+MONGO_URL = os.getenv('MONGO_URL_HUNTER')
 MONGO_DATABASE = os.getenv('MONGO_DATABASE')
 MONGO_COLLECTION = os.getenv('MONGO_COLLECTION')
 TOKEN = os.getenv('DISCORD_TOKEN_CURRENT_ONLY')
@@ -39,12 +40,22 @@ async def get_all_text_channels(guild):
             text_channel_list.append(channel.name)
     return text_channel_list
 
+async def delete_text_channels(guild):
+    channel_names = await get_all_text_channels(guild)
+    for channel_name in channel_names:
+        if channel_name != 'general':
+            channel = discord.utils.get(guild.channels, name=channel_name)
+            await channel.delete()
+            print ('Channel "{}" is deleted!'.format(channel_name))
+
 @client.event
 async def on_ready():
     await client.wait_until_ready()
     for guild in client.guilds:
-        print ("Server:", guild.name)
-    send_message.start()
+        print ("Server:", guild.id)
+        await delete_text_channels(guild)
+
+    calculate_profit.start()
     update_channels.start()
 
     print(f'{client.user.name} has connected to Discord!')
@@ -108,14 +119,66 @@ async def send_message():
             except:
                 print ('not available to send message to deleted channel')
 
+
+@tasks.loop(seconds=1)
+async def calculate_profit():
+    if trigger_queue.empty():
+        print ("no trigger")
+    else:
+        while not trigger_queue.empty():
+            trigger_item = trigger_queue.get()
+            if trigger_item['trade_doc']['side'].lower() == 'buy':
+                buy_list.append(trigger_item)
+            else:
+                if len(buy_list) > 0:
+                    for idx, buy_item in reversed(list(enumerate(buy_list))):
+                        buy_trade_doc = buy_item['trade_doc']
+                        if buy_item['channel_name'].lower() == trigger_item['channel_name'].lower():
+                            if buy_trade_doc['symbol'] == trigger_item['trade_doc']['symbol']:
+                                channel_name = trigger_item['channel_name'].lower()
+                                guild = client.get_guild(882549263534542868)
+                                text_channels = await get_all_text_channels(guild)
+                                if channel_name not in text_channels:
+                                    await guild.create_text_channel(name=channel_name)
+                                    time.sleep(0.5)
+                                channel = discord.utils.get(guild.channels, name=channel_name)
+
+                                try:
+                                    if channel is not None:
+                                        sell_trade_doc = trigger_item['trade_doc']
+                                        buy_msg = '    {}   {} - {} - {} - {}'.format(str(buy_trade_doc['date']),
+                                                                                buy_trade_doc['symbol'], 
+                                                                                buy_trade_doc['side'], 
+                                                                                int(float(buy_trade_doc['quantity'])), 
+                                                                                buy_trade_doc['price'])
+                                        
+                                        sell_msg = '    {}   {} - {} - {} - {}'.format(str(sell_trade_doc['date']), 
+                                                                                sell_trade_doc['symbol'], 
+                                                                                sell_trade_doc['side'], 
+                                                                                int(float(sell_trade_doc['quantity'])), 
+                                                                                sell_trade_doc['price'])
+                                        
+                                        profit_msg = '@@@@@@@@@@@@@@@@@@@@@@@=>  {} %       $ {}'.format(
+                                                round(float(sell_trade_doc['price'])*100/float(buy_trade_doc['price']) - 100 + 0.0000001, 4),
+                                                round(float(sell_trade_doc['price']) - float(buy_trade_doc['price']) + 0.0000001, 4)
+                                            )
+
+                                        await channel.send(buy_msg)
+                                        await channel.send(sell_msg)
+                                        await channel.send(profit_msg)
+                                        del buy_list[idx]
+                                except:
+                                    print ('not available to send message to deleted channel')
+
+
 @tasks.loop(seconds=10)
 async def update_channels():
     guild = client.get_guild(882549263534542868)
     for channel in guild.channels:
         if str(channel.type) == 'text':
             messages = await channel.history(limit=10).flatten()
-            if len(messages) > 0:
-                last_message = messages[-1]
+            if len(messages) > 1:
+                last_message = messages[-2]
                 time_str = ''.join(last_message.content[:19])
                 try:
                     msg_time = datetime.strptime(time_str, '%Y-%m-%d %H:%M:%S')

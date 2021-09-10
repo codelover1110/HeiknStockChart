@@ -8,6 +8,8 @@ urlpatterns = [
     url(r'^api/get_data$', views.get_live_data),
     # url(r'^api/get_live_data$', views.get_live_data),
     url(r'^api/get_backtesting_data$', views.get_backtesting_data),
+    url(r'^api/get_backtesting_symbols$', views.backtesting_symbols),
+    url(r'^api/get_backtesting_result$', views.backtesting_result),
     url(r'^api/get_data_trades$', views.get_data_trades),
     url(r'^api/get_table_candles$', views.get_table_candles),
     url(r'^api/get_strategies$', views.get_strategies),       # not use

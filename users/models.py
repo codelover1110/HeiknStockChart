@@ -8,6 +8,7 @@ class CustomUser(AbstractUser):
     phone_number = models.CharField(max_length=12)
     role = models.CharField(max_length=255)
 
+
 class SingupLinkRole(models.Model):
     link = models.CharField(max_length=255)
     role = models.TextField(default='')
@@ -15,4 +16,3 @@ class SingupLinkRole(models.Model):
     class Meta:
         managed = True
     
-

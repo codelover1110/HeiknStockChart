@@ -18,7 +18,10 @@ from .models import (
             get_micro_strategies, 
             get_macro_strategies, 
             get_strategy_symbols, 
-            get_backtesting_data_db, 
+            get_backtesting_data_db,   # not using
+            get_backtesting_symbols, 
+            get_backtesting_result,
+            get_data_trades_db,
             get_symbol_candles,
             put_script_file,
             update_strartegy_file,
@@ -64,6 +67,41 @@ def get_backtesting_data(request):
 
     return JsonResponse({'chart_data': bastestData}, status=status.HTTP_201_CREATED)
 
+@csrf_exempt
+def backtesting_symbols(request):
+    if request.method == 'POST':
+        request_data = JSONParser().parse(request)
+        macro = request_data['macro']
+        micro = request_data['micro']
+        start_date = request_data['start_date']
+        end_date = request_data['end_date']
+        symbols = get_backtesting_symbols(macro, micro, start_date, end_date)
+
+        return JsonResponse({'strategy_symbols': symbols}, status=status.HTTP_201_CREATED)
+
+
+@csrf_exempt    
+def backtesting_result(request):
+    if request.method == 'POST':
+        request_data = JSONParser().parse(request)
+        macro = request_data['macro']
+        micro = request_data['micro']
+        start_date = request_data['start_date']
+        end_date = request_data['end_date']
+        symbols = request_data['symbols']
+        list_db_data = get_backtesting_result(symbols, macro, micro, start_date, end_date)
+        
+        wL = calc_winningLosing(symbols, list_db_data)
+        pE_wLA_lS = calc_percentEfficiency(symbols, list_db_data)
+        bastestData = {
+            'percentEfficiency': pE_wLA_lS['pE'],
+            'winningLosing': wL,
+            "winningLosingAvg": pE_wLA_lS['wLA'],
+            "longShort": pE_wLA_lS['lS']
+        }
+
+        return JsonResponse({'chart_data': bastestData}, status=status.HTTP_201_CREATED)
+
 
 @csrf_exempt 
 def get_table_list(request):
@@ -90,23 +128,7 @@ def get_data_trades(request):
             symbol = request_data['symbol']
         macroStrategy = request_data['macroStrategy']
         microStrategy = request_data['microStrategy']
-        masterdb = mongoclient["backtesting_trades"]
-        db_collection = masterdb['all_trades']
-        query_obj = {}
-        if symbol != '':
-            query_obj['symbol'] = {"$regex": "^"+symbol.upper()}
-        if macroStrategy != '':
-            query_obj['strategy_name'] = {"$regex": "^"+macroStrategy.lower()}
-        if microStrategy != '':
-            query_obj['strategy_name'] = {"$regex": microStrategy.lower()}
-        if macroStrategy != '' and microStrategy != '':
-            query_obj['strategy_name'] = {"$regex": macroStrategy.lower() + '-' + microStrategy.lower()}
-        
-        startDate = datetime.strptime(request_data['tradeStartDate'], '%Y-%m-%d')
-        endDate = datetime.strptime(request_data['tradeEndDate'], '%Y-%m-%d')
-        query_obj['date'] = {"$gte": startDate, "$lt": endDate}
-
-        trades_data = list(db_collection.find(query_obj, {'_id': False}).sort('date', pymongo.ASCENDING))
+        trades_data = get_data_trades_db(request_data['tradeStartDate'], request_data['tradeEndDate'], macroStrategy, microStrategy, symbol)
         return JsonResponse({'trades_data': trades_data}, status=status.HTTP_201_CREATED)
 
 
@@ -182,7 +204,7 @@ def get_live_data(request):
     candles, strategy_trades = get_stock_candles_for_strategy(db_name, symbol, macro, micro)
     chat_candles = get_chat_data_rsi_heik_v1(candles)
     verdict = join_append(chat_candles, strategy_trades, strategy)
-    verdict = fill_missing_candles__(verdict, db_name, strategy)
+    verdict = fill_missing_candles__(verdict, db_name, macro, micro)
     
     return JsonResponse({'chart_data': verdict}, status=status.HTTP_201_CREATED)
 

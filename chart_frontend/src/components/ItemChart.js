@@ -182,8 +182,8 @@ const HeiknStockChartItem = (props) => {
               setOptionsMicroStrategy( microStrategyOptions )
 
               setMicroStrategy({
-                value: '2mins',
-                label: '2mins'
+                value: '2m',
+                label: '2m'
               })
 
               const symbolOptions = item.symbols.map(o => {

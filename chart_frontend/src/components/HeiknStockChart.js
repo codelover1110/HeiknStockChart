@@ -29,7 +29,7 @@ const HeiknStockChart = (props) => {
   const [collapseOpen,] = React.useState(false)
   const [chartColumn, setChartColumn] = useState({ value: 6, label: '6' })
   const [selectedViewType, setSelectedViewType] = useState({ value: 'charting', label: 'Charting' });
-  const [microStrategy, setMicroStrategy] = useState({ value: '2mins', label: '2mins' });
+  const [microStrategy, setMicroStrategy] = useState({ value: '2m', label: '2m' });
   const [strategy, setStrategy] = useState({ value: 'heikfilter', label: 'heikfilter' });
   const [strategyList, setStrategyList] = useState([]);
   
@@ -191,7 +191,7 @@ const HeiknStockChart = (props) => {
         selectedInstance,
         viewType: value,
         initStrategy: strategy,
-        initMicroStrategy: { value: '2mins', label: '2mins' },
+        initMicroStrategy: { value: '2m', label: '2m' },
         initIndicators: indicators,
         initSymbol: symbol,
       }
@@ -224,8 +224,8 @@ const HeiknStockChart = (props) => {
             setOptionsMicroStrategy( microStrategyOptions )
 
             setMicroStrategy({
-              value: '2mins',
-              label: '2mins'
+              value: '2m',
+              label: '2m'
             })
 
             const symbolOptions = item.symbols.map(o => {

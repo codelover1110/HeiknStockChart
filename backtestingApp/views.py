@@ -12,6 +12,7 @@ from rest_framework import status
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from django.contrib.auth.tokens import default_token_generator
+from rest_framework.authtoken.models import Token
 from django.utils.http import urlsafe_base64_decode as uid_decoder
 from django.utils.http import urlsafe_base64_encode as uid_encoder 
 from django.utils.encoding import force_bytes
@@ -21,7 +22,6 @@ import json
 @csrf_exempt 
 def signup_view(request):
     if request.method == 'POST':
-        print(request)
         request_data = JSONParser().parse(request)
         try:
             # signup_link = request_data['signup_path']
@@ -37,8 +37,11 @@ def signup_view(request):
                 last_name="",
                 role="",
                 # role=obj.role,
-                is_active=True,
+                is_active=True
             )
+            user = CustomUser.objects.get(email=request_data['email'])
+            Token.objects.create(user=user)
+            
             # obj.expired = True
             # obj.save()
             return JsonResponse({'success': 'success'}, status=status.HTTP_201_CREATED)
@@ -77,7 +80,8 @@ def verify_view(request):
     code = user.code
     if str(code) == num:
         code.save()
-        return JsonResponse({'verify': True}, status=status.HTTP_201_CREATED)
+        token = Token.objects.get(user_id=user.pk)
+        return JsonResponse({'verify': True, 'user_email': user.email, 'role': user.role, 'token': token.key}, status=status.HTTP_201_CREATED)
     return JsonResponse({'verify': False}, status=status.HTTP_201_CREATED)
 
 @csrf_exempt 
