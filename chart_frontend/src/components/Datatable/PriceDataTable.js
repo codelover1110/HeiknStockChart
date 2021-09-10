@@ -15,6 +15,7 @@ import { useHistory } from "react-router-dom";
 import { MDBDataTableV5 } from 'mdbreact';
 import { useAuth } from 'contexts/authContext';
 import { getAllSymbols, filterPriceData } from 'api/Api'
+import { currentDateString } from 'utils/helper'
 
 const PriceDataTable = () => {
   const auth = useAuth();
@@ -23,7 +24,7 @@ const PriceDataTable = () => {
   const [symbol, setSymbol] = React.useState({value: "GOOG", label: "GOOG"})
   const [timeFrame, setTimeFrame] = useState({ value: "1m", label: "1m"});
   const [tradeStartDate, setTradeStartDate] = useState('2021-01-01')
-  const [tradeEndDate, setTradeEndDate] = useState('2021-08-31')
+  const [tradeEndDate, setTradeEndDate] = useState(currentDateString())
   const [optionsSymbol, setOptionsSymbol] = useState([])
   const [optionsTimeFrame] = useState([
     { value: "1m", label: "1m" },

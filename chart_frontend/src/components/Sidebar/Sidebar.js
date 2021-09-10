@@ -1,5 +1,5 @@
 /*eslint-disable*/
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 // nodejs library to set properties for components
 import { PropTypes } from "prop-types";
@@ -20,7 +20,12 @@ var ps;
 function Sidebar(props) {
   const history = useHistory();
   const sidebarRef = React.useRef(null);
+  const [user] = useState(JSON.parse(localStorage.getItem('user-info')))
+  const [userRole, setUserRole] = useState('');
   // verifies if routeName is the one active (in browser input)
+  useEffect(() => {
+    setUserRole(user?.role)
+  }, [])
   React.useEffect(() => {
     if (navigator.platform.indexOf("Win") > -1) {
       ps = new PerfectScrollbar(sidebarRef.current, {
@@ -95,6 +100,9 @@ function Sidebar(props) {
             ) : (
               <Nav>
                 {routes.map((prop, key) => {
+                  if (!user.is_admin && !userRole.includes(prop.instance)) {
+                    return (<></>)
+                  }
                   return (
                     <li
                       className={

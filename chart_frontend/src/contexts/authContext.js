@@ -2,7 +2,7 @@ import React, { createContext, useContext } from "react";
 const authContext = createContext();
 
 const authUser = {
-  isAuthenticated: sessionStorage.getItem("auth-token") ? true : false,
+  isAuthenticated: localStorage.getItem("auth-token") ? true : false,
   async signin(email, password) {
     let formData = {
       username: email,
@@ -91,12 +91,12 @@ const authUser = {
         }
       })
     authUser.isAuthenticated = true;
-    sessionStorage.setItem("auth-token", 12345678)
     return res
   },
   signout() {
     authUser.isAuthenticated = false;
-    sessionStorage.removeItem("auth-token")
+    localStorage.removeItem("auth-token")
+    localStorage.removeItem("user-info")
   },
 };
 

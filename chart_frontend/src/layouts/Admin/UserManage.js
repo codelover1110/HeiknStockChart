@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import Select from 'react-select'
+import { useHistory } from "react-router-dom";
 import {
   Button
 } from "reactstrap";
@@ -21,6 +22,7 @@ import { getUserList, updateUserRole, deleteUser } from 'api/Api';
 var ps;
 
 function UserManage() {
+  const history = useHistory();
   const [isRequest, setIsRequest] = useState(true)
   const [error, setError] = useState(-1)
   const [isLoading, setIsLoading] = useState(false)
@@ -42,7 +44,15 @@ function UserManage() {
     { value: 'optimization', label: 'Optimization' },
     { value: 'live_trade', label: 'Live Trade' },
     { value: 'scanner', label: 'Scanner' },
+    { value: 'trade_data', label: 'Trade Data'},
   ]
+  const [user] = useState(JSON.parse(localStorage.getItem('user-info')));
+
+  useEffect(() => {
+    if (!user.is_admin) {
+      history.push('/')
+    }
+  }, [user, history])
 
   React.useEffect(() => {
     if (navigator.platform.indexOf("Win") > -1) {
@@ -89,7 +99,7 @@ function UserManage() {
           email: user.email,
           phone_number: user.phone_number,
           role: user.role,
-          active: user.active ? 'active' : 'inactive',
+          active: 'active',
           action: <div className="hunter-user-manage-button-area">
             <MDBBtn color="blue" size="sm" onClick={
             () => {

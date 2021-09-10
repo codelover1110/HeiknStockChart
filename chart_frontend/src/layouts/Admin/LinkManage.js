@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Select from 'react-select'
+import { useHistory } from "react-router-dom";
 import {
   Button
 } from "reactstrap";
@@ -22,6 +23,7 @@ import { validateEmail } from 'utils/helper';
 var ps;
 
 function LinkManage() {
+  const history = useHistory();
   const [roles, setRoles] = useState([])
   const [isShowSendModal, setIsShowSendModal] = useState(false)
   const [isShowCreateLinkModal, setShowCreateLinkModal] = useState(false);
@@ -43,6 +45,14 @@ function LinkManage() {
     { value: 'live_trade', label: 'Live Trade' },
     { value: 'scanner', label: 'Scanner' },
   ]
+
+  const [user] = useState(JSON.parse(localStorage.getItem('user-info')));
+
+  useEffect(() => {
+    if (!user.is_admin) {
+      history.push('/')
+    }
+  }, [user, history])
   
   React.useEffect(() => {
     if (navigator.platform.indexOf("Win") > -1) {
