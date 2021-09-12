@@ -183,6 +183,31 @@ export const getScriptFileNames = async() => {
     })
 }
 
+export const getModuleTypeNames = async() => {
+  return await fetch(process.env.REACT_APP_BACKEND_URL + "/strategy/parameter_list/")
+    .then(response => response.json())
+    .then(data => {
+      return data
+    })
+}
+
+export const getFileTypeNames = async(moduleType) => {
+  const requestOptions = {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      param_type: moduleType
+    })
+  };
+  return await fetch(process.env.REACT_APP_BACKEND_URL + "/strategy/parameter_detail_list/", requestOptions)
+    .then(response => response.json())
+    .then(data => {
+      return data
+    })
+}
+
+
+
 export const createScriptFile = async(filename, content, isUpdate) => {
   const requestOptions = {
     method: 'POST',

@@ -24,28 +24,26 @@ def signup_view(request):
     if request.method == 'POST':
         request_data = JSONParser().parse(request)
         try:
-            # signup_link = request_data['signup_path']
-            # if SingupLinkRole.objects.filter(link=signup_link).exists():
-            #     pk = SingupLinkRole.objects.get(link=signup_link).pk
-            #     obj = SingupLinkRole.objects.get(pk=pk)
-            #     if not obj.expired:
-            CustomUser.objects.create_user(
-                username=request_data['username'],
-                email=request_data['email'],
-                password=request_data['password1'],
-                first_name="",
-                last_name="",
-                role="",
-                # role=obj.role,
-                is_active=True
-            )
-            user = CustomUser.objects.get(email=request_data['email'])
-            Token.objects.create(user=user)
-            
-            # obj.expired = True
-            # obj.save()
-            return JsonResponse({'success': 'success'}, status=status.HTTP_201_CREATED)
-            # return JsonResponse({'error': 'error', 'content': 'Invalid link'}, status=status.HTTP_409_CONFLICT)
+            signup_link = request_data['signup_path']
+            if SingupLinkRole.objects.get(link=signup_link) is not []:
+                pk = SingupLinkRole.objects.get(link=signup_link).pk
+                obj = SingupLinkRole.objects.get(pk=pk)
+                if not obj.expired:
+                    CustomUser.objects.create_user(
+                        username=request_data['username'],
+                        email=request_data['email'],
+                        password=request_data['password1'],
+                        first_name="",
+                        last_name="",
+                        role=obj.role,
+                        is_active=True
+                    )
+                    user = CustomUser.objects.get(email=request_data['email'])
+                    Token.objects.create(user=user)
+                    obj.expired = True
+                    obj.save()
+                    return JsonResponse({'success': 'success'}, status=status.HTTP_201_CREATED)
+            return JsonResponse({'error': 'error', 'content': 'Invalid link'}, status=status.HTTP_409_CONFLICT)
         except Exception as e:
             print (e, type(e))
             return JsonResponse({'error': 'error', 'content': e}, status=status.HTTP_409_CONFLICT)
@@ -55,14 +53,18 @@ def signup_view(request):
 def auth_view(request):
     if request.method == "POST":
         request_data = JSONParser().parse(request)
-        username = request_data['username']
+        # username = request_data['username']
         password = request_data['password']
-        user = authenticate(request, username=username, password=password)
-        print(username, password)
-        if user is not None:
-            request.session['pk'] = user.pk
-            sendVerifyCodetoEmail(user.pk)
-            return JsonResponse({'user_id': user.pk}, status=status.HTTP_201_CREATED)
+        username = request_data['username']
+        try:
+            user = CustomUser.objects.get(email = username)
+            user_detail = authenticate(request, username=user.username, password=password)
+            if user is not None:
+                request.session['pk'] = user.pk
+                sendVerifyCodetoEmail(user_detail.pk)
+                return JsonResponse({'user_id': user_detail.pk}, status=status.HTTP_201_CREATED)
+        except:
+           pass
     return JsonResponse({'user_id': None}, status=status.HTTP_401_UNAUTHORIZED)
 
 def sendVerifyCodetoEmail(pk):
@@ -81,7 +83,7 @@ def verify_view(request):
     if str(code) == num:
         code.save()
         token = Token.objects.get(user_id=user.pk)
-        return JsonResponse({'verify': True, 'user_email': user.email, 'role': user.role, 'token': token.key}, status=status.HTTP_201_CREATED)
+        return JsonResponse({'verify': True, 'user_email': user.email, 'role': user.role, 'token': token.key, 'is_admin': user.is_superuser}, status=status.HTTP_201_CREATED)
     return JsonResponse({'verify': False}, status=status.HTTP_201_CREATED)
 
 @csrf_exempt 

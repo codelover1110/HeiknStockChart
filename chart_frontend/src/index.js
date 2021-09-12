@@ -44,7 +44,7 @@ ReactDOM.render(
               <LinkManage />
             </PrivateRoute>
             <PrivateRoute path="/admin">
-              <AdminLayout />
+              <UserManage />
             </PrivateRoute>
             <Route path="/login" render={(props) => <Login {...props} />} />
             <Route path="/signup" render={(props) => <SignUp {...props} />} />

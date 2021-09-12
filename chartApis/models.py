@@ -252,9 +252,11 @@ def get_backtesting_result(symbols, macro, micro, start_date, end_date):
             'micro_strategy': micro,
             'symbol':{'$in': symbols}
         }
+    print ("---get_backtesting_result---:", query)
     masterdb = mongoclient[BACKTESTING_TRADES]
     ob_table = masterdb[ALL_TRADES_HISTORY]
     list_data_db = list(ob_table.find(query, {'_id': False}).sort('date', pymongo.ASCENDING))
+    print ("===get_backtesting_result===", len(list_data_db))
     return list_data_db
 
 def get_data_trades_db(start_date, end_date, macro, micro, symbol):
@@ -274,7 +276,7 @@ def get_data_trades_db(start_date, end_date, macro, micro, symbol):
     endDate = datetime.strptime(end_date, '%Y-%m-%d')
     query_obj['date'] = {"$gte": startDate, "$lt": endDate}
 
-    print (query_obj)
+    print ("---get_data_trades_db---:", query_obj)
     trades_data = list(db_collection.find(query_obj, {'_id': False}).sort('date', pymongo.ASCENDING))
     return trades_data
 

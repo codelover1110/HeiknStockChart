@@ -105,7 +105,7 @@ const TradeDataTable = () => {
                   }
                 })
                 setOptionsMicroStrategy( microStrategyOptions )
-                // setMicroStrategy(microStrategyOptions[0])
+                setMicroStrategy(microStrategyOptions[0])
 
                 const symbolOptions = item.symbols.map(o => {
                   return {
@@ -187,10 +187,7 @@ const TradeDataTable = () => {
             })
             setOptionsMicroStrategy( microStrategyOptions )
 
-            setMicroStrategy({
-              value: '2m',
-              label: '2m'
-            })
+            setMicroStrategy(microStrategyOptions[0])
 
             const symbolOptions = item.symbols.map(o => {
               return {

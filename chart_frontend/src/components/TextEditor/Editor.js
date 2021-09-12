@@ -5,7 +5,7 @@ import { Editor } from "react-draft-wysiwyg";
 import { EditorState, convertToRaw ,convertFromHTML,ContentState} from "draft-js";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import draftToHtml from "draftjs-to-html";
-import { getScriptFile, getScriptFileNames, createScriptFile } from "api/Api";
+import { getScriptFile, getModuleTypeNames, getFileTypeNames, createScriptFile } from "api/Api";
 import {
   Button
 } from "reactstrap";
@@ -20,7 +20,9 @@ export default class TextEditor extends Component {
       textdata:["hello"],
       scriptfiles: [],
       scriptfile: null,
-      selectedFileName: null,
+      selectedFileType: null,
+      selectedModuleType: null,
+      selectedModuleContents: [],
       filename: '',
       file:[],
       content: null,
@@ -29,10 +31,32 @@ export default class TextEditor extends Component {
       isShowSaveModal: false,
     };
   }
+
+  componentDidMount () {
+    this.loadModuleTypes()  
+  }
   
+  loadModuleTypes = async () => {
+    const res = await getModuleTypeNames();
+    if (res.success) {
+      const moduleTypes = res.result.map(value => {
+        return {
+          value: value,
+          label: value
+        }
+      })
+
+      this.setState({
+        moduleTypeOptions: moduleTypes,
+        selectedModuleType: moduleTypes[0],
+        isUpdate: true,
+      })
+    }
+  }
+
   handleScriptFileChange = (e) => {
     this.setState({
-      selectedFileName: e,
+      selectedFileType: e,
       filename: e.value,
     });
   }
@@ -49,7 +73,7 @@ export default class TextEditor extends Component {
     }
 
     const res = await createScriptFile(
-      this.state.isUpdate ? this.state.selectedFileName.value : this.state.filename,
+      this.state.isUpdate ? this.state.selectedFileType.value : this.state.filename,
       this.state.content,
       this.state.isUpdate
     )
@@ -77,28 +101,49 @@ export default class TextEditor extends Component {
       isUpdate: false,
       scriptfiles: null,
       filename: '',
-      selectedFileName: null,
+      selectedFileType: null,
       editorState: EditorState.createEmpty(),
     })
   }
   
   handleOpenScriptFile = async () => {
-    const res = await getScriptFileNames();
-    const files = res.strategy_files.map(file => {
-      return {
-        value: file.file_name,
-        label: file.file_name
-      }
-    })
     this.setState({
-      scriptfiles: files,
-      selectedFileName: files[0],
-      filename: files[0].value,
       isShowOpenModal: true,
+      isUpdate: true,
+    })    
+  }
+  
+  handleFileTypeChange = async (e) => {
+    this.setState({
+      selectedFileType: e,
       isUpdate: true,
     })
   }
-  
+
+  handleModuleTypeChange = async (e) => {
+    this.setState({
+      selectedModuleType: e,
+      isUpdate: true,
+    })
+
+    const res = await getFileTypeNames(e.value);
+    if (res.success) {
+      const fileTypes = res.result.map(value => {
+        return {
+          value: value.name,
+          label: value.name
+        }
+      })
+
+      this.setState({
+        selectedModuleContents: res.result,
+        fileTypeOptions: fileTypes,
+        selectedFileType: fileTypes[0],
+        isUpdate: true,
+      })
+    }
+  }
+
   handleSaveModalShow = async () => {
     this.setState({isShowSaveModal: true})
   }
@@ -111,16 +156,16 @@ export default class TextEditor extends Component {
     this.setState({isShowSaveModal: false})
   }
 
-  handleScriptFileOpen = async (selectedFileName) => {
-    const file = await getScriptFile(selectedFileName.value)
-    const blocksFromHTML = convertFromHTML(file.file_content ? file.file_content.content : '');
+  handleScriptFileOpen = async (selectedFileType) => {
+    const selectedFile = this.state.selectedModuleContents.filter((file) => file.name === this.state.selectedFileType.value)
+    const blocksFromHTML = convertFromHTML(selectedFile[0] ? selectedFile[0].contents : '');
     const blockContent= ContentState.createFromBlockArray(
       blocksFromHTML.contentBlocks,
       blocksFromHTML.entityMap,
     );
     this.setState({
       editorState: EditorState.createWithContent(blockContent),
-      scriptfile: file.file_content,
+      scriptfile: selectedFile,
     })
     this.OpenScriptModalClose();
   }
@@ -175,15 +220,28 @@ export default class TextEditor extends Component {
               <Modal.Title>Open Script File</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              <div className="select-multi-option">
-                <label>select file name</label>
-                <Select
-                  name="filters"
-                  placeholder="Script Files"
-                  value={this.state.selectedFileName}
-                  onChange={this.handleScriptFileChange}
-                  options={this.state.scriptfiles}
-                />
+              <div className="hunter-select-module-area">
+                <div className="select-multi-option">
+                  <label>select module type</label>
+                  <Select
+                    className="hunter-module-type-select"
+                    name="select-module-type"
+                    placeholder="Module Type"
+                    value={this.state.selectedModuleType}
+                    onChange={this.handleModuleTypeChange}
+                    options={this.state.moduleTypeOptions}
+                  />
+                </div>
+                <div className="select-multi-option">
+                  <label>select file type</label>
+                  <Select
+                    name="select-file-type"
+                    placeholder="File Type"
+                    value={this.state.selectedFileType}
+                    onChange={this.handleFileTypeChange}
+                    options={this.state.fileTypeOptions}
+                  />
+                </div>
               </div>
             </Modal.Body>
             <Modal.Footer className="hunter-modal-footer">
@@ -191,7 +249,7 @@ export default class TextEditor extends Component {
                 variant="primary"
                 className="btn-md"
                 onClick = {() => {
-                  this.handleScriptFileOpen(this.state.selectedFileName)
+                  this.handleScriptFileOpen(this.state.selectedFileType)
                 }}
               >
                 Open

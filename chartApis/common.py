@@ -210,11 +210,11 @@ def calc_winningLosing(symbols, db_data):
         }
         pair_wL = {}
         for db_collection in db_data:
-            side = db_collection['side']
+            side = db_collection['side'].lower()
             if symbol == db_collection['symbol']:
                 pair_wL[side] = float(db_collection['price'])
-                if 'BUY' in pair_wL and 'SELL' in pair_wL:
-                    calc = pair_wL['SELL'] - pair_wL['BUY']
+                if 'buy' in pair_wL and 'sell' in pair_wL:
+                    calc = pair_wL['sell'] - pair_wL['buy']
                     if calc > 0:
                         winningLosing_temp['winning'] =  winningLosing_temp['winning'] + 1
                     else:
@@ -233,25 +233,25 @@ def calc_percentEfficiency(symbols, db_data):
         winningT = []
         losingT = []
         for db_collection in db_data:
-            side = db_collection['side']
+            side = db_collection['side'].lower()
             if symbol == db_collection['symbol']:
                 pair_pE[side] = {
                     "price": float(db_collection['price']),
                     "date": db_collection['date']
                     }
-                if 'BUY' in pair_pE and 'SELL' in pair_pE:
-                    percent = float(pair_pE['SELL']['price']) * 100  / float(pair_pE['BUY']['price'])
+                if 'buy' in pair_pE and 'sell' in pair_pE:
+                    percent = float(pair_pE['sell']['price']) * 100  / float(pair_pE['buy']['price'])
                     # percent = round(percent, 2)
                     percent = percent - 100
                     percent = round(percent, 3)
-                    if pair_pE['SELL']['date'].timestamp() - pair_pE['BUY']['date'].timestamp() > 0:
-                        entry = 'BUY'
-                        exit = 'SELL'
-                        exit_date = pair_pE['SELL']['date']
+                    if pair_pE['sell']['date'].timestamp() - pair_pE['buy']['date'].timestamp() > 0:
+                        entry = 'buy'
+                        exit = 'sell'
+                        exit_date = pair_pE['sell']['date']
                     else:
-                        entry = 'SELL'
-                        exit = 'BUY'
-                        exit_date = pair_pE['BUY']['date']
+                        entry = 'sell'
+                        exit = 'buy'
+                        exit_date = pair_pE['buy']['date']
 
                     sym_pE.append({
                         'date': exit_date,
@@ -283,10 +283,10 @@ def calc_percentEfficiency(symbols, db_data):
         # Calculation Long and Short
         short = 0
         long = 0
-        if len(sym_pE) > 0 and sym_pE[-1]['entry'] == 'BUY':
+        if len(sym_pE) > 0 and sym_pE[-1]['entry'] == 'buy':
             long = sym_pE[-1]['percent']
             short = 0
-        elif len(sym_pE) > 0 and sym_pE[-1]['entry'] == 'SELL':
+        elif len(sym_pE) > 0 and sym_pE[-1]['entry'] == 'sell':
             long = 0
             short = sym_pE[-1]['percent']
         lS.append({

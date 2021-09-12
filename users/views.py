@@ -72,7 +72,7 @@ def get_user_list(request):
     all_users = list(CustomUser.objects.all().values())
     result = []
     for user in all_users:
-        if user['is_active'] is True and user['is_superuser'] is False:
+        if user['is_active'] is True:
             result.append(user)
     return JsonResponse(result, safe=False)
 
@@ -84,8 +84,9 @@ def delete_user(request):
         req = JSONParser().parse(request)
         pk = req['id']
         user = CustomUser.objects.get(pk=pk)
-        user.is_active = False
-        user.save()
+        user.delete()
+        # user.is_active = False
+        # user.save()
         return JsonResponse({"success": True, "message": "User is deleted!"}, status=201)
     return JsonResponse({"success": "false", 'message': 'Invalied request method!'}, status=201)
  

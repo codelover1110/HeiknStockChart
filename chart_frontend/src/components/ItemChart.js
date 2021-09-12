@@ -79,8 +79,7 @@ const HeiknStockChartItem = (props) => {
                       label: o,
                     }
                   })
-                  setOptionsMicroStrategy( microStrategyOptions )
-                  // setMicroStrategy(microStrategyOptions[0])
+                  setOptionsMicroStrategy( microStrategyOptions )                
   
                   const symbolOptions = item.symbols.map(o => {
                     return {
@@ -184,10 +183,15 @@ const HeiknStockChartItem = (props) => {
               })
               setOptionsMicroStrategy( microStrategyOptions )
 
-              setMicroStrategy({
-                value: '2m',
-                label: '2m'
-              })
+              const is_2m = microStrategyOptions.filter((o => o.value === '2m'))
+              if (is_2m.length) {
+                setMicroStrategy({
+                  value: '2m',
+                  label: '2m'
+                })
+              } else {
+                  setMicroStrategy(microStrategyOptions[2])
+              }
 
               const symbolOptions = item.symbols.map(o => {
                 return {

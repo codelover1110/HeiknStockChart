@@ -429,7 +429,8 @@ div.mdb-datatable div.mdb-datatable-filter {
 }
 
 .public-DraftEditor-content {
-  min-height: 300px;
+  max-height: 300px;
+  overflow-y: scroll;
 }
 
 .display-flex-left {
@@ -439,6 +440,11 @@ div.mdb-datatable div.mdb-datatable-filter {
 }
 
 .hunter-user-manage-button-area {
+  display: flex;
+  justify-content: space-around;
+}
+
+.hunter-select-module-area {
   display: flex;
   justify-content: space-around;
 }

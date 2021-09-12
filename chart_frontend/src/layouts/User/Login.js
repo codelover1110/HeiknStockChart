@@ -3,7 +3,7 @@ import {
     useHistory,
 } from "react-router-dom";
 import { useAuth } from 'contexts/authContext'
-// import { validateEmail } from 'utils/helper'
+import { validateEmail } from 'utils/helper'
 
 const Login = () => {
     let auth = useAuth();
@@ -28,10 +28,12 @@ const Login = () => {
             setMessage('Email or password is wrong')
             return
         }
-        // if (!validateEmail(email)){
-        //     alert('Invalid email')
-        //     return
-        // }
+        
+        if (!validateEmail(email)){
+            alert('Invalid email')
+            return
+        }
+        
         setIsLoading(true)
         const res = await auth.authUser.signin(email, password)
         setIsLoading(false)
@@ -62,13 +64,14 @@ const Login = () => {
                 <h3>Log In</h3>
 
                 <div className="form-group">
-                    <label>User Name</label>
+                    <label>User Email</label>
                     <input
-                        type="text"
+                        type="email"
                         className="form-control hunter-form-control"
-                        placeholder="Enter user name"
+                        placeholder="Enter user email"
                         value={email}
                         onChange={(e) => { handleEmailChange(e)}}
+                        required
                     />
                 </div>
 
@@ -80,6 +83,7 @@ const Login = () => {
                         placeholder="Enter password"
                         value={password}
                         onChange={(e) => { handlePasswordChange(e)}}
+                        required
                     />
                 </div>
 
@@ -101,9 +105,9 @@ const Login = () => {
                 </button>
                 
                 <div className="form-group hunter-form-signup-area">
-                    <p className="sign-up-area text-left">
+                    {/* <p className="sign-up-area text-left">
                         <a href="/signup">Sign Up?</a>
-                    </p>
+                    </p> */}
                     <p className="forgot-password text-right">
                         Forgot <a href="/forgot_password">password?</a>
                     </p>
