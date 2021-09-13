@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from 'contexts/authContext'
 import { validateEmail } from 'utils/helper'
 import { useHistory } from "react-router-dom";
@@ -16,6 +16,19 @@ const SignUp = () => {
     const [confirmPassword, setConfirmPassword] = useState('')
     const [pathname] = useState(history.location.pathname)
 
+    useEffect(() => {
+        const listener = event => {
+            if (event.code === "Enter" || event.code === "NumpadEnter") {
+                event.preventDefault();
+                signup()
+            }
+        };
+        document.addEventListener("keydown", listener);
+        return () => {
+            document.removeEventListener("keydown", listener);
+        };
+    }, []);   
+    
     const handleEmailChange = (e) => {
         setEmail(e.target.value)
     }

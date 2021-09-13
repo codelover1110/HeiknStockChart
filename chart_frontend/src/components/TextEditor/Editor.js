@@ -1,14 +1,16 @@
 
 import React, { Component } from "react";
+import Switch from "react-switch";
 import Select from 'react-select'
 import { Editor } from "react-draft-wysiwyg";
 import { EditorState, convertToRaw ,convertFromHTML,ContentState} from "draft-js";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import draftToHtml from "draftjs-to-html";
-import { getScriptFile, getModuleTypeNames, getFileTypeNames, createScriptFile } from "api/Api";
+import { getScriptFile, getModuleTypeNames, getFileTypeNames, createScriptFile, saveConfigFile, saveScriptFile, getConfigFileList } from "api/Api";
 import {
   Button
 } from "reactstrap";
+import { MDBBtn, MDBIcon } from "mdbreact";
 
 import Modal from 'react-bootstrap/Modal'
 
@@ -22,24 +24,65 @@ export default class TextEditor extends Component {
       scriptfile: null,
       selectedFileType: null,
       selectedModuleType: null,
+      selectedModule1Type: null,
+      module1TypeOptions: [
+        { value: 'watchlists', label: 'watchlists' },
+        { value: 'indicator_signaling', label: 'indicator_signaling' },
+        { value: 'order_signalling', label: 'order_signalling' },
+        { value: 'order_routing', label: 'order_routing' },
+        { value: 'indicators', label: 'pass in processed data into indicators' },
+        { value: 'core', label: 'core' },
+      ],
+      selectedConfigFile: null,
       selectedModuleContents: [],
       filename: '',
       file:[],
       content: null,
       isUpdate: false,
       isShowOpenModal: false,
+      isShowAddIndicatorModal: false,
       isShowSaveModal: false,
+      isCheckedStrategy: false,
+      strategyIndicators: []
     };
+  }
+
+  openAddIndicatorModal = () => {
+    this.setState({ isShowAddIndicatorModal: true });
+  }
+
+  handleChange = (checked) => {
+    this.setState({ isCheckedStrategy: checked });
   }
 
   componentDidMount () {
     this.loadModuleTypes()  
+    this.loadConfigFiles()
   }
   
+  loadConfigFiles = async () => {
+    const res = await getConfigFileList();
+    if (res.success) {
+      const configFiles = res.result.map(value => {
+        return {
+          value: value,
+          label: value
+        }
+      })
+
+      this.setState({
+        configFileOptions: configFiles,
+        selectedConfigFile: configFiles[0],
+        isUpdate: true,
+      })
+    }
+  }
+
   loadModuleTypes = async () => {
     const res = await getModuleTypeNames();
     if (res.success) {
       const moduleTypes = res.result.map(value => {
+        console.log("value:", value);
         return {
           value: value,
           label: value
@@ -72,11 +115,34 @@ export default class TextEditor extends Component {
       return;
     }
 
-    const res = await createScriptFile(
-      this.state.isUpdate ? this.state.selectedFileType.value : this.state.filename,
-      this.state.content,
-      this.state.isUpdate
-    )
+    if (this.state.isSelectedStrategyFile) {
+      if (!this.state.strategyIndicators.length) {
+        console.log("content is empty!")
+        return;
+      }
+    } else {
+      if (this.state.isCheckedStrategy) {
+        console.log("content is empty!")
+        return;
+      }
+    }
+
+    let res;
+    if (this.state.isSelectedStrategyFile) {
+      res = await saveScriptFile(
+        this.state.isUpdate ? this.state.selectedFileType.value : this.state.filename,
+        this.state.content,
+        this.state.isUpdate,
+        this.state.isCheckedStrategy
+      )
+    } else {
+      res = await saveConfigFile(
+        this.state.isUpdate ? this.state.selectedFileType.value : this.state.filename,
+        this.state.strategyIndicators,
+        this.state.isUpdate,
+      )
+    }
+
     if (res.success) {
       this.SaveScriptModalClose()
       return;
@@ -119,6 +185,17 @@ export default class TextEditor extends Component {
       isUpdate: true,
     })
   }
+  
+  handleFile1TypeChange = async (e) => {
+    this.setState({
+      selectedFile1Type: e,
+      isUpdate: true,
+    })
+  }
+
+  handleConfigFileChange = async (e) => {
+
+  }
 
   handleModuleTypeChange = async (e) => {
     this.setState({
@@ -143,6 +220,31 @@ export default class TextEditor extends Component {
       })
     }
   }
+  
+  handleModule1TypeChange = async (e) => {
+    this.setState({
+      selectedModule1Type: e,
+      isUpdate: true,
+    })
+
+    const res = await getFileTypeNames(e.value);
+    if (res.success) {
+      const fileTypes = !res.result.length ? null :
+      res.result.map(value => {
+        return {
+          value: value.name,
+          label: value.name
+        }
+      })
+
+      this.setState({
+        selectedModuleContents: res.result,
+        file1TypeOptions: fileTypes,
+        selectedFile1Type: fileTypes ? fileTypes[0] : null,
+        isUpdate: true,
+      })
+    }
+  }
 
   handleSaveModalShow = async () => {
     this.setState({isShowSaveModal: true})
@@ -152,27 +254,42 @@ export default class TextEditor extends Component {
     this.setState({isShowOpenModal: false})
   }
   
+  AddIndicatorModalClose = () => {
+    this.setState({ isShowAddIndicatorModal: false })
+  }
+  
   SaveScriptModalClose = () => {
     this.setState({isShowSaveModal: false})
   }
 
-  handleScriptFileOpen = async (selectedFileType) => {
+  handleScriptFileOpen = async () => {
     const selectedFile = this.state.selectedModuleContents.filter((file) => file.name === this.state.selectedFileType.value)
-    const blocksFromHTML = convertFromHTML(selectedFile[0] ? selectedFile[0].contents : '');
+    const blocksFromHTML = convertFromHTML(selectedFile[0] ? `<pre>${selectedFile[0].contents}</pre>` : '');
     const blockContent= ContentState.createFromBlockArray(
       blocksFromHTML.contentBlocks,
       blocksFromHTML.entityMap,
     );
+
     this.setState({
       editorState: EditorState.createWithContent(blockContent),
       scriptfile: selectedFile,
     })
+
     this.OpenScriptModalClose();
   }
 
   handleSave = (content) => {
     this.setState({
       content,
+      isSelectedStrategyFile: true
+    })
+    this.handleSaveModalShow()
+  }
+  
+  handleIndicatorSave = (content) => {
+    this.setState({
+      content,
+      isSelectedStrategyFile: false
     })
     this.handleSaveModalShow()
   }
@@ -193,6 +310,23 @@ export default class TextEditor extends Component {
     reader.readAsText(e.target.files[0])
   }
 
+  handleModuleAndTypeSelect = () => {
+    const indicators = this.state.strategyIndicators;
+    indicators.push(`${this.state.selectedModule1Type.value} - ${this.state.selectedFile1Type.value}`)
+    this.setState( { strategyIndicators: indicators} )
+  }
+
+  handleIndicatorDelete = (indicator) => {
+    let indicators = this.state.strategyIndicators;
+    indicators = indicators.filter( (o) => o !== indicator )
+    console.log("indicator", indicators)
+    this.setState( { strategyIndicators: indicators} )
+  }
+
+  handleIndicatorReset = () => {
+    this.setState( { strategyIndicators: [] } )
+  }
+
   render() {
     const { editorState } = this.state;
     return (
@@ -209,11 +343,73 @@ export default class TextEditor extends Component {
             editorStyle={{backgroundColor:"whitesmoke"}}
             onEditorStateChange={this.onEditorStateChange}
           />
-          <div className="display-flex-left">
-            <button className="btn btn-md btn-secondary" onClick={()=>this.handleScriptFileCreate()}>New</button>
-            <button className="btn btn-md btn-secondary" onClick={()=>this.handleOpenScriptFile()}>Open</button>
-            <button className="btn btn-md btn-secondary" onClick={()=>this.handleSave(draftToHtml(convertToRaw(editorState.getCurrentContent())))}>Save</button>
+          <div className="hunter-editor-button-area">
+            <div className="display-flex-right">
+              <span className="mr-10">Strategy</span>
+                <Switch onChange={this.handleChange} checked={this.state.isCheckedStrategy} />
+              <span className="ml-10">Config</span>
+            </div>
+            <div className="display-flex-left">
+              <button className="btn btn-md btn-secondary" onClick={()=>this.handleScriptFileCreate()}>New</button>
+              <button className="btn btn-md btn-secondary" onClick={()=>this.handleOpenScriptFile()}>Open</button>
+              <button className="btn btn-md btn-secondary" onClick={()=>this.handleSave(draftToHtml(convertToRaw(editorState.getCurrentContent())))}>Save</button>
+            </div>
           </div>
+          {this.state.isCheckedStrategy && (
+          <div className="hunter-data-table-title mt-20">
+            Strategy Indicator Editor
+          </div>)}
+          {this.state.isCheckedStrategy && (
+          <div className={"strategy-indicator-edit-area"}>
+            <ul class="list-group">
+              {this.state.strategyIndicators.map((indicator, index) => {
+                return (
+                  <li class="list-group-item strategy-indicator-edit-list">
+                    <div className="strategy-indicator-edit-list-no display-flex-j-c">
+                      <MDBBtn tag="a" size="sm" >
+                        { index + 1 }
+                      </MDBBtn>
+                    </div>
+                    <div className="strategy-indicator-edit-list-content ml-30">
+                      <MDBBtn tag="a" size="sm" >
+                        { indicator }
+                      </MDBBtn>
+                    </div>
+                    <div className="strategy-indicator-edit-list-action display-flex-j-c">
+                      <MDBBtn tag="a" size="sm" floating gradient="blue" onClick={() => {
+                          this.handleIndicatorDelete(indicator)
+                        }}>
+                        <MDBIcon icon="window-close" />
+                      </MDBBtn>
+                    </div>
+                  </li>
+                )
+              })}
+              <li class="list-group-item strategy-indicator-edit-list">
+                <div className="strategy-indicator-edit-list-no display-flex-j-c">
+                  <MDBBtn tag="a" size="sm" >
+                    -
+                  </MDBBtn>
+                </div>
+                <div className="strategy-indicator-edit-list-content ml-30">
+                  <MDBBtn tag="a" size="sm" >
+                    New Indicator
+                  </MDBBtn>
+                </div>
+                <div className="strategy-indicator-edit-list-action display-flex-j-c">
+                  <MDBBtn tag="a" size="sm" floating gradient="blue" onClick={this.openAddIndicatorModal}>
+                    <MDBIcon icon="plus" />
+                  </MDBBtn>
+                </div>
+              </li>
+            </ul>
+            <div className="display-flex-left">
+              <button className="btn btn-md btn-secondary" onClick={()=>this.handleIndicatorReset()}>Reset</button>
+              <button className="btn btn-md btn-secondary" onClick={()=>this.handleOpenScriptFile()}>Open</button>
+              <button className="btn btn-md btn-secondary" onClick={()=>this.handleIndicatorSave(draftToHtml(convertToRaw(editorState.getCurrentContent())))}>Save</button>
+            </div>
+          </div>
+          )}
           {/* {this.state.textdata.map((item, index) => <div className="container bg-dark mt-2 p-2 rounded text-light" key={index}>{ item }</div>)} */}
           <Modal show={this.state.isShowOpenModal} className="hunter-modal" onHide={this.OpenScriptModalClose}>
             <Modal.Header closeButton>
@@ -222,7 +418,7 @@ export default class TextEditor extends Component {
             <Modal.Body>
               <div className="hunter-select-module-area">
                 <div className="select-multi-option">
-                  <label>select module type</label>
+                  <label>Select module type</label>
                   <Select
                     className="hunter-module-type-select"
                     name="select-module-type"
@@ -233,7 +429,7 @@ export default class TextEditor extends Component {
                   />
                 </div>
                 <div className="select-multi-option">
-                  <label>select file type</label>
+                  <label>Select file type</label>
                   <Select
                     name="select-file-type"
                     placeholder="File Type"
@@ -250,6 +446,47 @@ export default class TextEditor extends Component {
                 className="btn-md"
                 onClick = {() => {
                   this.handleScriptFileOpen(this.state.selectedFileType)
+                }}
+              >
+                Open
+              </Button>
+            </Modal.Footer>
+          </Modal>
+          <Modal show={this.state.isShowAddIndicatorModal} className="hunter-modal" onHide={this.AddIndicatorModalClose}>
+            <Modal.Header closeButton>
+              <Modal.Title>Select Module and Type</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <div className="hunter-select-module-area">
+                <div className="select-multi-option">
+                  <label>Select module type</label>
+                  <Select
+                    className="hunter-module-type-select"
+                    name="select-module-type"
+                    placeholder="Module Type"
+                    value={this.state.selectedModule1Type}
+                    onChange={this.handleModule1TypeChange}
+                    options={this.state.module1TypeOptions}
+                  />
+                </div>
+                <div className="select-multi-option">
+                  <label>Select file type</label>
+                  <Select
+                    name="select-file-type"
+                    placeholder="File Type"
+                    value={this.state.selectedFile1Type}
+                    onChange={this.handleFile1TypeChange}
+                    options={this.state.file1TypeOptions}
+                  />
+                </div>
+              </div>
+            </Modal.Body>
+            <Modal.Footer className="hunter-modal-footer">
+              <Button
+                variant="primary"
+                className="btn-md"
+                onClick = {() => {
+                  this.handleModuleAndTypeSelect()
                 }}
               >
                 Open

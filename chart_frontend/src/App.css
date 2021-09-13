@@ -448,3 +448,77 @@ div.mdb-datatable div.mdb-datatable-filter {
   display: flex;
   justify-content: space-around;
 }
+
+pre {
+  display: block;
+  font-family: monospace;
+  white-space: pre;
+  margin: 1em 0;
+}
+
+.hunter-editor-button-area {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #FFFFFF;
+}
+
+.display-flex-right {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+}
+
+/* common margin define */
+.mr-10 {
+  margin-right: 10px;
+}
+
+.ml-10 {
+  margin-left: 10px;
+}
+
+.ml-20 {
+  margin-left: 20px;
+}
+
+.ml-30 {
+  margin-left: 30px;
+}
+
+.mt-20 {
+  margin-top: 20px;
+}
+
+.strategy-indicator-edit-area {
+  width: 40%;
+}
+.strategy-indicator-edit-area ul li {
+  color: #212121;
+}
+
+.strategy-indicator-edit-list {
+  display: flex;
+}
+
+.strategy-indicator-edit-list-no {
+  width: 10%;
+}
+
+.strategy-indicator-edit-list-content {
+  width: 60%;
+}
+
+.strategy-indicator-edit-list-action {
+  width: 30%;
+}
+
+.display-flex-a-c {
+  display: flex;
+  align-items: center;
+}
+
+.display-flex-j-c {
+  display: flex;
+  justify-content: center;
+}

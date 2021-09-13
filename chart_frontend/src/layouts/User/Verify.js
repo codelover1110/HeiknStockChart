@@ -18,9 +18,21 @@ const Verify = () => {
     }
     
     useEffect(() => {
+        const listener = event => {
+            if (event.code === "Enter" || event.code === "NumpadEnter") {
+                event.preventDefault();
+                verify();
+            }
+        };
+        document.addEventListener("keydown", listener);
+
         if (!userId) {
             history.push('/login')
         }
+
+        return () => {
+            document.removeEventListener("keydown", listener);
+        };
     }, [userId, history])
 
     const verify = async () => {

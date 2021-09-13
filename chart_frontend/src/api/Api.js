@@ -227,6 +227,30 @@ export const createScriptFile = async(filename, content, isUpdate) => {
     })
 }
 
+export const saveConfigFile = async(filename, content, isUpdate) => {
+  return []
+}
+
+export const saveScriptFile = async(filename, content, isUpdate, isCheckedStrategy) => {
+  const requestOptions = {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      filename,
+      content,
+      isStrategyScript: isCheckedStrategy
+    })
+  };
+
+  const api = isUpdate ? '/strategy/save_script_file' : '/api/create_script_file';
+
+  return await fetch(process.env.REACT_APP_BACKEND_URL + api, requestOptions)
+    .then(response => response.json())
+    .then(data => {
+      return data
+    })
+}
+
 export const getScriptFile = async(filename) => {
   const requestOptions = {
     method: 'POST',
@@ -281,4 +305,8 @@ export const deleteUser = async (id) => {
     .then(data => {
       return data
     })
+}
+
+export const getConfigFileList = () => {
+  return []
 }
