@@ -33,6 +33,11 @@ const HeiknStockChart = (props) => {
   const [strategy, setStrategy] = useState({ value: 'heikfilter', label: 'heikfilter' });
   const [strategyList, setStrategyList] = useState([]);
   const [user] = useState(JSON.parse(localStorage.getItem('user-info')));
+  const [extendMarketTime, setExtendMarketTime] = useState(
+    {
+      value: 'markettime', label: 'market time',
+    }
+  );
   
   const [optionsViewTypes, setOptionsViewTypes] = useState([
     { value: 'charting', label: 'Charting' },
@@ -55,6 +60,15 @@ const HeiknStockChart = (props) => {
     },
     {
       value: 'HEIK2', label: 'HEIK2',
+    }
+  ]);
+  
+  const [optionsMarketTime, setOptionsMarketTime] = useState([
+    {
+      value: 'markettime', label: 'market time',
+    },
+    {
+      value: 'extend_markettime', label: 'extend market time',
     }
   ]);
 
@@ -216,6 +230,12 @@ const HeiknStockChart = (props) => {
     }
   }
 
+  const handleMarketTimeChange = (e) => {
+    if (e) {
+      setExtendMarketTime(e)
+    }
+  }
+
   const handleStrategy = async (e) => {
     if (e) {
       if (strategyList.length) {
@@ -336,6 +356,7 @@ const HeiknStockChart = (props) => {
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
           {microStrategy && symbol && (
             < StockChart 
+              extendMarketTime={extendMarketTime.value}
               selectedInstance={selectedInstance}
               selectedTradeDB='heikfilter-2mins-trades'
               chartPeriod='20D 2min'
@@ -352,7 +373,8 @@ const HeiknStockChart = (props) => {
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
           {microStrategy && symbol && (
-          < StockChart 
+            < StockChart 
+            extendMarketTime={extendMarketTime.value}
             selectedInstance={selectedInstance}
             selectedTradeDB='heikfilter-12mins-trades'
             chartPeriod='20D 12min'
@@ -369,6 +391,7 @@ const HeiknStockChart = (props) => {
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
           {microStrategy && symbol && (
             < StockChart
+              extendMarketTime={extendMarketTime.value}
               selectedInstance={selectedInstance}
               selectedTradeDB='heikfilter-1hour-trades'
               chartPeriod='30D 1hour'
@@ -385,6 +408,7 @@ const HeiknStockChart = (props) => {
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
           {microStrategy && symbol && (
             < StockChart
+              extendMarketTime={extendMarketTime.value}
               selectedInstance={selectedInstance}
               selectedTradeDB='heikfilter-4hours-trades'
               chartPeriod='90D 4hour'
@@ -401,6 +425,7 @@ const HeiknStockChart = (props) => {
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
           {microStrategy && symbol && (
             < StockChart
+              extendMarketTime={extendMarketTime.value}
               selectedInstance={selectedInstance}
               selectedTradeDB='heikfilter-12hours-trades'
               chartPeriod='90D 12hour'
@@ -417,6 +442,7 @@ const HeiknStockChart = (props) => {
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
           {microStrategy && symbol && (
           < StockChart
+            extendMarketTime={extendMarketTime.value}
             selectedInstance={selectedInstance}
             selectedTradeDB='heikfilter-1day-trades'
             chartPeriod='1Y 1day'
@@ -456,13 +482,21 @@ const HeiknStockChart = (props) => {
               />
             </div>
             <div className="select-option">
-                <Select
-                  value={strategy}
-                  onChange={handleStrategy}
-                  options={optionsStratgy}
-                  placeholder="Macro Strategy"
-                />
-              </div>
+              <Select
+                value={extendMarketTime}
+                onChange={handleMarketTimeChange}
+                options={optionsMarketTime}
+                placeholder="Market Time"
+              />
+            </div>
+            <div className="select-option">
+              <Select
+                value={strategy}
+                onChange={handleStrategy}
+                options={optionsStratgy}
+                placeholder="Macro Strategy"
+              />
+            </div>
             {isShowMicro && (
               <div className="select-option">
                 <Select

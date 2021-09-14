@@ -406,7 +406,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 		.merge((d, c) => {d.atr14 = c;})
 		.accessor(d => d.atr14);	
 
-		const { type, data: initialData, width, ratio, chartColumn } = this.props;
+		const { type, data: initialData, width, ratio, chartColumn, extendMarketTime } = this.props;
 
 		const isFullChart = (chartColumn === 1 || chartColumn === 2);
 
@@ -481,7 +481,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 		// console.log("xExtents1", this.props.data[0].date, this.props.data[this.props.data.length - 1].date)
 		
 		const xDisplayFormatProps = {
-			xDisplayFormat: timeFormat("%Y-%m-%d-%H-%M-%S"),
+			xDisplayFormat: timeFormat("%Y-%m-%d : %H-%M-%S"),
 			ohlcFormat: () => "",
 			volumeFormat: () => "",
 			percentFormat: () => "",
@@ -638,7 +638,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 							yDisplayFormat={format(".2f")}
 							appearance={rsiAppearance}
 							{...SMATooltipProps}
-							origin={[-40, this.props.isHompage ? 40 : 25]}/>
+							origin={[-40, 35]}/>
 					</Chart>
 				)}
 				{this.isIncludeIndicators('RSI2') && (
@@ -671,7 +671,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 							yDisplayFormat={format(".2f")}
 							appearance={rsiAppearance}
 							{...SMATooltipProps}
-							origin={[-40, this.props.isHompage ? 40 : 25]}/>
+							origin={[-40, 35]}/>
 					</Chart>
 				)}
 				{this.isIncludeIndicators('RSI3') && (
@@ -704,7 +704,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 							yDisplayFormat={format(".2f")}
 							appearance={rsiAppearance}
 							{...SMATooltipProps}
-							origin={[-40, this.props.isHompage ? 40 : 25]}/>
+							origin={[-40, 35]}/>
 					</Chart>
 				)}
 				{this.isIncludeIndicators('HEIK1') && (
@@ -737,7 +737,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 							yDisplayFormat={format(".2f")}
 							appearance={rsiAppearance}
 							{...SMATooltipProps}
-							origin={[-40, this.props.isHompage ? 40 : 25]}/>
+							origin={[-40, 35]}/>
 					</Chart>
 				)}
 				{this.isIncludeIndicators('HEIK2') && (
@@ -770,7 +770,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 							yDisplayFormat={format(".2f")}
 							appearance={rsiAppearance}
 							{...SMATooltipProps}
-							origin={[-40, this.props.isHompage ? 40 : 25]}/>
+							origin={[-40, 35]}/>
 					</Chart>
 				)}
 				{/* {this.isIncludeIndicators('RSI3') && (

@@ -491,7 +491,8 @@ pre {
 }
 
 .strategy-indicator-edit-area {
-  width: 40%;
+  display: flex;
+  width: 80%;
 }
 .strategy-indicator-edit-area ul li {
   color: #212121;
@@ -499,18 +500,20 @@ pre {
 
 .strategy-indicator-edit-list {
   display: flex;
+  align-items: center;
+  padding: 0px 5px;
 }
 
 .strategy-indicator-edit-list-no {
-  width: 10%;
+  width: 20%;
 }
 
 .strategy-indicator-edit-list-content {
-  width: 60%;
+  width: 40%;
 }
 
 .strategy-indicator-edit-list-action {
-  width: 30%;
+  width: 40%;
 }
 
 .display-flex-a-c {
@@ -521,4 +524,18 @@ pre {
 .display-flex-j-c {
   display: flex;
   justify-content: center;
+}
+
+.hunter-bot-name-input {
+
+}
+
+.hunter-process-mdb-btn {
+  width: 200px;
+}
+
+.strategy-edit-icon-area {
+  display: flex;
+  flex-direction: column;
+  margin-left: 30px;
 }

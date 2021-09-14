@@ -17,7 +17,8 @@ const StockChart = (props) => {
         selectedTradeDB,
         chartPeriod,
         startDate,
-        endDate
+        endDate,
+        extendMarketTime
     } = props;
     const [dbname, setDbname] = useState('')
 	const [chartData, setChartData] = useState(null)
@@ -67,7 +68,12 @@ const StockChart = (props) => {
                         'micro': (selectedInstance !== 'live_trading') ? microStrategy : '',
                     })
                 };
-                fetch(process.env.REACT_APP_BACKEND_URL+'/api/get_data', requestOptions)
+                setChartData(null)
+                let apiName = '/api/get_data';
+                if (extendMarketTime === 'extend_markettime') {
+                    apiName = '/api/get_data_extended';
+                }
+                fetch(process.env.REACT_APP_BACKEND_URL + apiName, requestOptions)
                 .then(response => response.json())
                 .then(data => {
                     data['chart_data']['columns'] = ["date", "open", "high", "low", "close", "volume", "split", "dividend", "absoluteChange", "percentChange"]
@@ -105,7 +111,7 @@ const StockChart = (props) => {
         if (symbol || multiSymbol.length) {
 			get_data(symbol)
 		}
-    }, [selectedInstance, dbname, viewType, symbol, multiSymbol, microStrategy, startDate, endDate, strategy.value])
+    }, [extendMarketTime, selectedInstance, dbname, viewType, symbol, multiSymbol, microStrategy, startDate, endDate, strategy.value])
 
     return (
 		<>
@@ -131,6 +137,7 @@ const StockChart = (props) => {
                                     chartColumn={chartColumn}
                                     microStrategy={microStrategy}
                                     selectedInstance={selectedInstance}
+                                    extendMarketTime={extendMarketTime}
                                 />
                                 : <PerformanceChart type={type} data={chartData} multiSymbol={multiSymbol.map((symbol) => symbol.value)}/>
                             )

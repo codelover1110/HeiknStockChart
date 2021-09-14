@@ -33,6 +33,21 @@ export default class TextEditor extends Component {
         { value: 'indicators', label: 'pass in processed data into indicators' },
         { value: 'core', label: 'core' },
       ],
+      processConfigOptions: {
+        bot_name: '',
+        timeframe: '',
+        indicator: [],
+        watchlist: [],
+        position_sizing: '',
+        order_routing: '',
+        data_source: '',
+        live_trading: false,
+        starting_cash: 10000,
+        hours: '',
+        name: '',
+        macro_strategy: '',
+        indicator_signalling: '',
+      },
       selectedConfigFile: null,
       selectedModuleContents: [],
       filename: '',
@@ -43,7 +58,7 @@ export default class TextEditor extends Component {
       isShowAddIndicatorModal: false,
       isShowSaveModal: false,
       isCheckedStrategy: false,
-      strategyIndicators: []
+      strategyIndicators: [],
     };
   }
 
@@ -312,7 +327,7 @@ export default class TextEditor extends Component {
 
   handleModuleAndTypeSelect = () => {
     const indicators = this.state.strategyIndicators;
-    indicators.push(`${this.state.selectedModule1Type.value} - ${this.state.selectedFile1Type.value}`)
+    indicators.push(`${this.state.selectedModule1Type.value}-${this.state.selectedFile1Type.value}`)
     this.setState( { strategyIndicators: indicators} )
   }
 
@@ -321,6 +336,55 @@ export default class TextEditor extends Component {
     indicators = indicators.filter( (o) => o !== indicator )
     console.log("indicator", indicators)
     this.setState( { strategyIndicators: indicators} )
+  }
+
+  handleBotNameChange = (e) => {
+
+  }
+  
+  handleProcessChange = (e, key) => {
+
+  }
+
+  displayProcessEditor = () => {
+    let keys = Object.keys(this.state.processConfigOptions);
+    return keys.map((key, index) => {
+      return (
+        <li class="list-group-item strategy-indicator-edit-list">
+          <div className="strategy-indicator-edit-list-no display-flex-j-c">
+            <MDBBtn tag="a" size="sm">
+              {index}
+            </MDBBtn>
+          </div>
+          <div className="strategy-indicator-edit-list-content ml-30">
+            <MDBBtn tag="a" size="sm"  className="hunter-process-mdb-btn">
+              {key}
+            </MDBBtn>
+          </div>
+          <div className="strategy-indicator-edit-list-action">
+          { key === 'bot_name'
+            ? 
+            (
+              <input
+                  type="name"
+                  className="form-control hunter-bot-name-input"
+                  placeholder="Enter bot name"
+                  value={this.state.processConfigOptions['key']}
+                  onChange={(e) => { this.handleBotNameChange(e)}}
+              />
+            )
+            :
+            (<Select
+              value={this.state.processConfigOptions['key']}
+              onChange={(e) => { this.handleProcessChange(e, key) }}
+              options={null}
+              placeholder="select"
+            />)
+          }
+          </div>
+        </li>
+      )
+    })
   }
 
   handleIndicatorReset = () => {
@@ -385,10 +449,11 @@ export default class TextEditor extends Component {
                   </li>
                 )
               })}
-              <li class="list-group-item strategy-indicator-edit-list">
+              {this.displayProcessEditor()}
+              {/* <li class="list-group-item strategy-indicator-edit-list">
                 <div className="strategy-indicator-edit-list-no display-flex-j-c">
                   <MDBBtn tag="a" size="sm" >
-                    -
+                    1
                   </MDBBtn>
                 </div>
                 <div className="strategy-indicator-edit-list-content ml-30">
@@ -401,9 +466,9 @@ export default class TextEditor extends Component {
                     <MDBIcon icon="plus" />
                   </MDBBtn>
                 </div>
-              </li>
+              </li> */}
             </ul>
-            <div className="display-flex-left">
+            <div className="strategy-edit-icon-area">
               <button className="btn btn-md btn-secondary" onClick={()=>this.handleIndicatorReset()}>Reset</button>
               <button className="btn btn-md btn-secondary" onClick={()=>this.handleOpenScriptFile()}>Open</button>
               <button className="btn btn-md btn-secondary" onClick={()=>this.handleIndicatorSave(draftToHtml(convertToRaw(editorState.getCurrentContent())))}>Save</button>
