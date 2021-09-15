@@ -206,8 +206,6 @@ export const getFileTypeNames = async(moduleType) => {
     })
 }
 
-
-
 export const createScriptFile = async(filename, content, isUpdate) => {
   const requestOptions = {
     method: 'POST',
@@ -227,8 +225,87 @@ export const createScriptFile = async(filename, content, isUpdate) => {
     })
 }
 
-export const saveConfigFile = async(filename, content, isUpdate) => {
-  return []
+const convertArraytoString = (src) => {
+  if (!src) {
+    return ''
+  }
+
+  let dest = ''
+  let comma = ''
+  src.forEach(o => {
+    dest = dest + comma + o.value
+    comma = ','
+  })
+  return dest
+}
+
+const convertStringtoArray = (src) => {
+  if (!src.length) {
+    return []
+  }
+
+  const dest = src.split(',')
+  return dest.map((o) => ({
+    value: o,
+    label: o
+  }))
+}
+
+const transformingProcessConfigToQuery = (settings) => {
+  return {
+    bot_name: settings.bot_name,
+    timeframe: convertArraytoString(settings.timeframe),
+    indicator: convertArraytoString(settings.indicator),
+    watchlist: convertArraytoString(settings.watchlist),
+    position_sizing: convertArraytoString(settings.position_sizing),
+    order_routing: convertArraytoString(settings.order_routing),
+    data_source: convertArraytoString(settings.data_source),
+    live_trading: convertArraytoString(settings.live_trading),
+    starting_cash: settings.starting_cash,
+    hours: convertArraytoString(settings.hours),
+    name: settings.name,
+    macro_strategy: convertArraytoString(settings.macro_strategy),
+    indicator_signalling: convertArraytoString(settings.indicator_signalling),
+  };
+}
+
+const transformingProcessConfigFromParam = (settings) => {
+  return {
+    bot_name: settings.bot_name,
+    timeframe: convertStringtoArray(settings.timeframe),
+    indicator: convertStringtoArray(settings.indicator),
+    watchlist: convertStringtoArray(settings.watchlist),
+    position_sizing: convertStringtoArray(settings.position_sizing),
+    order_routing: convertStringtoArray(settings.order_routing),
+    data_source: convertStringtoArray(settings.data_source),
+    live_trading: convertStringtoArray(settings.live_trading),
+    starting_cash: settings.starting_cash,
+    hours: convertStringtoArray(settings.hours),
+    name: settings.name,
+    macro_strategy: convertStringtoArray(settings.macro_strategy),
+    indicator_signalling: convertStringtoArray(settings.indicator_signalling),
+  };
+}
+
+export const saveConfigFile = async(settings) => {
+  const data = transformingProcessConfigToQuery(settings)
+  
+  const requestOptions = {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      config_collection: 'bot_configs',
+      config: data
+    })
+  };  
+
+  const api = '/strategy/create_one_config_detail/';
+
+  return await fetch(process.env.REACT_APP_BACKEND_URL + api, requestOptions)
+    .then(response => response.json())
+    .then(data => {
+      return data
+    })
 }
 
 export const saveScriptFile = async(filename, content, isUpdate, isCheckedStrategy) => {
@@ -307,6 +384,35 @@ export const deleteUser = async (id) => {
     })
 }
 
-export const getConfigFileList = () => {
-  return []
+export const getConfigFileList = async (collection) => {
+  const requestOptions = {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      config_collection: collection,
+    })
+  };
+  return await fetch(process.env.REACT_APP_BACKEND_URL + "/strategy/config_detail_names/", requestOptions)
+    .then(response => response.json())
+    .then(data => {
+      return data
+    })
+}
+
+export const getConfigFileDetail = async (collection, name) => {
+  const requestOptions = {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      config_collection: collection,
+      name,
+    })
+  };
+  const res = await fetch(process.env.REACT_APP_BACKEND_URL + "/strategy/config_item_detail/", requestOptions)
+    .then(response => response.json())
+    .then(data => {
+      return data
+    })
+
+  return transformingProcessConfigFromParam(res.result)
 }

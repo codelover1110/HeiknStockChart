@@ -6,7 +6,7 @@ import { Editor } from "react-draft-wysiwyg";
 import { EditorState, convertToRaw ,convertFromHTML,ContentState} from "draft-js";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import draftToHtml from "draftjs-to-html";
-import { getScriptFile, getModuleTypeNames, getFileTypeNames, createScriptFile, saveConfigFile, saveScriptFile, getConfigFileList } from "api/Api";
+import { getConfigFileDetail, getScriptFile, getModuleTypeNames, getFileTypeNames, createScriptFile, saveConfigFile, saveScriptFile, getConfigFileList } from "api/Api";
 import {
   Button
 } from "reactstrap";
@@ -35,18 +35,102 @@ export default class TextEditor extends Component {
       ],
       processConfigOptions: {
         bot_name: '',
-        timeframe: '',
-        indicator: [],
-        watchlist: [],
-        position_sizing: '',
-        order_routing: '',
-        data_source: '',
-        live_trading: false,
+        timeframe: [
+          {
+            value: '2m',
+            label: '2m'
+          },
+          {
+            value: '4m',
+            label: '4m'
+          },
+          {
+            value: '12m',
+            label: '12m'
+          }
+        ],
+        indicator: [
+          {
+            value: 'heik_diff',
+            label: 'heik_diff'
+          },
+          {
+            value: 'heik',
+            label: 'heik'
+          },
+          {
+            value: 'rsi1',
+            label: 'rsi1'
+          },
+          {
+            value: 'rsi2',
+            label: 'rsi2'
+          },
+          {
+            value: 'rsi3',
+            label: 'rsi3'
+          },
+        ],
+        watchlist: [
+          {
+            value: 'tech',
+            label: 'tech'
+          },
+          {
+            value: 'buffett',
+            label: 'buffett'
+          },
+        ],
+        position_sizing: [{value: 'equal', label: 'equal'}],
+        order_routing: [
+          {
+            value: 'alphaca',
+            label: 'alphaca'
+          },
+        ],
+        data_source: [{
+          label: "polygon",
+          value: "polygon"
+        }],
+        live_trading: [
+          {
+            value: true,
+            label: 'true'
+          },
+          {
+            value: false,
+            label: 'false'
+          },
+        ],
         starting_cash: 10000,
-        hours: '',
+        hours: {value: 'emkt', label: 'emkt'},
         name: '',
-        macro_strategy: '',
-        indicator_signalling: '',
+        macro_strategy: [{value: 'tsrh_dc', label: 'tsrh_dc'}],
+        indicator_signalling: [
+          {
+            label: "alternative",
+            value: "alternative"
+          },
+          {
+            value: 'default',
+            label: 'default'
+          }
+        ],
+      },
+      processConfigSetting: {
+        bot_name: '',
+        timeframe: null,
+        indicator: null,
+        watchlist: null,
+        position_sizing: null,
+        order_routing: null,
+        data_source: null,
+        live_trading: null,
+        starting_cash: 10000,
+        hours: null,
+        name: '',
+        macro_strategy: null,
+        indicator_signalling: null,
       },
       selectedConfigFile: null,
       selectedModuleContents: [],
@@ -58,6 +142,7 @@ export default class TextEditor extends Component {
       isShowAddIndicatorModal: false,
       isShowSaveModal: false,
       isCheckedStrategy: false,
+      isShowConfigOpenModal: false,
       strategyIndicators: [],
     };
   }
@@ -76,7 +161,7 @@ export default class TextEditor extends Component {
   }
   
   loadConfigFiles = async () => {
-    const res = await getConfigFileList();
+    const res = await getConfigFileList('bot_configs');
     if (res.success) {
       const configFiles = res.result.map(value => {
         return {
@@ -97,7 +182,6 @@ export default class TextEditor extends Component {
     const res = await getModuleTypeNames();
     if (res.success) {
       const moduleTypes = res.result.map(value => {
-        console.log("value:", value);
         return {
           value: value,
           label: value
@@ -153,7 +237,7 @@ export default class TextEditor extends Component {
     } else {
       res = await saveConfigFile(
         this.state.isUpdate ? this.state.selectedFileType.value : this.state.filename,
-        this.state.strategyIndicators,
+        this.state.processConfigSetting,
         this.state.isUpdate,
       )
     }
@@ -193,6 +277,13 @@ export default class TextEditor extends Component {
       isUpdate: true,
     })    
   }
+
+  handleOpenProcessConfigModal = async () => {
+    this.setState({
+      isShowConfigOpenModal: true,
+      isUpdate: true
+    })
+  }
   
   handleFileTypeChange = async (e) => {
     this.setState({
@@ -209,7 +300,10 @@ export default class TextEditor extends Component {
   }
 
   handleConfigFileChange = async (e) => {
-
+    this.setState({
+      selectedConfigFile: e,
+      isUpdate: true,
+    })
   }
 
   handleModuleTypeChange = async (e) => {
@@ -265,6 +359,9 @@ export default class TextEditor extends Component {
     this.setState({isShowSaveModal: true})
   }
   
+  ProcessConfigModalClose = () => {
+    this.setState({isShowConfigOpenModal: false})
+  }
   OpenScriptModalClose = () => {
     this.setState({isShowOpenModal: false})
   }
@@ -293,6 +390,16 @@ export default class TextEditor extends Component {
     this.OpenScriptModalClose();
   }
 
+  handleConfigFileOpen = async () => {
+    const res = await getConfigFileDetail('bot_configs', this.state.selectedConfigFile.value)
+    this.setState({
+      processConfigSetting: res,
+      isUpdate: true
+    })
+    console.log("res", res)
+    this.ProcessConfigModalClose()
+  }
+
   handleSave = (content) => {
     this.setState({
       content,
@@ -301,12 +408,21 @@ export default class TextEditor extends Component {
     this.handleSaveModalShow()
   }
   
-  handleIndicatorSave = (content) => {
-    this.setState({
-      content,
-      isSelectedStrategyFile: false
-    })
-    this.handleSaveModalShow()
+  handleProcessConfigSettingSave = async () => {
+    if (!this.state.processConfigSetting.name.length) {
+      alert("name field is required!")
+      return
+    }
+    const res = await saveConfigFile(
+      this.state.processConfigSetting,
+      this.state.isUpdate,
+    )
+
+    if (res.success) {
+      alert(res.message)
+    } else {
+      alert('The config is not saved')
+    }
   }
 
   showFile = async (e) => {
@@ -338,19 +454,21 @@ export default class TextEditor extends Component {
     this.setState( { strategyIndicators: indicators} )
   }
 
-  handleBotNameChange = (e) => {
-
+  handleBotNameChange = (e, key) => {
+    this.state.processConfigSetting[key] = e.target.value
+    this.setState({processConfigSetting: this.state.processConfigSetting})
   }
   
   handleProcessChange = (e, key) => {
-
+    this.state.processConfigSetting[key] = e
+    this.setState({processConfigSetting: this.state.processConfigSetting})
   }
 
   displayProcessEditor = () => {
     let keys = Object.keys(this.state.processConfigOptions);
     return keys.map((key, index) => {
       return (
-        <li class="list-group-item strategy-indicator-edit-list">
+        <li key={key} className="list-group-item strategy-indicator-edit-list">
           <div className="strategy-indicator-edit-list-no display-flex-j-c">
             <MDBBtn tag="a" size="sm">
               {index}
@@ -362,23 +480,26 @@ export default class TextEditor extends Component {
             </MDBBtn>
           </div>
           <div className="strategy-indicator-edit-list-action">
-          { key === 'bot_name'
+          { key === 'bot_name' || key === 'name' || key === 'starting_cash'
             ? 
             (
               <input
                   type="name"
                   className="form-control hunter-bot-name-input"
-                  placeholder="Enter bot name"
-                  value={this.state.processConfigOptions['key']}
-                  onChange={(e) => { this.handleBotNameChange(e)}}
+                  placeholder= {
+                    key === 'bot_name' ? "Enter bot name" : key === 'name' ? "Enter name" : "Enter starting cash"
+                  }
+                  value={this.state.processConfigSetting[key]}
+                  onChange={(e) => { this.handleBotNameChange(e, key)}}
               />
             )
             :
             (<Select
-              value={this.state.processConfigOptions['key']}
+              value={this.state.processConfigSetting[key]}
               onChange={(e) => { this.handleProcessChange(e, key) }}
-              options={null}
+              options={this.state.processConfigOptions[key]}
               placeholder="select"
+              isMulti
             />)
           }
           </div>
@@ -388,7 +509,25 @@ export default class TextEditor extends Component {
   }
 
   handleIndicatorReset = () => {
-    this.setState( { strategyIndicators: [] } )
+    this.setState(
+      { 
+        processConfigSetting: {
+          bot_name: '',
+          timeframe: null,
+          indicator: null,
+          watchlist: null,
+          position_sizing: null,
+          order_routing: null,
+          data_source: null,
+          live_trading: null,
+          starting_cash: 10000,
+          hours: null,
+          name: '',
+          macro_strategy: null,
+          indicator_signalling: null,
+        }
+      }
+    )
   }
 
   render() {
@@ -425,57 +564,16 @@ export default class TextEditor extends Component {
           </div>)}
           {this.state.isCheckedStrategy && (
           <div className={"strategy-indicator-edit-area"}>
-            <ul class="list-group">
-              {this.state.strategyIndicators.map((indicator, index) => {
-                return (
-                  <li class="list-group-item strategy-indicator-edit-list">
-                    <div className="strategy-indicator-edit-list-no display-flex-j-c">
-                      <MDBBtn tag="a" size="sm" >
-                        { index + 1 }
-                      </MDBBtn>
-                    </div>
-                    <div className="strategy-indicator-edit-list-content ml-30">
-                      <MDBBtn tag="a" size="sm" >
-                        { indicator }
-                      </MDBBtn>
-                    </div>
-                    <div className="strategy-indicator-edit-list-action display-flex-j-c">
-                      <MDBBtn tag="a" size="sm" floating gradient="blue" onClick={() => {
-                          this.handleIndicatorDelete(indicator)
-                        }}>
-                        <MDBIcon icon="window-close" />
-                      </MDBBtn>
-                    </div>
-                  </li>
-                )
-              })}
+            <ul className="list-group">
               {this.displayProcessEditor()}
-              {/* <li class="list-group-item strategy-indicator-edit-list">
-                <div className="strategy-indicator-edit-list-no display-flex-j-c">
-                  <MDBBtn tag="a" size="sm" >
-                    1
-                  </MDBBtn>
-                </div>
-                <div className="strategy-indicator-edit-list-content ml-30">
-                  <MDBBtn tag="a" size="sm" >
-                    New Indicator
-                  </MDBBtn>
-                </div>
-                <div className="strategy-indicator-edit-list-action display-flex-j-c">
-                  <MDBBtn tag="a" size="sm" floating gradient="blue" onClick={this.openAddIndicatorModal}>
-                    <MDBIcon icon="plus" />
-                  </MDBBtn>
-                </div>
-              </li> */}
             </ul>
             <div className="strategy-edit-icon-area">
               <button className="btn btn-md btn-secondary" onClick={()=>this.handleIndicatorReset()}>Reset</button>
-              <button className="btn btn-md btn-secondary" onClick={()=>this.handleOpenScriptFile()}>Open</button>
-              <button className="btn btn-md btn-secondary" onClick={()=>this.handleIndicatorSave(draftToHtml(convertToRaw(editorState.getCurrentContent())))}>Save</button>
+              <button className="btn btn-md btn-secondary" onClick={()=>this.handleOpenProcessConfigModal()}>Open</button>
+              <button className="btn btn-md btn-secondary" onClick={()=>this.handleProcessConfigSettingSave()}>Save</button>
             </div>
           </div>
           )}
-          {/* {this.state.textdata.map((item, index) => <div className="container bg-dark mt-2 p-2 rounded text-light" key={index}>{ item }</div>)} */}
           <Modal show={this.state.isShowOpenModal} className="hunter-modal" onHide={this.OpenScriptModalClose}>
             <Modal.Header closeButton>
               <Modal.Title>Open Script File</Modal.Title>
@@ -517,31 +615,21 @@ export default class TextEditor extends Component {
               </Button>
             </Modal.Footer>
           </Modal>
-          <Modal show={this.state.isShowAddIndicatorModal} className="hunter-modal" onHide={this.AddIndicatorModalClose}>
+          <Modal show={this.state.isShowConfigOpenModal} className="hunter-modal" onHide={this.ProcessConfigModalClose}>
             <Modal.Header closeButton>
-              <Modal.Title>Select Module and Type</Modal.Title>
+              <Modal.Title>Open Script File</Modal.Title>
             </Modal.Header>
             <Modal.Body>
               <div className="hunter-select-module-area">
                 <div className="select-multi-option">
-                  <label>Select module type</label>
+                  <label>Select Config File</label>
                   <Select
                     className="hunter-module-type-select"
-                    name="select-module-type"
-                    placeholder="Module Type"
-                    value={this.state.selectedModule1Type}
-                    onChange={this.handleModule1TypeChange}
-                    options={this.state.module1TypeOptions}
-                  />
-                </div>
-                <div className="select-multi-option">
-                  <label>Select file type</label>
-                  <Select
-                    name="select-file-type"
-                    placeholder="File Type"
-                    value={this.state.selectedFile1Type}
-                    onChange={this.handleFile1TypeChange}
-                    options={this.state.file1TypeOptions}
+                    name="select-config-file"
+                    placeholder="Config File"
+                    value={this.state.selectedConfigFile}
+                    onChange={this.handleConfigFileChange}
+                    options={this.state.configFileOptions}
                   />
                 </div>
               </div>
@@ -551,7 +639,7 @@ export default class TextEditor extends Component {
                 variant="primary"
                 className="btn-md"
                 onClick = {() => {
-                  this.handleModuleAndTypeSelect()
+                  this.handleConfigFileOpen()
                 }}
               >
                 Open
