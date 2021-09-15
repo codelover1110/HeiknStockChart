@@ -13,11 +13,14 @@ import {
 import { MDBBtn, MDBIcon } from "mdbreact";
 
 import Modal from 'react-bootstrap/Modal'
+import Tabs from 'react-bootstrap/Tabs'
+import Tab from 'react-bootstrap/Tab'
 
 export default class TextEditor extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      key: 'parameter',
       editorState: EditorState.createEmpty(),
       textdata:["hello"],
       scriptfiles: [],
@@ -535,45 +538,47 @@ export default class TextEditor extends Component {
     return (
       <React.Fragment>
         <div className="hunter-textedit-container" > 
-          <div className="hunter-data-table-title">
-            Strategy File Editor
-          </div>
-          <Editor
-            editorState={editorState}
-            toolbarClassName="toolbarClassName"
-            wrapperClassName="wrapperClassName"
-            editorClassName="editorClassName"
-            editorStyle={{backgroundColor:"whitesmoke"}}
-            onEditorStateChange={this.onEditorStateChange}
-          />
-          <div className="hunter-editor-button-area">
-            <div className="display-flex-right">
-              <span className="mr-10">Strategy</span>
-                <Switch onChange={this.handleChange} checked={this.state.isCheckedStrategy} />
-              <span className="ml-10">Config</span>
-            </div>
-            <div className="display-flex-left">
-              <button className="btn btn-md btn-secondary" onClick={()=>this.handleScriptFileCreate()}>New</button>
-              <button className="btn btn-md btn-secondary" onClick={()=>this.handleOpenScriptFile()}>Open</button>
-              <button className="btn btn-md btn-secondary" onClick={()=>this.handleSave(draftToHtml(convertToRaw(editorState.getCurrentContent())))}>Save</button>
-            </div>
-          </div>
-          {this.state.isCheckedStrategy && (
-          <div className="hunter-data-table-title mt-20">
-            Strategy Indicator Editor
-          </div>)}
-          {this.state.isCheckedStrategy && (
-          <div className={"strategy-indicator-edit-area"}>
-            <ul className="list-group">
-              {this.displayProcessEditor()}
-            </ul>
-            <div className="strategy-edit-icon-area">
-              <button className="btn btn-md btn-secondary" onClick={()=>this.handleIndicatorReset()}>Reset</button>
-              <button className="btn btn-md btn-secondary" onClick={()=>this.handleOpenProcessConfigModal()}>Open</button>
-              <button className="btn btn-md btn-secondary" onClick={()=>this.handleProcessConfigSettingSave()}>Save</button>
-            </div>
-          </div>
-          )}
+          <Tabs
+            id="controlled-tab-example"
+            activeKey={this.state.key}
+            onSelect={(k) => this.setState({ key: k })}
+            className="mb-3"
+          >
+            <Tab eventKey="parameter" title="Parameter Editor">
+              <Editor
+                editorState={editorState}
+                toolbarClassName="toolbarClassName"
+                wrapperClassName="wrapperClassName"
+                editorClassName="editorClassName"
+                editorStyle={{backgroundColor:"whitesmoke"}}
+                onEditorStateChange={this.onEditorStateChange}
+              />
+              <div className="hunter-editor-button-area">
+                {/* <div className="display-flex-right">
+                  <span className="mr-10">Strategy</span>
+                    <Switch onChange={this.handleChange} checked={this.state.isCheckedStrategy} />
+                  <span className="ml-10">Config</span>
+                </div> */}
+                <div className="display-flex-left">
+                  <button className="btn btn-md btn-secondary" onClick={()=>this.handleScriptFileCreate()}>New</button>
+                  <button className="btn btn-md btn-secondary" onClick={()=>this.handleOpenScriptFile()}>Open</button>
+                  <button className="btn btn-md btn-secondary" onClick={()=>this.handleSave(draftToHtml(convertToRaw(editorState.getCurrentContent())))}>Save</button>
+                </div>
+              </div>
+            </Tab>
+            <Tab eventKey="process" title="Process Config Editor">
+              <div className={"strategy-indicator-edit-area"}>
+                <ul className="list-group">
+                  {this.displayProcessEditor()}
+                </ul>
+                <div className="strategy-edit-icon-area">
+                  <button className="btn btn-md btn-secondary" onClick={()=>this.handleIndicatorReset()}>Reset</button>
+                  <button className="btn btn-md btn-secondary" onClick={()=>this.handleOpenProcessConfigModal()}>Open</button>
+                  <button className="btn btn-md btn-secondary" onClick={()=>this.handleProcessConfigSettingSave()}>Save</button>
+                </div>
+              </div>
+            </Tab>
+          </Tabs>
           <Modal show={this.state.isShowOpenModal} className="hunter-modal" onHide={this.OpenScriptModalClose}>
             <Modal.Header closeButton>
               <Modal.Title>Open Script File</Modal.Title>

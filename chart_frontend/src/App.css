@@ -30,6 +30,10 @@
   overflow-y: scroll;
 }
 
+.half-width {
+  width: 50%;
+}
+
 .grap-container-wrap {
   width: 100%;
   height: 100%;
@@ -526,10 +530,6 @@ pre {
   justify-content: center;
 }
 
-.hunter-bot-name-input {
-
-}
-
 .hunter-process-mdb-btn {
   width: 200px;
 }
@@ -538,4 +538,13 @@ pre {
   display: flex;
   flex-direction: column;
   margin-left: 30px;
+}
+
+.public-DraftStyleDefault-block {
+  min-height: 400px;
+}
+
+.test-class {
+  margin-top: 300px;
+  color: #FFFFFF;
 }
