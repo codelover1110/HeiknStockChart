@@ -82,6 +82,12 @@ export var routes = [
       }
     ],
   },
+  {
+    name: "Hybrid view",
+    icon: "tim-icons icon-video-66",
+    instance: "hybrid_view",
+    pathname: '/hybrid_view'
+  },
 ]
 
 export var adminRoutes = [
