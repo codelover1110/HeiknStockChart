@@ -9,6 +9,7 @@ import UserManage from "layouts/Admin/UserManage.js";
 import LinkManage from "layouts/Admin/LinkManage";
 import PriceData from "layouts/User/PriceData";
 import TradeData from "layouts/User/TradeData";
+import HybridView from "layouts/User/HybridView";
 
 import "assets/scss/black-dashboard-react.scss";
 import "assets/demo/demo.css";
@@ -62,6 +63,9 @@ ReactDOM.render(
             </PrivateRoute>
             <PrivateRoute path="/tradedatatable">
               <TradeData />
+            </PrivateRoute>
+            <PrivateRoute path="/hybrid_view">
+              <HybridView />
             </PrivateRoute>
             <PrivateRoute path="/">
               <HomePage />

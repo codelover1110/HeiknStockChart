@@ -2,7 +2,7 @@ import React, { useCallback, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Select from 'react-select'
 import "react-datetime/css/react-datetime.css";
-import StockChart from "./stock-chart/StockChart"
+import StockChart from "../stock-chart/StockChart"
 import { useHistory } from "react-router-dom";
 import {
   Collapse,
@@ -15,11 +15,12 @@ import {
 } from "reactstrap";
 import { useAuth } from 'contexts/authContext';
 import disableScroll from 'disable-scroll';
+import HybridViewTable from "./HybridViewTable"
 
-const HeiknStockChart = (props) => {
+const HybridViewChartTable = (props) => {
 
   const auth = useAuth();
-  const { selectedInstance, handleChartRedirect } = props
+  const { selectedInstance } = props
   const history = useHistory();
   const [symbol, setSymbol] = useState({ value: 'MSFT', label: 'MSFT' });
   const [indicators, setIndicators] = useState([]);
@@ -27,7 +28,6 @@ const HeiknStockChart = (props) => {
   const [symbolList, setSymbolList] = useState([])
   const [isGetSymbolList] = useState(false)
   const [collapseOpen,] = React.useState(false)
-  const [chartColumn, setChartColumn] = useState({ value: 6, label: '6' })
   const [selectedViewType, setSelectedViewType] = useState({ value: 'charting', label: 'Charting' });
   const [microStrategy, setMicroStrategy] = useState({ value: '2m', label: '2m' });
   const [strategy, setStrategy] = useState({ value: 'heikfilter', label: 'heikfilter' });
@@ -56,6 +56,12 @@ const HeiknStockChart = (props) => {
       value: 'RSI', label: 'RSI',
     },
     {
+      value: 'RSI2', label: 'RSI2',
+    },
+    {
+      value: 'RSI3', label: 'RSI3',
+    },
+    {
       value: 'HEIK1', label: 'HEIK1',
     },
     {
@@ -72,21 +78,6 @@ const HeiknStockChart = (props) => {
     }
   ]);
 
-  const optionsColumn = [
-    {
-      value: 1, label: '1',
-    },
-    {
-      value: 2, label: '2',
-    },
-    {
-      value: 4, label: '4',
-    },
-    {
-      value: 6, label: '6',
-    }
-  ]
-
   const getStrategyList = useCallback(
     () => {
       fetch(process.env.REACT_APP_BACKEND_URL + "/api/get_strategy_list")
@@ -99,10 +90,6 @@ const HeiknStockChart = (props) => {
               label: o.macro,
             }
           }))
-          // setStrategy({
-          //   value: 'heikfilter',
-          //   label: 'heikfilter'
-          // });
           setOptionsStrategy(strategyOptions);
           if (data.result.length) {
             data.result.forEach((item) => {
@@ -114,7 +101,6 @@ const HeiknStockChart = (props) => {
                   }
                 })
                 setOptionsMicroStrategy( microStrategyOptions )
-                // setMicroStrategy(microStrategyOptions[0])
 
                 const symbolOptions = item.symbols.map(o => {
                   return {
@@ -123,7 +109,6 @@ const HeiknStockChart = (props) => {
                   }
                 })
                 setSymbolList(symbolOptions)
-                // setSymbol(symbolOptions[0])
               }
             })
           }
@@ -154,7 +139,7 @@ const HeiknStockChart = (props) => {
             return null
           })
           setSymbolList(temp_data)
-          // setSymbol(temp_data[0])
+          setSymbol(temp_data[0])
         })
     },
     [],
@@ -181,13 +166,10 @@ const HeiknStockChart = (props) => {
           { value: 'no_strategy', label: 'No Srategy' },
         ])
         return
-      } else if (value === 'forward_test') {
-        setStrategy({ value: 'heikfilter', label: 'heikfilter' });
-        setSymbol({ value: 'MSFT', label: 'MSFT' });
       }
       getStrategyList()
       setIsShowMicro(true);
-    } 
+    }
     if (!user.is_admin && !user?.role.length) {
       return;
     }
@@ -219,7 +201,6 @@ const HeiknStockChart = (props) => {
         initSymbol: symbol,
       }
       if (value) {
-        handleChartRedirect(false)
         history.push({
           state: locationState,
         });
@@ -254,15 +235,8 @@ const HeiknStockChart = (props) => {
 
             const is_2m = microStrategyOptions.filter((o => o.value === '2m'))
 
-            if (is_2m.length) {
-              setMicroStrategy({
-                value: '2m',
-                label: '2m'
-              })
-            } else {
-              setMicroStrategy(microStrategyOptions[0])
-            }
-
+            setMicroStrategy(microStrategyOptions[0])
+            
             const symbolOptions = item.symbols.map(o => {
               return {
                 value: o,
@@ -270,7 +244,6 @@ const HeiknStockChart = (props) => {
               }
             })
             setSymbolList(symbolOptions)
-            // setSymbol(symbolOptions[0])
             setSymbol({value: 'MSFT', label: 'MSFT'})
           }
         })
@@ -329,23 +302,10 @@ const HeiknStockChart = (props) => {
         }
       ])
     }
-    setChartColumn(option)
-  }
-
-  const calculateHeightStyle = () => {
-    if (chartColumn.value === 1 || chartColumn.value === 2) {
-      return 'full-height'
-    }
-    return 'half-height'
   }
 
   const calculateGridColumn = () => {
-    if (chartColumn.value === 1) {
-      return 12
-    } else if ((chartColumn.value === 2) || (chartColumn.value === 4)) {
-      return 6
-    }
-    return 4
+    return 12
   }
 
   const handleSignout = () => {
@@ -355,7 +315,7 @@ const HeiknStockChart = (props) => {
 
   const displayChart = () => {
     return (
-      <div className={`row ${calculateHeightStyle()}`}>
+      <div className={`row full-height`}>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
           {microStrategy && symbol && (
             < StockChart 
@@ -367,7 +327,7 @@ const HeiknStockChart = (props) => {
               indicators={indicators}
               strategy={strategy}
               isHomePage={true}
-              chartColumn={chartColumn.value}
+              chartColumn={1}
               microStrategy={microStrategy.value}
               startDate={null}
               endDate={null}
@@ -385,7 +345,7 @@ const HeiknStockChart = (props) => {
             indicators={indicators}
             strategy={strategy}
             isHomePage={true}
-            chartColumn={chartColumn.value}
+            chartColumn={1}
             microStrategy={microStrategy.value}
             startDate={null}
             endDate={null}
@@ -402,7 +362,7 @@ const HeiknStockChart = (props) => {
               indicators={indicators}
               strategy={strategy}
               isHomePage={true}
-              chartColumn={chartColumn.value}
+              chartColumn={1}
               microStrategy={microStrategy.value}
               startDate={null}
               endDate={null}
@@ -419,7 +379,7 @@ const HeiknStockChart = (props) => {
               indicators={indicators}
               strategy={strategy}
               isHomePage={true}
-              chartColumn={chartColumn.value}
+              chartColumn={1}
               microStrategy={microStrategy.value}
               startDate={null}
               endDate={null}
@@ -436,7 +396,7 @@ const HeiknStockChart = (props) => {
               indicators={indicators}
               strategy={strategy}
               isHomePage={true}
-              chartColumn={chartColumn.value}
+              chartColumn={1}
               microStrategy={microStrategy.value}
               startDate={null}
               endDate={null}
@@ -453,7 +413,7 @@ const HeiknStockChart = (props) => {
             indicators={indicators}
             strategy={strategy}
             isHomePage={true}
-            chartColumn={chartColumn.value}
+            chartColumn={1}
             microStrategy={microStrategy.value}
             startDate={null}
             endDate={null}
@@ -528,14 +488,6 @@ const HeiknStockChart = (props) => {
                 isMulti={true}
               />
             </div>
-            <div className="select-option">
-              <Select
-                value={chartColumn}
-                onChange={handleChartsColumnChange}
-                options={optionsColumn}
-                placeholder="Columns"
-              />
-            </div>
           </div>
         )}
         <Collapse navbar isOpen={collapseOpen}>
@@ -556,12 +508,6 @@ const HeiknStockChart = (props) => {
                   <p className="d-lg-none">Log out</p>
                 </DropdownToggle>
                 <DropdownMenu className="dropdown-navbar" right tag="ul">
-                  {/* <NavLink tag="li">
-                    <DropdownItem className="nav-item">Profile</DropdownItem>
-                  </NavLink>
-                  <NavLink tag="li">
-                    <DropdownItem className="nav-item">Settings</DropdownItem>
-                  </NavLink> */}
                   <DropdownItem divider tag="li" />
                   <NavLink tag="li">
                     <DropdownItem className="nav-item" onClick={() => {
@@ -574,23 +520,16 @@ const HeiknStockChart = (props) => {
             </Nav>
           </Collapse>    
       </nav>
-      {!user.is_admin && !user?.role.length
-        ? (<div className="development-in-content dark">
-            No Permission
-          </div>)
-        : selectedInstance === 'stress_test' || selectedInstance === 'optimization' 
-        ? (<div className="development-in-content dark">
-          In development
-        </div>)
-        : (<div className="graphs-container dark">
-          {(chartColumn.value === 1) && displayChart()}
-          {(chartColumn.value === 2) && displayChart()}
-          {(chartColumn.value === 4) && displayChart()}
-          {(chartColumn.value === 6) && displayChart()}
-        </div>)
-      }
+      <div className="display-flex-j-c">
+        <div className="graphs-container half-width dark">
+          {displayChart()}
+        </div>
+        <div className="half-width dark">
+          <HybridViewTable />
+        </div>
+      </div>
     </div>
   );
 };
 
-export default HeiknStockChart;
+export default HybridViewChartTable;

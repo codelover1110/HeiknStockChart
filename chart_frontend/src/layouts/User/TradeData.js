@@ -27,15 +27,15 @@ function TradeData() {
       {({ color }) => (
         <React.Fragment>
           <div className="wrapper hunter-wrapper">
-          {!isShowSidebar && (
-            <Button
-              className ={"show-sidebar-toggle-area show-sidebar-icon"}
-              onClick={handleSidebarChange}
-            >
-              <i className="tim-icons icon-align-left-2"/>
-            </Button>
-          )}
-          {isShowSidebar && (
+            {!isShowSidebar && (
+              <Button
+                className ={"show-sidebar-toggle-area show-sidebar-icon"}
+                onClick={handleSidebarChange}
+              >
+                <i className="tim-icons icon-align-left-2"/>
+              </Button>
+            )}
+            {isShowSidebar && (
               <Sidebar
                 isAdminPage={false}
                 routes={routes}
