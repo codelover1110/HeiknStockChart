@@ -69,9 +69,9 @@ const StockChart = (props) => {
                     })
                 };
                 setChartData(null)
-                let apiName = '/api/get_data';
+                let apiName = '/api/get_data_nr';
                 if (extendMarketTime === 'extend_markettime') {
-                    apiName = '/api/get_data_extended';
+                    apiName = '/api/get_data_extended_nr';
                 }
                 fetch(process.env.REACT_APP_BACKEND_URL + apiName, requestOptions)
                 .then(response => response.json())
@@ -83,6 +83,21 @@ const StockChart = (props) => {
                         return null
                     })
                     setChartData(data['chart_data'])
+                    let apiName = '/api/get_data';
+                    if (extendMarketTime === 'extend_markettime') {
+                        apiName = '/api/get_data_extended';
+                    }
+                    fetch(process.env.REACT_APP_BACKEND_URL + apiName, requestOptions)
+                    .then(response => response.json())
+                    .then(data => {
+                        data['chart_data']['columns'] = ["date", "open", "high", "low", "close", "volume", "split", "dividend", "absoluteChange", "percentChange"]
+                        data['chart_data'].map((x) => {
+                            let converDate = new Date(x.date)
+                            x.date = converDate
+                            return null
+                        })
+                        setChartData(data['chart_data'])
+                    })
                 })
             } else {
                 const symbols = multiSymbol.map((symbol) => symbol.value);
@@ -112,6 +127,31 @@ const StockChart = (props) => {
 			get_data(symbol)
 		}
     }, [extendMarketTime, selectedInstance, dbname, viewType, symbol, multiSymbol, microStrategy, startDate, endDate, strategy.value])
+    
+    const displayChart = () => {
+        return (
+            <TypeChooser >
+                {type => {
+                    return (
+                        (isHomePage | (viewType !== 'performance'))
+                        ? <Chart
+                            type={type}
+                            data={chartData}
+                            symbol={symbol}
+                            strategy={strategy}
+                            isHomePage={isHomePage}
+                            indicators={indicators}
+                            chartColumn={chartColumn}
+                            microStrategy={microStrategy}
+                            selectedInstance={selectedInstance}
+                            extendMarketTime={extendMarketTime}
+                        />
+                        : <PerformanceChart type={type} data={chartData} multiSymbol={multiSymbol.map((symbol) => symbol.value)}/>
+                    )
+                }}
+            </TypeChooser>
+        )
+    }
 
     return (
 		<>
@@ -123,29 +163,12 @@ const StockChart = (props) => {
                             <strong>{chartPeriod} [NASDAQ]</strong>
                         </div>
                     </div>
-                    <TypeChooser >
-                        {type => {
-                            return (
-                                (isHomePage | (viewType !== 'performance'))
-                                ? <Chart
-                                    type={type}
-                                    data={chartData}
-                                    symbol={symbol}
-                                    strategy={strategy}
-                                    isHomePage={isHomePage}
-                                    indicators={indicators}
-                                    chartColumn={chartColumn}
-                                    microStrategy={microStrategy}
-                                    selectedInstance={selectedInstance}
-                                    extendMarketTime={extendMarketTime}
-                                />
-                                : <PerformanceChart type={type} data={chartData} multiSymbol={multiSymbol.map((symbol) => symbol.value)}/>
-                            )
-                        }}
-                    </TypeChooser>
+                    {(chartColumn === 1) && displayChart()}
+                    {(chartColumn === 2) && displayChart()}
+                    {(chartColumn === 4) && displayChart()}
+                    {(chartColumn === 6) && displayChart()}
                 </>
-
-			}
+            }
 		</>
 
 	)

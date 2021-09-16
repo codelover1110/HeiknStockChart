@@ -147,9 +147,6 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 	}
 
 	onDrawComplete(channels_1) {
-		// this gets called on
-		// 1. draw complete of drawing object
-		// 2. drag complete of drawing object
 		this.setState({
 			enableInteractiveObject: false,
 			channels_1
@@ -629,7 +626,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 						<BarSeries
 							yAccessor={d => d.rsi.bearPower}
 							baseAt={(xScale, yScale, d) => yScale(0)}
-							fill={d => d.side === 'buy' ? '#800080' : d.side === 'sell' ? '#FFA500' : d.side === 'hold' ? '#00FF00' : '#FF0000'} />
+							fill={d => d.rsi.color === 'buy' ? '#800080' : d.rsi.color === 'sell' ? '#FFA500' : d.rsi.color === 'hold' ? '#00FF00' : '#FF0000'} />
 						<StraightLine yValue={0} />
 
 						<SingleValueTooltip
@@ -662,7 +659,9 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 						<BarSeries
 							yAccessor={d => d.rsi2.bearPower}
 							baseAt={(xScale, yScale, d) => yScale(0)}
-							fill={d => d.side === 'buy' ? '#800080' : d.side === 'sell' ? '#FFA500' : d.side === 'hold' ? '#00FF00' : '#FF0000'} />
+							fill={d => 
+								d.rsi2.color === 'l_g' ? '#90EE90' : d.rsi2.color === 'd_g' ? '#006400' : d.rsi2.color === 'l_r' ? '#ED0800' : '#8B0000'
+							} />
 						<StraightLine yValue={0} />
 
 						<SingleValueTooltip
@@ -695,7 +694,9 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 						<BarSeries
 							yAccessor={d => d.rsi3.bearPower}
 							baseAt={(xScale, yScale, d) => yScale(0)}
-							fill={d => d.side === 'buy' ? '#800080' : d.side === 'sell' ? '#FFA500' : d.side === 'hold' ? '#00FF00' : '#FF0000'} />
+							fill={d => 
+								d.rsi3.color === 'l_g' ? '#90EE90' : d.rsi3.color === 'd_g' ? '#006400' : d.rsi3.color === 'l_r' ? '#ED0800' : '#8B0000'
+							} />
 						<StraightLine yValue={0} />
 
 						<SingleValueTooltip
@@ -728,7 +729,9 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 						<BarSeries
 							yAccessor={d => d.heik.bearPower}
 							baseAt={(xScale, yScale, d) => yScale(0)}
-							fill={d => d.side === 'buy' ? '#800080' : d.side === 'sell' ? '#FFA500' : d.side === 'hold' ? '#00FF00' : '#FF0000'} />
+							fill={d => 
+								d.heik.color === 'l_g' ? '#90EE90' : d.heik.color === 'd_g' ? '#006400' : d.heik.color === 'l_r' ? '#ED0800' : '#8B0000'
+							} />
 						<StraightLine yValue={0} />
 
 						<SingleValueTooltip
@@ -761,7 +764,9 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 						<BarSeries
 							yAccessor={d => d.heik2.bearPower}
 							baseAt={(xScale, yScale, d) => yScale(0)}
-							fill={d => d.side === 'buy' ? '#800080' : d.side === 'sell' ? '#FFA500' : d.side === 'hold' ? '#00FF00' : '#FF0000'} />
+							fill={d => 
+								d.heik2.color === 'l_g' ? '#90EE90' : d.heik2.color === 'd_g' ? '#006400' : d.heik2.color === 'l_r' ? '#ED0800' : '#8B0000'
+							} />
 						<StraightLine yValue={0} />
 
 						<SingleValueTooltip
