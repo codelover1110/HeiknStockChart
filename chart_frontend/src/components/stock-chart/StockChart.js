@@ -127,6 +127,31 @@ const StockChart = (props) => {
 			get_data(symbol)
 		}
     }, [extendMarketTime, selectedInstance, dbname, viewType, symbol, multiSymbol, microStrategy, startDate, endDate, strategy.value])
+    
+    const displayChart = () => {
+        return (
+            <TypeChooser >
+                {type => {
+                    return (
+                        (isHomePage | (viewType !== 'performance'))
+                        ? <Chart
+                            type={type}
+                            data={chartData}
+                            symbol={symbol}
+                            strategy={strategy}
+                            isHomePage={isHomePage}
+                            indicators={indicators}
+                            chartColumn={chartColumn}
+                            microStrategy={microStrategy}
+                            selectedInstance={selectedInstance}
+                            extendMarketTime={extendMarketTime}
+                        />
+                        : <PerformanceChart type={type} data={chartData} multiSymbol={multiSymbol.map((symbol) => symbol.value)}/>
+                    )
+                }}
+            </TypeChooser>
+        )
+    }
 
     return (
 		<>
@@ -138,29 +163,12 @@ const StockChart = (props) => {
                             <strong>{chartPeriod} [NASDAQ]</strong>
                         </div>
                     </div>
-                    <TypeChooser >
-                        {type => {
-                            return (
-                                (isHomePage | (viewType !== 'performance'))
-                                ? <Chart
-                                    type={type}
-                                    data={chartData}
-                                    symbol={symbol}
-                                    strategy={strategy}
-                                    isHomePage={isHomePage}
-                                    indicators={indicators}
-                                    chartColumn={chartColumn}
-                                    microStrategy={microStrategy}
-                                    selectedInstance={selectedInstance}
-                                    extendMarketTime={extendMarketTime}
-                                />
-                                : <PerformanceChart type={type} data={chartData} multiSymbol={multiSymbol.map((symbol) => symbol.value)}/>
-                            )
-                        }}
-                    </TypeChooser>
+                    {(chartColumn === 1) && displayChart()}
+                    {(chartColumn === 2) && displayChart()}
+                    {(chartColumn === 4) && displayChart()}
+                    {(chartColumn === 6) && displayChart()}
                 </>
-
-			}
+            }
 		</>
 
 	)

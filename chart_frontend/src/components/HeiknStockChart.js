@@ -583,10 +583,11 @@ const HeiknStockChart = (props) => {
           In development
         </div>)
         : (<div className="graphs-container dark">
-          {(chartColumn.value === 1) && displayChart()}
+          {displayChart()}
+          {/* {(chartColumn.value === 1) && displayChart()}
           {(chartColumn.value === 2) && displayChart()}
           {(chartColumn.value === 4) && displayChart()}
-          {(chartColumn.value === 6) && displayChart()}
+          {(chartColumn.value === 6) && displayChart()} */}
         </div>)
       }
     </div>
