@@ -15,6 +15,7 @@ pd.options.mode.chained_assignment = None  # default='warn'
 from .models import (
             get_strategies_names, 
             get_stock_candles_for_strategy,  
+            get_stock_candles_for_strategy_all,
             get_micro_strategies, 
             get_macro_strategies, 
             get_strategy_symbols, 
@@ -31,6 +32,7 @@ from .models import (
 from .common import (
             get_chat_data_from_candles, 
             get_chat_data_rsi_heik_v1,
+            get_chat_data_rsi_heik_v1_non,
             join_append, 
             calc_percentEfficiency, 
             calc_winningLosing, 
@@ -201,8 +203,59 @@ def get_live_data(request):
     macro = request_data['macro']
     micro = request_data['micro']
     strategy = '{}-{}-trades'.format(macro, micro)
-    candles, strategy_trades = get_stock_candles_for_strategy(db_name, symbol, macro, micro)
-    chat_candles = get_chat_data_rsi_heik_v1(candles)
+    # candles, strategy_trades = get_stock_candles_for_strategy(db_name, symbol, macro, micro)
+    candles, strategy_trades = get_stock_candles_for_strategy_all(db_name, symbol, macro, micro)
+    chat_candles = get_chat_data_from_candles(candles)
+    verdict = join_append(chat_candles, strategy_trades, strategy)
+    verdict = fill_missing_candles__(verdict, db_name, macro, micro)
+    
+    return JsonResponse({'chart_data': verdict}, status=status.HTTP_201_CREATED)
+
+
+@csrf_exempt
+def get_live_data_extended(request):
+    request_data = JSONParser().parse(request)
+    db_name = request_data['db_name']
+    symbol = request_data['symbol']
+    macro = request_data['macro']
+    micro = request_data['micro']
+    strategy = '{}-{}-trades'.format(macro, micro)
+    candles, strategy_trades = get_stock_candles_for_strategy_all(db_name, symbol, macro, micro, extended=True)
+    chat_candles = get_chat_data_from_candles(candles)
+    # chat_candles = get_chat_data_rsi_heik_v1(candles)
+    verdict = join_append(chat_candles, strategy_trades, strategy)
+    verdict = fill_missing_candles__(verdict, db_name, macro, micro)
+    
+    return JsonResponse({'chart_data': verdict}, status=status.HTTP_201_CREATED)
+
+
+@csrf_exempt
+def get_live_data_nr(request):
+    request_data = JSONParser().parse(request)
+    db_name = request_data['db_name']
+    symbol = request_data['symbol']
+    macro = request_data['macro']
+    micro = request_data['micro']
+    strategy = '{}-{}-trades'.format(macro, micro)
+    # candles, strategy_trades = get_stock_candles_for_strategy(db_name, symbol, macro, micro)
+    candles, strategy_trades = get_stock_candles_for_strategy_all(db_name, symbol, macro, micro)
+    chat_candles = get_chat_data_rsi_heik_v1_non(candles)
+    verdict = join_append(chat_candles, strategy_trades, strategy)
+    verdict = fill_missing_candles__(verdict, db_name, macro, micro)
+    
+    return JsonResponse({'chart_data': verdict}, status=status.HTTP_201_CREATED)
+
+
+@csrf_exempt
+def get_live_data_extended_nr(request):
+    request_data = JSONParser().parse(request)
+    db_name = request_data['db_name']
+    symbol = request_data['symbol']
+    macro = request_data['macro']
+    micro = request_data['micro']
+    strategy = '{}-{}-trades'.format(macro, micro)
+    candles, strategy_trades = get_stock_candles_for_strategy_all(db_name, symbol, macro, micro, extended=True)
+    chat_candles = get_chat_data_rsi_heik_v1_non(candles)
     verdict = join_append(chat_candles, strategy_trades, strategy)
     verdict = fill_missing_candles__(verdict, db_name, macro, micro)
     

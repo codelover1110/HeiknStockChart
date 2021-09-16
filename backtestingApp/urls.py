@@ -17,6 +17,15 @@ urlpatterns = [
     path('strategy/parameter_item_names/', strategy_view.parameter_item_names, name='parameter-item-names'),
     path('strategy/parameter_content/', strategy_view.parameter_content, name='parameter-content'),
     path('strategy/parameter_detail_list/', strategy_view.parameter_detail_list, name='parameter-detail-list'),
+    path('strategy/save_script_file/', strategy_view.save_script_file, name='save-script-file'),
+    path('strategy/config_list/', strategy_view.config_list, name='config-list'),
+    path('strategy/config_details/', strategy_view.config_details, name='config-details'),
+    path('strategy/config_detail_names/', strategy_view.config_detail_names, name='config-detail-names'),
+    path('strategy/create_one_config_detail/', strategy_view.create_one_config_detail, name='create-one-config-detail'),
+    path('strategy/delete_config/', strategy_view.delete_configs, name='delete-config'),
+    path('strategy/delete_config_details/', strategy_view.delete_config_details, name='delete-config-details'),
+    path('strategy/config_item_detail/', strategy_view.config_item_detail, name='config_item_detail'),
+
 
     # app api
     url(r'^', include('users.urls')),

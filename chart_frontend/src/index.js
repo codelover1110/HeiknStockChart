@@ -11,15 +11,15 @@ import PriceData from "layouts/User/PriceData";
 import TradeData from "layouts/User/TradeData";
 import HybridView from "layouts/User/HybridView";
 
+import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import "assets/scss/black-dashboard-react.scss";
 import "assets/demo/demo.css";
-import "@fortawesome/fontawesome-free/css/all.min.css";
-
 import '@fortawesome/fontawesome-free/css/all.min.css'; 
 import'bootstrap-css-only/css/bootstrap.min.css'; 
 import 'mdbreact/dist/css/mdb.css';
 import "./App.css";
 import "assets/css/nucleo-icons.css";
+
 
 import FileManager from "components/SystemFileManager/FileManager";
 import ThemeContextWrapper from "./components/ThemeWrapper/ThemeWrapper";

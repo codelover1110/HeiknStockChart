@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 import pymongo
-from .utils import define_start_date
+from .utils import define_start_date, check_candle_in_maket_time
 
 mongoclient_candle = pymongo.MongoClient("mongodb://hunter:STOCKdb123@cluster0-shard-00-00.vcom7.mongodb.net:27017,cluster0-shard-00-01.vcom7.mongodb.net:27017,cluster0-shard-00-02.vcom7.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-7w6acj-shard-0&authSource=admin&retryWrites=true&w=majority")
 mongoclient = pymongo.MongoClient("mongodb://aliaksandr:BD20fc854X0LIfSv@cluster0-shard-00-00.35i8i.mongodb.net:27017,cluster0-shard-00-01.35i8i.mongodb.net:27017,cluster0-shard-00-02.35i8i.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-aoj781-shard-0&authSource=admin&retryWrites=true&w=majority") 
@@ -129,14 +129,72 @@ def get_strategy_name_only():
 ###############################################
 ### get stock candles for specific strategy ### 
 ###############################################
-def get_stock_candles_for_strategy(candle_name, symbol, macro, micro):
+def get_stock_candles_for_strategy(candle_name, symbol, macro, micro, extended=False):
     start_date, end_date = define_start_date(candle_name)
     
     # get candles
     masterdb = mongoclient_candle[candle_name]
     ob_table = masterdb[symbol]  # 'AMNZ'
-    candle_result = ob_table.find({'date': {'$gte': start_date, '$lt': end_date}})
-    candles = list(candle_result.sort('date', pymongo.ASCENDING))
+    if extended:
+        candle_result = ob_table.find({'date': {'$gte': start_date, '$lt': end_date}})
+        candles = list(candle_result.sort('date', pymongo.ASCENDING))   
+    else:
+        candle_result = ob_table.find({'date': {'$gte': start_date, '$lt': end_date}})
+        sort_candles = list(candle_result.sort('date', pymongo.ASCENDING))   
+        # # filter by market time
+        # candles = []
+        # for candle in sort_candles:
+        #     if check_candle_in_maket_time(candle):
+        #         candles.append(candle)
+        candles = sort_candles
+    result_dates = []
+    result_candles = []
+    for candle in candles:
+        if candle['date'] not in result_dates:
+            result_candles.append(candle)
+            result_dates.append(candle['date'])
+    
+    print ('-------------- db_name: {}, symbol {}, candles count: {}'.format(candle_name, symbol, len(candles)))
+
+    if macro == 'no_strategy':
+        find_trades_query = {
+            'date': {'$gte': start_date, '$lt': end_date},
+            'symbol': symbol
+        }    
+    else:  
+        find_trades_query = {
+            'date': {'$gte': start_date, '$lt': end_date},
+            'micro_strategy': micro,
+            'macro_strategy': macro,
+            'symbol': symbol
+        }
+    masterdb = mongoclient[BACKTESTING_TRADES]
+    ob_table = masterdb[ALL_TRADES_HISTORY] 
+    trade_result = ob_table.find(find_trades_query)
+    strategy_trades = list(trade_result.sort('date', pymongo.ASCENDING))
+    print ('--------strategy: macro: {}, micro: {}, symbol {}, candles count: {}'.format(macro, micro, symbol, len(strategy_trades)))
+
+    return result_candles, strategy_trades
+
+def get_stock_candles_for_strategy_all(candle_name, symbol, macro, micro, extended=False):
+    start_date, end_date = define_start_date(candle_name)
+    
+    # get candles
+    masterdb = mongoclient_candle['stock_market_data']
+    ob_table = masterdb[candle_name] 
+    candle_result = ob_table.find({'date': {'$gte': start_date, '$lt': end_date}, 'stock': symbol})
+    sort_candles = list(candle_result.sort('date', pymongo.ASCENDING))   
+    
+    candles = []
+    if extended:
+        candles = sort_candles
+    else:
+        if candle_name != 'backtest_12_hour' and candle_name != 'backtest_1_day':
+            for candle in sort_candles:
+                if check_candle_in_maket_time(candle):
+                    candles.append(candle)
+        else:
+            candles = sort_candles
     result_dates = []
     result_candles = []
     for candle in candles:

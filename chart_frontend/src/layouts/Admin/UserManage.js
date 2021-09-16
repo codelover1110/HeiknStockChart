@@ -93,12 +93,12 @@ function UserManage() {
     const fetchUserList = async () => {
       const list = await getUserList();
       const users = list.map((user, index) => {
+        console.log("check...", user)
         return {
           id: index,
           username: user.username,
           email: user.email,
-          phone_number: user.phone_number,
-          role: user.role,
+          role: user.is_superuser ? 'Super User' : user.role,
           active: 'active',
           action: <div className="hunter-user-manage-button-area">
             <MDBBtn color="blue" size="sm" onClick={
@@ -166,10 +166,6 @@ function UserManage() {
     {
       label: 'email',
       field: 'email',
-    },
-    {
-      label: 'Phone number',
-      field: 'phone_number',
     },
     {
       label: 'Role',

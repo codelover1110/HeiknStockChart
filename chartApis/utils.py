@@ -18,5 +18,24 @@ def define_start_date(candle_name):
         start_time = cur_date - timedelta(days=365)
     
     cur_date = cur_date + timedelta(days=1)
-
     return datetime.strptime(str(start_time), '%Y-%m-%d'), datetime.strptime(str(cur_date), '%Y-%m-%d')
+
+
+
+def check_candle_in_maket_time(candle):
+    market_start_time = [9, 30]
+    market_end_time = [16, 30]
+
+    candle['date'] = datetime.fromtimestamp((candle['t']/1000))
+    year = int(candle['date'].strftime("%Y"))
+    month = int(candle['date'].strftime("%m"))
+    day = int(candle['date'].strftime("%d"))
+    mk_start = datetime(year, month, day, market_start_time[0], market_start_time[1])
+    mk_end = datetime(year, month, day, market_end_time[0], market_end_time[1])
+    if mk_start <= candle['date'] <= mk_end:
+        return True
+    else:
+        return False
+        
+    
+

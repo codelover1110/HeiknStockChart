@@ -301,6 +301,8 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
 }
 
 .hunter-date-time-picker .hunter-input {
+  background-color: #FFFFFF;
+  color: #000;
   border-radius: 5px !important;
   margin-left: 5px;
 }
@@ -495,8 +497,7 @@ pre {
 }
 
 .strategy-indicator-edit-area {
-  display: flex;
-  width: 80%;
+  width: 50%;
 }
 .strategy-indicator-edit-area ul li {
   color: #212121;
@@ -536,7 +537,7 @@ pre {
 
 .strategy-edit-icon-area {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   margin-left: 30px;
 }
 
@@ -544,7 +545,15 @@ pre {
   min-height: 400px;
 }
 
-.test-class {
-  margin-top: 300px;
+.public-DraftStyleDefault-block span {
+  color: #000;
+}
+
+.hunter-bot-name-input {
+  color: #000;
+}
+
+.table .thead-dark th
+{
   color: #FFFFFF;
 }

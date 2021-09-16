@@ -4,7 +4,6 @@ import Switch from "react-switch";
 import Select from 'react-select'
 import { Editor } from "react-draft-wysiwyg";
 import { EditorState, convertToRaw ,convertFromHTML,ContentState} from "draft-js";
-import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import draftToHtml from "draftjs-to-html";
 import { getConfigFileDetail, getScriptFile, getModuleTypeNames, getFileTypeNames, createScriptFile, saveConfigFile, saveScriptFile, getConfigFileList } from "api/Api";
 import {
@@ -572,9 +571,9 @@ export default class TextEditor extends Component {
                   {this.displayProcessEditor()}
                 </ul>
                 <div className="strategy-edit-icon-area">
-                  <button className="btn btn-md btn-secondary" onClick={()=>this.handleIndicatorReset()}>Reset</button>
-                  <button className="btn btn-md btn-secondary" onClick={()=>this.handleOpenProcessConfigModal()}>Open</button>
-                  <button className="btn btn-md btn-secondary" onClick={()=>this.handleProcessConfigSettingSave()}>Save</button>
+                  <button className="btn btn-md btn-secondary mr-10" onClick={()=>this.handleIndicatorReset()}>Reset</button>
+                  <button className="btn btn-md btn-secondary mr-10" onClick={()=>this.handleOpenProcessConfigModal()}>Open</button>
+                  <button className="btn btn-md btn-secondary mr-10" onClick={()=>this.handleProcessConfigSettingSave()}>Save</button>
                 </div>
               </div>
             </Tab>

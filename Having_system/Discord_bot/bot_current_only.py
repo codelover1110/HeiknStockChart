@@ -53,7 +53,7 @@ async def on_ready():
     await client.wait_until_ready()
     for guild in client.guilds:
         print ("Server:", guild.id)
-        await delete_text_channels(guild)
+        # await delete_text_channels(guild)
 
     calculate_profit.start()
     update_channels.start()
@@ -183,7 +183,8 @@ async def update_channels():
                 try:
                     msg_time = datetime.strptime(time_str, '%Y-%m-%d %H:%M:%S')
                     current_time = datetime.now()
-                    if current_time > msg_time + timedelta(days=7):
+                    print (msg_time)
+                    if current_time > msg_time + timedelta(days=10):
                         if channel is not None:
                             print ('delete channel: {}     => {}'.format(channel.name, last_message.content))
                             await channel.delete()

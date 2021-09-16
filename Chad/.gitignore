@@ -1,7 +1,0 @@
-env/**
-venv/**
-logs/**
-data/**
-accounts/**
-__pycache__/
-*.key

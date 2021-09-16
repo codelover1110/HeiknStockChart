@@ -182,7 +182,7 @@ class SymbolCandleThread(object):
                     candle = self.candle_queue.get()
                     put_candles.append(candle)
 
-                self.ob_table.insert_many(put_candles)
+                # self.ob_table.insert_many(put_candles)
     
             time.sleep(0.001)
 

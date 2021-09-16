@@ -5,6 +5,7 @@ from ib_insync import util
 from pymongo.common import MIN_SUPPORTED_SERVER_VERSION
 from .lib.heikfilter import HA, Filter
 from .lib.ts_rsi_heik_v1 import Filter as rsi_heik_v1_fitler
+from .lib.ts_rsi_heik_v1_1 import Filter as rsi_heik_v1_fitler_1
 from .models import get_strategy_name_only, get_micro_strategies
 
 def dataConverter(obj):
@@ -18,15 +19,31 @@ def dataConverter(obj):
         return obj.__str__()
 
 def get_chat_data_from_candles(candles):
+    result_data = []
+    for idx in range(0, len(candles)-25):
+        sub_candles = candles[idx:idx+24]
+        df = util.df(sub_candles)
+        result_data.append(rsi_heik_v1_fitler_1(df))
+    return result_data 
+
+def get_chat_data_rsi_heik_v1(candles):
     df = util.df(candles)
-    df = Filter(df)
-    # chat_candles = get_chat_data(df)
-    hadf = HA(df) 
-    heik = (hadf["c"] - hadf["o"]).rolling(window=3).mean()
-    heik_diff = heik.diff()
+    hadf = rsi_heik_v1_fitler(df)
+    heik = (hadf["HA_close"] - hadf["HA_open"]).rolling(window=3).mean()
+    heik_tmp = heik.copy()
+    lastdf = df.iloc[-1] 
+
+    heik_diff = heik_tmp.diff()
+    heik_last = heik.iloc[-1]
+    # print ("&&&&&&&&&&&&&& heik: ", type(heik), "->", heik)
+    # print ("&&&&&&&&&&&&&& heik_diff: ", type(heik_diff), "->", heik_diff)
+
     df.replace(np.nan, 0)
     result_data = []
+        
     for data in df.iloc:
+        # if( data.rsi2 >= 0 and data.rsi3 >= 0 and heik.iloc[-1] >=0 and heik_diff.iloc[-1] >= 0):
+        # if( data.rsi2 >= 0 and data.rsi3 >= 0 and heik_last >=0 and heik_diff.iat[-1] >= 0):
         if( data.rsi2 >= 0 and data.rsi3 >= 0):
             side = "buy"
         elif ( data.rsi2 <= 0 and heik_diff.iloc[-1] <= 0):
@@ -40,9 +57,10 @@ def get_chat_data_from_candles(candles):
         rsi3 = dataConverter(np.nan_to_num(data.rsi3))
         heik = dataConverter(np.nan_to_num(data.rsi2))
         heik2 = dataConverter(np.nan_to_num(data.rsi3))
-        # heik = dataConverter(np.nan_to_num(heik_diff.iloc[-1]))
-        # heik2 = dataConverter(np.nan_to_num(heik_diff.iloc[-2]))
-
+        # heik = dataConverter(np.nan_to_num(heik_diff.iat[-1]))
+        # heik2 = dataConverter(np.nan_to_num(heik_diff.iat[-2]))
+        
+        log_str = ' {}    {}    {}    {}    {}'.format(rsi, rsi2, rsi3, heik, heik2)
         result_data.append({
             'close': float(data.c),
             'date': data.date,
@@ -59,37 +77,16 @@ def get_chat_data_from_candles(candles):
             'heik': {'bearPower': heik, 'bullPower': heik},
             'heik2': {'bearPower': heik2, 'bullPower': heik2},
         })
-    
-    return result_data 
 
-def get_chat_data_rsi_heik_v1(candles):
+    return result_data
+
+def get_chat_data_rsi_heik_v1_non(candles):
     df = util.df(candles)
-    hadf = rsi_heik_v1_fitler(df)
-    heik = (hadf["HA_close"] - hadf["HA_open"]).rolling(window=3).mean()
-    heik_tmp = heik.copy()
-    lastdf = df.iloc[-1]
-    heik_diff = heik_tmp.diff()
 
     df.replace(np.nan, 0)
     result_data = []
+        
     for data in df.iloc:
-        # if( data.rsi2 >= 0 and data.rsi3 >= 0 and heik.iloc[-1] >=0 and heik_diff.iloc[-1] >= 0):
-        if( data.rsi2 >= 0 and data.rsi3 >= 0):
-            side = "buy"
-        elif ( data.rsi2 <= 0 and heik_diff.iloc[-1] <= 0):
-            side = "sell"
-        elif ( data.rsi1 >= 0):
-            side = "hold"
-        else:
-            side = "wait"
-        rsi = dataConverter(np.nan_to_num(data.RSI))
-        rsi2 = dataConverter(np.nan_to_num(data.rsi2))
-        rsi3 = dataConverter(np.nan_to_num(data.rsi3))
-        heik = dataConverter(np.nan_to_num(data.rsi2))
-        heik2 = dataConverter(np.nan_to_num(data.rsi3))
-        # heik = dataConverter(np.nan_to_num(heik_diff.iloc[-1]))
-        # heik2 = dataConverter(np.nan_to_num(heik_diff.iloc[-2]))
-
         result_data.append({
             'close': float(data.c),
             'date': data.date,
@@ -98,13 +95,13 @@ def get_chat_data_rsi_heik_v1(candles):
             'open': float(data.o),
             'percentChange': "",
             'volume': int(data.v),
-            'RSI': rsi,
-            'side': side,
-            'rsi': {'bearPower': rsi, 'bullPower': rsi},
-            'rsi2': {'bearPower': rsi2, 'bullPower': rsi2},
-            'rsi3': {'bearPower': rsi3, 'bullPower': rsi3},
-            'heik': {'bearPower': heik, 'bullPower': heik},
-            'heik2': {'bearPower': heik2, 'bullPower': heik2},
+            'RSI': 0,
+            'side': "",
+            'rsi': {'bearPower': 0, 'bullPower': 0, 'color': ''},
+            'rsi2': {'bearPower': 0, 'bullPower': 0, 'color': ""},
+            'rsi3': {'bearPower': 0, 'bullPower': 0, 'color': ''},
+            'heik': {'bearPower': 0, 'bullPower': 0, 'color': ''},
+            'heik2': {'bearPower': 0, 'bullPower': 0, 'color': ''},
         })
 
     return result_data
