@@ -6,9 +6,9 @@ export var routes = [
     items: [
       {
         id: 0,
-        label: 'System File Manager',
+        label: 'Bot Management',
         instance: "systemfilemanager",
-        pathname: '/systemfilemanager'
+        pathname: '/botmanagement'
       },
       {
         id: 1,

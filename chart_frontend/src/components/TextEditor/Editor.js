@@ -1,19 +1,28 @@
 
 import React, { Component } from "react";
-import Switch from "react-switch";
 import Select from 'react-select'
 import { Editor } from "react-draft-wysiwyg";
 import { EditorState, convertToRaw ,convertFromHTML,ContentState} from "draft-js";
 import draftToHtml from "draftjs-to-html";
-import { getConfigFileDetail, getScriptFile, getModuleTypeNames, getFileTypeNames, createScriptFile, saveConfigFile, saveScriptFile, getConfigFileList } from "api/Api";
+import { 
+  getBotStatusList,
+  getConfigFileDetail,
+  getModuleTypeNames,
+  getFileTypeNames,
+  saveConfigFile,
+  saveScriptFile,
+  getConfigFileList
+} from "api/Api";
 import {
   Button
 } from "reactstrap";
-import { MDBBtn, MDBIcon } from "mdbreact";
+import { MDBBtn } from "mdbreact";
 
 import Modal from 'react-bootstrap/Modal'
 import Tabs from 'react-bootstrap/Tabs'
 import Tab from 'react-bootstrap/Tab'
+import { MDBDataTableV5 } from 'mdbreact';
+import moment from 'moment'
 
 export default class TextEditor extends Component {
   constructor(props) {
@@ -105,7 +114,10 @@ export default class TextEditor extends Component {
           },
         ],
         starting_cash: 10000,
-        hours: {value: 'emkt', label: 'emkt'},
+        hours: [
+          {value: true, label: 'true'},
+          {value: false, label: 'false'}
+        ],
         name: '',
         macro_strategy: [{value: 'tsrh_dc', label: 'tsrh_dc'}],
         indicator_signalling: [
@@ -146,6 +158,42 @@ export default class TextEditor extends Component {
       isCheckedStrategy: false,
       isShowConfigOpenModal: false,
       strategyIndicators: [],
+      headerColumns: [
+        {
+          label: 'ID',
+          field: 'id',
+          width: 100,
+          attributes: {
+            'aria-controls': 'DataTable',
+            'aria-label': 'symbol',
+          },
+        },
+        {
+          label: 'BOT NAME',
+          field: 'name',
+          width: 200,
+        },
+        {
+          label: 'STATUS',
+          field: 'status',
+          width: 150,
+        },
+        {
+          label: 'UPDATED',
+          field: 'updated',
+          width: 150,
+        },
+        {
+          label: 'Action',
+          field: 'action',
+          sort: false,
+          width: 100,
+        }
+      ],
+      datatable: {
+        columns: [],
+        rows: [],    
+      }
     };
   }
 
@@ -157,9 +205,10 @@ export default class TextEditor extends Component {
     this.setState({ isCheckedStrategy: checked });
   }
 
-  componentDidMount () {
+  async componentDidMount () {
     this.loadModuleTypes()  
     this.loadConfigFiles()
+    this.loadBotStatusList()
   }
   
   loadConfigFiles = async () => {
@@ -178,6 +227,26 @@ export default class TextEditor extends Component {
         isUpdate: true,
       })
     }
+  }
+
+  loadBotStatusList = async () => {
+    const res = await getBotStatusList();
+    const botStatusList = res.result.map((bot, index) => ({
+      id: index + 1,
+      name: bot.name,
+      status: bot.status,
+      updated: moment(bot.updated).format("YYYY-MM-DD h:mm:ss"),
+      action: <MDBBtn color="blue" size="sm" onClick={
+        () => {}}
+      >{bot.status === 'dead' ? 'Run' : 'Stop'}</MDBBtn>
+    }))
+    const data = {
+      columns: this.state.headerColumns,
+      rows: botStatusList
+    }
+    this.setState({
+      datatable: data
+    })
   }
 
   loadModuleTypes = async () => {
@@ -364,6 +433,7 @@ export default class TextEditor extends Component {
   ProcessConfigModalClose = () => {
     this.setState({isShowConfigOpenModal: false})
   }
+
   OpenScriptModalClose = () => {
     this.setState({isShowOpenModal: false})
   }
@@ -398,7 +468,6 @@ export default class TextEditor extends Component {
       processConfigSetting: res,
       isUpdate: true
     })
-    console.log("res", res)
     this.ProcessConfigModalClose()
   }
 
@@ -553,11 +622,6 @@ export default class TextEditor extends Component {
                 onEditorStateChange={this.onEditorStateChange}
               />
               <div className="hunter-editor-button-area">
-                {/* <div className="display-flex-right">
-                  <span className="mr-10">Strategy</span>
-                    <Switch onChange={this.handleChange} checked={this.state.isCheckedStrategy} />
-                  <span className="ml-10">Config</span>
-                </div> */}
                 <div className="display-flex-left">
                   <button className="btn btn-md btn-secondary" onClick={()=>this.handleScriptFileCreate()}>New</button>
                   <button className="btn btn-md btn-secondary" onClick={()=>this.handleOpenScriptFile()}>Open</button>
@@ -576,6 +640,24 @@ export default class TextEditor extends Component {
                   <button className="btn btn-md btn-secondary mr-10" onClick={()=>this.handleProcessConfigSettingSave()}>Save</button>
                 </div>
               </div>
+            </Tab>
+            <Tab eventKey="botmanager" title="Bot Manager">
+            {console.log(this.state.datatable)}
+            <MDBDataTableV5 
+              hover
+              maxHeight="500px"
+              entriesOptions={[10, 25, 50, 100]}
+              entries={10}
+              pagesAmount={4}
+              data={this.state.datatable}
+              // searchTop searchBottom={false}
+              // bordered={true}
+              dark={true}
+              noBottomColumns={true}
+              small={true}
+              striped={true}
+              scrollY={true}
+            />;
             </Tab>
           </Tabs>
           <Modal show={this.state.isShowOpenModal} className="hunter-modal" onHide={this.OpenScriptModalClose}>
