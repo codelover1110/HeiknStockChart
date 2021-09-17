@@ -416,3 +416,19 @@ export const getConfigFileDetail = async (collection, name) => {
 
   return transformingProcessConfigFromParam(res.result)
 }
+
+export const getBotStatusList = async () => {
+  const requestOptions = {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      "config_collection": "bot_status"
+    })
+  };
+  
+  return await fetch(process.env.REACT_APP_BACKEND_URL + "/strategy/bot_status_list/", requestOptions)
+    .then(response => response.json())
+    .then(data => {
+      return data
+    })  
+}
