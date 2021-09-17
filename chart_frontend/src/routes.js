@@ -88,6 +88,12 @@ export var routes = [
     instance: "hybrid_view",
     pathname: '/hybrid_view'
   },
+  {
+    name: "Financial Data",
+    icon: "tim-icons icon-coins",
+    instance: "financial_data",
+    pathname: '/financial_data'
+  },
 ]
 
 export var adminRoutes = [
