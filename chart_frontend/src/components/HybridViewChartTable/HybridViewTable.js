@@ -102,45 +102,6 @@ const HybridViewTable = (props) => {
 
   return (
     <div className="hunter-chart-container">
-      <nav className="navbar navbar-expand navbar-dark bg-dark hunter-nav-bar">
-        <div className="logo-title">
-          <a href="/chart" className="hunter-navbar-brand">
-            Violette AM - Client Portal
-          </a>
-        </div>
-        <div className="navbar-nav mr-auto">
-          <li className="nav-item">
-            <Link to={"/chart"} className="nav-link"></Link>
-          </li>
-        </div>
-        <Collapse navbar isOpen={collapseOpen}>
-            <Nav className="ml-auto" navbar>
-              <UncontrolledDropdown nav>
-                <DropdownToggle
-                  caret
-                  color="default"
-                  nav
-                  onClick={(e) => e.preventDefault()}
-                >
-                  <div className="photo">
-                    <img
-                      alt="..."
-                      src={require("assets/img/anime3.png").default}
-                    />
-                  </div>
-                  <p className="d-lg-none">Log out</p>
-                </DropdownToggle>
-                <DropdownMenu className="dropdown-navbar" right tag="ul">
-                  <DropdownItem divider tag="li" />
-                  <NavLink tag="li">
-                    <DropdownItem className="nav-item" onClick={() => {handleSignout()}}>Log out</DropdownItem>
-                  </NavLink>
-                </DropdownMenu>
-              </UncontrolledDropdown>
-              <li className="separator d-lg-none" />
-            </Nav>
-          </Collapse>    
-      </nav>
       <div className="col-sm-12 hunter-data-table-container">
         <div className="hunter-data-table-title">
           Trade Data Table
