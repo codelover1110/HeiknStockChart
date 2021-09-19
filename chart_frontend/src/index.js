@@ -53,7 +53,7 @@ ReactDOM.render(
             <Route path="/verify" render={(props) => <Verify {...props} />} />
             <Route path="/forgot_password" render={(props) => <ForgotPassword {...props} />} />
             <Route path="/password-reset-confirm/:uuid/:token" render={(props) => <PasswordResetConfirm {...props} />} />
-            <PrivateRoute path="/systemfilemanager">
+            <PrivateRoute path="/botmanagement">
               <FileManager/>
             </PrivateRoute>
             <PrivateRoute path="/scanner">

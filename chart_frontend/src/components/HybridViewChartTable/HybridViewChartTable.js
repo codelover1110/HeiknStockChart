@@ -262,48 +262,6 @@ const HybridViewChartTable = (props) => {
     setIndicators(options);
   }
 
-  const handleChartsColumnChange = (option) => {
-    if (option.value === 4 || option.value === 6) {
-      setIndicators([])
-      setOptionsIndicator([
-        {
-          value: 'VOLUME', label: 'VOLUME',
-        },
-        {
-          value: 'RSI', label: 'RSI',
-        },
-        {
-          value: 'HEIK1', label: 'HEIK1',
-        },
-        {
-          value: 'HEIK2', label: 'HEIK2',
-        }
-      ])
-    } else {
-      setIndicators([])
-      setOptionsIndicator([
-        {
-          value: 'VOLUME', label: 'VOLUME',
-        },
-        {
-          value: 'RSI', label: 'RSI',
-        },
-        {
-          value: 'RSI2', label: 'RSI2',
-        },
-        {
-          value: 'RSI3', label: 'RSI3',
-        },
-        {
-          value: 'HEIK1', label: 'HEIK1',
-        },
-        {
-          value: 'HEIK2', label: 'HEIK2',
-        }
-      ])
-    }
-  }
-
   const calculateGridColumn = () => {
     return 12
   }
@@ -422,7 +380,7 @@ const HybridViewChartTable = (props) => {
       </div>
     )
   }
-
+  
   return (
     <div className="hunter-chart-container">
       <nav className="navbar navbar-expand navbar-dark bg-dark hunter-nav-bar">
@@ -431,65 +389,63 @@ const HybridViewChartTable = (props) => {
             Violette AM - Client Portal
           </a>
         </div>
-        {(user.is_admin || (user.role?.length)) && (
-          <div className="navbar-nav mr-auto">
-            <li className="nav-item">
-              <Link to={"/chart"} className="nav-link"></Link>
-            </li>
-            <div className="select-option">
-              <Select
-                value={selectedViewType}
-                onChange={handleViewTypeChange}
-                options={optionsViewTypes}
-                placeholder="Charting"
-              />
-            </div>
-            <div className="select-option">
-              <Select
-                value={extendMarketTime}
-                onChange={handleMarketTimeChange}
-                options={optionsMarketTime}
-                placeholder="Market Time"
-              />
-            </div>
-            <div className="select-option">
-              <Select
-                value={strategy}
-                onChange={handleStrategy}
-                options={optionsStratgy}
-                placeholder="Macro Strategy"
-              />
-            </div>
-            {isShowMicro && (
-              <div className="select-option">
-                <Select
-                  value={microStrategy}
-                  onChange={handleMicroStrategyChange}
-                  options={optionsMicroStrategy}
-                  placeholder="Micro Strategy"
-                />
-              </div>  
-            )}
-            <div className="select-option">
-              <Select
-                value={symbol}
-                onChange={handlSymbolChange}
-                options={symbolList}
-                placeholder="Symbol"
-              />
-            </div>
-            <div className="select-multi-option">
-              <Select
-                name="filters"
-                placeholder="Indicators"
-                value={indicators}
-                onChange={handleIndicatorsChange}
-                options={optionsIndicator}
-                isMulti={true}
-              />
-            </div>
+        <div className="navbar-nav mr-auto">
+          <li className="nav-item">
+            <Link to={"/chart"} className="nav-link"></Link>
+          </li>
+          <div className="select-option">
+            <Select
+              value={selectedViewType}
+              onChange={handleViewTypeChange}
+              options={optionsViewTypes}
+              placeholder="Charting"
+            />
           </div>
-        )}
+          <div className="select-option">
+            <Select
+              value={extendMarketTime}
+              onChange={handleMarketTimeChange}
+              options={optionsMarketTime}
+              placeholder="Market Time"
+            />
+          </div>
+          <div className="select-option">
+            <Select
+              value={strategy}
+              onChange={handleStrategy}
+              options={optionsStratgy}
+              placeholder="Macro Strategy"
+            />
+          </div>
+          {isShowMicro && (
+            <div className="select-option">
+              <Select
+                value={microStrategy}
+                onChange={handleMicroStrategyChange}
+                options={optionsMicroStrategy}
+                placeholder="Micro Strategy"
+              />
+            </div>  
+          )}
+          <div className="select-option">
+            <Select
+              value={symbol}
+              onChange={handlSymbolChange}
+              options={symbolList}
+              placeholder="Symbol"
+            />
+          </div>
+          <div className="select-multi-option">
+            <Select
+              name="filters"
+              placeholder="Indicators"
+              value={indicators}
+              onChange={handleIndicatorsChange}
+              options={optionsIndicator}
+              isMulti={true}
+            />
+          </div>
+        </div>
         <Collapse navbar isOpen={collapseOpen}>
             <Nav className="ml-auto" navbar>
               <UncontrolledDropdown>
@@ -525,7 +481,11 @@ const HybridViewChartTable = (props) => {
           {displayChart()}
         </div>
         <div className="half-width dark">
-          <HybridViewTable />
+          <HybridViewTable
+            symbol={symbol}
+            macroStrategy={strategy}
+            microStrategy={microStrategy}
+          />
         </div>
       </div>
     </div>
