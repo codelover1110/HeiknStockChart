@@ -25,6 +25,13 @@ const Header = (props) => {
           <div className="dashboard-navbar">
             <ul className="nav justify-content-center">
               <li
+                className={`nav-item ${selectedHeaderNav == "All Financial Statements" ? "selected" : ""}`}
+                onClick={() => handleNavClicked("All Financial Statements")}
+              >
+                <i className="fas fa-inbox"></i>
+                <span>All Financial Statements</span>
+              </li>
+              <li
                 className={`nav-item ${selectedHeaderNav == "Data Table" ? "selected" : ""}`}
                 onClick={() => handleNavClicked("Data Table")}
               >
