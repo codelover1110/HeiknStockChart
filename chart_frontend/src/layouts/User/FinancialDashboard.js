@@ -9,6 +9,7 @@ import Header from 'components/FinancialDashboard/Header';
 import GroupBarChart from 'components/FinancialDashboard/GroupBarChart';
 import GraphTypes from 'components/FinancialDashboard/GraphTypes';
 import FinancialDataTable from 'components/FinancialDashboard/FinancialDataTable';
+import FinancialStatementsDataTable from 'components/FinancialDashboard/FinancialStatementsDataTable';
 
 /** Dummy data for Income statement */
 const dummyForRevenue = {
@@ -391,6 +392,10 @@ const dummyForPaymentDivAndCashDistributions = {
   },
 };
 
+const dummyForFinancialStatements = {
+  column: [],
+  rows: []
+}
 // 0: income statement 1: Balance sheet 2: Cash Flow Statement
 const dummyForDataTable = {
   columns: [
@@ -1006,7 +1011,19 @@ const FinancialDashboard = () => {
         selectedAggregationType={selectedAggregationType}
         setSelectedAggregationType={setSelectedAggregationType}
       />
-      {selectedHeaderNav !== 'Data Table' ? (
+      {
+      selectedHeaderNav === 'Data Table' ? (
+        <FinancialDataTable
+          data={dummyForDataTable}
+          symbols={symbols}
+        />
+      ) : 
+      selectedHeaderNav === 'All Financial Statements' ? (
+        <FinancialStatementsDataTable
+          data={dummyForDataTable}
+          symbols={symbols}
+        />
+      ) : (
         <div className="container custom-container chart-area">
           <div className="row justify-content-center">
             {chartData &&
@@ -1020,12 +1037,8 @@ const FinancialDashboard = () => {
               ))}
           </div>
         </div>
-      ) : (
-        <FinancialDataTable
-          data={dummyForDataTable}
-          symbols={symbols}
-        />
-      )}
+      )
+    }
     </>
   );
 };
