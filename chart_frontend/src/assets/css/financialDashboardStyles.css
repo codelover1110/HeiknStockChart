@@ -135,6 +135,9 @@ body {
   padding-top: 1px;
   margin-left: 5px;
 }
+.chart-toolbar-select option {
+  color: #495057 !important;
+}
 .apexcharts-text {
   fill: white;
 }
@@ -194,5 +197,23 @@ body {
 .dashboard-graph-types .selected {
   background-color: rgb(25, 185, 154);
   color: white;
+}
+.financial-data-table {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  padding-left: 20px !important;
+  padding-right: 20px !important;
+}
+.financial-data-table .financial-table-body-1 {
+  background-color: rgb(111, 58, 53) !important;
+}
+.financial-data-table .financial-table-body-2 {
+  background-color: rgb(86, 85, 33) !important;
+}
+.financial-data-table .financial-table-body-3 {
+  background-color: rgb(44, 66, 21) !important;
+}
+.financial-data-table .financial-table-head {
+  height: 60px !important;
 }
 /* Dashboard End */
