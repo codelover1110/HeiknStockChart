@@ -393,22 +393,14 @@ const HybridViewChartTable = (props) => {
           <li className="nav-item">
             <Link to={"/chart"} className="nav-link"></Link>
           </li>
-          <div className="select-option">
-            <Select
-              value={selectedViewType}
-              onChange={handleViewTypeChange}
-              options={optionsViewTypes}
-              placeholder="Charting"
-            />
-          </div>
-          <div className="select-option">
+          {/* <div className="select-option">
             <Select
               value={extendMarketTime}
               onChange={handleMarketTimeChange}
               options={optionsMarketTime}
               placeholder="Market Time"
             />
-          </div>
+          </div> */}
           <div className="select-option">
             <Select
               value={strategy}

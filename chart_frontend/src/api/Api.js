@@ -432,3 +432,54 @@ export const getBotStatusList = async () => {
       return data
     })  
 }
+
+export const updateBotStatus = async (botName, botStatus) => {
+  const requestOptions = {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      "config_collection": "bot_configs",
+      "name": botName
+    })
+  };
+  
+  const apiUrl = botStatus ? '/strategy/bot_run/' : '/strategy/bot_stop/'
+
+  try {
+    return await fetch(process.env.REACT_APP_BACKEND_URL + apiUrl, requestOptions)
+      .then(response => response.json())
+      .then(data => {
+        return data
+      })  
+  } catch (e) {
+    return {
+      success: false,
+      message: e
+    }
+  }
+}
+
+export const getBotConfigList = async () => {
+  const requestOptions = {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      "config_collection": "bot_configs",
+    })
+  };
+  
+  const apiUrl = '/strategy/config_details/'
+
+  try {
+    return await fetch(process.env.REACT_APP_BACKEND_URL + apiUrl, requestOptions)
+      .then(response => response.json())
+      .then(data => {
+        return data
+      })  
+  } catch (e) {
+    return {
+      success: false,
+      message: e
+    }
+  }
+}
