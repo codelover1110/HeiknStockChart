@@ -433,8 +433,75 @@ export const getBotStatusList = async () => {
     })  
 }
 
-// Financial Dashboard
-export const getIncomeStatement = async (symbol, aggregationType) => {
+export const updateBotStatus = async (botName, botStatus) => {
+  const requestOptions = {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      "config_collection": "bot_configs",
+      "name": botName
+    })
+  };
+  
+  const apiUrl = botStatus ? '/strategy/bot_run/' : '/strategy/bot_stop/'
+
+  try {
+    return await fetch(process.env.REACT_APP_BACKEND_URL + apiUrl, requestOptions)
+      .then(response => response.json())
+      .then(data => {
+        return data
+      })  
+  } catch (e) {
+    return {
+      success: false,
+      message: e
+    }
+  }
+}
+
+export const getBotConfigList = async () => {
+  const requestOptions = {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      "config_collection": "bot_configs",
+    })
+  };
+  
+  const apiUrl = '/strategy/config_details/'
+
+  try {
+    return await fetch(process.env.REACT_APP_BACKEND_URL + apiUrl, requestOptions)
+      .then(response => response.json())
+      .then(data => {
+        return data
+      })  
+  } catch (e) {
+    return {
+      success: false,
+      message: e
+    }
+  }
+}
+
+export const getNewsFinancialData = async () => {
+  const apiUrl = '/news/recent_news/'
+
+  try {
+    return await fetch(process.env.REACT_APP_BACKEND_URL + apiUrl)
+      .then(response => response.json())
+      .then(data => {
+        return data
+      })  
+  } catch (e) {
+    return {
+      success: false,
+      message: e
+    }
+  }
+}
+
+export const getIncomeStatement = async (symbol, aggregationType=null) => {
   const requestOptions = {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
@@ -450,8 +517,7 @@ export const getIncomeStatement = async (symbol, aggregationType) => {
       return data
     })
 }
-
-export const getBalanceSheet = async (symbol, aggregationType) => {
+export const getBalanceSheet = async (symbol, aggregationType=null) => {
   const requestOptions = {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},

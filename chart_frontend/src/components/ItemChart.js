@@ -6,6 +6,8 @@ import StockChart from "./stock-chart/StockChart"
 import { useHistory } from "react-router-dom";
 import disableScroll from 'disable-scroll';
 
+import MultiRangeSlider from 'components/MultiRangeSlider/MultiRangeSlider'
+
 const HeiknStockChartItem = (props) => {
     
     const { selectedInstance, handleChartRedirect } = props
@@ -215,12 +217,17 @@ const HeiknStockChartItem = (props) => {
       setMicroStrategy(e);
     }
 
-    const handleTradeStartDateChange = (e) => {
-      setTradeStartDate(e.target.value)
-    }
+    // const handleTradeStartDateChange = (e) => {
+    //   setTradeStartDate(e.target.value)
+    // }
     
-    const handleTradeEndDateChange = (e) => {
-      setTradeEndDate(e.target.value)
+    // const handleTradeEndDateChange = (e) => {
+    //   setTradeEndDate(e.target.value)
+    // }
+
+    const selectDateRange = (startDate, endDate) => {
+      setTradeStartDate(startDate)
+      setTradeEndDate(endDate)
     }
 
     return (
@@ -231,7 +238,7 @@ const HeiknStockChartItem = (props) => {
               Violette AM - Client Portal 
             </a>
           </div>
-          <div className="navbar-nav mr-auto">
+          <div className="navbar-nav ma-auto hunter-nav-bar-nav">
             <li className="nav-item">
                 <Link to={"/chart"} className="nav-link"></Link>
             </li>
@@ -293,45 +300,28 @@ const HeiknStockChartItem = (props) => {
                 />
               </div>)
             }
-            <div className='input-group date hunter-performance-chart hunter-date-time-picker' id='datetimepicker1'>
-              <span> Start: </span> 
-                <input 
-                  type='date'
-                  className="form-control hunter-input"
-                  value={tradeStartDate}
-                  onChange={handleTradeStartDateChange}
-                />
-                <span className="input-group-addon">
-                <span className="glyphicon glyphicon-calendar"></span>
-              </span>
-            </div>
-            <div className='input-group date hunter-performance-chart hunter-date-time-picker' id='datetimepicker2'>
-              <span> End: </span> 
-              <input 
-                type='date'
-                className="form-control hunter-input"
-                value={tradeEndDate}
-                onChange={handleTradeEndDateChange}
+            <div className='date hunter-date-time-picker' id='datetimepicker1'>
+              <MultiRangeSlider
+                selectDateRange={selectDateRange}
               />
-              <span className="input-group-addon">
-              <span className="glyphicon glyphicon-calendar"></span>
-              </span>
             </div>
           </div>
         </nav>
         <div className="graphs-container dark">
-          < StockChart
-            selectedInstance ={selectedInstance.value}
-            viewType={selectedViewType.value}
-            microStrategy={microStrategy.value}
-            symbol={symbol.value}
-            multiSymbol={multiSymbol}
-            indicators={indicators}
-            strategy={strategy}
-            isHomePage={false}
-            startDate={tradeStartDate}
-            endDate={tradeEndDate}
-          />
+          {viewType && (
+            < StockChart
+              selectedInstance ={selectedInstance.value}
+              viewType={selectedViewType.value}
+              microStrategy={microStrategy.value}
+              symbol={symbol.value}
+              multiSymbol={multiSymbol}
+              indicators={indicators}
+              strategy={strategy}
+              isHomePage={false}
+              startDate={tradeStartDate}
+              endDate={tradeEndDate}
+            />
+          )}
         </div>
       </div>
     );

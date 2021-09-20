@@ -93,7 +93,6 @@ function UserManage() {
     const fetchUserList = async () => {
       const list = await getUserList();
       const users = list.map((user, index) => {
-        console.log("check...", user)
         return {
           id: index,
           username: user.username,

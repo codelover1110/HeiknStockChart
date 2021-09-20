@@ -16,6 +16,7 @@ import { MDBDataTableV5 } from 'mdbreact';
 import { useAuth } from 'contexts/authContext';
 import { getAllSymbols, filterTradesData } from 'api/Api'
 import { currentDateString } from 'utils/helper'
+import MultiRangeSlider from 'components/MultiRangeSlider/MultiRangeSlider'
 
 const TradeDataTable = () => {
   const auth = useAuth();
@@ -124,20 +125,6 @@ const TradeDataTable = () => {
   )
 
   useEffect(() => {
-    // const getStrategies = async () => {
-    //   let options = await getStrategyOptions();
-    //   let newOptions = []
-    //   if (options.micro_strategy.length) {
-    //     options.micro_strategy.forEach((option) => {
-    //       newOptions.push({
-    //         value: option._id,
-    //         label: option._id
-    //       })
-    //     })
-    //     setOptionsMicroStrategy(newOptions)
-    //   }
-    // }
-    // getStrategies();
     getStrategyList()
   }, [getStrategyList])
 
@@ -210,12 +197,9 @@ const TradeDataTable = () => {
     setMicroStrategy(e)
   }
 
-  const handleTradeStartDateChange = (e) => {
-    setTradeStartDate(e.target.value)
-  }
-  
-  const handleTradeEndDateChange = (e) => {
-    setTradeEndDate(e.target.value)
+  const selectDateRange = (startDate, endDate) => {
+    setTradeStartDate(startDate)
+    setTradeEndDate(endDate)
   }
 
   return (
@@ -295,28 +279,9 @@ const TradeDataTable = () => {
             />
           </div>
           <div className='input-group date hunter-date-time-picker' id='datetimepicker1'>
-            <span>Trade Start Time:</span>
-              <input 
-                type='date'
-                className="form-control hunter-input"
-                value={tradeStartDate}
-                onChange={handleTradeStartDateChange}
-              />
-              <span className="input-group-addon">
-              <span className="glyphicon glyphicon-calendar"></span>
-            </span>
-          </div>
-          <div className='input-group date hunter-date-time-picker' id='datetimepicker2'>
-            <span>Trade End Time:</span> 
-            <input 
-              type='date'
-              className="form-control hunter-input"
-              value={tradeEndDate}
-              onChange={handleTradeEndDateChange}
+            <MultiRangeSlider
+              selectDateRange={selectDateRange}
             />
-            <span className="input-group-addon">
-            <span className="glyphicon glyphicon-calendar"></span>
-            </span>
           </div>
         </div>
         <MDBDataTableV5 

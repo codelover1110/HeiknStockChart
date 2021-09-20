@@ -9,6 +9,9 @@ import Header from 'components/FinancialDashboard/Header';
 import GroupBarChart from 'components/FinancialDashboard/GroupBarChart';
 import GraphTypes from 'components/FinancialDashboard/GraphTypes';
 import FinancialDataTable from 'components/FinancialDashboard/FinancialDataTable';
+import FinancialStatementsDataTable from 'components/FinancialDashboard/FinancialStatementsDataTable';
+
+import { getNewsFinancialData } from 'api/Api'
 
 
 import {
@@ -400,6 +403,21 @@ const dummyForPaymentDivAndCashDistributions = {
     '2019-12-31': [0.8, 1.2, 1.5, 1.7, 1.4, 1.3, 1.9, 1.5],
   },
 };
+
+const dummyForFinancialStatements = {
+  columns: [
+    'id',
+    'time',
+    'title',
+  ],
+  rows: [
+    {
+      id: "0",
+      time: "2021-09-12",
+      title: "Sorrento Announces an Independent Real-World Study That Reports Superior Sensitivity Results in Detecting COVID-19 Virus Infections in All-Comer General Population by COVISTIX as Compared to a Globally Leading Rapid Antigen Test",
+    }
+  ]
+}
 
 // 0: income statement 1: Balance sheet 2: Cash Flow Statement
 const dummyForDataTable = {
@@ -940,6 +958,11 @@ const FinancialDashboard = () => {
     setSelectedInstance(instance);
   };
 
+  const [financialStatements, setFinancialStatements] = useState({
+    columns: ['id', 'time', 'title'],
+    rows: []
+  })
+
   useEffect(() => {
     const getSymbols = async () => {
       const res = await getAllSymbols();
@@ -1128,6 +1151,16 @@ const FinancialDashboard = () => {
       });
     }
     getTotalData();
+
+    const getNewsFinancials = async () => {
+      const res = await getNewsFinancialData()
+      console.log("res???", res)
+      setFinancialStatements({
+        columns: ['id', 'time', 'title'],
+        rows: res.result
+      })
+    }
+    getNewsFinancials()
   }, [selectedHeaderNav, symbol]);
 
   return (
@@ -1163,7 +1196,19 @@ const FinancialDashboard = () => {
         selectedAggregationType={selectedAggregationType}
         setSelectedAggregationType={setSelectedAggregationType}
       />
-      {selectedHeaderNav !== 'Data Table' ? (
+      {
+      selectedHeaderNav === 'Data Table' ? (
+        <FinancialDataTable
+          data={datatable}
+          symbols={optionsSymbol}
+        />
+      ) : 
+      selectedHeaderNav === 'All Financial Statements' ? (
+        <FinancialStatementsDataTable
+          data={financialStatements}
+          symbols={optionsSymbol}
+        />
+      ) : (
         <div className="container custom-container chart-area">
           <div className="row justify-content-center">
             {chartData &&
@@ -1177,13 +1222,8 @@ const FinancialDashboard = () => {
               ))}
           </div>
         </div>
-      ) : (
-        <FinancialDataTable
-          // data={dummyForDataTable}
-          data={datatable}
-          optionsSymbol={optionsSymbol}
-        />
-      )}
+      )
+    }
     </>
   );
 };

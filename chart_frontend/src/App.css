@@ -293,7 +293,6 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
 }
 
 .hunter-date-time-picker {
-  width: 300px;
   margin-right: 30px;
   color: #FFFFFF;
   display: flex;
@@ -477,7 +476,7 @@ pre {
 
 /* common margin define */
 .mr-10 {
-  margin-right: 10px;
+  margin-right: 10px !important;
 }
 
 .ml-10 {
@@ -556,4 +555,29 @@ pre {
 .table .thead-dark th
 {
   color: #FFFFFF;
+}
+
+.hunter-multi-range-area {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0px;
+}
+
+.hunter-multi-range-area .form-control {
+  padding: 5px;
+}
+
+.hunter-nav-bar-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hunter-nav-bar-nav .hunter-date-time-picker {
+  display: flex;
+  align-items: center;
+}
+
+.hunter-chart-container .table-foot {
+  display: none !important;
 }

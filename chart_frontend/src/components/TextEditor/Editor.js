@@ -11,7 +11,9 @@ import {
   getFileTypeNames,
   saveConfigFile,
   saveScriptFile,
-  getConfigFileList
+  getConfigFileList,
+  getBotConfigList,
+  updateBotStatus
 } from "api/Api";
 import {
   Button
@@ -114,7 +116,7 @@ export default class TextEditor extends Component {
           },
         ],
         starting_cash: 10000,
-        hours: [
+        extended_hours: [
           {value: true, label: 'true'},
           {value: false, label: 'false'}
         ],
@@ -158,39 +160,106 @@ export default class TextEditor extends Component {
       isCheckedStrategy: false,
       isShowConfigOpenModal: false,
       strategyIndicators: [],
-      headerColumns: [
-        {
-          label: 'ID',
-          field: 'id',
-          width: 100,
-          attributes: {
-            'aria-controls': 'DataTable',
-            'aria-label': 'symbol',
-          },
+    headerColumnsBotStatus: [
+      {
+        label: 'ID',
+        field: 'id',
+        width: 100,
+        attributes: {
+          'aria-controls': 'DataTable',
+          'aria-label': 'symbol',
         },
-        {
-          label: 'BOT NAME',
-          field: 'name',
-          width: 200,
-        },
-        {
-          label: 'STATUS',
-          field: 'status',
-          width: 150,
-        },
-        {
-          label: 'UPDATED',
-          field: 'updated',
-          width: 150,
-        },
-        {
-          label: 'Action',
-          field: 'action',
-          sort: false,
-          width: 100,
-        }
-      ],
-      datatable: {
+      },
+      {
+        label: 'BOT NAME',
+        field: 'name',
+        width: 200,
+      },
+      {
+        label: 'STATUS',
+        field: 'status',
+        width: 150,
+      },
+      {
+        label: 'UPDATED',
+        field: 'updated',
+        width: 150,
+      },
+      {
+        label: 'Action',
+        field: 'action',
+        sort: false,
+        width: 100,
+      }
+    ],
+    headerColumnsBotConfig: [
+      {
+        label: 'ID',
+        field: 'id',
+      },
+      {
+        label: 'BOT NAME',
+        field: 'name',
+      },
+      {
+        label: 'Time Frame',
+        field: 'timeframe',
+      },
+      {
+        label: 'Indicator',
+        field: 'indicator',
+      },
+      {
+        label: 'Watch List',
+        field: 'watchlist',
+        sort: false,
+      },
+      {
+        label: 'Position Sizing',
+        field: 'position_sizing',
+        sort: false,
+      },
+      {
+        label: 'Order Routing',
+        field: 'order_routing',
+        sort: false,
+      },
+      {
+        label: 'Data Source',
+        field: 'data_source',
+        sort: false,
+      },
+      {
+        label: 'Live Trading',
+        field: 'live_trading',
+        sort: false,
+      },
+      {
+        label: 'Starting Cash',
+        field: 'starting_cash',
+        sort: false,
+      },
+      {
+        label: 'Hours',
+        field: 'hours',
+        sort: false,
+      },
+      {
+        label: 'Macro Strategy',
+        field: 'macro_strategy',
+        sort: false,
+      },
+      {
+        label: 'Indicator Signalling',
+        field: 'indicator_signalling',
+        sort: false,
+      }
+    ],
+      botStatusDatatable: {
+        columns: [],
+        rows: [],    
+      },
+      botConfigDatatable: {
         columns: [],
         rows: [],    
       }
@@ -209,6 +278,7 @@ export default class TextEditor extends Component {
     this.loadModuleTypes()  
     this.loadConfigFiles()
     this.loadBotStatusList()
+    this.loadBotConfigList()
   }
   
   loadConfigFiles = async () => {
@@ -229,6 +299,16 @@ export default class TextEditor extends Component {
     }
   }
 
+  updateBotStatus = async (bot) => {
+    let res
+    if (bot.status === 'dead') {
+      res = await updateBotStatus(bot.name, true)
+    } else {
+      res = await updateBotStatus(bot.name, false)
+    }
+    alert(res.message)
+  } 
+
   loadBotStatusList = async () => {
     const res = await getBotStatusList();
     const botStatusList = res.result.map((bot, index) => ({
@@ -236,16 +316,61 @@ export default class TextEditor extends Component {
       name: bot.name,
       status: bot.status,
       updated: moment(bot.updated).format("YYYY-MM-DD h:mm:ss"),
-      action: <MDBBtn color="blue" size="sm" onClick={
-        () => {}}
-      >{bot.status === 'dead' ? 'Run' : 'Stop'}</MDBBtn>
+      action: <>
+        <MDBBtn className="mr-10" color="blue" size="sm" onClick={
+          () => {
+            this.updateBotStatus(bot, bot.status === 'start' ? 'pause' : 'start');
+          }}
+        >
+          {bot.status === 'start' ? 'pause' : 'start'}
+        </MDBBtn>
+        <MDBBtn color="blue" size="sm" onClick={
+          () => {
+            this.updateBotStatus(bot, 'kill');
+          }}
+        >
+          kill
+        </MDBBtn>
+      </>
     }))
     const data = {
-      columns: this.state.headerColumns,
+      columns: this.state.headerColumnsBotStatus,
       rows: botStatusList
     }
     this.setState({
-      datatable: data
+      botStatusDatatable: data
+    })
+  }
+  
+  loadBotConfigList = async () => {
+    const res = await getBotConfigList();
+    const botConfigList = res.result.map((bot, index) => ({
+      id: index + 1,
+      bot_name: bot.bot_name,
+      timeframe: bot.timeframe,
+      indicator: bot.indicator,
+      watchlist: bot.watchlist,
+      position_sizing: bot.position_sizing,
+      order_routing: bot.order_routing,
+      data_source: bot.data_source,
+      live_trading: bot.live_trading,
+      starting_cash: bot.starting_cash,
+      hours: bot.hours,
+      name: bot.name,
+      macro_strategy: bot.macro_strategy,
+      indicator_signalling: bot.indicator_signalling,
+      action: <MDBBtn color="blue" size="sm" onClick={
+        () => {
+          this.updateBotStatus(bot);
+        }}
+      >{bot.status === 'dead' ? 'Run' : 'Stop'}</MDBBtn>
+    }))
+    const data = {
+      columns: this.state.headerColumnsBotConfig,
+      rows: botConfigList
+    }
+    this.setState({
+      botConfigDatatable: data
     })
   }
 
@@ -521,7 +646,6 @@ export default class TextEditor extends Component {
   handleIndicatorDelete = (indicator) => {
     let indicators = this.state.strategyIndicators;
     indicators = indicators.filter( (o) => o !== indicator )
-    console.log("indicator", indicators)
     this.setState( { strategyIndicators: indicators} )
   }
 
@@ -641,15 +765,14 @@ export default class TextEditor extends Component {
                 </div>
               </div>
             </Tab>
-            <Tab eventKey="botmanager" title="Bot Manager">
-            {console.log(this.state.datatable)}
+            <Tab eventKey="bot-status-manager" title="Bot Status Manager">
             <MDBDataTableV5 
               hover
               maxHeight="500px"
               entriesOptions={[10, 25, 50, 100]}
               entries={10}
               pagesAmount={4}
-              data={this.state.datatable}
+              data={this.state.botStatusDatatable}
               // searchTop searchBottom={false}
               // bordered={true}
               dark={true}
@@ -658,6 +781,24 @@ export default class TextEditor extends Component {
               striped={true}
               scrollY={true}
             />;
+            </Tab>
+            <Tab eventKey="bot-config-manager" title="Bot Config Manager">
+              <MDBDataTableV5 
+                hover
+                maxHeight="500px"
+                entriesOptions={[10, 25, 50, 100]}
+                entries={10}
+                pagesAmount={4}
+                data={this.state.botConfigDatatable}
+                // searchTop searchBottom={false}
+                // bordered={true}
+                dark={true}
+                noBottomColumns={true}
+                small={true}
+                sortable={false}
+                striped={true}
+                scrollY={true}
+              />;
             </Tab>
           </Tabs>
           <Modal show={this.state.isShowOpenModal} className="hunter-modal" onHide={this.OpenScriptModalClose}>
