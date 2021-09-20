@@ -393,9 +393,36 @@ const dummyForPaymentDivAndCashDistributions = {
 };
 
 const dummyForFinancialStatements = {
-  column: [],
-  rows: []
+  columns: [
+    'id',
+    'publisher',
+    'title',
+    'author',
+    'published_utc',
+    'article_url',
+    'tickers',
+    'amp_url',
+    'image_url',
+    'description',
+    'keywords',
+  ],
+  rows: [
+    {
+      id: "0",
+      publisher: "",
+      title: "Sorrento Announces an Independent Real-World Study That Reports Superior Sensitivity Results in Detecting COVID-19 Virus Infections in All-Comer General Population by COVISTIX as Compared to a Globally Leading Rapid Antigen Test",
+      author: "Sorrento Therapeutics, Inc.",
+      published_utc: "2021-09-19T18:58:00Z",
+      article_url: "https://www.globenewswire.com/news-release/2021/09/19/2299397/0/en/Sorrento-Announces-an-Independent-Real-World-Study-That-Reports-Superior-Sensitivity-Results-in-Detecting-COVID-19-Virus-Infections-in-All-Comer-General-Population-by-COVISTIX-as-C.html",
+      tickers: "SRNE",
+      amp_url: "https://www.globenewswire.com/news-release/2021/09/19/2299397/0/en/Sorrento-Announces-an-Independent-Real-World-Study-That-Reports-Superior-Sensitivity-Results-in-Detecting-COVID-19-Virus-Infections-in-All-Comer-General-Population-by-COVISTIX-as-C.html",
+      image_url: "https://ml.globenewswire.com/Resource/Download/0111f4df-8430-4285-9ae5-b11617628ee9?size=1",
+      description: "SAN DIEGO, Sept.  19, 2021  (GLOBE NEWSWIRE) -- Sorrento Therapeutics, Inc. (Nasdaq: SRNE, \"Sorrento\"), a clinical and commercial stage biopharmaceutical company developing new therapies to treat cancer, pain (non-opioid treatments), autoimmune disease and COVID-19, today announced impressive results from an independent study conducted under real-world field conditions by INMEGEN (The Institute of National Genomics Medicine, Mexico).",
+      keywords: "Product / Services Announcement"
+    }
+  ]
 }
+
 // 0: income statement 1: Balance sheet 2: Cash Flow Statement
 const dummyForDataTable = {
   columns: [
@@ -1020,7 +1047,7 @@ const FinancialDashboard = () => {
       ) : 
       selectedHeaderNav === 'All Financial Statements' ? (
         <FinancialStatementsDataTable
-          data={dummyForDataTable}
+          data={dummyForFinancialStatements}
           symbols={symbols}
         />
       ) : (
