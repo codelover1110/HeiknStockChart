@@ -5,51 +5,13 @@ import { MDBTable, MDBTableBody, MDBTableHead } from 'mdbreact';
 const FinancialStatementsDataTable = (props) => {
   const { data, symbols } = props;
 
-  const [symbol, setSymbol] = useState({ value: 'GOOG', label: 'GOOG' });
-  const [optionsSymbol, setOptionsSymbol] = useState([]);
+//   const [symbol, setSymbol] = useState({ value: 'GOOG', label: 'GOOG' });
+//   const [optionsSymbol, setOptionsSymbol] = useState([]);
   const [datatable, setDatatable] = useState();
 
-  // const hearder_columns = [
-  //   {
-  //     label: 'O',
-  //     field: 'o',
-  //     width: 200,
-  //     attributes: {
-  //       'aria-controls': 'DataTable',
-  //       'aria-label': 'symbol',
-  //     },
-  //   },
-  //   {
-  //     label: 'H',
-  //     field: 'h',
-  //     width: 200,
-  //   },
-  //   {
-  //     label: 'C',
-  //     field: 'c',
-  //     width: 200,
-  //   },
-  //   {
-  //     label: 'L',
-  //     field: 'l',
-  //     width: 200,
-  //   },
-  //   {
-  //     label: 'V',
-  //     field: 'v',
-  //     width: 200,
-  //   },
-  //   {
-  //     label: 'Date',
-  //     field: 'date',
-  //     sort: 'price',
-  //   },
-  // ];
-
-
-  const handleSymbolChange = (e) => {
-    setSymbol(e);
-  };
+//   const handleSymbolChange = (e) => {
+//     setSymbol(e);
+//   };
 
   useEffect(() => {
     const columns = data.columns.map((item, index) => {
@@ -81,7 +43,7 @@ const FinancialStatementsDataTable = (props) => {
   return (
     <div className="hunter-chart-container">
       <div className="col-sm-12 hunter-data-table-container financial-data-table">
-        <div className="hunter-search-filter-area">
+        {/* <div className="hunter-search-filter-area">
           <div className="select-option">
             <Select
               value={symbol}
@@ -90,7 +52,7 @@ const FinancialStatementsDataTable = (props) => {
               placeholder="Symbol"
             />
           </div>
-        </div>
+        </div> */}
         {datatable && (
           <MDBTable
             hover
@@ -107,16 +69,7 @@ const FinancialStatementsDataTable = (props) => {
               class={"financial-table-head"}
             />
             <MDBTableBody
-              class={"financial-table-body-1"}
-              rows={datatable.rows[0]}
-            />
-            <MDBTableBody
-              rows={datatable.rows[1]}
-              class="financial-table-body-2"
-            />
-            <MDBTableBody
-              rows={datatable.rows[2]}
-              class="financial-table-body-3"
+              rows={datatable.rows}
             />
           </MDBTable>
         )}
