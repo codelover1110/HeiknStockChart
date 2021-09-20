@@ -293,7 +293,6 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
 }
 
 .hunter-date-time-picker {
-  width: 300px;
   margin-right: 30px;
   color: #FFFFFF;
   display: flex;
@@ -556,4 +555,13 @@ pre {
 .table .thead-dark th
 {
   color: #FFFFFF;
+}
+
+.hunter-multi-range-area {
+  display: flex;
+  align-items: center;
+}
+
+.hunter-multi-range-area .form-control {
+  padding: 5px;
 }

@@ -21,7 +21,6 @@ import 'mdbreact/dist/css/mdb.css';
 import "./App.css";
 import "assets/css/nucleo-icons.css";
 
-
 import FileManager from "components/SystemFileManager/FileManager";
 import ThemeContextWrapper from "./components/ThemeWrapper/ThemeWrapper";
 import BackgroundColorWrapper from "./components/BackgroundColorWrapper/BackgroundColorWrapper";
