@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
-import { MDBTable, MDBTableBody, MDBTableHead } from 'mdbreact';
+import { MDBDataTableV5, MDBTable, MDBTableBody, MDBTableHead } from 'mdbreact';
 
 const FinancialStatementsDataTable = (props) => {
   const { data, symbols } = props;
@@ -19,24 +19,31 @@ const FinancialStatementsDataTable = (props) => {
         return {
           label: item,
           field: item,
-          width: 400,
-          attributes: {
-            'aria-controls': 'DataTable',
-            'aria-label': 'BreakDown',
-          }
+          width: 100,
+        };  
+      } else if (index === 1){
+        return {
+          label: item,
+          field: item,
+          width: 300,
         };
       } else {
         return {
           label: item,
           field: item,
-          width: 150,
         };
       }
     });
 
     setDatatable({
       columns,
-      rows: data.rows,
+      rows: data.rows.map((row, index) => {
+        return {
+          id: index,
+          time: row.published_utc,
+          title: row.title
+        }
+      }),
     });
   }, [data]);
 
@@ -54,24 +61,19 @@ const FinancialStatementsDataTable = (props) => {
           </div>
         </div> */}
         {datatable && (
-          <MDBTable
+          <MDBDataTableV5 
             hover
+            maxHeight="500px"
+            entriesOptions={[10, 25, 50, 100]}
+            entries={10}
+            pagesAmount={4}
+            data={datatable}
             dark={true}
-            maxHeight='70vh'
             noBottomColumns={true}
+            small={true}
             striped={true}
-            scrollX={true}
             scrollY={true}
-            paging={false}
-          >
-            <MDBTableHead
-              columns={datatable.columns}
-              class={"financial-table-head"}
-            />
-            <MDBTableBody
-              rows={datatable.rows}
-            />
-          </MDBTable>
+          />
         )}
       </div>
     </div>

@@ -83,7 +83,7 @@ export var routes = [
     ],
   },
   {
-    name: "Hybrid view",
+    name: "Hybrid View",
     icon: "tim-icons icon-video-66",
     instance: "hybrid_view",
     pathname: '/hybrid_view'
