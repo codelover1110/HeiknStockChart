@@ -216,4 +216,10 @@ body {
 .financial-data-table .financial-table-head {
   height: 60px !important;
 }
+.financial-data-table th {
+  cursor: pointer !important;
+}
+.select-option {
+  z-index: 9999 !important;
+}
 /* Dashboard End */
