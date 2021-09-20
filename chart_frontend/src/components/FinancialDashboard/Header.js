@@ -1,11 +1,20 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import Select from 'react-select';
+
 
 const Header = (props) => {
-  const { selectedHeaderNav, setSelectedHeaderNav } = props;
+  const { selectedHeaderNav, setSelectedHeaderNav, symbol, setSymbol, optionsSymbol } = props;
 
+  
   const handleNavClicked = (item) => {
     setSelectedHeaderNav(item);
   }
+
+  const handleSymbolChange = (e) => {
+    setSymbol(e);
+  };
+
+  
 
   return (
     <div className="container custom-container">
@@ -14,13 +23,13 @@ const Header = (props) => {
           <span>Dashboard</span>
         </div>
         <div className="dashboard-toolbar-main d-flex">
-          <div>
-            <div className="input-group">
-              <input type="text" className="form-control" placeholder="Enter Ticker (e.g. AAPL)" />
-              <div className="input-group-append">
-                <button class="btn-lazy">Be Lazy!</button>
-              </div>
-            </div>
+          <div className="select-option">
+            <Select
+              value={symbol}
+              onChange={handleSymbolChange}
+              options={optionsSymbol}
+              placeholder="Symbol"
+            />
           </div>
           <div className="dashboard-navbar">
             <ul className="nav justify-content-center">

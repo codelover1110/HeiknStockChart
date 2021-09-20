@@ -500,3 +500,70 @@ export const getNewsFinancialData = async () => {
     }
   }
 }
+
+export const getIncomeStatement = async (symbol, aggregationType=null) => {
+  const requestOptions = {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      'symbol': symbol,
+      'aggregationType': aggregationType,
+    })
+  };
+
+  return await fetch(process.env.REACT_APP_BACKEND_URL + "/financials/income_statement/", requestOptions)
+    .then(response => response.json())
+    .then(data => {
+      return data
+    })
+}
+export const getBalanceSheet = async (symbol, aggregationType=null) => {
+  const requestOptions = {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      'symbol': symbol,
+      'aggregationType': aggregationType,
+    })
+  };
+
+  return await fetch(process.env.REACT_APP_BACKEND_URL + "/financials/balance_sheet/", requestOptions)
+    .then(response => response.json())
+    .then(data => {
+      return data
+    })
+}
+
+export const getCashStatement = async (symbol, aggregationType=null) => {
+  const requestOptions = {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      'symbol': symbol,
+      'aggregationType': aggregationType,
+    })
+  };
+
+  return await fetch(process.env.REACT_APP_BACKEND_URL + "/financials/cash_statement/", requestOptions)
+    .then(response => response.json())
+    .then(data => {
+      return data
+    })
+}
+
+export const getFinancialTotalData = async (symbol, aggregationType) => {
+  const requestOptions = {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      'symbol': symbol,
+      'aggregationType': aggregationType,
+    })
+  };
+
+  return await fetch(process.env.REACT_APP_BACKEND_URL + "/financials/financial_total_data/", requestOptions)
+    .then(response => response.json())
+    .then(data => {
+      return data
+    })
+}

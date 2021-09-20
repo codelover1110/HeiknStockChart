@@ -55,6 +55,7 @@ const GroupBarChart = (props) => {
         }
         chartDataPoints[index].push(dataPoint);
       });
+      // chartDataPoints.push(dataPoint);
     });
 
     let series = [];
