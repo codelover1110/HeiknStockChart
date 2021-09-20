@@ -42,8 +42,11 @@ function LinkManage() {
     { value: 'forward_test', label: 'Forward Test' },
     { value: 'stress_test', label: 'Stress Test' },
     { value: 'optimization', label: 'Optimization' },
-    { value: 'live_trade', label: 'Live Trade' },
+    { value: 'live_trading', label: 'Live Trade' },
     { value: 'scanner', label: 'Scanner' },
+    { value: 'trade_data', label: 'Trade Data' },
+    { value: 'hybrid_view', label: 'Hybrid View' },
+    { value: 'financial_data', label: 'Financial Data' },
   ]
 
   const [user] = useState(JSON.parse(localStorage.getItem('user-info')));

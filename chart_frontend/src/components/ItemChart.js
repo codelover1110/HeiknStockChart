@@ -238,7 +238,7 @@ const HeiknStockChartItem = (props) => {
               Violette AM - Client Portal 
             </a>
           </div>
-          <div className="navbar-nav mr-auto">
+          <div className="navbar-nav ma-auto hunter-nav-bar-nav">
             <li className="nav-item">
                 <Link to={"/chart"} className="nav-link"></Link>
             </li>
@@ -300,7 +300,7 @@ const HeiknStockChartItem = (props) => {
                 />
               </div>)
             }
-            <div className='input-group date hunter-date-time-picker' id='datetimepicker1'>
+            <div className='date hunter-date-time-picker' id='datetimepicker1'>
               <MultiRangeSlider
                 selectDateRange={selectDateRange}
               />

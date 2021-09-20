@@ -116,7 +116,7 @@ export default class TextEditor extends Component {
           },
         ],
         starting_cash: 10000,
-        hours: [
+        extended_hours: [
           {value: true, label: 'true'},
           {value: false, label: 'false'}
         ],
@@ -316,11 +316,22 @@ export default class TextEditor extends Component {
       name: bot.name,
       status: bot.status,
       updated: moment(bot.updated).format("YYYY-MM-DD h:mm:ss"),
-      action: <MDBBtn color="blue" size="sm" onClick={
-        () => {
-          this.updateBotStatus(bot);
-        }}
-      >{bot.status === 'dead' ? 'Run' : 'Stop'}</MDBBtn>
+      action: <>
+        <MDBBtn className="mr-10" color="blue" size="sm" onClick={
+          () => {
+            this.updateBotStatus(bot, bot.status === 'start' ? 'pause' : 'start');
+          }}
+        >
+          {bot.status === 'start' ? 'pause' : 'start'}
+        </MDBBtn>
+        <MDBBtn color="blue" size="sm" onClick={
+          () => {
+            this.updateBotStatus(bot, 'kill');
+          }}
+        >
+          kill
+        </MDBBtn>
+      </>
     }))
     const data = {
       columns: this.state.headerColumnsBotStatus,
