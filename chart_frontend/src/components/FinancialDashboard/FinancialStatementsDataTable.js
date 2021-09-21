@@ -87,7 +87,6 @@ const FinancialStatementsDataTable = (props) => {
           />
         )}
       </div>
-      { console.log(selectedData) }
       { selectedData !== null &&
         (<div className="hunter-data-table-details-area">
           <div className="hunter-data-table-details-area-title">

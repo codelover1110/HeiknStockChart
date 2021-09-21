@@ -1190,7 +1190,7 @@ const FinancialDashboard = () => {
         setSymbol={setSymbol}
         optionsSymbol={optionsSymbol}
       />
-      {selectedHeaderNav !== 'All Financial Statements' && (
+      {selectedHeaderNav !== 'News' && (
         <GraphTypes
           selectedGraphType={selectedGraphType}
           setSelectedGraphType={setSelectedGraphType}
@@ -1205,7 +1205,7 @@ const FinancialDashboard = () => {
           symbols={optionsSymbol}
         />
       ) : 
-      selectedHeaderNav === 'All Financial Statements' ? (
+      selectedHeaderNav === 'News' ? (
         <FinancialStatementsDataTable
           data={financialStatements}
           symbols={optionsSymbol}
