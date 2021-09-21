@@ -37,13 +37,14 @@ const FinancialStatementsDataTable = (props) => {
 
     setDatatable({
       columns,
-      rows: data.rows.map((row, index) => {
-        return {
-          id: index,
-          time: row.published_utc,
-          title: row.title
-        }
-      }),
+      rows: data.rows ? 
+        data.rows.map((row, index) => {
+          return {
+            id: index,
+            time: row.published_utc,
+            title: row.title
+          }
+        }) : [],
     });
   }, [data]);
 
