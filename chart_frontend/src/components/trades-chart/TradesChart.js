@@ -626,7 +626,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 						<BarSeries
 							yAccessor={d => d.rsi.bearPower}
 							baseAt={(xScale, yScale, d) => yScale(0)}
-							fill={d => d.rsi.color === 'buy' ? '#800080' : d.rsi.color === 'sell' ? '#FFA500' : d.rsi.color === 'hold' ? '#00FF00' : '#FF0000'} />
+							fill={d => d.rsi.side === 'buy' ? '#800080' : d.rsi.side === 'sell' ? '#FFA500' : d.rsi.side === 'hold' ? '#00FF00' : '#FF0000'} />
 						<StraightLine yValue={0} />
 
 						<SingleValueTooltip
