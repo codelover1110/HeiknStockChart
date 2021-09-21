@@ -77,6 +77,9 @@ const GroupBarChart = (props) => {
             download: false,
           },
         },
+        zoom: {
+          enabled: true
+        }
       },
       plotOptions: {
         bar: {

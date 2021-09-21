@@ -1190,12 +1190,14 @@ const FinancialDashboard = () => {
         setSymbol={setSymbol}
         optionsSymbol={optionsSymbol}
       />
-      <GraphTypes
-        selectedGraphType={selectedGraphType}
-        setSelectedGraphType={setSelectedGraphType}
-        selectedAggregationType={selectedAggregationType}
-        setSelectedAggregationType={setSelectedAggregationType}
-      />
+      {selectedHeaderNav !== 'All Financial Statements' && (
+        <GraphTypes
+          selectedGraphType={selectedGraphType}
+          setSelectedGraphType={setSelectedGraphType}
+          selectedAggregationType={selectedAggregationType}
+          setSelectedAggregationType={setSelectedAggregationType}
+        />
+      )}
       {
       selectedHeaderNav === 'Data Table' ? (
         <FinancialDataTable
