@@ -13,6 +13,9 @@ import itertools
 pd.options.mode.chained_assignment = None  # default='warn'
 from datetime import datetime,date
 import yaml
+import argparse
+
+sys.path.append(os.getcwd())
 
 def PlaceOrder(side, timeframe, stock, account):
 
@@ -262,42 +265,69 @@ def Judge():
 
 
 if __name__ == "__main__":
+    if False:
+        thisfile = pathlib.Path(__file__).parent.resolve()
 
-    thisfile = pathlib.Path(__file__).parent.resolve()
+        os.chdir(thisfile)
 
-    os.chdir(thisfile)
+        with open("config.json","r") as f:
+            config = json.load(f)
 
-    with open("config.json","r") as f:
-        config = json.load(f)
+        with open("watchlist.json","r") as f:
+            watchlist = json.loads(json.load(f))["tickers"]
 
-    with open("watchlist.json","r") as f:
-        watchlist = json.loads(json.load(f))["tickers"]
+        order_routing = importlib.import_module(f"{config['order_routing']}_order_routing", package=None)
+        # DoTrade(account, stock, stocks, side, apiKey)
 
-    order_routing = importlib.import_module(f"{config['order_routing']}_order_routing", package=None)
-    # DoTrade(account, stock, stocks, side, apiKey)
-
-    data_source = importlib.import_module(f"{config['data_source']}_data_source", package=None)
-    # GetVerdicts(barSize, mktDataHours, stocks)
-
-
-    macroStrategy = config['macro_strategy']
-    liveTrading = config['live_trading']
-    startingCashPerAccount = int(config["starting_cash"])
-    mktDataHours = config["hours"]
-    timeframes = [config["timeframe"]]
-    dataSource = config["data_source"]
-    broker = config["order_routing"]
+        data_source = importlib.import_module(f"{config['data_source']}_data_source", package=None)
+        # GetVerdicts(barSize, mktDataHours, stocks)
 
 
-    with open("general.json") as f:
-        generalConfig = json.loads(json.load(f))
+        macroStrategy = config['macro_strategy']
+        liveTrading = config['live_trading']
+        startingCashPerAccount = int(config["starting_cash"])
+        mktDataHours = config["hours"]
+        timeframes = [config["timeframe"]]
+        dataSource = config["data_source"]
+        broker = config["order_routing"]
 
-    mongoUrl = generalConfig["mongo_url"]
-    sendToMongo = generalConfig["send_to_mongo"]
-    ## time to wait between grabbing syms in seconds
-    refreshtime = int(generalConfig["refresh_time"].replace("s",""))
 
-    while True:
-        Judge()
-        time.sleep(60)
+        with open("general.json") as f:
+            generalConfig = json.loads(json.load(f))
+
+        mongoUrl = generalConfig["mongo_url"]
+        sendToMongo = generalConfig["send_to_mongo"]
+        ## time to wait between grabbing syms in seconds
+        refreshtime = int(generalConfig["refresh_time"].replace("s",""))
+
+        while True:
+            Judge()
+            time.sleep(60)
+    else:
+        parser = argparse.ArgumentParser(description='config file name as args')
+        parser.add_argument("--bot", type=str, default="")
+        parser.add_argument("--watchlist")
+
+        args = parser.parse_args()
+
+        bot_config = args.bot
+        watch_list = args.watchlist
+        print ('bot: {}, watch_list: {}'.format(bot_config, watch_list))
+
+        config_file = "chartApis/lib/configs/" + bot_config + '.json'
+        with open(config_file,"r") as f:
+            config = json.load(f)
+        print (config)
+
+        macroStrategy = config['macro_strategy']
+        liveTrading = config['live_trading']
+        startingCashPerAccount = int(config["starting_cash"])
+        mktDataHours = config["hours"]
+        timeframes = [config["timeframe"]]
+        dataSource = config["data_source"]
+        broker = config["order_routing"]
+
+        mongoUrl = ""
+        sendToMongo = "TRUE"
+
 
