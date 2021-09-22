@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Chart from './Chart';
 import ChartTools from '../ChartTools';
 
 const GroupBarChart = (props) => {
-  const { data, chartData } = props;
-  console.log("props", props);
+  const { data, chartData, globalAggregationType } = props;
+
   const [aggregationTypeForOne, setAggregrationTypeForOne] = useState();
-  const [currentData, setCurrentData] = useState(data);
+  const [currentData, setCurrentData] = useState();
 
   const labels = [
     [
@@ -35,44 +35,76 @@ const GroupBarChart = (props) => {
     ],
   ];
 
+  const filterByAggregationTyoe = (selectedData) => {
+    if (selectedData) {
+      let filteredData = {...selectedData};
+      const dataPoints = filteredData.dataPoints.filter(
+        (item) => aggregationTypeForOne === "" || item.period === aggregationTypeForOne
+      );
+      filteredData['dataPoints'] = dataPoints;
+      return filteredData;
+    }
+    return selectedData;
+  };
+
   const handleDataTypeChanged = (e) => {
     const selectedData = chartData.filter(
       (item) => item.label === e.target.value
     );
-    setCurrentData(selectedData[0]);
+    const filteredSelectedData = filterByAggregationTyoe(selectedData[0]);
+    setCurrentData(filteredSelectedData);
   };
+
+  useEffect(() => {
+    setAggregrationTypeForOne(globalAggregationType);
+    const filteredSelectedData = filterByAggregationTyoe(data);
+    setCurrentData(filteredSelectedData);
+  }, [globalAggregationType]);
+
+  useEffect(() => {
+    const filteredSelectedData = filterByAggregationTyoe(data);
+    setCurrentData(filteredSelectedData);
+  }, [aggregationTypeForOne]);
 
   return (
     <>
-      <div className="chart-toolbar">
-        <div className="chart-toolbar-select">
-          <select
-            className="browser-default custom-select"
-            style={{ borderColor: currentData.color, boxShadow: 'unset' }}
-            onChange={handleDataTypeChanged}
-          >
-            {labels[currentData.group].map((item, index) => (
-              <option
-                key={index}
-                val={item}
-                selected={item === currentData.label ? true : false}
+      {currentData && (
+        <>
+          <div className="chart-toolbar">
+            <div className="chart-toolbar-select">
+              <select
+                className="browser-default custom-select"
+                style={{ borderColor: currentData.color, boxShadow: 'unset' }}
+                onChange={handleDataTypeChanged}
               >
-                {item}
-              </option>
-            ))}
-          </select>
-        </div>
-        <ChartTools
-          aggregationTypeForOne={aggregationTypeForOne}
-          setAggregrationTypeForOne={setAggregrationTypeForOne}
-          color={currentData.color}
-        />
-      </div>
-      <div className="chart-title-area">
-        <div style={{ backgroundColor: currentData.color }}></div>
-        <span>{currentData.label}</span>
-      </div>
-      {currentData.dataPoints.length > 0 ? <Chart type={'svg'} data={currentData} /> : <div className="no-data">No data...</div>}
+                {labels[currentData.group].map((item, index) => (
+                  <option
+                    key={index}
+                    val={item}
+                    selected={item === currentData.label ? true : false}
+                  >
+                    {item}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <ChartTools
+              aggregationTypeForOne={aggregationTypeForOne}
+              setAggregrationTypeForOne={setAggregrationTypeForOne}
+              color={currentData.color}
+            />
+          </div>
+          <div className="chart-title-area">
+            <div style={{ backgroundColor: currentData.color }}></div>
+            <span>{currentData.label}</span>
+          </div>
+          {currentData.dataPoints.length > 0 ? (
+            <Chart type={'svg'} data={currentData} />
+          ) : (
+            <div className="no-data">No data...</div>
+          )}
+        </>
+      )}
     </>
   );
 };

@@ -501,13 +501,12 @@ export const getNewsFinancialData = async () => {
   }
 }
 
-export const getIncomeStatement = async (symbol, aggregationType=null) => {
+export const getIncomeStatement = async (symbol) => {
   const requestOptions = {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
       'symbol': symbol,
-      'aggregationType': aggregationType,
     })
   };
 
@@ -517,13 +516,12 @@ export const getIncomeStatement = async (symbol, aggregationType=null) => {
       return data
     })
 }
-export const getBalanceSheet = async (symbol, aggregationType=null) => {
+export const getBalanceSheet = async (symbol) => {
   const requestOptions = {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
       'symbol': symbol,
-      'aggregationType': aggregationType,
     })
   };
 
@@ -534,13 +532,12 @@ export const getBalanceSheet = async (symbol, aggregationType=null) => {
     })
 }
 
-export const getCashStatement = async (symbol, aggregationType=null) => {
+export const getCashStatement = async (symbol) => {
   const requestOptions = {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
       'symbol': symbol,
-      'aggregationType': aggregationType,
     })
   };
 
@@ -551,13 +548,12 @@ export const getCashStatement = async (symbol, aggregationType=null) => {
     })
 }
 
-export const getFinancialTotalData = async (symbol, aggregationType) => {
+export const getFinancialTotalData = async (symbol) => {
   const requestOptions = {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
       'symbol': symbol,
-      'aggregationType': aggregationType,
     })
   };
 

@@ -15,6 +15,9 @@ body {
   margin-top: 10px;
   border-radius: 0;
 }
+.show-sidebar-toggle-area {
+  top: 110px !important;
+}
 .dashboard-toolbar {
   background-color: #222a42!important;
   margin-left: -2px;
@@ -26,10 +29,18 @@ body {
   border-radius: 4px;
   box-shadow: 0 2px 5px 0 rgb(0 0 0 / 16%), 0 2px 10px 0 rgb(0 0 0 / 12%);
 }
+.financial-dashboard-toolbar {
+  font-weight: normal !important; 
+}
 .dashboard-toolbar-title {
   font-size: 20px;
   font-weight: bold;
   color: white;
+  justify-content: space-between;
+}
+.financial-dashboard-title {
+  display: flex;
+  align-items: center;
 }
 .dashboard-toolbar-main {
   justify-content: space-between;
@@ -73,6 +84,7 @@ body {
   display: flex;
   align-items: center;
   color: white;
+  font-size: 16px;
 }
 .dashboard-navbar li {
   border-left: 1px solid rgb(42,63,84);
@@ -220,7 +232,8 @@ body {
   cursor: pointer !important;
 }
 .select-option {
-  z-index: 9999 !important;
+  z-index: 9000 !important;
+  color: #303030 !important;
 }
 .react-stockchart text {
   fill: white;
