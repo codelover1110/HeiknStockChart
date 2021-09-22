@@ -51,7 +51,6 @@ const FinancialDashboard = () => {
   });
 
   useEffect(() => {
-    console.log('here ????????????????//')
     disableScroll.on();
     const getSymbols = async () => {
       const res = await getAllSymbols();
@@ -63,7 +62,6 @@ const FinancialDashboard = () => {
       disableScroll.off();
     };
   }, []);
-
 
   useEffect(() => {
     setChartData();
@@ -142,38 +140,40 @@ const FinancialDashboard = () => {
         color: 'rgb(226, 71, 130)',
         dataPoints: [],
       };
-      res.results.map((item) => {
-        revenus.dataPoints.push({
-          calendarDate: item.calendarDate,
-          period: item.period,
-          value: item.revenues,
+      if (res && res.results) {
+        res.results.map((item) => {
+          revenus.dataPoints.push({
+            calendarDate: item.calendarDate,
+            period: item.period,
+            value: item.revenues,
+          });
+          costOfRevenue.dataPoints.push({
+            calendarDate: item.calendarDate,
+            period: item.period,
+            value: item.costOfRevenue,
+          });
+          grossProfit.dataPoints.push({
+            calendarDate: item.calendarDate,
+            period: item.period,
+            value: item.grossProfit,
+          });
+          EBITDAMargin.dataPoints.push({
+            calendarDate: item.calendarDate,
+            period: item.period,
+            value: item.EBITDAMargin,
+          });
+          NetIncome.dataPoints.push({
+            calendarDate: item.calendarDate,
+            period: item.period,
+            value: item.netIncome,
+          });
+          earningsPerBasicShare.dataPoints.push({
+            calendarDate: item.calendarDate,
+            period: item.period,
+            value: item.earningsPerBasicShare,
+          });
         });
-        costOfRevenue.dataPoints.push({
-          calendarDate: item.calendarDate,
-          period: item.period,
-          value: item.costOfRevenue,
-        });
-        grossProfit.dataPoints.push({
-          calendarDate: item.calendarDate,
-          period: item.period,
-          value: item.grossProfit,
-        });
-        EBITDAMargin.dataPoints.push({
-          calendarDate: item.calendarDate,
-          period: item.period,
-          value: item.EBITDAMargin,
-        });
-        NetIncome.dataPoints.push({
-          calendarDate: item.calendarDate,
-          period: item.period,
-          value: item.netIncome,
-        });
-        earningsPerBasicShare.dataPoints.push({
-          calendarDate: item.calendarDate,
-          period: item.period,
-          value: item.earningsPerBasicShare,
-        });
-      });
+      }
       setChartData([
         revenus,
         costOfRevenue,
@@ -222,38 +222,41 @@ const FinancialDashboard = () => {
         color: 'rgb(46, 149, 187)',
         dataPoints: [],
       };
-      res.results.map((item) => {
-        assets.dataPoints.push({
-          calendarDate: item.calendarDate,
-          period: item.period,
-          value: item.assets,
+      if (res && res.results) {
+        res.results.map((item) => {
+          assets.dataPoints.push({
+            calendarDate: item.calendarDate,
+            period: item.period,
+            value: item.assets,
+          });
+          liabilitiesNonCurrent.dataPoints.push({
+            calendarDate: item.calendarDate,
+            period: item.period,
+            value: item.liabilitiesNonCurrent,
+          });
+          debt.dataPoints.push({
+            calendarDate: item.calendarDate,
+            period: item.period,
+            value: item.debt,
+          });
+          tradeAndNonTradeReceivables.dataPoints.push({
+            calendarDate: item.calendarDate,
+            period: item.period,
+            value: item.tradeAndNonTradeReceivables,
+          });
+          tradeAndNonTradePayables.dataPoints.push({
+            calendarDate: item.calendarDate,
+            period: item.period,
+            value: item.tradeAndNonTradePayables,
+          });
+          cashAndEquivalents.dataPoints.push({
+            calendarDate: item.calendarDate,
+            period: item.period,
+            value: item.cashAndEquivalents,
+          });
         });
-        liabilitiesNonCurrent.dataPoints.push({
-          calendarDate: item.calendarDate,
-          period: item.period,
-          value: item.liabilitiesNonCurrent,
-        });
-        debt.dataPoints.push({
-          calendarDate: item.calendarDate,
-          period: item.period,
-          value: item.debt,
-        });
-        tradeAndNonTradeReceivables.dataPoints.push({
-          calendarDate: item.calendarDate,
-          period: item.period,
-          value: item.tradeAndNonTradeReceivables,
-        });
-        tradeAndNonTradePayables.dataPoints.push({
-          calendarDate: item.calendarDate,
-          period: item.period,
-          value: item.tradeAndNonTradePayables,
-        });
-        cashAndEquivalents.dataPoints.push({
-          calendarDate: item.calendarDate,
-          period: item.period,
-          value: item.cashAndEquivalents,
-        });
-      });
+      }
+
       setChartData([
         assets,
         liabilitiesNonCurrent,
@@ -302,38 +305,41 @@ const FinancialDashboard = () => {
         color: 'rgb(96, 54, 217)',
         dataPoints: [],
       };
-      res.results.map((item) => {
-        netCashFlowFromOperations.dataPoints.push({
-          calendarDate: item.calendarDate,
-          period: item.period,
-          value: item.netCashFlowFromOperations,
+      if (res && res.results) {
+        res.results.map((item) => {
+          netCashFlowFromOperations.dataPoints.push({
+            calendarDate: item.calendarDate,
+            period: item.period,
+            value: item.netCashFlowFromOperations,
+          });
+          netCashFlowFromInvesting.dataPoints.push({
+            calendarDate: item.calendarDate,
+            period: item.period,
+            value: item.netCashFlowFromInvesting,
+          });
+          netCashFlowFromFinancing.dataPoints.push({
+            calendarDate: item.calendarDate,
+            period: item.period,
+            value: item.netCashFlowFromFinancing,
+          });
+          issuanceDebtSecurities.dataPoints.push({
+            calendarDate: item.calendarDate,
+            period: item.period,
+            value: item.issuanceDebtSecurities,
+          });
+          issuanceEquityShares.dataPoints.push({
+            calendarDate: item.calendarDate,
+            period: item.period,
+            value: item.issuanceEquityShares,
+          });
+          paymentDividendsOtherCashDistributions.dataPoints.push({
+            calendarDate: item.calendarDate,
+            period: item.period,
+            value: item.paymentDividendsOtherCashDistributions,
+          });
         });
-        netCashFlowFromInvesting.dataPoints.push({
-          calendarDate: item.calendarDate,
-          period: item.period,
-          value: item.netCashFlowFromInvesting,
-        });
-        netCashFlowFromFinancing.dataPoints.push({
-          calendarDate: item.calendarDate,
-          period: item.period,
-          value: item.netCashFlowFromFinancing,
-        });
-        issuanceDebtSecurities.dataPoints.push({
-          calendarDate: item.calendarDate,
-          period: item.period,
-          value: item.issuanceDebtSecurities,
-        });
-        issuanceEquityShares.dataPoints.push({
-          calendarDate: item.calendarDate,
-          period: item.period,
-          value: item.issuanceEquityShares,
-        });
-        paymentDividendsOtherCashDistributions.dataPoints.push({
-          calendarDate: item.calendarDate,
-          period: item.period,
-          value: item.paymentDividendsOtherCashDistributions,
-        });
-      });
+      }
+
       setChartData([
         netCashFlowFromOperations,
         netCashFlowFromInvesting,
@@ -345,19 +351,19 @@ const FinancialDashboard = () => {
     };
 
     switch (selectedHeaderNav) {
-      case "All Financial Statements":
+      case 'All Financial Statements':
         getNewsFinancials();
         break;
-      case "Data Table":
+      case 'Data Table':
         getTotalData();
         break;
-      case "Income Statement":
+      case 'Income Statement':
         getIncome();
         break;
-      case "Balance Sheet":
+      case 'Balance Sheet':
         getBalance();
         break;
-      case "Cash Flow Statement":
+      case 'Cash Flow Statement':
         getCash();
         break;
     }
@@ -390,7 +396,7 @@ const FinancialDashboard = () => {
         setSymbol={setSymbol}
         optionsSymbol={optionsSymbol}
       />
-      {selectedHeaderNav !== 'News' && (
+      {selectedHeaderNav !== 'News' && selectedHeaderNav !== 'Data Table' && (
         <GraphTypes
           selectedGraphType={selectedGraphType}
           setSelectedGraphType={setSelectedGraphType}
@@ -398,14 +404,9 @@ const FinancialDashboard = () => {
           setSelectedAggregationType={setSelectedAggregationType}
         />
       )}
-      {
-      selectedHeaderNav === 'Data Table' ? (
-        <FinancialDataTable
-          data={datatable}
-          symbols={optionsSymbol}
-        />
-      ) : 
-      selectedHeaderNav === 'News' ? (
+      {selectedHeaderNav === 'Data Table' ? (
+        <FinancialDataTable data={datatable} symbols={optionsSymbol} />
+      ) : selectedHeaderNav === 'News' ? (
         <FinancialStatementsDataTable
           data={financialStatements}
           symbols={optionsSymbol}

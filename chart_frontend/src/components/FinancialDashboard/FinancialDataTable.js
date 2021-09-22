@@ -67,7 +67,7 @@ const FinancialDataTable = (props) => {
           <MDBTable
             hover
             dark={true}
-            maxHeight='70vh'
+            maxHeight='80vh'
             noBottomColumns={true}
             striped={true}
             scrollX={true}
