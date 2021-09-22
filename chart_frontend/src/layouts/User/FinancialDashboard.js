@@ -50,6 +50,24 @@ const FinancialDashboard = () => {
     rows: [],
   });
 
+  const sortDataPointsByDate = (data) => {
+    let sortedData = {...data};
+    if (sortedData.dataPoints.length > 0) {
+      sortedData.dataPoints.sort(function (a, b) {
+        let valueA = a['calendarDate'];
+        let valueB = b['calendarDate'];
+        if (typeof a['calendarDate'] != "string") {
+          valueA = valueA.toString();
+        }
+        if (typeof b['calendarDate'] != "string") {
+          valueB = valueB.toString();
+        }
+        return valueA.localeCompare(valueB);
+      });
+    }
+    return sortedData;
+  }
+
   useEffect(() => {
     disableScroll.on();
     const getSymbols = async () => {
@@ -175,12 +193,12 @@ const FinancialDashboard = () => {
         });
       }
       setChartData([
-        revenus,
-        costOfRevenue,
-        grossProfit,
-        EBITDAMargin,
-        NetIncome,
-        earningsPerBasicShare,
+        sortDataPointsByDate(revenus),
+        sortDataPointsByDate(costOfRevenue),
+        sortDataPointsByDate(grossProfit),
+        sortDataPointsByDate(EBITDAMargin),
+        sortDataPointsByDate(NetIncome),
+        sortDataPointsByDate(earningsPerBasicShare),
       ]);
     };
 
@@ -258,12 +276,12 @@ const FinancialDashboard = () => {
       }
 
       setChartData([
-        assets,
-        liabilitiesNonCurrent,
-        debt,
-        tradeAndNonTradeReceivables,
-        tradeAndNonTradePayables,
-        cashAndEquivalents,
+        sortDataPointsByDate(assets),
+        sortDataPointsByDate(liabilitiesNonCurrent),
+        sortDataPointsByDate(debt),
+        sortDataPointsByDate(tradeAndNonTradeReceivables),
+        sortDataPointsByDate(tradeAndNonTradePayables),
+        sortDataPointsByDate(cashAndEquivalents),
       ]);
     };
 
@@ -341,12 +359,12 @@ const FinancialDashboard = () => {
       }
 
       setChartData([
-        netCashFlowFromOperations,
-        netCashFlowFromInvesting,
-        netCashFlowFromFinancing,
-        issuanceDebtSecurities,
-        issuanceEquityShares,
-        paymentDividendsOtherCashDistributions,
+        sortDataPointsByDate(netCashFlowFromOperations),
+        sortDataPointsByDate(netCashFlowFromInvesting),
+        sortDataPointsByDate(netCashFlowFromFinancing),
+        sortDataPointsByDate(issuanceDebtSecurities),
+        sortDataPointsByDate(issuanceEquityShares),
+        sortDataPointsByDate(paymentDividendsOtherCashDistributions),
       ]);
     };
 
