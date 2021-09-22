@@ -18,6 +18,18 @@ def dataConverter(obj):
     elif isinstance(obj, datetime.datetime):
         return obj.__str__()
 
+def define_color(value, candle, pre_candle):
+    if value > 0:
+        if candle > pre_candle :
+            return "l_g" # light green
+        else:
+            return "d_g" # dark green
+    else:
+        if candle > pre_candle :
+            return "l_r" # light red
+        else:
+            return "d_r" # dark red
+
 def get_chat_data_from_candles(candles):
     result_data = []
     for idx in range(0, len(candles)-25):
@@ -71,12 +83,71 @@ def get_chat_data_rsi_heik_v1(candles):
             'volume': int(data.v),
             'RSI': rsi,
             'side': side,
-            'rsi': {'bearPower': rsi, 'bullPower': rsi},
-            'rsi2': {'bearPower': rsi2, 'bullPower': rsi2},
-            'rsi3': {'bearPower': rsi3, 'bullPower': rsi3},
-            'heik': {'bearPower': heik, 'bullPower': heik},
-            'heik2': {'bearPower': heik2, 'bullPower': heik2},
+            'rsi': {'bearPower': rsi, 'bullPower': rsi, 'side': side},
+            'rsi2': {'bearPower': rsi2, 'bullPower': rsi2, 'color': 'l_r'},
+            'rsi3': {'bearPower': rsi3, 'bullPower': rsi3, 'color': 'l_r'},
+            'heik': {'bearPower': heik, 'bullPower': heik, 'color': 'l_r'},
+            'heik2': {'bearPower': heik2, 'bullPower': heik2, 'color': 'l_r'},
         })
+
+    return result_data
+
+def get_chat_data_rsi_heik_v11(candles):
+    df = util.df(candles)
+    hadf = rsi_heik_v1_fitler(df)
+    heik = (hadf["HA_close"] - hadf["HA_open"]).rolling(window=3).mean()
+    heik_tmp = heik.copy()
+    lastdf = df.iloc[-1] 
+
+    heik_diff = heik_tmp.diff()
+    heik_last = heik.iloc[-1]
+
+    df.replace(np.nan, 0)
+    result_data = []
+    idx = 0        
+    for data in df.iloc:
+        if idx == 0:
+            prev_data = df.iloc[idx]
+        else:
+            prev_data = df.iloc[idx-1]
+        # if( data.rsi2 >= 0 and data.rsi3 >= 0 and heik.iloc[-1] >=0 and heik_diff.iloc[-1] >= 0):
+        # if( data.rsi2 >= 0 and data.rsi3 >= 0 and heik_last >=0 and heik_diff.iat[-1] >= 0):
+        if( data.rsi2 >= 0 and data.rsi3 >= 0):
+            side = "buy"
+        elif ( data.rsi2 <= 0 and heik_diff.iloc[-1] <= 0):
+            side = "sell"
+        elif ( data.rsi1 >= 0):
+            side = "hold"
+        else:
+            side = "wait"
+        rsi = dataConverter(np.nan_to_num(data.RSI))
+        pre_rsi = dataConverter(np.nan_to_num(prev_data.RSI))
+        rsi2 = rsi - pre_rsi
+        pre_rs2 = dataConverter(np.nan_to_num(prev_data.rsi2))
+        rsi3 = rsi2 - pre_rs2
+        pre_rs3 = dataConverter(np.nan_to_num(prev_data.rsi3))
+        heik = rsi3 - pre_rs3
+        pre_heik = dataConverter(np.nan_to_num(heik_diff.iat[-1]))
+        heik2 = heik - pre_heik
+        
+        result_data.append({
+            'close': float(data.c),
+            'date': data.date,
+            'high': float(data.h),
+            'low': float(data.l),
+            'open': float(data.o),
+            'percentChange': "",
+            'volume': int(data.v),
+            'RSI': rsi,
+            'side': side,
+            'rsi': {'bearPower': rsi, 'bullPower': rsi, 'side': side},
+            'rsi2': {'bearPower': rsi2, 'bullPower': rsi2, 'color': define_color(rsi2, rsi, pre_rsi)},
+            'rsi3': {'bearPower': rsi3, 'bullPower': rsi3, 'color': define_color(rsi3, rsi2, pre_rs2)},
+            'heik': {'bearPower': heik, 'bullPower': heik, 'color': define_color(heik, rsi3, pre_rs3)},
+            'heik2': {'bearPower': heik2, 'bullPower': heik2, 'color': define_color(heik2, heik, pre_heik)},
+        })
+
+        idx += 1
 
     return result_data
 

@@ -62,7 +62,7 @@ def get_config_item_detail(config_collection, name):
 
     return db_collection.find_one({"name": name}, {'_id': False})
 
-def create_configs_one(config_collection, config):
+def save_configs_one(config_collection, config):
     db_collection = proc_db[config_collection]
     config['update_date'] = datetime.now()
     query = {"name": config['name']}

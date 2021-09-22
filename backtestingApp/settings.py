@@ -56,6 +56,8 @@ INSTALLED_APPS = [
     'codes',
     'users',
     'strategy',
+    'news',
+    'financials',
     'crispy_forms', 
 ]
 

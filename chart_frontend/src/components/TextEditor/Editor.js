@@ -307,39 +307,50 @@ export default class TextEditor extends Component {
       res = await updateBotStatus(bot.name, false)
     }
     alert(res.message)
+    await this.loadBotStatusList()
   } 
 
   loadBotStatusList = async () => {
     const res = await getBotStatusList();
-    const botStatusList = res.result.map((bot, index) => ({
-      id: index + 1,
-      name: bot.name,
-      status: bot.status,
-      updated: moment(bot.updated).format("YYYY-MM-DD h:mm:ss"),
-      action: <>
-        <MDBBtn className="mr-10" color="blue" size="sm" onClick={
-          () => {
-            this.updateBotStatus(bot, bot.status === 'start' ? 'pause' : 'start');
-          }}
-        >
-          {bot.status === 'start' ? 'pause' : 'start'}
-        </MDBBtn>
-        <MDBBtn color="blue" size="sm" onClick={
-          () => {
-            this.updateBotStatus(bot, 'kill');
-          }}
-        >
-          kill
-        </MDBBtn>
-      </>
-    }))
-    const data = {
-      columns: this.state.headerColumnsBotStatus,
-      rows: botStatusList
+    if (res.success) {
+      const botStatusList = res.result.map((bot, index) => ({
+        id: index + 1,
+        name: bot.name,
+        status: bot.status,
+        updated: moment(bot.updated).format("YYYY-MM-DD h:mm:ss"),
+        action: <>
+          <MDBBtn className="mr-10" color="blue" size="sm" onClick={
+            () => {
+              this.updateBotStatus(bot, bot.status === 'live' ? 'pause' : 'start');
+            }}
+          >
+            {bot.status === 'live' ? 'pause' : 'start'}
+          </MDBBtn>
+          <MDBBtn color="blue" size="sm" onClick={
+            () => {
+              this.updateBotStatus(bot, 'kill');
+            }}
+          >
+            kill
+          </MDBBtn>
+        </>
+      }))
+      const data = {
+        columns: this.state.headerColumnsBotStatus,
+        rows: botStatusList
+      }
+      this.setState({
+        botStatusDatatable: data
+      })
+    } else {
+      const data = {
+        columns: this.state.headerColumnsBotStatus,
+        rows: []
+      }
+      this.setState({
+        botStatusDatatable: data
+      })
     }
-    this.setState({
-      botStatusDatatable: data
-    })
   }
   
   loadBotConfigList = async () => {

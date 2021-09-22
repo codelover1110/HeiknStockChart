@@ -15,7 +15,8 @@ except ImportError:
 
 API_KEY = 'tuQt2ur25Y7hTdGYdqI2VrE4dueVA8Xk'
 # mongoclient = pymongo.MongoClient('mongodb://aliaksandr:BD20fc854X0LIfSv@cluster0-shard-00-00.35i8i.mongodb.net:27017,cluster0-shard-00-01.35i8i.mongodb.net:27017,cluster0-shard-00-02.35i8i.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-aoj781-shard-0&authSource=admin&retryWrites=true&w=majority')
-mongoclient = pymongo.MongoClient('mongodb://user:-Hz2f$!YBXbDcKG@cluster0-shard-00-00.vcom7.mongodb.net:27017,cluster0-shard-00-01.vcom7.mongodb.net:27017,cluster0-shard-00-02.vcom7.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-7w6acj-shard-0&authSource=admin&retryWrites=true&w=majority')
+# mongoclient = pymongo.MongoClient('mongodb://user:-Hz2f$!YBXbDcKG@cluster0-shard-00-00.vcom7.mongodb.net:27017,cluster0-shard-00-01.vcom7.mongodb.net:27017,cluster0-shard-00-02.vcom7.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-7w6acj-shard-0&authSource=admin&retryWrites=true&w=majority')
+mongoclient = pymongo.MongoClient('mongodb://root:%2123QweAsd@20.84.64.243:27017')
 
 def get_symbols():
     url="https://pkgstore.datahub.io/core/nasdaq-listings/nasdaq-listed_csv/data/7665719fb51081ba0bd834fde71ce822/nasdaq-listed_csv.csv"
@@ -27,13 +28,13 @@ def get_symbols():
 DB_NAME = 'stock_market_data'
 
 intervals = [
-    [['1', 'minute'], 1, False, 500],    # use 30 when get a year candles
-    [['2', 'minute'], 2, False, 500],    # use 60 when get a year candles
-    [['12', 'minute'], 12, False, 500],  # use 200 when get a year candles
-    [['1', 'hour'], 1*60, False, 500],
-    [['4', 'hour'], 4*60, False, 500],
-    [['12', 'hour'], 12*60, False, 500],
-    [['1', 'day'], 24*60, False, 500],
+    [['1', 'minute'], 1, False, 30],    # use 30 when get a year candles
+    # [['2', 'minute'], 2, False, 500],    # use 60 when get a year candles
+    # [['12', 'minute'], 12, False, 500],  # use 200 when get a year candles
+    # [['1', 'hour'], 1*60, False, 500],
+    # [['4', 'hour'], 4*60, False, 500],
+    # [['12', 'hour'], 12*60, False, 500],
+    # [['1', 'day'], 24*60, False, 500],
 ]
 
 class DailyPutThread(object):

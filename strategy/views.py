@@ -13,7 +13,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser 
 
 from strategy import models as params
-from strategy.utils import save_strategy
+from strategy.utils import save_strategy, save_config, run_command
 
 def BAD_REQUEST():
     return JsonResponse({"success": False, "message": "Invalid request!"}, safe=True)
@@ -136,9 +136,12 @@ def config_item_detail(request):
 
         try:
             config_detail = params.get_config_item_detail(config_collection, name)
+            save_config(name, config_detail)
+            file_path = 'chartApis/lib/download/test.py'
+            run_command('python {} --bot={}'.format(file_path, name))
             return JsonResponse({"success": True, "result": config_detail}, safe=True)
         except:
-            return JsonResponse({"success": False, "message": "Failed to get {config_collection}-{name} config details!"}, safe=True)
+            return JsonResponse({"success": False, "message": 'Failed to get {}-{} config details!'.format(config_collection, name)}, safe=True)
     return BAD_REQUEST()
 
 @csrf_exempt
@@ -150,7 +153,7 @@ def create_one_config_detail(request):
         config = req['config']
         try:
             if config['name'] != "":
-                params.create_configs_one(config_collection, config)
+                params.save_configs_one(config_collection, config)
                 return JsonResponse({"success": True, "message": "The config is saved!"}, safe=True)
             else: 
                 return JsonResponse({"success": False, "message": "Name is required to save!"}, safe=True)    
@@ -184,5 +187,40 @@ def delete_config_details(request):
             return JsonResponse({"success": True, "message": "The config details are deleted!"}, safe=True)
         except:
             return JsonResponse({"success": False, "message": "Failed to delete config details!"}, safe=True)
+    return BAD_REQUEST()
+
+
+@csrf_exempt
+def bot_run(request):
+    print (" ++++++ API: bot_run ++++++")
+    if request.method == 'POST':
+        req = JSONParser().parse(request)
+        config_collection = req['config_collection']
+        bot_name = req['name']
+        try:
+            config_detail = params.get_config_item_detail(config_collection, bot_name)
+            save_config(bot_name, config_detail)
+            file_path = 'chartApis/lib/download/test.py'
+            run_command('python {} --bot={}'.format(file_path, bot_name))
+            params.save_configs_one('bot_status', {'name': bot_name, 'status': 'live'})
+            return JsonResponse({"success": True, "message": 'Bot "{}" is running and the status is updated!'.format(bot_name)}, safe=True)
+        except:
+            return JsonResponse({"success": False, "message": 'Failed to run bot "{}"!'.format(config_collection, bot_name)}, safe=True)
+    return BAD_REQUEST()
+
+@csrf_exempt
+def bot_stop(request):
+    print (" ++++++ API: bot_stop ++++++")
+    if request.method == 'POST':
+        req = JSONParser().parse(request)
+        config_collection = req['config_collection']
+        bot_name = req['name']
+        try:
+            # kill bot process
+            # run_command('python {} --bot={}'.format(file_path, bot_name))
+            params.save_configs_one('bot_status', {'name': bot_name, 'status': 'dead'})
+            return JsonResponse({"success": True, "message": 'Bot "{}" is stopped and the status is updated!'.format(bot_name)}, safe=True)
+        except:
+            return JsonResponse({"success": False, "message": 'Failed to stop bot "{}"!'.format(config_collection, bot_name)}, safe=True)
     return BAD_REQUEST()
 
