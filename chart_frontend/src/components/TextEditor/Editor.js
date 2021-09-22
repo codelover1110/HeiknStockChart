@@ -132,6 +132,16 @@ export default class TextEditor extends Component {
             label: 'default'
           }
         ],
+        asset_class: [
+          {
+            label: "crypto",
+            value: "crypto"
+          },
+          {
+            label: "equities",
+            value: "equities"
+          }
+        ]
       },
       processConfigSetting: {
         bot_name: '',
@@ -147,6 +157,7 @@ export default class TextEditor extends Component {
         name: '',
         macro_strategy: null,
         indicator_signalling: null,
+        asset_class: null,
       },
       selectedConfigFile: null,
       selectedModuleContents: [],
@@ -253,6 +264,11 @@ export default class TextEditor extends Component {
         label: 'Indicator Signalling',
         field: 'indicator_signalling',
         sort: false,
+      },
+      {
+        label: 'Asset Class',
+        field: 'asset_class',
+        sort: false,
       }
     ],
       botStatusDatatable: {
@@ -299,13 +315,8 @@ export default class TextEditor extends Component {
     }
   }
 
-  updateBotStatus = async (bot) => {
-    let res
-    if (bot.status === 'dead') {
-      res = await updateBotStatus(bot.name, true)
-    } else {
-      res = await updateBotStatus(bot.name, false)
-    }
+  updateBotStatus = async (bot, action) => {
+    const res = await updateBotStatus(bot.name, action)
     alert(res.message)
     await this.loadBotStatusList()
   } 
@@ -370,11 +381,7 @@ export default class TextEditor extends Component {
       name: bot.name,
       macro_strategy: bot.macro_strategy,
       indicator_signalling: bot.indicator_signalling,
-      action: <MDBBtn color="blue" size="sm" onClick={
-        () => {
-          this.updateBotStatus(bot);
-        }}
-      >{bot.status === 'dead' ? 'Run' : 'Stop'}</MDBBtn>
+      asset_class: bot.asset_class,
     }))
     const data = {
       columns: this.state.headerColumnsBotConfig,
@@ -630,6 +637,10 @@ export default class TextEditor extends Component {
     } else {
       alert('The config is not saved')
     }
+
+    this.loadConfigFiles()
+    this.loadBotConfigList()
+
   }
 
   showFile = async (e) => {
@@ -731,6 +742,7 @@ export default class TextEditor extends Component {
           name: '',
           macro_strategy: null,
           indicator_signalling: null,
+          asset_class: null,
         }
       }
     )

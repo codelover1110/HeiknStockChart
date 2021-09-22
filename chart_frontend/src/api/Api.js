@@ -266,6 +266,7 @@ const transformingProcessConfigToQuery = (settings) => {
     name: settings.name,
     macro_strategy: convertArraytoString(settings.macro_strategy),
     indicator_signalling: convertArraytoString(settings.indicator_signalling),
+    asset_class: convertArraytoString(settings.asset_class),
   };
 }
 
@@ -284,6 +285,7 @@ const transformingProcessConfigFromParam = (settings) => {
     name: settings.name,
     macro_strategy: convertStringtoArray(settings.macro_strategy),
     indicator_signalling: convertStringtoArray(settings.indicator_signalling),
+    asset_class: convertStringtoArray(settings.asset_class),
   };
 }
 
@@ -433,7 +435,7 @@ export const getBotStatusList = async () => {
     })  
 }
 
-export const updateBotStatus = async (botName, botStatus) => {
+export const updateBotStatus = async (botName, botAction) => {
   const requestOptions = {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
@@ -443,7 +445,11 @@ export const updateBotStatus = async (botName, botStatus) => {
     })
   };
   
-  const apiUrl = botStatus ? '/strategy/bot_run/' : '/strategy/bot_stop/'
+  const apiUrl = botAction === 'start' 
+    ? '/strategy/bot_run/'
+    : botAction === 'pause' 
+    ? '/strategy/bot_pause/'
+    : '/strategy/bot_stop/'
 
   try {
     return await fetch(process.env.REACT_APP_BACKEND_URL + apiUrl, requestOptions)
