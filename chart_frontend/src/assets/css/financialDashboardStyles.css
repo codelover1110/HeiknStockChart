@@ -222,4 +222,19 @@ body {
 .select-option {
   z-index: 9999 !important;
 }
+.react-stockchart text {
+  fill: white;
+}
+.react-stockcharts-axis-domain {
+  stroke: white;
+}
+.financial-dashboard-container {
+  width: 100%;
+  height: 100%;
+  overflow-y: scroll;
+}
+.no-data {
+  color: white;
+  padding-left: 15px;
+}
 /* Dashboard End */
