@@ -369,7 +369,7 @@ const FinancialDashboard = () => {
     };
 
     switch (selectedHeaderNav) {
-      case 'All Financial Statements':
+      case 'News':
         getNewsFinancials();
         break;
       case 'Data Table':
