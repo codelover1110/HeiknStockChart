@@ -32,7 +32,7 @@ const FinancialDashboard = () => {
   const [selectedHeaderNav, setSelectedHeaderNav] =
     useState('Income Statement');
   const [selectedGraphType, setSelectedGraphType] = useState('Charts');
-  const [selectedAggregationType, setSelectedAggregationType] = useState('ANN');
+  const [selectedAggregationType, setSelectedAggregationType] = useState('');
 
   const [chartData, setChartData] = useState(null);
   const [datatable, setDataTable] = useState();
@@ -145,26 +145,32 @@ const FinancialDashboard = () => {
       res.results.map((item) => {
         revenus.dataPoints.push({
           calendarDate: item.calendarDate,
+          period: item.period,
           value: item.revenues,
         });
         costOfRevenue.dataPoints.push({
           calendarDate: item.calendarDate,
+          period: item.period,
           value: item.costOfRevenue,
         });
         grossProfit.dataPoints.push({
           calendarDate: item.calendarDate,
+          period: item.period,
           value: item.grossProfit,
         });
         EBITDAMargin.dataPoints.push({
           calendarDate: item.calendarDate,
+          period: item.period,
           value: item.EBITDAMargin,
         });
         NetIncome.dataPoints.push({
           calendarDate: item.calendarDate,
+          period: item.period,
           value: item.netIncome,
         });
         earningsPerBasicShare.dataPoints.push({
           calendarDate: item.calendarDate,
+          period: item.period,
           value: item.earningsPerBasicShare,
         });
       });
@@ -219,26 +225,32 @@ const FinancialDashboard = () => {
       res.results.map((item) => {
         assets.dataPoints.push({
           calendarDate: item.calendarDate,
+          period: item.period,
           value: item.assets,
         });
         liabilitiesNonCurrent.dataPoints.push({
           calendarDate: item.calendarDate,
+          period: item.period,
           value: item.liabilitiesNonCurrent,
         });
         debt.dataPoints.push({
           calendarDate: item.calendarDate,
+          period: item.period,
           value: item.debt,
         });
         tradeAndNonTradeReceivables.dataPoints.push({
           calendarDate: item.calendarDate,
+          period: item.period,
           value: item.tradeAndNonTradeReceivables,
         });
         tradeAndNonTradePayables.dataPoints.push({
           calendarDate: item.calendarDate,
+          period: item.period,
           value: item.tradeAndNonTradePayables,
         });
         cashAndEquivalents.dataPoints.push({
           calendarDate: item.calendarDate,
+          period: item.period,
           value: item.cashAndEquivalents,
         });
       });
@@ -293,26 +305,32 @@ const FinancialDashboard = () => {
       res.results.map((item) => {
         netCashFlowFromOperations.dataPoints.push({
           calendarDate: item.calendarDate,
+          period: item.period,
           value: item.netCashFlowFromOperations,
         });
         netCashFlowFromInvesting.dataPoints.push({
           calendarDate: item.calendarDate,
+          period: item.period,
           value: item.netCashFlowFromInvesting,
         });
         netCashFlowFromFinancing.dataPoints.push({
           calendarDate: item.calendarDate,
+          period: item.period,
           value: item.netCashFlowFromFinancing,
         });
         issuanceDebtSecurities.dataPoints.push({
           calendarDate: item.calendarDate,
+          period: item.period,
           value: item.issuanceDebtSecurities,
         });
         issuanceEquityShares.dataPoints.push({
           calendarDate: item.calendarDate,
+          period: item.period,
           value: item.issuanceEquityShares,
         });
         paymentDividendsOtherCashDistributions.dataPoints.push({
           calendarDate: item.calendarDate,
+          period: item.period,
           value: item.paymentDividendsOtherCashDistributions,
         });
       });
@@ -401,7 +419,11 @@ const FinancialDashboard = () => {
                   key={data.label}
                   className="col-lg-4 col-md-4 col-sm-6 col-xs-12 group-bar-chart"
                 >
-                  <BarChart data={data} chartData={chartData} />
+                  <BarChart
+                    data={data}
+                    chartData={chartData}
+                    globalAggregationType={selectedAggregationType}
+                  />
                 </div>
               ))}
           </div>

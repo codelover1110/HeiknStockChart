@@ -8,7 +8,11 @@ const ChartTools = (props) => {
   } = props;
   
   const handleAggregationForOneClicked = (aggregationType) => {
-    setAggregrationTypeForOne(aggregationType);
+    if (aggregationTypeForOne === aggregationType) {
+      setAggregrationTypeForOne("");
+    } else {
+      setAggregrationTypeForOne(aggregationType);
+    }
   }
 
   return (
@@ -16,22 +20,22 @@ const ChartTools = (props) => {
       <ul className="nav justify-content-center">
         <li
           className="nav-item"
-          style={aggregationTypeForOne === "A" ? { backgroundColor: color, color: "white" } : {}}
-          onClick={() => handleAggregationForOneClicked("A")}
+          style={aggregationTypeForOne === "YA" ? { backgroundColor: color, color: "white" } : {}}
+          onClick={() => handleAggregationForOneClicked("YA")}
         >
           <span>A</span>
         </li>
         <li
           className="nav-item"
-          style={aggregationTypeForOne === "Q" ? { backgroundColor: color, color: "white" } : {}}
-          onClick={() => handleAggregationForOneClicked("Q")}
+          style={aggregationTypeForOne === "QA" ? { backgroundColor: color, color: "white" } : {}}
+          onClick={() => handleAggregationForOneClicked("QA")}
         >
           <span>Q</span>
         </li>
         <li
           className="nav-item"
-          style={aggregationTypeForOne === "T" ? { backgroundColor: color, color: "white" } : {}}
-          onClick={() => handleAggregationForOneClicked("T")}
+          style={aggregationTypeForOne === "TA" ? { backgroundColor: color, color: "white" } : {}}
+          onClick={() => handleAggregationForOneClicked("TA")}
         >
           <span>T</span>
         </li>
