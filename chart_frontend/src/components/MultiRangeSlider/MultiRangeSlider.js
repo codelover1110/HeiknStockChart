@@ -30,7 +30,7 @@ export default (props) => {
       <Col xs="3">
         <input 
           type='text'
-          className="form-control"
+          className="hunter-form-control-input"
           value={tradeStartDate}
           disabled
         />
@@ -52,7 +52,7 @@ export default (props) => {
       <Col xs="3">
         <input 
           type='text'
-          className="form-control"
+          className="hunter-form-control-input"
           value={tradeEndDate}
           disabled
         />    

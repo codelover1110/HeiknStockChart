@@ -85,7 +85,6 @@ const FinancialDashboard = () => {
     setChartData();
     const getNewsFinancials = async () => {
       const res = await getNewsFinancialData();
-      console.log('res???', res);
       setFinancialStatements({
         columns: ['id', 'time', 'title'],
         rows: res.result,
