@@ -4,7 +4,7 @@ import {
 } from "reactstrap";
 
 import Sidebar from "components/Sidebar/Sidebar.js";
-import Scanner from "components/Scanner"
+import WatchList from "components/WatchList"
 
 import { routes } from "routes.js";
 
@@ -45,7 +45,7 @@ function TradeScanner() {
               />
             )}
             <div className="col-sm-12">
-                <Scanner />
+                <WatchList />
             </div>
           </div>
         </React.Fragment>

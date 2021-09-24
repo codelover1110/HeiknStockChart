@@ -1,0 +1,10 @@
+.watch-list-item-container {
+    width: 100%;
+    height: 100%;
+}
+
+.watch-list-item-header {
+    height: 50px;
+    width: 100%;
+    background-color: #303030;
+}
