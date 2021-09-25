@@ -685,3 +685,15 @@ pre {
   height: 30px;
   margin-bottom: 0px;
 }
+
+.watch-list-edit-column-widget {
+  width: 100%;
+}
+
+.hunter-watch-list-area {
+  padding: 0px;
+}
+
+.hunter-financial-table-column {
+  background-color: #000;
+}

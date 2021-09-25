@@ -44,7 +44,7 @@ function TradeScanner() {
                 handleInstanceChange={handleInstanceChange}
               />
             )}
-            <div className="col-sm-12">
+            <div className="col-sm-12 hunter-watch-list-area">
                 <WatchList />
             </div>
           </div>
