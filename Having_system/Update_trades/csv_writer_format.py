@@ -10,7 +10,7 @@ dotenv_file = dotenv.find_dotenv()
 dotenv.load_dotenv(dotenv_file)
 DOUBLE_DB = False
 
-MONGO_URL = os.environ['MONGO_URL_HUNTER']
+MONGO_URL = os.environ['MONGO_URL_BIGML']
 MONGO_DATABASE = os.environ['MONGO_DATABASE']
 MONGO_COLLECTION = os.environ['MONGO_COLLECTION']
 

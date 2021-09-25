@@ -1,34 +1,12 @@
-from json.decoder import JSONDecodeError
-from django.shortcuts import render
 import sys
 sys.path.append("..")
-
-from django.shortcuts import render
-from rest_framework import generics, views
-
-from django.http import JsonResponse, HttpResponse
-from django.core import serializers
-
+from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser 
-
 from financials import models as financials
-# Create your views here.
 
 def BAD_REQUEST():
     return JsonResponse({"success": False, "message": "Invalid request!"}, safe=True)
-
-
-# @csrf_exempt
-# def symbol_financials(request):
-#     print (" ++++++ API: symbol_financials ++++++")
-
-#     try:
-#         symbol_financials = financials.get_symbol_financials()
-#         return JsonResponse({"success": True, "result": symbol_financials}, safe=True)
-#     except:
-#         return JsonResponse({"success": False, "message": "Failed to get symbol financials!"}, safe=True)
-
 
 @csrf_exempt
 def symbol_financials(request):

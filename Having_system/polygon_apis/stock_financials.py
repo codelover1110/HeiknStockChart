@@ -31,7 +31,7 @@ API_KEY = "tuQt2ur25Y7hTdGYdqI2VrE4dueVA8Xk"
 
 # mongoclient = pymongo.MongoClient('mongodb://aliaksandr:BD20fc854X0LIfSv@cluster0-shard-00-00.35i8i.mongodb.net:27017,cluster0-shard-00-01.35i8i.mongodb.net:27017,cluster0-shard-00-02.35i8i.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-aoj781-shard-0&authSource=admin&retryWrites=true&w=majority')
 # mongoclient = pymongo.MongoClient('mongodb://user:-Hz2f$!YBXbDcKG@cluster0-shard-00-00.vcom7.mongodb.net:27017,cluster0-shard-00-01.vcom7.mongodb.net:27017,cluster0-shard-00-02.vcom7.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-7w6acj-shard-0&authSource=admin&retryWrites=true&w=majority')
-mongoclient = pymongo.MongoClient('mongodb://root:%2123QweAsd@20.84.64.243:27017')
+mongoclient = pymongo.MongoClient('mongodb://root:!23QweAsd@20.84.64.243:27017')
 
 
 def get_symbols():
@@ -107,7 +107,7 @@ class DailyPutThread(object):
 
         try:
             # https://api.polygon.io/v2/reference/financials/AAPL?limit=5&apiKey=*
-            polygon_url = "https://api.polygon.io/v2/reference/financials/" + symbol + "?limit=2000&apiKey=" + API_KEY
+            polygon_url = "https://api.polygon.io/v2/reference/financials/" + symbol + "?limit=1000&apiKey=" + API_KEY
             datasets = requests.get(polygon_url).json()
             api_candles = datasets['results'] if 'results' in datasets else []
             new_candles = api_candles
@@ -153,8 +153,9 @@ if __name__ == "__main__":
     thread_count = 10
     thread_list = []
 
-    # symbols = get_symbols()
-    symbols = ["GOOG", "ATVI", "AMD", "MSFT", "AMZN", "NVDA", "TSLA", "AAPL", ""]
+    symbols = get_symbols()
+    symbols.append("")
+    # symbols = ["GOOG", "ATVI", "AMD", "MSFT", "AMZN", "NVDA", "TSLA", "AAPL", ""]
     symbol_count = len(symbols)
     print ("symbols: ", symbol_count)
 

@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'strategy',
     'news',
     'financials',
+    'scanner',
     'crispy_forms', 
 ]
 

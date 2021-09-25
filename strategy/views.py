@@ -198,10 +198,10 @@ def bot_run(request):
         config_collection = req['config_collection']
         bot_name = req['name']
         try:
-            config_detail = params.get_config_item_detail(config_collection, bot_name)
-            save_config(bot_name, config_detail)
-            file_path = 'chartApis/lib/download/test.py'
-            run_command('python {} --bot={}'.format(file_path, bot_name))
+            # config_detail = params.get_config_item_detail(config_collection, bot_name)
+            # save_config(bot_name, config_detail)
+            # file_path = 'chartApis/lib/download/test.py'
+            # run_command('python {} --bot={}'.format(file_path, bot_name))
             params.save_configs_one('bot_status', {'name': bot_name, 'status': 'live'})
             return JsonResponse({"success": True, "message": 'Bot "{}" is running and the status is updated!'.format(bot_name)}, safe=True)
         except:
@@ -224,3 +224,18 @@ def bot_stop(request):
             return JsonResponse({"success": False, "message": 'Failed to stop bot "{}"!'.format(config_collection, bot_name)}, safe=True)
     return BAD_REQUEST()
 
+@csrf_exempt
+def bot_pause(request):
+    print (" ++++++ API: bot_pause ++++++")
+    if request.method == 'POST':
+        req = JSONParser().parse(request)
+        config_collection = req['config_collection']
+        bot_name = req['name']
+        try:
+            # kill bot process
+            # run_command('python {} --bot={}'.format(file_path, bot_name))
+            params.save_configs_one('bot_status', {'name': bot_name, 'status': 'pause'})
+            return JsonResponse({"success": True, "message": 'Bot "{}" is paused and the status is updated!'.format(bot_name)}, safe=True)
+        except:
+            return JsonResponse({"success": False, "message": 'Failed to pause bot "{}"!'.format(config_collection, bot_name)}, safe=True)
+    return BAD_REQUEST()

@@ -1,8 +1,10 @@
 from datetime import datetime, timedelta
 import pymongo
 
-# mongoclient = pymongo.MongoClient("mongodb://aliaksandr:BD20fc854X0LIfSv@cluster0-shard-00-00.35i8i.mongodb.net:27017,cluster0-shard-00-01.35i8i.mongodb.net:27017,cluster0-shard-00-02.35i8i.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-aoj781-shard-0&authSource=admin&retryWrites=true&w=majority") 
-mongoclient = pymongo.MongoClient('mongodb://user:-Hz2f$!YBXbDcKG@cluster0-shard-00-00.vcom7.mongodb.net:27017,cluster0-shard-00-01.vcom7.mongodb.net:27017,cluster0-shard-00-02.vcom7.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-7w6acj-shard-0&authSource=admin&retryWrites=true&w=majority')
+# mongo_client = pymongo.MongoClient('mongodb://aliaksandr:BD20fc854X0LIfSv@cluster0-shard-00-00.35i8i.mongodb.net:27017,cluster0-shard-00-01.35i8i.mongodb.net:27017,cluster0-shard-00-02.35i8i.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-aoj781-shard-0&authSource=admin&retryWrites=true&w=majority')
+# mongoclient = pymongo.MongoClient('mongodb://user:-Hz2f$!YBXbDcKG@cluster0-shard-00-00.vcom7.mongodb.net:27017,cluster0-shard-00-01.vcom7.mongodb.net:27017,cluster0-shard-00-02.vcom7.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-7w6acj-shard-0&authSource=admin&retryWrites=true&w=majority')
+mongoclient = pymongo.MongoClient('mongodb://root:!23QweAsd@20.84.64.243:27017')
+
 FINANCIALS = 'financials_data'
 COL_NAME = 'financials'
 
@@ -23,6 +25,8 @@ def get_income_statement(symbol):
     }
     fields = {
         "_id": 0,
+        "ticker": 1,
+        "period": 1,
         "calendarDate": 1, 
         "revenues": 1,
         "costOfRevenue": 1,
@@ -35,25 +39,8 @@ def get_income_statement(symbol):
     financials_db = mongoclient[FINANCIALS]
     db_collection = financials_db[COL_NAME]
     financials_list = list(db_collection.find(query, fields))
-    revenues, costOfRevenue, grossProfit, EBITDAMargin, earningsPerBasicShare = {}, {}, {}, {}, {}
-    for financials in financials_list:
-        if 'calendarDate' in financials.keys() and len(financials.keys()) == 7:
-            key = financials['calendarDate']
-            revenues[key] = financials['revenues']
-            costOfRevenue[key] = financials['costOfRevenue']
-            grossProfit[key] = financials['grossProfit']
-            EBITDAMargin[key] = financials['EBITDAMargin']
-            earningsPerBasicShare[key] = financials['earningsPerBasicShare']
-
-
-    result = dict()
-    result['revenues'] = revenues
-    result['costOfRevenue'] = costOfRevenue
-    result['grossProfit'] = grossProfit
-    result['EBITDAMargin'] = EBITDAMargin
-    result['earningsPerBasicShare'] = earningsPerBasicShare
-
-    return result
+   
+    return financials_list
 
 def get_balance_sheet(symbol):
     query = {
@@ -61,6 +48,8 @@ def get_balance_sheet(symbol):
     }
     fields = {
         "_id": 0,
+        "ticker": 1,
+        "period": 1,
         "calendarDate": 1, 
         "assets": 1,
         "liabilitiesNonCurrent": 1,
@@ -73,26 +62,7 @@ def get_balance_sheet(symbol):
     financials_db = mongoclient[FINANCIALS]
     db_collection = financials_db[COL_NAME]
     financials_list = list(db_collection.find(query, fields))
-    assets, liabilitiesNonCurrent, debt, tradeAndNonTradeReceivables, tradeAndNonTradePayables, cashAndEquivalents = {}, {}, {}, {}, {}, {}
-    for financials in financials_list:
-        if 'calendarDate' in financials.keys() and len(financials.keys()) == 7:
-            key = financials['calendarDate']
-            assets[key] = financials['assets']
-            liabilitiesNonCurrent[key] = financials['liabilitiesNonCurrent']
-            debt[key] = financials['debt']
-            tradeAndNonTradeReceivables[key] = financials['tradeAndNonTradeReceivables']
-            tradeAndNonTradePayables[key] = financials['tradeAndNonTradePayables']
-            cashAndEquivalents[key] = financials['cashAndEquivalents']
-
-    result = dict()
-    result['assets'] = assets
-    result['liabilitiesNonCurrent'] = liabilitiesNonCurrent
-    result['debt'] = debt
-    result['tradeAndNonTradeReceivables'] = tradeAndNonTradeReceivables
-    result['tradeAndNonTradePayables'] = tradeAndNonTradePayables
-    result['cashAndEquivalents'] = cashAndEquivalents
-
-    return result
+    return financials_list
 
 def get_cash_statement(symbol):
     query = {
@@ -100,29 +70,21 @@ def get_cash_statement(symbol):
     }
     fields = {
         "_id": 0,
+        "ticker": 1,
+        "period": 1,
         "calendarDate": 1, 
         "netCashFlowFromOperations": 1,
         "netCashFlowFromInvesting": 1,
         "netCashFlowFromFinancing": 1,
+        "issuanceDebtSecurities": 1,
+        "issuanceEquityShares": 1,
+        "paymentDividendsOtherCashDistributions": 1
     }
 
     financials_db = mongoclient[FINANCIALS]
     db_collection = financials_db[COL_NAME]
     financials_list = list(db_collection.find(query, fields))
-    netCashFlowFromOperations, netCashFlowFromInvesting, netCashFlowFromFinancing = {}, {}, {}
-    for financials in financials_list:
-        if 'calendarDate' in financials.keys() and len(financials.keys()) == 7:
-            key = financials['calendarDate']
-            netCashFlowFromOperations[key] = financials['netCashFlowFromOperations']
-            netCashFlowFromInvesting[key] = financials['netCashFlowFromInvesting']
-            netCashFlowFromFinancing[key] = financials['netCashFlowFromFinancing']
-
-    result = dict()
-    result['netCashFlowFromOperations'] = netCashFlowFromOperations
-    result['netCashFlowFromInvesting'] = netCashFlowFromInvesting
-    result['netCashFlowFromFinancing'] = netCashFlowFromFinancing
-
-    return result
+    return financials_list
 
 
 

@@ -5,6 +5,7 @@ from .views import auth_view, verify_view, signup_view, password_reset_view, pas
 from strategy import views as strategy_view
 from news import views as news_view
 from financials import views as financials_view
+from scanner import views as scanner_view
 
 admin.autodiscover()
 urlpatterns = [
@@ -21,6 +22,7 @@ urlpatterns = [
     path('strategy/parameter_content/', strategy_view.parameter_content, name='parameter-content'),
     path('strategy/parameter_detail_list/', strategy_view.parameter_detail_list, name='parameter-detail-list'),
     path('strategy/save_script_file/', strategy_view.save_script_file, name='save-script-file'),
+   
     # config management
     path('strategy/config_list/', strategy_view.config_list, name='config-list'),
     path('strategy/config_details/', strategy_view.config_details, name='config-details'),
@@ -32,6 +34,7 @@ urlpatterns = [
     path('strategy/config_item_detail/', strategy_view.config_item_detail, name='config-item-detail'),
     path('strategy/bot_run/', strategy_view.bot_run, name='bot-run'),
     path('strategy/bot_stop/', strategy_view.bot_stop, name='bot-stop'),
+    path('strategy/bot_pause/', strategy_view.bot_pause, name='bot-pause'), 
 
     ################ news api ##################
     path('news/recent_news/', news_view.recent_news, name='recent-news'),
@@ -43,6 +46,14 @@ urlpatterns = [
     path('financials/balance_sheet/', financials_view.balance_sheet, name='balance-sheet'),
     path('financials/cash_statement/', financials_view.cash_statement, name='cash-statement'),
     path('financials/financial_total_data/', financials_view.financial_total_data, name='financial-total-data'),
+
+    ################ scanner api ##################
+    path('scanner/stock_financials_fields/', scanner_view.stock_financials_fields, name='stock-financials-fields'),
+    path('scanner/indicators_fields/', scanner_view.indicators_fields, name='indicators-fields'),
+    path('scanner/ticker_news_fields/', scanner_view.ticker_news_fields, name='ticker-news-fields'),
+    path('scanner/ticker_details_fields/', scanner_view.ticker_details_fields, name='ticker-details-fields'),
+    path('scanner/available_items/', scanner_view.available_items, name='available-items'),
+
 
     # app api
     url(r'^', include('users.urls')),

@@ -28,13 +28,13 @@ def get_symbols():
 DB_NAME = 'stock_market_data'
 
 intervals = [
-    [['1', 'minute'], 1, False, 30],    # use 30 when get a year candles
-    # [['2', 'minute'], 2, False, 500],    # use 60 when get a year candles
-    # [['12', 'minute'], 12, False, 500],  # use 200 when get a year candles
-    # [['1', 'hour'], 1*60, False, 500],
-    # [['4', 'hour'], 4*60, False, 500],
-    # [['12', 'hour'], 12*60, False, 500],
-    # [['1', 'day'], 24*60, False, 500],
+    [['1', 'minute'], 1, False, 500],    # use 30 when get a year candles
+    [['2', 'minute'], 2, False, 500],    # use 60 when get a year candles
+    [['12', 'minute'], 12, False, 500],  # use 200 when get a year candles
+    [['1', 'hour'], 1*60, False, 500],
+    [['4', 'hour'], 4*60, False, 500],
+    [['12', 'hour'], 12*60, False, 500],
+    [['1', 'day'], 24*60, False, 500],
 ]
 
 class DailyPutThread(object):
@@ -108,7 +108,7 @@ class DailyPutThread(object):
                 return default_date
         else:
             symbol_last_date = dict()
-            if True:
+            if False:
                 symbol_last_date['symbol'] = symbol
                 symbol_last_date['1_minute'] = default_date
                 symbol_last_date['2_minute'] = default_date
@@ -119,10 +119,10 @@ class DailyPutThread(object):
                 symbol_last_date['1_day'] = default_date
             else:
                 symbol_last_date['symbol'] = symbol
-                symbol_last_date['1_minute'] = datetime.now() - timedelta(days=20)
-                symbol_last_date['2_minute'] = datetime.now() - timedelta(days=20)
-                symbol_last_date['12_minute'] = datetime.now() - timedelta(days=20)
-                symbol_last_date['1_hour'] = datetime.now() - timedelta(days=30)
+                symbol_last_date['1_minute'] = datetime.now() - timedelta(days=30)
+                symbol_last_date['2_minute'] = datetime.now() - timedelta(days=30)
+                symbol_last_date['12_minute'] = datetime.now() - timedelta(days=30)
+                symbol_last_date['1_hour'] = datetime.now() - timedelta(days=40)
                 symbol_last_date['4_hour'] = datetime.now() - timedelta(days=90)
                 symbol_last_date['12_hour'] = datetime.now() - timedelta(days=90)
                 symbol_last_date['1_day'] = datetime.now() - timedelta(days=365)
@@ -220,8 +220,8 @@ if __name__ == "__main__":
     thread_count = 10
     thread_list = []
 
-    symbols = get_symbols()
-    # symbols = ["GOOG", "ATVI", "AMD", "MSFT", "AMZN", "NVDA", "TSLA", "AAPL", ""]
+    # symbols = get_symbols()
+    symbols = ["GOOG", "ATVI", "AMD", "MSFT", "AMZN", "NVDA", "TSLA", "AAPL", ""]
     symbol_count = len(symbols)
     print ("symbols: ", symbol_count)
 
@@ -274,6 +274,4 @@ if __name__ == "__main__":
     time.sleep(2)
     end_time = datetime.now()
     print ('start at: {}, end_at: {}'.format(start_time, end_time))
-    
-
-    
+        

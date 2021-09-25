@@ -5,73 +5,36 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser 
 from rest_framework import status
 
-import pymongo
-from datetime import datetime, timedelta
 from ib_insync import *
 import numpy as np
 import pandas as pd
 pd.options.mode.chained_assignment = None  # default='warn'
 
 from .models import (
-            get_strategies_names, 
-            get_stock_candles_for_strategy,  
             get_stock_candles_for_strategy_all,
             get_micro_strategies, 
             get_macro_strategies, 
             get_strategy_symbols, 
-            get_backtesting_data_db,   # not using
             get_backtesting_symbols, 
             get_backtesting_result,
             get_data_trades_db,
             get_symbol_candles,
             put_script_file,
             update_strartegy_file,
+            get_table_list_db,
             get_strategy_file,
             get_strategy_list)
 
 from .common import (
-            get_chat_data_from_candles, 
-            get_chat_data_rsi_heik_v1,
             get_chat_data_rsi_heik_v11,
-            get_chat_data_rsi_heik_v1_non,
             join_append, 
             calc_percentEfficiency, 
             calc_winningLosing, 
             fill_missing_candles__)
 
-# mongoclient = pymongo.MongoClient("mongodb://localhost:27017")
-mongoclient = pymongo.MongoClient("mongodb://hunter:STOCKdb123@cluster0-shard-00-00.vcom7.mongodb.net:27017,cluster0-shard-00-01.vcom7.mongodb.net:27017,cluster0-shard-00-02.vcom7.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-7w6acj-shard-0&authSource=admin&retryWrites=true&w=majority")
-# mongoclient = pymongo.MongoClient("mongodb://hunter:STOCKdb123@cluster0-shard-00-00.agmoz.mongodb.net:27017,cluster0-shard-00-01.agmoz.mongodb.net:27017,cluster0-shard-00-02.agmoz.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-f8c9fs-shard-0&authSource=admin&retryWrites=true&w=majority")
-
-
-@csrf_exempt    
-def get_backtesting_data(request):
-    if request.method == 'POST':
-        request_data = JSONParser().parse(request)
-        table_name = request_data['table_name']
-        symbols = request_data['symbols']
-        if True:
-            start_date = request_data['start_date']
-            end_date = request_data['end_date']
-            list_db_data = get_backtesting_data_db(table_name, start_date, end_date)
-        else:
-            masterdb = mongoclient["backtesting_trades"]
-            db_collection = masterdb[table_name]
-            list_db_data = list(db_collection.find().sort('date', pymongo.ASCENDING))
-        
-        wL = calc_winningLosing(symbols, list_db_data)
-        pE_wLA_lS = calc_percentEfficiency(symbols, list_db_data)
-        bastestData = {
-            'percentEfficiency': pE_wLA_lS['pE'],
-            'winningLosing': wL,
-            "winningLosingAvg": pE_wLA_lS['wLA'],
-            "longShort": pE_wLA_lS['lS']
-        }
-
-    return JsonResponse({'chart_data': bastestData}, status=status.HTTP_201_CREATED)
-
 @csrf_exempt
 def backtesting_symbols(request):
+    print (" ++++++ API: backtesting_symbols ++++++")
     if request.method == 'POST':
         request_data = JSONParser().parse(request)
         macro = request_data['macro']
@@ -85,6 +48,7 @@ def backtesting_symbols(request):
 
 @csrf_exempt    
 def backtesting_result(request):
+    print (" ++++++ API: backtesting_result ++++++")
     if request.method == 'POST':
         request_data = JSONParser().parse(request)
         macro = request_data['macro']
@@ -108,21 +72,16 @@ def backtesting_result(request):
 
 @csrf_exempt 
 def get_table_list(request):
-    request_data = JSONParser().parse(request)
-    strategy_name = request_data['strategy']
-    masterdb = mongoclient["backtest_tables"]
-    if strategy_name != 'no_strategy':
-        ob_table = masterdb['trade_list']
-    else:
-        ob_table = masterdb['stock_list']
-    tables_name = []
-    for x in ob_table.find():
-        tables_name.append(x['stock_name'])
-    return JsonResponse({'tables': tables_name}, status=status.HTTP_201_CREATED)
-
+    print (" ++++++ API: get_table_list ++++++")
+    if request.method == 'POST':        
+        request_data = JSONParser().parse(request)
+        strategy_name = request_data['strategy']
+        tables_name = get_table_list_db(strategy_name)
+        return JsonResponse({'tables': tables_name}, status=status.HTTP_201_CREATED)
 
 @csrf_exempt 
 def get_data_trades(request):
+    print (" ++++++ API: get_data_trades ++++++")
     if request.method == 'POST':        
         request_data = JSONParser().parse(request)
         if not 'symbol' in request_data:
@@ -137,6 +96,7 @@ def get_data_trades(request):
 
 @csrf_exempt
 def get_table_candles(request):
+    print (" ++++++ API: get_table_candles ++++++")
     if request.method == 'POST':
         request_data = JSONParser().parse(request)
         symbol = request_data['symbol']
@@ -148,13 +108,8 @@ def get_table_candles(request):
         return JsonResponse({"candles": candles}, status=status.HTTP_201_CREATED)
 
 @csrf_exempt
-def get_strategies(request):
-    strategies = get_strategies_names()
-    return JsonResponse(strategies, status=status.HTTP_201_CREATED)
-
-
-@csrf_exempt
 def get_strategies_list(request):
+    print (" ++++++ API: get_strategies_list ++++++")
     strategies = []
     macro_strtg = get_macro_strategies()
     for macro in macro_strtg:
@@ -165,39 +120,9 @@ def get_strategies_list(request):
         strategies.append(item)
     return JsonResponse({"result": strategies}, status=status.HTTP_201_CREATED)    
 
-
-@csrf_exempt
-def get_micros(request):
-    if request.method == 'POST':
-        request_data = JSONParser().parse(request)
-        strategies = get_micro_strategies(request_data['macro'])
-        return JsonResponse({"micros": strategies}, status=status.HTTP_201_CREATED)
-
-
-@csrf_exempt
-def get_macros(request):
-    strategies = get_macro_strategies()
-    return JsonResponse({"macros": strategies}, status=status.HTTP_201_CREATED)
-
-
-@csrf_exempt
-def get_stock_strategy_candles(request):
-    request_data = JSONParser().parse(request)
-    db_name = request_data['db_name']
-    symbol = request_data['symbol']
-    macro = request_data['macro']
-    micro = request_data['micro']
-    strategy = '{}-{}-trades'.format(macro, micro)
-    candles, strategy_trades = get_stock_candles_for_strategy(db_name, symbol, macro, micro)
-    chat_candles = get_chat_data_from_candles(candles)
-    verdict = join_append(chat_candles, strategy_trades, strategy)
-    verdict = fill_missing_candles__(verdict, db_name, strategy)
-    
-    return JsonResponse({'chart_data': verdict}, status=status.HTTP_201_CREATED)
-
-
 @csrf_exempt
 def get_live_data(request):
+    print (" ++++++ API: get_live_data ++++++")
     request_data = JSONParser().parse(request)
     db_name = request_data['db_name']
     symbol = request_data['symbol']
@@ -215,6 +140,7 @@ def get_live_data(request):
 
 @csrf_exempt
 def get_live_data_extended(request):
+    print (" ++++++ API: get_live_data_extended ++++++")
     request_data = JSONParser().parse(request)
     db_name = request_data['db_name']
     symbol = request_data['symbol']
@@ -230,42 +156,10 @@ def get_live_data_extended(request):
     return JsonResponse({'chart_data': verdict}, status=status.HTTP_201_CREATED)
 
 
-@csrf_exempt
-def get_live_data_nr(request):
-    request_data = JSONParser().parse(request)
-    db_name = request_data['db_name']
-    symbol = request_data['symbol']
-    macro = request_data['macro']
-    micro = request_data['micro']
-    strategy = '{}-{}-trades'.format(macro, micro)
-    # candles, strategy_trades = get_stock_candles_for_strategy(db_name, symbol, macro, micro)
-    candles, strategy_trades = get_stock_candles_for_strategy_all(db_name, symbol, macro, micro)
-    chat_candles = get_chat_data_rsi_heik_v1_non(candles)
-    verdict = join_append(chat_candles, strategy_trades, strategy)
-    verdict = fill_missing_candles__(verdict, db_name, macro, micro)
-    
-    return JsonResponse({'chart_data': verdict}, status=status.HTTP_201_CREATED)
-
-
-@csrf_exempt
-def get_live_data_extended_nr(request):
-    request_data = JSONParser().parse(request)
-    db_name = request_data['db_name']
-    symbol = request_data['symbol']
-    macro = request_data['macro']
-    micro = request_data['micro']
-    strategy = '{}-{}-trades'.format(macro, micro)
-    candles, strategy_trades = get_stock_candles_for_strategy_all(db_name, symbol, macro, micro, extended=True)
-    chat_candles = get_chat_data_rsi_heik_v1_non(candles)
-    verdict = join_append(chat_candles, strategy_trades, strategy)
-    verdict = fill_missing_candles__(verdict, db_name, macro, micro)
-    
-    return JsonResponse({'chart_data': verdict}, status=status.HTTP_201_CREATED)
-
-
 # strategy management api
 @csrf_exempt
 def get_script_file(request):
+    print (" ++++++ API: get_script_file ++++++")
     if request.method == 'POST':
         request_data = JSONParser().parse(request)
         file_name = request_data['filename']
@@ -274,6 +168,7 @@ def get_script_file(request):
 
 @csrf_exempt
 def create_script_file(request):
+    print (" ++++++ API: create_script_file ++++++")
     if request.method == 'POST':
         request_data = JSONParser().parse(request)
         file_name = request_data['filename']
@@ -285,6 +180,7 @@ def create_script_file(request):
 
 @csrf_exempt
 def update_script_file(request):
+    print (" ++++++ API: update_script_file ++++++")
     if request.method == 'POST':
         request_data = JSONParser().parse(request)
         file_name = request_data['filename']
@@ -297,6 +193,7 @@ def update_script_file(request):
 
 @csrf_exempt
 def get_script_list(request):
+    print (" ++++++ API: get_script_list ++++++")
     strategies = get_strategy_list()
     return JsonResponse({'strategy_files': strategies}, status=status.HTTP_201_CREATED)
 
