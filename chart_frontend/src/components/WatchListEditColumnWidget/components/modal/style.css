@@ -60,7 +60,7 @@ h1 {
   display: grid;
 }
 .rct-icon {
-  color: white;
+  color: white !important;
 }
 .right-box-footer {
   margin-top: 10px;
