@@ -2,144 +2,136 @@ import React, { useEffect, useState } from 'react';
 
 import Widget from './components/modal/Widget';
 
-import {
-  getStockFinancialFields,
-  getIndicatorFields,
-  getTickerNewsFields,
-  getTickerDetailFields,
-} from 'api/Api';
+import { getStockModalData } from 'api/Api';
 
-const WatchListEditColumnWidget = () => {
+const WatchListEditColumnWidget = (props) => {
   const [totalNodes, setTotalNodes] = useState([]);
   const [currentNodes, setCurrentNodes] = useState([]);
-  const [visible, setVisible] = useState(true);
-
+  
   const handleCurrentNodesChanged = (nodes) => {
-    console.log('nodes', nodes);
     setCurrentNodes(nodes);
+    props.setColumns(nodes)
   };
 
   const handleVisible = (visibleStatus) => {
-    setVisible(visibleStatus);
+    props.handleModalClose()
   };
 
   useEffect(() => {
     let nodes = [];
     let childNodes = [];
 
-    // Stock Financials Fields
     const getModalData = async () => {
-      childNodes = [];
-      let res = await getStockFinancialFields();
-      Array.isArray(res.results.snapshots) &&
-        res.results.snapshots.map((node, index) => {
+      let res = await getStockModalData();
+      if (res.result) {
+        const stockFinancialsData = res.result.stock_financials;
+        const indicators = res.result.indicators;
+        const tickerNews = res.result.ticker_news;
+        const tickerDetails = res.result.ticker_details;
+
+        // Stock Financials Fields
+        childNodes = [];
+        stockFinancialsData.total.map((node, index) => {
           childNodes.push({
             label: node,
             value: 'child_value_1_' + (index + 1),
-            default: res.defaults.includes(node) ? true : false,
+            default: stockFinancialsData.defaults.includes(node) ? true : false,
           });
         });
-      Array.isArray(res.results.others) &&
-        res.results.others.map((node, index) => {
-          childNodes.push({
-            label: node,
-            value: 'child_value_1_' + (childNodes.length + index + 1),
-            default: res.defaults.includes(node) ? true : false,
-          });
-        });
-      if (childNodes.length > 0) {
-        nodes.push({
-          label: 'Stock Financials',
-          value: 'parent_value_1',
-          children: childNodes,
-          default: true,
-        });
-      } else {
-        nodes.push({
-          label: 'Stock Financials',
-          value: 'parent_value_1',
-          default: false,
-        });
-      }
 
-      childNodes = [];
-      res = await getIndicatorFields();
-      Array.isArray(res.results.snapshots) &&
-        res.results.snapshots.map((node, index) => {
+        if (childNodes.length > 0) {
+          nodes.push({
+            label: 'Stock Financials',
+            value: 'parent_value_1',
+            children: childNodes,
+            default: true,
+          });
+        } else {
+          nodes.push({
+            label: 'Stock Financials',
+            value: 'parent_value_1',
+            default: false,
+          });
+        }
+
+        // Indicators
+        childNodes = [];
+        indicators.total.map((node, index) => {
           childNodes.push({
             label: node,
             value: 'child_value_2_' + (index + 1),
-            default: res.defaults.includes(node) ? true : false,
+            default: indicators.defaults.includes(node) ? true : false,
           });
         });
-      if (childNodes.length > 0) {
-        nodes.push({
-          label: 'Indicators',
-          value: 'parent_value_2',
-          children: childNodes,
-          default: true,
-        });
-      } else {
-        nodes.push({
-          label: 'Indicators',
-          value: 'parent_value_2',
-          default: false,
-        });
-      }
 
-      childNodes = [];
-      res = await getTickerNewsFields();
-      Array.isArray(res.results) &&
-        res.results.map((node, index) => {
+        if (childNodes.length > 0) {
+          nodes.push({
+            label: 'Indicators',
+            value: 'parent_value_2',
+            children: childNodes,
+            default: true,
+          });
+        } else {
+          nodes.push({
+            label: 'Indicators',
+            value: 'parent_value_2',
+            default: false,
+          });
+        }
+
+        // Ticker News
+        childNodes = [];
+        tickerNews.total.map((node, index) => {
           childNodes.push({
             label: node,
             value: 'child_value_3_' + (index + 1),
-            default: res.defaults.includes(node) ? true : false,
+            default: tickerNews.defaults.includes(node) ? true : false,
           });
         });
-      if (childNodes.length > 0) {
-        nodes.push({
-          label: 'Ticker News',
-          value: 'parent_value_3',
-          children: childNodes,
-          default: true,
-        });
-      } else {
-        nodes.push({
-          label: 'Ticker News',
-          value: 'parent_value_3',
-          default: false,
-        });
-      }
 
-      childNodes = [];
-      res = await getTickerDetailFields();
-      Array.isArray(res.results) &&
-        res.results.map((node, index) => {
+        if (childNodes.length > 0) {
+          nodes.push({
+            label: 'Ticker News',
+            value: 'parent_value_3',
+            children: childNodes,
+            default: true,
+          });
+        } else {
+          nodes.push({
+            label: 'Ticker News',
+            value: 'parent_value_3',
+            default: false,
+          });
+        }
+
+        // Ticker Details
+        childNodes = [];
+        tickerDetails.total.map((node, index) => {
           childNodes.push({
             label: node,
             value: 'child_value_4_' + (index + 1),
-            default: res.defaults.includes(node) ? true : false,
+            default: tickerDetails.defaults.includes(node) ? true : false,
           });
         });
-      if (childNodes.length > 0) {
-        nodes.push({
-          label: 'Ticker Details',
-          value: 'parent_value_4',
-          children: childNodes,
-          default: true,
-        });
-      } else {
-        nodes.push({
-          label: 'Ticker Details',
-          value: 'parent_value_4',
-          default: false,
-        });
-      }
 
+        if (childNodes.length > 0) {
+          nodes.push({
+            label: 'Ticker Details',
+            value: 'parent_value_4',
+            children: childNodes,
+            default: true,
+          });
+        } else {
+          nodes.push({
+            label: 'Ticker Details',
+            value: 'parent_value_4',
+            default: false,
+          });
+        }
+
+      }
       setTotalNodes(nodes);
     };
-
     getModalData();
   }, []);
 
@@ -150,7 +142,6 @@ const WatchListEditColumnWidget = () => {
           totalNodes={totalNodes}
           currentNodes={currentNodes}
           handleCurrentNodesChanged={handleCurrentNodesChanged}
-          visible={visible}
           handleVisible={handleVisible}
         />
       )}

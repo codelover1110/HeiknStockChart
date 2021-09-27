@@ -5,7 +5,7 @@ h1 {
 .widget-container {
   display: block;
   background: rgb(10, 10, 10);
-  width: 837px;
+  width: 1180px;
   padding-top: 20px;
 }
 .items-area {
@@ -19,13 +19,17 @@ h1 {
   margin-left: 20px;
   margin-right: 20px;
 }
+.left-group {
+  width: 490px;
+}
 .left-group .react-checkbox-tree {
   height: 400px;
-  width: 300px;
+  width: 490px;
   overflow: hidden;
   overflow-y: scroll;
+  direction: ltr;
   color: white;
-  font-size: 18px;
+  font-size: 14px;
 }
 .left-box-header {
   background-color: gray;
@@ -46,11 +50,11 @@ h1 {
 }
 .right-group .react-checkbox-tree {
   height: 438px;
-  width: 300px;
+  width: 490px;
   overflow: hidden;
   overflow-y: scroll;
   color: white;
-  font-size: 18px;
+  font-size: 14px;
 }
 .right-group .items-container {
   display: flex;
