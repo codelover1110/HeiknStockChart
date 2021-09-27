@@ -4,71 +4,70 @@ import Modal from 'react-bootstrap/Modal'
 import { MDBTable, MDBTableBody, MDBTableHead } from 'mdbreact';
 import WatchListEditColumnWidget from 'components/WatchListEditColumnWidget/WatchListEditColumnWidget'
 import './WatchListItem.css'
+import { set } from 'lodash';
 
 const WatchListItem = () => {
   const [ws, setWs] = useState(null);
   const [isOpenedEditColumnWidget, setIsOpenedEditColumnWidget] = useState(false)
-  
-  const colums_1 = [
-    { Header: 'V', accessor: 'v' },
-    { Header: 'VW', accessor: 'vw' },
-    { Header: 'O', accessor: 'o' },
-    { Header: 'C', accessor: 'c' },
-    { Header: 'H', accessor: 'h' },
-    { Header: 'L', accessor: 'l' },
-    { Header: 'N', accessor: 'n' },
-    { Header: 'DATE', accessor: 'date' }
-  ]
+  const [rowItems, setRowItems] = useState([])
+  const [isUpdatedRows, setIsUpdatedRows] = useState(false)
+  const [isUpdatedCols, setIsUpdatedCols] = useState(false)
+  const [columnItems, setColumnItems] = useState([
+    'symbol', 'o', 'h', 'l', 'c', 'n', 'v', 'vw'
+  ])
+  const [isInited, setIsInited] = useState(false)
+  const [isUpdatedWatchList, setIsUpdatedWatchList] = useState(false);
   
   const [columns, setColumns] = useState([
     {
-      label: 'Symbol',
-      field: 'symbol',
+      value: 'symbol',
+      label: 'symbol',
       width: 100,
     },
     {
-      label: 'V',
-      field: 'v',
+      value: 'o',
+      label: 'o',
       width: 100,
     },
     {
-      label: 'VW',
-      field: 'vw',
+      value: 'h',
+      label: 'h',
       width: 100,
     },
     {
-      label: 'O',
-      field: 'o',
+      value: 'l',
+      label: 'l',
       width: 100,
     },
     {
-      label: 'C',
-      field: 'c',
+      value: 'c',
+      label: 'c',
       width: 100,
     },
     {
-      label: 'H',
-      field: 'h',
+      value: 'n',
+      label: 'n',
       width: 100,
     },
     {
-      label: 'L',
-      field: 'l',
+      value: 'v',
+      label: 'v',
       width: 100,
     },
     {
-      label: 'N',
-      field: 'n',
+      value: 'vw',
+      label: 'vw',
       width: 100,
     },
     {
-      label: 'Date',
-      field: 'date',
+      value: 'date',
+      label: 'date',
       width: 100,
     }
   ]);
   
   const [watchListData, setWatchListData] = useState([])
+  const [watchListInitData, setWatchListInitData] = useState([])
 
   const handleColumnsChange = () => {
     setIsOpenedEditColumnWidget(true)
@@ -79,6 +78,39 @@ const WatchListItem = () => {
   }
 
   useEffect(() => {
+    const loadRows = async () => {
+      const requestOptions = {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          'strategy': ''
+        })
+      };
+      let rows = []
+      await fetch(process.env.REACT_APP_BACKEND_URL + "/api/tables", requestOptions)
+      .then(response => response.json())
+      .then(data => {
+        rows = data.tables
+        setRowItems(data.tables)
+        setIsUpdatedRows(true)
+        
+        let realData = [];
+        rows.forEach((row) => {
+          const object = {}
+          columns.forEach((col) => {
+            object[col.value] = ''
+          })
+          object.symbol = row
+          realData.push(object);
+        })
+        setWatchListInitData(realData)
+        setIsInited(true);  
+      })
+    }
+    if (!isInited) {
+      loadRows();
+    }
+    
     if (!ws) {
       const socket = new WebSocket(process.env.REACT_APP_SOCKET_URL);
       setWs(socket)
@@ -89,8 +121,8 @@ const WatchListItem = () => {
     
       socket.onmessage = (event) => {
         const msg = JSON.parse(event.data)
-        console.log('msg???', msg)
         setWatchListData(msg)
+        setIsUpdatedWatchList(true)
       };
     
       socket.onclose = () => {
@@ -99,10 +131,72 @@ const WatchListItem = () => {
     }
   }, [])
 
+  useEffect(() => {
+    const keys = Object.keys(columnItems)
+    if(keys.length) {
+      const columns = [
+        {
+          value: 'symbol',
+          label: 'symbol',
+          width: 100,
+        },
+      ]
+      columnItems.forEach((value) => {
+        if (value !== 'symbol') {
+          columns.push({
+            value: value,
+            label: value,
+            width: 100,
+          })
+        }
+      })
+      setColumns(columns)
+    }
+
+  }, [isUpdatedCols])
+
+  useEffect(() => {
+    let initData = watchListInitData
+    let newData = []
+    let isValid = true
+    initData.forEach((init) => {
+      watchListData.forEach(o => {
+        if (o.symbol === init.symbol) {
+          const newObject = {
+            symbol: o.symbol,
+            ...o.data
+          }
+          newData.push(newObject)
+          isValid = false
+        }
+      })
+      if (isValid) {
+        newData.push(init)
+      }
+      isValid = true
+    })
+    setWatchListInitData(newData)
+    setIsUpdatedWatchList(false)
+  }, [isUpdatedWatchList])
+
+  const handleColumnSet = (columns) => {
+    let cols = []
+    Object.keys(columns).forEach((key) => {
+      columns[key].children.forEach((col) => {
+        cols.push(col.label)
+      })
+    })
+    setIsUpdatedCols(!isUpdatedCols)
+    setColumnItems(cols)
+  }
+
   return (
     <div className="watch-list-item-container">
       <Modal show={isOpenedEditColumnWidget} className="hunter-modal" onHide={() => handleModalClose()}>
-        <WatchListEditColumnWidget />
+        <WatchListEditColumnWidget
+          handleModalClose={handleModalClose}
+          setColumns={handleColumnSet}
+        />
       </Modal>
       <div className="watch-list-item-wrap">
         <div className="watch-list-item-header">
@@ -134,17 +228,11 @@ const WatchListItem = () => {
             <MDBTableBody
               className={"financial-table-body-1"}
             >
-              {watchListData && watchListData.map((item) => (
-                <tr>
-                  <td key={item.id} className="hunter-financial-table-column">{item.symbol}</td>
-                  <td key={item.id} className="hunter-financial-table-column">{item.data.v}</td>
-                  <td key={item.id} className="hunter-financial-table-column">{item.data.vw}</td>
-                  <td key={item.id} className="hunter-financial-table-column">{item.data.o}</td>
-                  <td key={item.id} className="hunter-financial-table-column">{item.data.c}</td>
-                  <td key={item.id} className="hunter-financial-table-column">{item.data.h}</td>
-                  <td key={item.id} className="hunter-financial-table-column">{item.data.l}</td>
-                  <td key={item.id} className="hunter-financial-table-column">{item.data.n}</td>
-                  <td key={item.id} className="hunter-financial-table-column">{item.data.date}</td>
+              {watchListInitData && watchListInitData.map((item) => (
+                <tr key={`row-${item.symbol}`}>
+                  {columnItems.map((key) => (
+                    <td key={`${item.symbol}-${key}`} className="hunter-financial-table-column">{item[key]}</td>)
+                  )}
                 </tr>
               ))}
             </MDBTableBody>

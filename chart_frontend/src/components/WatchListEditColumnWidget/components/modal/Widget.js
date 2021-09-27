@@ -606,7 +606,7 @@ class Widget extends React.Component {
                 onExpand={this.onExpandAvailableItem}
               />
             </div>
-            <div class="left-box-footer">
+            <div className="left-box-footer">
               <div className="modal-btn btn-exchange" onClick={this.onAddItems}>
                 <span>{"Add Item(s) >>"}</span>
               </div>
