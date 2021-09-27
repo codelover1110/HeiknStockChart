@@ -8,3 +8,11 @@
     width: 100%;
     background-color: #303030;
 }
+
+.background-green {
+    background-color: green;
+}
+
+.background-light-red {
+    background-color: purple;
+}

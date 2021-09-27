@@ -98,7 +98,7 @@ const WatchListItem = () => {
         rows.forEach((row) => {
           const object = {}
           columns.forEach((col) => {
-            object[col.value] = ''
+            object[col.value] = '0.00'
           })
           object.symbol = row
           realData.push(object);
@@ -190,6 +190,13 @@ const WatchListItem = () => {
     setColumnItems(cols)
   }
 
+  const isEven = (str) => {
+    const dbl = parseFloat(str);
+    const number = dbl.toFixed(0);
+    console.log(number % 2 === 1 ? true : false)
+    return number % 2;
+  }
+
   return (
     <div className="watch-list-item-container">
       <Modal show={isOpenedEditColumnWidget} className="hunter-modal" onHide={() => handleModalClose()}>
@@ -230,8 +237,15 @@ const WatchListItem = () => {
             >
               {watchListInitData && watchListInitData.map((item) => (
                 <tr key={`row-${item.symbol}`}>
-                  {columnItems.map((key) => (
-                    <td key={`${item.symbol}-${key}`} className="hunter-financial-table-column">{item[key]}</td>)
+                  {columnItems.map((key) => 
+                    (
+                      <td 
+                        key={`${item.symbol}-${key}`}
+                        className={`hunter-financial-table-column ${isEven(item[key]) ===1 ? 'background-green' : isEven(item[key]) ===0 ? 'background-light-red' : ''}`}
+                      >
+                        {item[key]}
+                      </td>
+                    )
                   )}
                 </tr>
               ))}
