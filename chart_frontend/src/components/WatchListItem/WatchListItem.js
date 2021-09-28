@@ -5,6 +5,7 @@ import { MDBTable, MDBTableBody, MDBTableHead } from 'mdbreact';
 import WatchListEditColumnWidget from 'components/WatchListEditColumnWidget/WatchListEditColumnWidget'
 import './WatchListItem.css'
 import { set } from 'lodash';
+import Select from 'react-select'
 
 const WatchListItem = () => {
   const [ws, setWs] = useState(null);
@@ -65,6 +66,18 @@ const WatchListItem = () => {
       width: 100,
     }
   ]);
+
+  const [timeFrames, setTimeFrames] = useState([])
+  const [timeFrameOptions, setTimeFrameOptions] = useState([
+    {
+      value: '1d',
+      label: '1d'
+    },
+    {
+      value: '3d',
+      label: '3d'
+    },
+  ])
   
   const [watchListData, setWatchListData] = useState([])
   const [watchListInitData, setWatchListInitData] = useState([])
@@ -128,6 +141,7 @@ const WatchListItem = () => {
       socket.onclose = () => {
         console.log('Closed Connection!')
       };
+
     }
   }, [])
 
@@ -179,6 +193,12 @@ const WatchListItem = () => {
     setIsUpdatedWatchList(false)
   }, [isUpdatedWatchList])
 
+  useEffect(() => {
+    if (ws) {
+      ws.send("set_time_frame", '1d, 3d')
+    }
+  }, [timeFrames])
+
   const handleColumnSet = (columns) => {
     let cols = []
     Object.keys(columns).forEach((key) => {
@@ -193,8 +213,11 @@ const WatchListItem = () => {
   const isEven = (str) => {
     const dbl = parseFloat(str);
     const number = dbl.toFixed(0);
-    console.log(number % 2 === 1 ? true : false)
     return number % 2;
+  }
+
+  const handleTimeFrameChange = (e) => {
+    setTimeFrames(e)
   }
 
   return (
@@ -207,13 +230,23 @@ const WatchListItem = () => {
       </Modal>
       <div className="watch-list-item-wrap">
         <div className="watch-list-item-header">
-        <Button
-          size="sm"
-          className=""
-          onClick={() => {handleColumnsChange()}}
-        >
-          change columns
-        </Button>
+          <div className="select-multi-option ml-10">
+            <Select
+              name="filters"
+              placeholder="Time Frame"
+              value={timeFrames}
+              onChange={handleTimeFrameChange}
+              options={timeFrameOptions}
+              isMulti={true}
+            />
+          </div>
+          <Button
+            size="sm"
+            className=""
+            onClick={() => {handleColumnsChange()}}
+          >
+            change columns
+          </Button>
         </div>
         <div className="watch-list-item-content">
           <MDBTable

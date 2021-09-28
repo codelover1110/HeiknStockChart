@@ -4,6 +4,8 @@
 }
 
 .watch-list-item-header {
+    display: flex;
+    align-items: center;
     height: 50px;
     width: 100%;
     background-color: #303030;
