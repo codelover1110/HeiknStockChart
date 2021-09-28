@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Select from 'react-select';
 
 
@@ -49,6 +49,13 @@ const Header = (props) => {
                   <span>Data Table</span>
                 </li>
                 <li
+                  className={`nav-item ${selectedHeaderNav == "Chart" ? "selected" : ""}`}
+                  onClick={() => handleNavClicked("Chart")}
+                >
+                  <i className="fas fa-chart-bar"></i>
+                  <span>Chart</span>
+                </li>
+                {/* <li
                   className={`nav-item ${selectedHeaderNav == "Income Statement" ? "selected" : ""}`}
                   onClick={() => handleNavClicked("Income Statement")}
                 >
@@ -68,7 +75,7 @@ const Header = (props) => {
                 >
                   <i className="fas fa-dollar-sign"></i>
                   <span>Cash Flow Statement</span>
-                </li>
+                </li> */}
               </ul>
             </div>
           </div>

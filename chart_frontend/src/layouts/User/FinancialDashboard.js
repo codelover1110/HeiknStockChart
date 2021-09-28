@@ -11,6 +11,7 @@ import Sidebar from 'components/Sidebar/Sidebar.js';
 import Header from 'components/FinancialDashboard/Header';
 import BarChart from 'components/FinancialDashboard/BarChart';
 import GraphTypes from 'components/FinancialDashboard/GraphTypes';
+import StockTypes from 'components/FinancialDashboard/StockTypes';
 import FinancialDataTable from 'components/FinancialDashboard/FinancialDataTable';
 import FinancialStatementsDataTable from 'components/FinancialDashboard/FinancialStatementsDataTable';
 
@@ -29,13 +30,14 @@ const FinancialDashboard = () => {
   const [optionsSymbol, setOptionsSymbol] = useState([]);
   const [isShowSidebar, setShowSidebar] = useState(false);
   const [selectedInstance, setSelectedInstance] = useState('financial_data');
-  const [selectedHeaderNav, setSelectedHeaderNav] =
+  const [selectedHeaderNav, setSelectedHeaderNav] = useState('Chart');
+  const [selectedAggregationType, setSelectedAggregationType] = useState('QA');
+  const [selectedStockType, setSelectedStockType] =
     useState('Income Statement');
-  const [selectedGraphType, setSelectedGraphType] = useState('Charts');
-  const [selectedAggregationType, setSelectedAggregationType] = useState('');
 
   const [chartData, setChartData] = useState(null);
   const [datatable, setDataTable] = useState();
+  const [isLoading, setIsLoading] = useState(0);
 
   const handleSidebarChange = () => {
     setShowSidebar(!isShowSidebar);
@@ -51,22 +53,22 @@ const FinancialDashboard = () => {
   });
 
   const sortDataPointsByDate = (data) => {
-    let sortedData = {...data};
+    let sortedData = { ...data };
     if (sortedData.dataPoints.length > 0) {
       sortedData.dataPoints.sort(function (a, b) {
         let valueA = a['calendarDate'];
         let valueB = b['calendarDate'];
-        if (typeof a['calendarDate'] != "string") {
+        if (typeof a['calendarDate'] != 'string') {
           valueA = valueA.toString();
         }
-        if (typeof b['calendarDate'] != "string") {
+        if (typeof b['calendarDate'] != 'string') {
           valueB = valueB.toString();
         }
         return valueA.localeCompare(valueB);
       });
     }
     return sortedData;
-  }
+  };
 
   useEffect(() => {
     disableScroll.on();
@@ -82,6 +84,7 @@ const FinancialDashboard = () => {
   }, []);
 
   useEffect(() => {
+    setIsLoading(1);
     setChartData();
     const getNewsFinancials = async () => {
       const res = await getNewsFinancialData();
@@ -93,30 +96,26 @@ const FinancialDashboard = () => {
 
     const getTotalData = async () => {
       const res = await getFinancialTotalData(symbol.value);
-      let columns = ['BreakDown', 'TTM'];
-      let rows = [];
-      res.results.map((item) => {
-        const calendarDateKey = item['calendarDate'];
-        if (!columns.includes(calendarDateKey)) {
-          columns.push(calendarDateKey);
-        }
+      setDataTable(res.results);
+      setIsLoading(2);
+    };
 
-        const keys = Object.keys(item);
-        keys.map((key, index) => {
-          if (!(index in rows)) {
-            rows[index] = {};
-          }
-          rows[index]['BreakDown'] = key;
-          rows[index]['TTM'] = '1000000';
-          rows[index][calendarDateKey] = item[key];
-        });
-      });
+    const getIncomeForDataTable = async () => {
+      const res = await getFinancialTotalData(symbol.value);
+      setDataTable(res.results);
+      setIsLoading(2);
+    };
 
-      rows = [rows, rows, rows];
-      setDataTable({
-        columns,
-        rows,
-      });
+    const getBalanceForDataTable = async () => {
+      const res = await getFinancialTotalData(symbol.value);
+      setDataTable(res.results);
+      setIsLoading(2);
+    };
+
+    const getCashForDataTable = async () => {
+      const res = await getFinancialTotalData(symbol.value);
+      setDataTable(res.results);
+      setIsLoading(2);
     };
 
     const getIncome = async () => {
@@ -199,6 +198,7 @@ const FinancialDashboard = () => {
         sortDataPointsByDate(NetIncome),
         sortDataPointsByDate(earningsPerBasicShare),
       ]);
+      setIsLoading(2);
     };
 
     const getBalance = async () => {
@@ -282,6 +282,7 @@ const FinancialDashboard = () => {
         sortDataPointsByDate(tradeAndNonTradePayables),
         sortDataPointsByDate(cashAndEquivalents),
       ]);
+      setIsLoading(2);
     };
 
     const getCash = async () => {
@@ -365,26 +366,31 @@ const FinancialDashboard = () => {
         sortDataPointsByDate(issuanceEquityShares),
         sortDataPointsByDate(paymentDividendsOtherCashDistributions),
       ]);
+      setIsLoading(2);
     };
 
-    switch (selectedHeaderNav) {
-      case 'News':
-        getNewsFinancials();
-        break;
-      case 'Data Table':
+    if (selectedHeaderNav === 'News') {
+      getNewsFinancials();
+    } else if (selectedHeaderNav === 'Data Table') {
+      if (selectedStockType === '') {
         getTotalData();
-        break;
-      case 'Income Statement':
+      } else if (selectedStockType === 'Income Statement') {
+        getIncomeForDataTable();
+      } else if (selectedStockType === 'Balance Sheet') {
+        getBalanceForDataTable();
+      } else if (selectedStockType === 'Cash Flow Statement') {
+        getCashForDataTable();
+      }
+    } else if (selectedHeaderNav === 'Chart') {
+      if (selectedStockType === 'Income Statement') {
         getIncome();
-        break;
-      case 'Balance Sheet':
+      } else if (selectedStockType === 'Balance Sheet') {
         getBalance();
-        break;
-      case 'Cash Flow Statement':
+      } else if (selectedStockType === 'Cash Flow Statement') {
         getCash();
-        break;
+      }
     }
-  }, [selectedHeaderNav, symbol]);
+  }, [selectedHeaderNav, selectedStockType, symbol]);
 
   return (
     <div className="financial-dashboard-container">
@@ -413,16 +419,25 @@ const FinancialDashboard = () => {
         setSymbol={setSymbol}
         optionsSymbol={optionsSymbol}
       />
-      {selectedHeaderNav !== 'News' && selectedHeaderNav !== 'Data Table' && (
-        <GraphTypes
-          selectedGraphType={selectedGraphType}
-          setSelectedGraphType={setSelectedGraphType}
-          selectedAggregationType={selectedAggregationType}
-          setSelectedAggregationType={setSelectedAggregationType}
-        />
+      {selectedHeaderNav !== 'News' && (
+        <div className="filter-types-section">
+          <GraphTypes
+            selectedAggregationType={selectedAggregationType}
+            setSelectedAggregationType={setSelectedAggregationType}
+          />
+          <StockTypes
+            selectedStockType={selectedStockType}
+            setSelectedStockType={setSelectedStockType}
+            selectedHeaderNav={selectedHeaderNav}
+          />
+        </div>
       )}
       {selectedHeaderNav === 'Data Table' ? (
-        <FinancialDataTable data={datatable} symbols={optionsSymbol} />
+        <FinancialDataTable
+          data={datatable}
+          selectedStockType={selectedStockType}
+          selectedAggregationType={selectedAggregationType}
+        />
       ) : selectedHeaderNav === 'News' ? (
         <FinancialStatementsDataTable
           data={financialStatements}
@@ -431,7 +446,7 @@ const FinancialDashboard = () => {
       ) : (
         <div className="container custom-container chart-area">
           <div className="row justify-content-center">
-            {chartData &&
+            {chartData ? (
               chartData.map((data) => (
                 <div
                   key={data.label}
@@ -443,7 +458,12 @@ const FinancialDashboard = () => {
                     globalAggregationType={selectedAggregationType}
                   />
                 </div>
-              ))}
+              ))
+            ) : isLoading === 2 ? (
+              <div className="no-data">No data</div>
+            ) : (
+              <div className="no-data">Fetching...</div>
+            )}
           </div>
         </div>
       )}

@@ -1,5 +1,5 @@
 body {
-  background-color: #303030;
+  background-color: #303030 !important;
 }
 .custom-container {
   max-width: 100% !important;
@@ -211,7 +211,7 @@ body {
   color: white;
 }
 .financial-data-table {
-  margin-top: 100px !important;
+  margin-top: 0px !important;
   padding-top: 0 !important;
   padding-left: 20px !important;
   padding-right: 20px !important;
@@ -249,5 +249,9 @@ body {
 .no-data {
   color: white;
   padding-left: 15px;
+}
+.filter-types-section {
+  display: flex;
+  justify-content: center;
 }
 /* Dashboard End */
