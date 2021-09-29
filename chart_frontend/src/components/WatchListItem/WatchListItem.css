@@ -18,3 +18,13 @@
 .background-light-red {
     background-color: purple;
 }
+
+.hunter-scanner-page-chart-area {
+    width: 100px;
+    height: 30px;
+    max-width: 100px;
+}
+
+.hunter-watch-list-item-wrap {
+    overflow-y: scroll;
+}
