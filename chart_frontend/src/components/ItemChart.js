@@ -300,7 +300,7 @@ const HeiknStockChartItem = (props) => {
                 />
               </div>)
             }
-            <div className='date hunter-date-time-picker' id='datetimepicker1'>
+            <div className='date hunter-item-chart hunter-date-time-picker' id='datetimepicker1'>
               <MultiRangeSlider
                 selectDateRange={selectDateRange}
               />
