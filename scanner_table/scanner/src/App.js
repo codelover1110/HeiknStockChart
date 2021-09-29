@@ -19,7 +19,6 @@ class App extends React.Component {
 
     this.ws.onmessage = (event) => {
       const msg = JSON.parse(event.data)
-      console.log('-------------------', msg)
       // const tdata = array()
       let tempCon = []
       msg.map(data => {

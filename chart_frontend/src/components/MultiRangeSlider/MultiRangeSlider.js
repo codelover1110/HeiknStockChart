@@ -27,35 +27,29 @@ export default (props) => {
   
   return (
     <Form.Group as={Row} className="hunter-multi-range-area">
-      <Col xs="3">
-        <input 
-          type='text'
-          className="hunter-form-control-input"
-          value={tradeStartDate}
-          disabled
-        />
-      </Col>
-      <Col xs="6">
-        <Range
-          min={0}
-          max={365}
-          defaultValue={[0, 365]}
-          step={1}
-          onChange={(value) => {
-            handleDateRangeChange(value, false)
-          }}
-          onAfterChange={(value) => {
-            handleDateRangeChange(value, true)
-          }}
-        />
-      </Col>
-      <Col xs="3">
-        <input 
-          type='text'
-          className="hunter-form-control-input"
-          value={tradeEndDate}
-          disabled
-        />    
-      </Col>
+      <input 
+        type='text'
+        className="hunter-form-control-input"
+        value={tradeStartDate}
+        disabled
+      />
+      <Range
+        min={0}
+        max={365}
+        defaultValue={[0, 365]}
+        step={1}
+        onChange={(value) => {
+          handleDateRangeChange(value, false)
+        }}
+        onAfterChange={(value) => {
+          handleDateRangeChange(value, true)
+        }}
+      />
+      <input 
+        type='text'
+        className="hunter-form-control-input"
+        value={tradeEndDate}
+        disabled
+      />    
     </Form.Group>
 )};

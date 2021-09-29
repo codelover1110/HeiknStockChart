@@ -1,4 +1,5 @@
 import React, { useCallback, useState, useEffect, useMemo } from "react";
+import MultiRangeSlider from 'components/MultiRangeSlider/MultiRangeSlider'
 import { Link } from "react-router-dom";
 import "react-datetime/css/react-datetime.css";
 import {
@@ -92,12 +93,9 @@ const HybridViewTable = (props) => {
     history.push('/login')
   }
 
-  const handleTradeStartDateChange = (e) => {
-    setTradeStartDate(e.target.value)
-  }
-  
-  const handleTradeEndDateChange = (e) => {
-    setTradeEndDate(e.target.value)
+  const selectDateRange = (startDate, endDate) => {
+    setTradeStartDate(startDate)
+    setTradeEndDate(endDate)
   }
 
   return (
@@ -107,29 +105,10 @@ const HybridViewTable = (props) => {
           Trade Data Table
         </div>
         <div className="hunter-search-filter-area">
-          <div className='input-group date hunter-date-time-picker' id='datetimepicker1'>
-            <span>Trade Start Time:</span>
-              <input 
-                type='date'
-                className="form-control hunter-input"
-                value={tradeStartDate}
-                onChange={handleTradeStartDateChange}
-              />
-              <span className="input-group-addon">
-              <span className="glyphicon glyphicon-calendar"></span>
-            </span>
-          </div>
-          <div className='input-group date hunter-date-time-picker' id='datetimepicker2'>
-            <span>Trade End Time:</span> 
-            <input 
-              type='date'
-              className="form-control hunter-input"
-              value={tradeEndDate}
-              onChange={handleTradeEndDateChange}
+          <div className='date hunter-item-chart hunter-date-time-picker mb-3' id='datetimepicker1'>
+            <MultiRangeSlider
+              selectDateRange={selectDateRange}
             />
-            <span className="input-group-addon">
-            <span className="glyphicon glyphicon-calendar"></span>
-            </span>
           </div>
         </div>
         <MDBDataTableV5 

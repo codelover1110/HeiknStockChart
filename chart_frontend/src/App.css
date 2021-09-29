@@ -3,6 +3,11 @@
   margin: 20px 0 20px 0;
 }
 
+.hunter-nav-bar-nav {
+  max-width: 1400px;
+  width: 100%;
+}
+
 .select-wrape {
   display: flex;
   /* width: 200px; */
@@ -334,6 +339,11 @@ div.mdb-datatable div.mdb-datatable-filter {
   top: 30%;
 }
 
+.hunter-widget-modal .modal-dialog{
+  top: 20%;
+  right: 20%;
+}
+
 .hunter-modal-footer.modal-footer {
   display: flex;
   justify-content: flex-end;
@@ -567,8 +577,27 @@ pre {
 
 .hunter-multi-range-area {
   display: flex;
+  flex-direction: row;
   align-items: center;
   margin-bottom: 0px;
+  min-width: 500px;
+  max-width: 700px;
+  width: 100%;
+  justify-content: space-evenly;
+}
+
+.hunter-multi-range-area .rc-slider {
+  max-width: 400px;
+  width: 100%;
+}
+
+.hunter-item-chart .hunter-multi-range-area .rc-slider {
+  width: 250px;
+}
+
+.hunter-multi-range-area .hunter-form-control-input {
+  max-width: 100px;
+  text-align: center;
 }
 
 .hunter-multi-range-area .form-control {

@@ -222,7 +222,7 @@ const WatchListItem = () => {
 
   return (
     <div className="watch-list-item-container">
-      <Modal show={isOpenedEditColumnWidget} className="hunter-modal" onHide={() => handleModalClose()}>
+      <Modal show={isOpenedEditColumnWidget} className="hunter-widget-modal" onHide={() => handleModalClose()}>
         <WatchListEditColumnWidget
           handleModalClose={handleModalClose}
           setColumns={handleColumnSet}
