@@ -14,16 +14,6 @@ import { MDBSelect } from "mdbreact";
 
 
 const WatchListItem = () => {
-  // const options =  [
-  //   {
-  //     "labelKey": "optionItem1",
-  //     "value": "Option item 1"
-  //   },
-  //   {
-  //     "labelKey": "optionItem2",
-  //     "value": "Option item 2"
-  //   }
-  // ]
   const [chartData, setChartData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [ws, setWs] = useState(null);
@@ -121,8 +111,8 @@ const WatchListItem = () => {
       .then(async data => {
         rows = data.tables
 
-        const financials = await getMultiFinancials(rows, 'income_statement')
-        setMultiFinancials(financials)
+        // const financials = await getMultiFinancials(rows, 'income_statement')
+        // setMultiFinancials(financials)
 
         setRowItems(data.tables)
         setIsUpdatedRows(true)
@@ -154,26 +144,6 @@ const WatchListItem = () => {
       setIsLoading(1);
       getIncome();
       loadRows();
-    }
-    
-    if (!ws) {
-      const socket = new WebSocket(process.env.REACT_APP_SOCKET_URL);
-      setWs(socket)
-      
-      socket.onopen = () => {
-        console.log('Opened Connection!')
-      };
-    
-      socket.onmessage = (event) => {
-        const msg = JSON.parse(event.data)
-        setWatchListData(msg)
-        setIsUpdatedWatchList(true)
-      };
-    
-      socket.onclose = () => {
-        console.log('Closed Connection!')
-      };
-
     }
   }, [])
 
@@ -217,8 +187,6 @@ const WatchListItem = () => {
     if (!filtered.length) {
       return []
     }
-    console.log('chartData', chartData)
-    console.log('filtered[1]???', filtered)
     return filtered[0][1]
   }
 
@@ -236,7 +204,7 @@ const WatchListItem = () => {
             chart: 
               <div className="container custom-container chart-area hunter-scanner-page-chart-area">
                 <div className="row justify-content-center hunter-scanner-page-chart-area-wrap">
-                  {isValidChartData(o.symbol) ? (
+                  {chartData && chartData.length ? (
                     <BarChart
                       // data={getChartDataBySymbol(o.symbol)}
                       data={chartData[0]}
@@ -290,6 +258,49 @@ const WatchListItem = () => {
 
     const number = parseFloat(item[key])
     return number > 0 ? 1 : 0
+  }
+
+  const indicatorStyle = (key, item) => {
+    let bgColor;
+    const indicators = ['rsi', 'rsi2', 'rsi3', 'heik', 'heik2']
+    if (indicators.includes(key)) {
+      switch (key){
+        case 'rsi':
+          bgColor = item.rsi_side === 'buy'
+          ? 'background-pink-color' : item.rsi_side === 'sell'
+          ? 'background-orange-color' : item.rsi_side === 'hold'
+          ? 'background-light-green-color' : 'background-red-color'
+          return bgColor
+        case 'rsi2':
+          bgColor = item.rsi2_color === 'l_g'
+            ? 'background-light-green' : item.rsi2_color === 'd_g'
+            ? 'background-dark-green' : item.rsi2_color === 'l_r'
+            ? 'background-light-red' : 'background-dark-red'
+          return bgColor
+        case 'rsi3':
+          bgColor = item.rsi3_color === 'l_g'
+            ? 'background-light-green' : item.rsi3_color === 'd_g'
+            ? 'background-dark-green' : item.rsi3_color === 'l_r'
+            ? 'background-light-red' : 'background-dark-red'
+          return bgColor
+        case 'heik':
+          bgColor = item.heik1_color === 'l_g'
+            ? 'background-light-green' : item.heik_color === 'd_g'
+            ? 'background-dark-green' : item.heik_color === 'l_r'
+            ? 'background-light-red' : 'background-dark-red'
+          return bgColor
+        case 'heik2':
+          bgColor = item.heik2_color === 'l_g'
+            ? 'background-light-green' : item.heik2_color === 'd_g'
+            ? 'background-dark-green' : item.heik2_color === 'l_r'
+            ? 'background-light-red' : 'background-dark-red'
+          return bgColor
+        default:
+          return ''
+      }
+      return ''
+    }
+    return ''
   }
 
   const handleTimeFrameChange = (e) => {
@@ -379,6 +390,31 @@ const WatchListItem = () => {
     setIsLoading(2);
   };
 
+  useEffect (() => {
+    if (isLoading === 2) {
+      if (!ws) {
+        const socket = new WebSocket(process.env.REACT_APP_SOCKET_URL);
+        setWs(socket)
+        
+        socket.onopen = () => {
+          console.log('Opened Connection!')
+        };
+      
+        socket.onmessage = (event) => {
+          const msg = JSON.parse(event.data)
+          console.log('msg????', msg)
+          setWatchListData(msg)
+          setIsUpdatedWatchList(true)
+        };
+      
+        socket.onclose = () => {
+          console.log('Closed Connection!')
+        };
+  
+      }
+    }
+  }, [isLoading])
+
   const sortDataPointsByDate = (data) => {
     let sortedData = { ...data };
     if (sortedData.dataPoints.length > 0) {
@@ -396,6 +432,11 @@ const WatchListItem = () => {
     }
     return sortedData;
   };
+
+  const isSelectedSymbol = (symbol) => {
+    const filtered = selectedSymbols.filter(o => o.value === symbol)
+    return filtered.length ? true : false
+  }
 
   return (
     <div className="watch-list-item-container">
@@ -462,12 +503,13 @@ const WatchListItem = () => {
               className={"financial-table-body-1"}
             >
               {watchListInitData && watchListInitData.map((item) => (
+                // isSelectedSymbol(item.symbol) && 
                 <tr key={`row-${item.symbol}`}>
                   {columnItems.map((key) => 
                     (
                       <td 
                         key={`${item.symbol}-${key}`}
-                        className={`hunter-financial-table-column ${key === 'chart' ? 'table-chart-column' : ''}${checkSign(key, item) === 1 ? 'background-green' : checkSign(key, item) === 0 ? 'background-light-red' : ''}`}
+                        className={`hunter-financial-table-column ${key === 'chart' ? 'table-chart-column' : ''} ${indicatorStyle(key, item)}`}
                       >
                         {key !== 'symbol' && key !== 'chart' ? parseFloat(item[key]).toFixed(2) : item[key]}
                       </td>
