@@ -493,6 +493,10 @@ pre {
   margin-left: 10px;
 }
 
+.ml-5 {
+  margin-left: 10px;
+}
+
 .ml-20 {
   margin-left: 20px;
 }
@@ -725,4 +729,14 @@ pre {
 
 .hunter-financial-table-column {
   background-color: #000;
+}
+
+.table-chart-column {
+  width: 100%;
+  max-width: 100px;
+}
+
+.hunter-watch-list-item-wrap
+.search-multi-option {
+  margin-right: 10px
 }

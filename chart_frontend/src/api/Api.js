@@ -586,3 +586,28 @@ export const getStockModalData = async () => {
     }
   }
 }
+
+export const getMultiFinancials = async (symbols, statement_type) => {
+  const requestOptions = {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      'symbols': symbols,
+      'financial_part': statement_type,
+    })
+  };
+
+  const apiURL = '/scanner/multi_financials/'
+  try {
+    return await fetch(process.env.REACT_APP_BACKEND_URL + apiURL, requestOptions)
+      .then(response => response.json())
+      .then(data => {
+        return data.results
+      })  
+  } catch (e) {
+    return {
+      success: false,
+      message: e
+    }
+  }
+}
