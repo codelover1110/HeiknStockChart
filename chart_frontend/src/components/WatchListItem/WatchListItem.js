@@ -497,9 +497,8 @@ const WatchListItem = (props) => {
             size="sm"
             className=""
             onClick={() => {
-              // const symbols = selectedSymbols.map(symbol => symbol.value)
-              // saveScannerView(props.chart_number, symbols, columnItems)
-              getChartDataBySymbol('AAPL')
+              const symbols = selectedSymbols.map(symbol => symbol.value)
+              saveScannerView(props.chart_number, symbols, columnItems)
             }}
           >
             save default
