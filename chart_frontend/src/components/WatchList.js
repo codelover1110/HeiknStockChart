@@ -75,22 +75,22 @@ const WatchList = (props) => {
     return (
       <div className={`row ${calculateHeightStyle()}`}>
         <div className={`watch-list col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          <WatchListItem />
+          <WatchListItem chart_number={1}/>
         </div>
         <div className={`watch-list col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          <WatchListItem />
+          <WatchListItem chart_number={2}/>
         </div>
         <div className={`watch-list col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          <WatchListItem />
+          <WatchListItem chart_number={3}/>
         </div>
         <div className={`watch-list col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          <WatchListItem />
+          <WatchListItem chart_number={4}/>
         </div>
         <div className={`watch-list col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          <WatchListItem />
+          <WatchListItem chart_number={5}/>
         </div>
         <div className={`watch-list col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          <WatchListItem />
+          <WatchListItem chart_number={6}/>
         </div>
       </div>
     )

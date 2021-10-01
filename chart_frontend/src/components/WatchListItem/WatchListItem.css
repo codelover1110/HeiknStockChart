@@ -23,12 +23,14 @@
     position: relative;
     height: 30px;
     width: 100%;
-    max-width: 200px;
+    max-width: 0px;
 }
 
 .hunter-scanner-page-chart-area-wrap {
+    width: 100%;
+    max-width: 0px;
     position: absolute;
-    right: 100px;
+    left: 0px;
 }
 
 .hunter-watch-list-item-wrap {
@@ -65,4 +67,15 @@
 
 .background-red-color {
     background-color: #FF0000;
+}
+
+.hunter-custom-table-chart-th {
+    min-width: 200px;
+    text-align: center;
+}
+
+.hunter-multi-select-checkboxes 
+button {
+    width: 150px;
+    border-radius: 3px;
 }

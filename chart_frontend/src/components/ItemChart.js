@@ -6,6 +6,7 @@ import StockChart from "./stock-chart/StockChart"
 import { useHistory } from "react-router-dom";
 import disableScroll from 'disable-scroll';
 
+import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
 import MultiRangeSlider from 'components/MultiRangeSlider/MultiRangeSlider'
 
 const HeiknStockChartItem = (props) => {
@@ -258,13 +259,12 @@ const HeiknStockChartItem = (props) => {
                     options={symbolList}
                 />
                   </div>)
-              : (<div className="select-multi-option">
-                    <Select
-                        value={multiSymbol}
-                        onChange={handlMultiSymbolChange}
-                        options={symbolList}
-                        isMulti={true}
-                    />
+              : (<div className="select-multi-option hunter-multi-select-checkboxes">
+                  <ReactMultiSelectCheckboxes
+                    options={symbolList}
+                    value={multiSymbol}
+                    onChange={handlMultiSymbolChange}
+                  />
                 </div>)
             }
             {(selectedInstance.value !== 'live_trading') &&

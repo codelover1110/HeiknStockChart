@@ -611,3 +611,29 @@ export const getMultiFinancials = async (symbols, statement_type) => {
     }
   }
 }
+
+export const saveScannerView = async (chart_number, symbols, fields) => {
+  const requestOptions = {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      'chart_number': chart_number,
+      'symbols': symbols,
+      'fields': fields,
+    })
+  };
+
+  const apiURL = '/scanner/save_scanner_views/'
+  try {
+    return await fetch(process.env.REACT_APP_BACKEND_URL + apiURL, requestOptions)
+      .then(response => response.json())
+      .then(data => {
+        return data.results
+      })  
+  } catch (e) {
+    return {
+      success: false,
+      message: e
+    }
+  }    
+}

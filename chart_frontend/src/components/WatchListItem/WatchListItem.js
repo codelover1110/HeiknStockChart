@@ -5,15 +5,14 @@ import BarChart from 'components/FinancialDashboard/SmallBarChart';
 import { MDBTable, MDBTableBody, MDBTableHead } from 'mdbreact';
 import WatchListEditColumnWidget from 'components/WatchListEditColumnWidget/WatchListEditColumnWidget'
 import './WatchListItem.css'
-import { set } from 'lodash';
 import Select from 'react-select'
 import {
-  getIncomeStatement, getMultiFinancials
+  getIncomeStatement, getMultiFinancials, saveScannerView
 } from 'api/Api';
-import { MDBSelect } from "mdbreact";
+import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
 
 
-const WatchListItem = () => {
+const WatchListItem = (props) => {
   const [chartData, setChartData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [ws, setWs] = useState(null);
@@ -22,8 +21,38 @@ const WatchListItem = () => {
   const [rowItems, setRowItems] = useState([])
   const [isUpdatedRows, setIsUpdatedRows] = useState(false)
   const [isUpdatedCols, setIsUpdatedCols] = useState(false)
-  const [columnItems, setColumnItems] = useState([
-    'symbol', 'rsi', 'rsi2', 'rsi3', 'heik', 'heik2', 'chart'
+  const [columnItems, setColumnItems] = useState([])
+  const [initColumnItems] = useState([
+    {
+      value: 'symbol',
+      label: 'symbol',
+      width: 100,
+    },
+    {
+      value: 'rsi',
+      label: 'rsi',
+      width: 100,
+    },
+    {
+      value: 'rsi2',
+      label: 'rsi2',
+      width: 100,
+    },
+    {
+      value: 'rsi3',
+      label: 'rsi3',
+      width: 100,
+    },
+    {
+      value: 'heik',
+      label: 'heik',
+      width: 100,
+    },
+    {
+      value: 'heik2',
+      label: 'heik2',
+      width: 100,
+    }
   ])
   const [isInited, setIsInited] = useState(false)
   const [isUpdatedWatchList, setIsUpdatedWatchList] = useState(false);
@@ -112,6 +141,7 @@ const WatchListItem = () => {
         rows = data.tables
 
         // const financials = await getMultiFinancials(rows, 'income_statement')
+        // console.log('setted financial ...................')
         // setMultiFinancials(financials)
 
         setRowItems(data.tables)
@@ -136,6 +166,7 @@ const WatchListItem = () => {
           realData.push(object);
         })
         setSymbolOptions(symbols)
+        setSelectedSymbols(symbols)
         setWatchListInitData(realData)
         setIsInited(true);  
       })
@@ -150,13 +181,7 @@ const WatchListItem = () => {
   useEffect(() => {
     const keys = Object.keys(columnItems)
     if(keys.length) {
-      const columns = [
-        {
-          value: 'symbol',
-          label: 'symbol',
-          width: 100,
-        },
-      ]
+      const columns = [...initColumnItems]
       columnItems.forEach((value) => {
         if (value !== 'symbol') {
           columns.push({
@@ -165,6 +190,11 @@ const WatchListItem = () => {
             width: 100,
           })
         }
+      })
+      columns.push({
+        value: 'chart',
+        label: 'chart',
+        width: 100,
       })
       setColumns(columns)
     }
@@ -183,10 +213,12 @@ const WatchListItem = () => {
     if (!multiFinancials.length) {
       return []
     }
-    const filtered = multiFinancials.filter((financial) => financial[0] === symbol)
+    const filtered = multiFinancials.filter((financial) => { console.log('multiFinancials .................', financial[0], symbol);  return financial[0] === symbol })
     if (!filtered.length) {
       return []
     }
+    console.log('chartData?????', chartData)
+    console.log('filtered?????', filtered[0])
     return filtered[0][1]
   }
 
@@ -251,20 +283,11 @@ const WatchListItem = () => {
     setColumnItems(cols)
   }
 
-  const checkSign = (key, item) => {
-    if (key === 'symbol' || key === 'chart') {
-      return -1
-    }
-
-    const number = parseFloat(item[key])
-    return number > 0 ? 1 : 0
-  }
-
   const indicatorStyle = (key, item) => {
     let bgColor;
     const indicators = ['rsi', 'rsi2', 'rsi3', 'heik', 'heik2']
     if (indicators.includes(key)) {
-      switch (key){
+      switch (key) {
         case 'rsi':
           bgColor = item.rsi_side === 'buy'
           ? 'background-pink-color' : item.rsi_side === 'sell'
@@ -298,7 +321,6 @@ const WatchListItem = () => {
         default:
           return ''
       }
-      return ''
     }
     return ''
   }
@@ -457,14 +479,11 @@ const WatchListItem = () => {
               options={timeFrameOptions}
             />
           </div>
-          <div className="select-multi-option mr-1">
-            <Select
-              name="filters"
-              placeholder="Select Symbol"
+          <div className="select-multi-option hunter-multi-select-checkboxes mr-2">
+            <ReactMultiSelectCheckboxes
+              options={symbolOptions}
               value={selectedSymbols}
               onChange={handleSymbolChange}
-              options={symbolOptions}
-              isMulti={true}
             />
           </div>
           <Button
@@ -477,7 +496,11 @@ const WatchListItem = () => {
           <Button
             size="sm"
             className=""
-            onClick={() => {}}
+            onClick={() => {
+              // const symbols = selectedSymbols.map(symbol => symbol.value)
+              // saveScannerView(props.chart_number, symbols, columnItems)
+              getChartDataBySymbol('AAPL')
+            }}
           >
             save default
           </Button>
@@ -495,7 +518,7 @@ const WatchListItem = () => {
             <MDBTableHead  className="watch-list-data-table-header">
               <tr>
                 {columns.map((item) => (
-                  <th key={item.label}>{item.label}</th>
+                  <th key={item.label} className={`${item.value === 'chart' ? 'hunter-custom-table-chart-th' : ''}`}>{item.label}</th>
                 ))}
               </tr>
             </MDBTableHead>
@@ -503,15 +526,15 @@ const WatchListItem = () => {
               className={"financial-table-body-1"}
             >
               {watchListInitData && watchListInitData.map((item) => (
-                // isSelectedSymbol(item.symbol) && 
+                isSelectedSymbol(item.symbol) && 
                 <tr key={`row-${item.symbol}`}>
-                  {columnItems.map((key) => 
+                  {columns.map((column) => 
                     (
                       <td 
-                        key={`${item.symbol}-${key}`}
-                        className={`hunter-financial-table-column ${key === 'chart' ? 'table-chart-column' : ''} ${indicatorStyle(key, item)}`}
+                        key={`${item.symbol}-${column.value}`}
+                        className={`hunter-financial-table-column ${column.value === 'chart' ? 'table-chart-column' : ''} ${indicatorStyle(column.value, item)}`}
                       >
-                        {key !== 'symbol' && key !== 'chart' ? parseFloat(item[key]).toFixed(2) : item[key]}
+                        {column.value !== 'symbol' && column.value !== 'chart' ? parseFloat(item[column.value]).toFixed(2) : item[column.value]}
                       </td>
                     )
                   )}
