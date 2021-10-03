@@ -22,15 +22,14 @@
 .hunter-scanner-page-chart-area {
     position: relative;
     height: 30px;
-    width: 100%;
-    max-width: 0px;
+    width: 150px;
+    max-width: 150px;
 }
 
 .hunter-scanner-page-chart-area-wrap {
     width: 100%;
-    max-width: 0px;
     position: absolute;
-    right: 0px;
+    left: 0px;
 }
 
 .hunter-watch-list-item-wrap {

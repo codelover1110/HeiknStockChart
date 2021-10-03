@@ -9,7 +9,6 @@ const WatchListEditColumnWidget = (props) => {
   const [currentNodes, setCurrentNodes] = useState(props.selectedColumns);
   
   const handleCurrentNodesChanged = (nodes) => {
-    console.log('nodes?????????????????????', nodes)
     setCurrentNodes(nodes);
     props.setColumns(nodes)
   };

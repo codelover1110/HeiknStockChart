@@ -167,11 +167,9 @@ const WatchListItem = (props) => {
         
         rows = data.result
 
-        console.log('rows', rows)
-
         const financials = await getMultiFinancials(rows, 'income_statement')
         loadMultiFinancials(financials)
-        
+
         // setRowItems(data.tables)
         // setIsUpdatedRows(true)
         
@@ -246,7 +244,6 @@ const WatchListItem = (props) => {
     financials.forEach((financial) => {
       getIncomeFromFinancial(financial[1], financial[0])
     })
-
   }
 
   const getChartDataBySymbol = (symbol, isChild) => {
@@ -262,6 +259,7 @@ const WatchListItem = (props) => {
     if (isChild) {
       return filtered[0].chartData[0]
     }
+    console.log('chartMultiData???????????????????', filtered[0].chartData)
     return filtered[0].chartData
   }
 
@@ -412,6 +410,9 @@ const WatchListItem = (props) => {
       color: 'rgb(226, 71, 130)',
       dataPoints: [],
     };
+    
+    console.log('financial???????????????????????????????????????', financial)
+
     if (financial && financial.length) {
       financial.forEach((item) => {
         revenus.dataPoints.push({
@@ -446,6 +447,7 @@ const WatchListItem = (props) => {
         });
       });
     }
+
     const multiCharts = chartMultiData;
     multiCharts.push({
       symbol: symbol,
@@ -530,13 +532,6 @@ const WatchListItem = (props) => {
               options={timeFrameOptions}
             />
           </div>
-          {/* <div className="select-multi-option hunter-multi-select-checkboxes mr-2">
-            <ReactMultiSelectCheckboxes
-              options={symbolOptions}
-              value={selectedSymbols}
-              onChange={handleSymbolChange}
-            />
-          </div> */}
           <div className="select-multi-option mr-1">
             <Select
               name="filters"
