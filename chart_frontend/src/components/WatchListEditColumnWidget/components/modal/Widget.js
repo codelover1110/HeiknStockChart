@@ -45,6 +45,8 @@ class Widget extends React.Component {
     this.onCancelClicked = this.onCancelClicked.bind(this);
 
     this.onGetAvailabelNodes = this.onGetAvailabelNodes.bind(this);
+    this.onLoadTotalNodes = this.onLoadTotalNodes.bind(this);
+    this.isExistItem = this.isExistItem.bind(this);
 
   }
 
@@ -401,6 +403,84 @@ class Widget extends React.Component {
     }
   }
 
+  isExistItem(key, item, currentNodes) {
+    let isExist = false
+    currentNodes.forEach((current) => {
+      if (current.value === key) {
+        current.children.forEach((child) => {
+          console.log('item, currentNodes????', child, item)
+          if (child.value === item.value) {
+            isExist = true
+            return
+          }
+        })
+      }
+    })
+    return isExist  
+  }
+
+  onLoadTotalNodes() {
+    const totalNodes = this.props.totalNodes;
+    let availableNodes = [];
+
+    if (!this.props.currentNodes) {
+      return
+    }
+
+    totalNodes.map((item) => {
+      let pushItem = {...item};
+      if ("children" in pushItem) {
+        if (pushItem.children.length > 0) {
+          let availableChildItems = [];
+          pushItem.children.map((childItem) => {
+            if (!this.isExistItem(pushItem.value, childItem, this.props.currentNodes)) {
+              availableChildItems.push(childItem);
+            }
+          });
+
+          if (availableChildItems.length > 0) {
+            availableNodes.push({...pushItem, children: availableChildItems});
+          }
+        }
+      }
+      
+      // if (pushItem.default) {
+      //   if ("children" in pushItem) {
+      //     if (pushItem.children.length > 0) {
+      //       let currentChildItems = [];
+      //       let availableChildItems = [];
+      //       pushItem.children.map((childItem) => {
+      //         if (childItem.default) {
+      //           currentChildItems.push(childItem);
+      //         } else {
+      //           availableChildItems.push(childItem);
+      //         }
+      //       });
+
+      //       if (currentChildItems.length > 0) {
+      //         defaultNodes.push({...pushItem, children: currentChildItems});
+      //       }
+
+      //       if (availableChildItems.length > 0) {
+      //         availableNodes.push({...pushItem, children: availableChildItems});
+      //       }
+      //     } else {
+      //       defaultNodes.push(pushItem);
+      //     }
+      //   } else {
+      //     defaultNodes.push(pushItem);
+      //   }
+      // } else {
+      //   availableNodes.push(pushItem);
+      // }
+    });
+    console.log('availableNodes?????????????????????????????????', availableNodes)
+    this.setState({
+      nodesAvailableItem: availableNodes,
+      nodesFilteredAvailableItem: availableNodes,
+    });
+  }
+
   onLoadDefaults() {
     const totalNodes = this.props.totalNodes;
     let defaultNodes = [];
@@ -581,6 +661,7 @@ class Widget extends React.Component {
 
   componentDidMount() {
     this.onGetAvailabelNodes();
+    this.onLoadTotalNodes();
   }
 
   render() {

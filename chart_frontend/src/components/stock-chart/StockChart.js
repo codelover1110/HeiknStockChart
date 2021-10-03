@@ -76,32 +76,21 @@ const StockChart = (props) => {
                 if (extendMarketTime === 'extend_markettime') {
                     apiName = '/api/get_data_extended';
                 }
-                fetch(process.env.REACT_APP_BACKEND_URL + apiName, requestOptions)
-                .then(response => response.json())
-                .then(data => {
-                    data['chart_data']['columns'] = ["date", "open", "high", "low", "close", "volume", "split", "dividend", "absoluteChange", "percentChange"]
-                    data['chart_data'].map((x) => {
-                        let converDate = new Date(x.date)
-                        x.date = converDate
-                        return null
+                try {
+                    fetch(process.env.REACT_APP_BACKEND_URL + apiName, requestOptions)
+                    .then(response => response.json())
+                    .then(data => {
+                        data['chart_data']['columns'] = ["date", "open", "high", "low", "close", "volume", "split", "dividend", "absoluteChange", "percentChange"]
+                        data['chart_data'].map((x) => {
+                            let converDate = new Date(x.date)
+                            x.date = converDate
+                            return null
+                        })
+                        setChartData(data['chart_data'])
                     })
-                    setChartData(data['chart_data'])
-                    // let apiName = '/api/get_data';
-                    // if (extendMarketTime === 'extend_markettime') {
-                    //     apiName = '/api/get_data_extended';
-                    // }
-                    // fetch(process.env.REACT_APP_BACKEND_URL + apiName, requestOptions)
-                    // .then(response => response.json())
-                    // .then(data => {
-                    //     data['chart_data']['columns'] = ["date", "open", "high", "low", "close", "volume", "split", "dividend", "absoluteChange", "percentChange"]
-                    //     data['chart_data'].map((x) => {
-                    //         let converDate = new Date(x.date)
-                    //         x.date = converDate
-                    //         return null
-                    //     })
-                    //     setChartData(data['chart_data'])
-                    // })
-                })
+                } catch (error) {
+                    console.log(error)    
+                }
             } else {
                 const symbols = multiSymbol.map((symbol) => symbol.value);
                 if (!symbols.length | !microStrategy) {
@@ -118,11 +107,15 @@ const StockChart = (props) => {
                         'end_date': endDate,
                     })
                 };
-                fetch(process.env.REACT_APP_BACKEND_URL+'/api/get_backtesting_result', requestOptions)
-                    .then(response => response.json())
-                    .then(data => {
-                        setChartData(data['chart_data'])
-                    })
+                try {
+                    
+                } catch (error) {
+                    fetch(process.env.REACT_APP_BACKEND_URL+'/api/get_backtesting_result', requestOptions)
+                        .then(response => response.json())
+                        .then(data => {
+                            setChartData(data['chart_data'])
+                        })
+                }
             }
         }
         

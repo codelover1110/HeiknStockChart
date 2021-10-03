@@ -89,45 +89,49 @@ const HeiknStockChart = (props) => {
 
   const getStrategyList = useCallback(
     () => {
-      fetch(process.env.REACT_APP_BACKEND_URL + "/api/get_strategy_list")
-        .then(response => response.json())
-        .then(data => {
-          setStrategyList(data.result);
-          const strategyOptions = data.result.map((o => {
-            return {
-              value: o.macro,
-              label: o.macro,
-            }
-          }))
-          // setStrategy({
-          //   value: 'heikfilter',
-          //   label: 'heikfilter'
-          // });
-          setOptionsStrategy(strategyOptions);
-          if (data.result.length) {
-            data.result.forEach((item) => {
-              if (item.macro === 'heikfilter') {
-                const microStrategyOptions = item.micro.map(o => {
-                  return {
-                    value: o,
-                    label: o,
-                  }
-                })
-                setOptionsMicroStrategy( microStrategyOptions )
-                // setMicroStrategy(microStrategyOptions[0])
-
-                const symbolOptions = item.symbols.map(o => {
-                  return {
-                    value: o,
-                    label: o,
-                  }
-                })
-                setSymbolList(symbolOptions)
-                // setSymbol(symbolOptions[0])
+      try {
+        fetch(process.env.REACT_APP_BACKEND_URL + "/api/get_strategy_list")
+          .then(response => response.json())
+          .then(data => {
+            setStrategyList(data.result);
+            const strategyOptions = data.result.map((o => {
+              return {
+                value: o.macro,
+                label: o.macro,
               }
-            })
-          }
-        })   
+            }))
+            // setStrategy({
+            //   value: 'heikfilter',
+            //   label: 'heikfilter'
+            // });
+            setOptionsStrategy(strategyOptions);
+            if (data.result.length) {
+              data.result.forEach((item) => {
+                if (item.macro === 'heikfilter') {
+                  const microStrategyOptions = item.micro.map(o => {
+                    return {
+                      value: o,
+                      label: o,
+                    }
+                  })
+                  setOptionsMicroStrategy( microStrategyOptions )
+                  // setMicroStrategy(microStrategyOptions[0])
+  
+                  const symbolOptions = item.symbols.map(o => {
+                    return {
+                      value: o,
+                      label: o,
+                    }
+                  })
+                  setSymbolList(symbolOptions)
+                  // setSymbol(symbolOptions[0])
+                }
+              })
+            }
+          })   
+      } catch (error) {
+        console.log(error)
+      }
     },
     [],
   )

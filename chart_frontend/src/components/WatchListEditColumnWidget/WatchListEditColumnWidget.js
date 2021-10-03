@@ -6,9 +6,10 @@ import { getStockModalData } from 'api/Api';
 
 const WatchListEditColumnWidget = (props) => {
   const [totalNodes, setTotalNodes] = useState([]);
-  const [currentNodes, setCurrentNodes] = useState([]);
+  const [currentNodes, setCurrentNodes] = useState(props.selectedColumns);
   
   const handleCurrentNodesChanged = (nodes) => {
+    console.log('nodes?????????????????????', nodes)
     setCurrentNodes(nodes);
     props.setColumns(nodes)
   };

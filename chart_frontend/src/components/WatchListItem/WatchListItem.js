@@ -7,19 +7,74 @@ import WatchListEditColumnWidget from 'components/WatchListEditColumnWidget/Watc
 import './WatchListItem.css'
 import Select from 'react-select'
 import {
-  getIncomeStatement, getMultiFinancials, saveScannerView
+  getMultiFinancials, saveScannerView
 } from 'api/Api';
-import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
-
 
 const WatchListItem = (props) => {
-  const [chartData, setChartData] = useState(null);
+  const [selectedColumns, setSelectedColumns] = useState(
+    [
+      {
+        label: "Indicators",
+        value: "parent_value_2",
+        children: [
+            {
+                label: "rsi",
+                value: "child_value_2_1",
+                default: true
+            },
+            {
+                label: "rsi2",
+                value: "child_value_2_2",
+                default: true
+            },
+            {
+                label: "rsi3",
+                value: "child_value_2_3",
+                default: false
+            },
+            {
+                label: "heik",
+                value: "child_value_2_4",
+                default: false
+            },
+            {
+                label: "heik2",
+                value: "child_value_2_5",
+                default: false
+            }
+        ],
+        "default": true
+      }
+    ]
+  );
+  
+  const [chartMultiData, setChartMultiData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [ws, setWs] = useState(null);
   const [isOpenedEditColumnWidget, setIsOpenedEditColumnWidget] = useState(false)
+  const [selectedWatchList, setSelectedWatchList] = useState({
+    value: 'tech',
+    label: 'tech'
+  })
+  const [selectedWatchListOptions] = useState([
+    {
+      value: 'crypto',
+      label: 'crypto'
+    },
+    {
+      value: 'buffett',
+      label: 'buffett'
+    },
+    {
+      value: 'tech',
+      label: 'tech'
+    },
+    {
+      value: 'tech2',
+      label: 'tech2'
+    }
+  ])
   const [selectedAggregationType, setSelectedAggregationType] = useState('QA');
-  const [rowItems, setRowItems] = useState([])
-  const [isUpdatedRows, setIsUpdatedRows] = useState(false)
   const [isUpdatedCols, setIsUpdatedCols] = useState(false)
   const [columnItems, setColumnItems] = useState([])
   const [initColumnItems] = useState([
@@ -28,35 +83,9 @@ const WatchListItem = (props) => {
       label: 'symbol',
       width: 100,
     },
-    {
-      value: 'rsi',
-      label: 'rsi',
-      width: 100,
-    },
-    {
-      value: 'rsi2',
-      label: 'rsi2',
-      width: 100,
-    },
-    {
-      value: 'rsi3',
-      label: 'rsi3',
-      width: 100,
-    },
-    {
-      value: 'heik',
-      label: 'heik',
-      width: 100,
-    },
-    {
-      value: 'heik2',
-      label: 'heik2',
-      width: 100,
-    }
   ])
   const [isInited, setIsInited] = useState(false)
   const [isUpdatedWatchList, setIsUpdatedWatchList] = useState(false);
-  const [multiFinancials, setMultiFinancials] = useState([])
   const [selectedSymbols, setSelectedSymbols] = useState([])
   const [symbolOptions, setSymbolOptions] = useState([])
   
@@ -113,10 +142,6 @@ const WatchListItem = (props) => {
   const [watchListData, setWatchListData] = useState([])
   const [watchListInitData, setWatchListInitData] = useState([])
 
-  const handleSymbolChange = (e) => {
-    setSelectedSymbols(e)
-  }
-
   const handleColumnsChange = () => {
     setIsOpenedEditColumnWidget(true)
   }
@@ -131,21 +156,24 @@ const WatchListItem = (props) => {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
-          'strategy': ''
+          'name': selectedWatchList.value
         })
       };
       let rows = []
-      await fetch(process.env.REACT_APP_BACKEND_URL + "/api/tables", requestOptions)
+      await fetch(process.env.REACT_APP_BACKEND_URL + "/scanner/watchlists/", requestOptions)
       .then(response => response.json())
       .then(async data => {
-        rows = data.tables
+        // console.log(data)
+        
+        rows = data.result
 
-        // const financials = await getMultiFinancials(rows, 'income_statement')
-        // console.log('setted financial ...................')
-        // setMultiFinancials(financials)
+        console.log('rows', rows)
 
-        setRowItems(data.tables)
-        setIsUpdatedRows(true)
+        const financials = await getMultiFinancials(rows, 'income_statement')
+        loadMultiFinancials(financials)
+        
+        // setRowItems(data.tables)
+        // setIsUpdatedRows(true)
         
         let realData = [];
         let symbols = [];
@@ -165,6 +193,7 @@ const WatchListItem = (props) => {
           })
           realData.push(object);
         })
+
         setSymbolOptions(symbols)
         setSelectedSymbols(symbols)
         setWatchListInitData(realData)
@@ -173,7 +202,6 @@ const WatchListItem = (props) => {
     }
     if (!isInited) {
       setIsLoading(1);
-      getIncome();
       loadRows();
     }
   }, [])
@@ -202,24 +230,39 @@ const WatchListItem = (props) => {
   }, [isUpdatedCols])
 
   const isValidChartData = (symbol) => {
-    if (!multiFinancials.length) {
+    if (!chartMultiData.length) {
       return false
     }
-    const filtered = multiFinancials.filter((financial) => { console.log('filtered???', financial[0], symbol); return financial[0] === symbol; })
-    return filtered.length ? true : false
+    const filtered = chartMultiData.filter((chartData) => { return chartData.symbol === symbol; })
+
+    return filtered[0].chartData.length ? true : false
+  }
+
+  const loadMultiFinancials = (financials) => {
+    if (!financials.length) {
+      return
+    }
+
+    financials.forEach((financial) => {
+      getIncomeFromFinancial(financial[1], financial[0])
+    })
+
   }
 
   const getChartDataBySymbol = (symbol, isChild) => {
-    if (!multiFinancials.length) {
+    if (!chartMultiData.length) {
       return []
     }
-    const filtered = multiFinancials.filter((financial) => { console.log('multiFinancials .................', financial[0], symbol);  return financial[0] === symbol })
+    
+    const filtered = chartMultiData.filter((chartData) => { return chartData.symbol === symbol })
     if (!filtered.length) {
       return []
     }
-    console.log('chartData?????', chartData)
-    console.log('filtered?????', filtered[0])
-    return filtered[0][1]
+    
+    if (isChild) {
+      return filtered[0].chartData[0]
+    }
+    return filtered[0].chartData
   }
 
   useEffect(() => {
@@ -236,12 +279,10 @@ const WatchListItem = (props) => {
             chart: 
               <div className="container custom-container chart-area hunter-scanner-page-chart-area">
                 <div className="row justify-content-center hunter-scanner-page-chart-area-wrap">
-                  {chartData && chartData.length ? (
+                  {isValidChartData(o.symbol) ? (
                     <BarChart
-                      // data={getChartDataBySymbol(o.symbol)}
-                      data={chartData[0]}
-                      // chartData={chartData}
-                      chartData={chartData}
+                      data={getChartDataBySymbol(o.symbol, true)}
+                      chartData={getChartDataBySymbol(o.symbol, false)}
                       globalAggregationType={selectedAggregationType}
                     />
                   ) : isLoading === 2 ? (
@@ -281,6 +322,7 @@ const WatchListItem = (props) => {
     })
     setIsUpdatedCols(!isUpdatedCols)
     setColumnItems(cols)
+    setSelectedColumns(columns)
   }
 
   const indicatorStyle = (key, item) => {
@@ -328,9 +370,12 @@ const WatchListItem = (props) => {
   const handleTimeFrameChange = (e) => {
     setTimeFrames(e)
   }
+  
+  const handleWatchListChange = (e) => {
+    setSelectedWatchList(e)
+  }
 
-  const getIncome = async (symbol) => {
-    const res = await getIncomeStatement('AAPL');
+  const getIncomeFromFinancial = async (financial, symbol) => {
     let revenus = {
       label: 'Revenue',
       group: 0,
@@ -367,8 +412,8 @@ const WatchListItem = (props) => {
       color: 'rgb(226, 71, 130)',
       dataPoints: [],
     };
-    if (res && res.results) {
-      res.results.map((item) => {
+    if (financial && financial.length) {
+      financial.forEach((item) => {
         revenus.dataPoints.push({
           calendarDate: item.calendarDate,
           period: item.period,
@@ -401,14 +446,20 @@ const WatchListItem = (props) => {
         });
       });
     }
-    setChartData([
-      sortDataPointsByDate(revenus),
-      sortDataPointsByDate(costOfRevenue),
-      sortDataPointsByDate(grossProfit),
-      sortDataPointsByDate(EBITDAMargin),
-      sortDataPointsByDate(NetIncome),
-      sortDataPointsByDate(earningsPerBasicShare),
-    ]);
+    const multiCharts = chartMultiData;
+    multiCharts.push({
+      symbol: symbol,
+      chartData: [
+        sortDataPointsByDate(revenus),
+        sortDataPointsByDate(costOfRevenue),
+        sortDataPointsByDate(grossProfit),
+        sortDataPointsByDate(EBITDAMargin),
+        sortDataPointsByDate(NetIncome),
+        sortDataPointsByDate(earningsPerBasicShare),
+      ]
+    })
+
+    setChartMultiData(multiCharts)
     setIsLoading(2);
   };
 
@@ -424,7 +475,6 @@ const WatchListItem = (props) => {
       
         socket.onmessage = (event) => {
           const msg = JSON.parse(event.data)
-          console.log('msg????', msg)
           setWatchListData(msg)
           setIsUpdatedWatchList(true)
         };
@@ -466,6 +516,7 @@ const WatchListItem = (props) => {
         <WatchListEditColumnWidget
           handleModalClose={handleModalClose}
           setColumns={handleColumnSet}
+          selectedColumns={selectedColumns}
         />
       </Modal>
       <div className="watch-list-item-wrap hunter-watch-list-item-wrap">
@@ -479,11 +530,20 @@ const WatchListItem = (props) => {
               options={timeFrameOptions}
             />
           </div>
-          <div className="select-multi-option hunter-multi-select-checkboxes mr-2">
+          {/* <div className="select-multi-option hunter-multi-select-checkboxes mr-2">
             <ReactMultiSelectCheckboxes
               options={symbolOptions}
               value={selectedSymbols}
               onChange={handleSymbolChange}
+            />
+          </div> */}
+          <div className="select-multi-option mr-1">
+            <Select
+              name="filters"
+              placeholder="Time Frame"
+              value={selectedWatchList}
+              onChange={handleWatchListChange}
+              options={selectedWatchListOptions}
             />
           </div>
           <Button
