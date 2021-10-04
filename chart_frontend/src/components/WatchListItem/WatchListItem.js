@@ -205,11 +205,9 @@ const WatchListItem = (props) => {
       }
       
     }
-    if (!isInited) {
-      setIsLoading(1);
-      loadRows();
-    }
-  }, [])
+    setIsLoading(1);
+    loadRows();
+  }, [selectedWatchList])
 
   useEffect(() => {
     const keys = Object.keys(columnItems)
@@ -398,6 +396,7 @@ const WatchListItem = (props) => {
   }
   
   const handleWatchListChange = (e) => {
+    setIsUpdatedWatchList(true)
     setSelectedWatchList(e)
   }
 
@@ -521,18 +520,6 @@ const WatchListItem = (props) => {
       }
     }
   }, [isLoading])
-
-  // useEffect(() => {
-  //   const content = {
-  //     'chart_number': '1',
-  //     'symbols': ['DOG', 'CAT', 'PIG'],
-  //     'fields': ['rsi', 'ris2', 'rsi3', 'heik', 'heik2']
-  //   }
-  //   if (isConnected) {
-  //     ws.send(JSON.stringify(content));
-  //     console.log('Filter options sent to BE')
-  //   }
-  // }, [isConnected])
 
   const sortDataPointsByDate = (data) => {
     let sortedData = { ...data };
