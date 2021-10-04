@@ -75,22 +75,22 @@ const WatchList = (props) => {
     return (
       <div className={`row ${calculateHeightStyle()}`}>
         <div className={`watch-list col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          <WatchListItem chart_number={1}/>
+          <WatchListItem chart_number={1} chartColumn={chartColumn.value}/>
         </div>
         <div className={`watch-list col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          <WatchListItem chart_number={2}/>
+          <WatchListItem chart_number={2} chartColumn={chartColumn.value}/>
         </div>
         <div className={`watch-list col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          <WatchListItem chart_number={3}/>
+          <WatchListItem chart_number={3} chartColumn={chartColumn.value}/>
         </div>
         <div className={`watch-list col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          <WatchListItem chart_number={4}/>
+          <WatchListItem chart_number={4} chartColumn={chartColumn.value}/>
         </div>
         <div className={`watch-list col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          <WatchListItem chart_number={5}/>
+          <WatchListItem chart_number={5} chartColumn={chartColumn.value}/>
         </div>
         <div className={`watch-list col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          <WatchListItem chart_number={6}/>
+          <WatchListItem chart_number={6} chartColumn={chartColumn.value}/>
         </div>
       </div>
     )
@@ -137,12 +137,6 @@ const WatchList = (props) => {
                   <p className="d-lg-none">Log out</p>
                 </DropdownToggle>
                 <DropdownMenu className="dropdown-navbar" right tag="ul">
-                  {/* <NavLink tag="li">
-                    <DropdownItem className="nav-item">Profile</DropdownItem>
-                  </NavLink>
-                  <NavLink tag="li">
-                    <DropdownItem className="nav-item">Settings</DropdownItem>
-                  </NavLink> */}
                   <DropdownItem divider tag="li" />
                   <NavLink tag="li">
                     <DropdownItem className="nav-item" onClick={() => {

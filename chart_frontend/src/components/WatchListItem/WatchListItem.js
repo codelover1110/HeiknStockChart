@@ -154,11 +154,33 @@ const WatchListItem = (props) => {
   useEffect(() => {
     const getScannerAvailableFields = async () => {
       const result = await getScannerViewData(props.chart_number)
+      if (result) {
+        let columns = result.fields;
+        if (columns) {
+          let cols = []
+          let temps = []
+          let colObjects = []
+          Object.keys(columns).forEach((key) => {
+            columns[key].children.forEach((col) => {
+              cols.push(col.label)
+              temps.push(col.label)
+            })
+
+            colObjects.push({
+              [columns[key].label]: temps
+            })
+            temps = []
+          })
+          setColumnItems(cols)
+          setSelectedColumns(columns)
+          setIsUpdatedCols(!isUpdatedCols)
+        }
+      }
     }
     
     getScannerAvailableFields()
 
-  }, [props.chart_number])
+  }, [])
 
   useEffect(() => {
     const loadRows = async () => {
@@ -211,7 +233,6 @@ const WatchListItem = (props) => {
       } catch (error) {
         console.log(error)
       }
-      
     }
     setIsLoading(1);
     loadRows();
@@ -245,7 +266,9 @@ const WatchListItem = (props) => {
       return false
     }
     const filtered = chartMultiData.filter((chartData) => { return chartData.symbol === symbol; })
-
+    if (!filtered.length) {
+      return false
+    }
     return filtered[0].chartData.length ? true : false
   }
 
@@ -541,7 +564,6 @@ const WatchListItem = (props) => {
             const msg = JSON.parse(event.data)
             setWatchListData(msg)
             setIsUpdatedWatchList(true)
-            console.log('msg ???', msg)
           } catch (error) {
             console.log(error)  
           }
@@ -625,9 +647,10 @@ const WatchListItem = (props) => {
           <Button
             size="sm"
             className=""
-            onClick={() => {
+            onClick={async () => {
               const symbols = selectedSymbols.map(symbol => symbol.value)
-              saveScannerView(props.chart_number, symbols, selectedColumns)
+              const result = await saveScannerView(props.chart_number, symbols, selectedColumns)
+              alert('Fields saved successfully!!!')
             }}
           >
             save default
@@ -638,6 +661,7 @@ const WatchListItem = (props) => {
             hover
             dark={true}
             maxHeight='100%'
+            height={`${(props.chartColumn === 1 || props.chartColumn === 2) ? '800px' : '100%'}`}
             noBottomColumns={true}
             striped={true}
             scrollX={true}

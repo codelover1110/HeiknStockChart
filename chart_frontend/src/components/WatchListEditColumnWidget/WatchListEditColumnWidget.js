@@ -80,29 +80,29 @@ const WatchListEditColumnWidget = (props) => {
         }
 
         // Ticker News
-        childNodes = [];
-        tickerNews.total.map((node, index) => {
-          childNodes.push({
-            label: node,
-            value: 'child_value_3_' + (index + 1),
-            default: tickerNews.defaults.includes(node) ? true : false,
-          });
-        });
+        // childNodes = [];
+        // tickerNews.total.map((node, index) => {
+        //   childNodes.push({
+        //     label: node,
+        //     value: 'child_value_3_' + (index + 1),
+        //     default: tickerNews.defaults.includes(node) ? true : false,
+        //   });
+        // });
 
-        if (childNodes.length > 0) {
-          nodes.push({
-            label: 'Ticker News',
-            value: 'parent_value_3',
-            children: childNodes,
-            default: true,
-          });
-        } else {
-          nodes.push({
-            label: 'Ticker News',
-            value: 'parent_value_3',
-            default: false,
-          });
-        }
+        // if (childNodes.length > 0) {
+        //   nodes.push({
+        //     label: 'Ticker News',
+        //     value: 'parent_value_3',
+        //     children: childNodes,
+        //     default: true,
+        //   });
+        // } else {
+        //   nodes.push({
+        //     label: 'Ticker News',
+        //     value: 'parent_value_3',
+        //     default: false,
+        //   });
+        // }
 
         // Ticker Details
         childNodes = [];
