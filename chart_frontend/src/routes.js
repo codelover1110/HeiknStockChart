@@ -40,7 +40,7 @@ export var routes = [
         id: 0,
         label: 'View',
         instance: "view",
-        pathname: '/'
+        pathname: '/optimization'
       }
     ],
   },

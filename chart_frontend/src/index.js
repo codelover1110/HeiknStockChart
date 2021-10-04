@@ -31,6 +31,7 @@ import Verify from 'layouts/User/Verify'
 import ForgotPassword from 'layouts/User/ForgotPassword'
 import PasswordResetConfirm from 'layouts/User/PasswordResetConfirm'
 import TradeScanner from 'layouts/User/TradeScanner'
+import Optimization from 'layouts/User/Optimization'
 
 ReactDOM.render(
   <ThemeContextWrapper>
@@ -57,6 +58,9 @@ ReactDOM.render(
             </PrivateRoute>
             <PrivateRoute path="/scanner">
               <TradeScanner />
+            </PrivateRoute>
+            <PrivateRoute path="/optimization">
+              <Optimization />
             </PrivateRoute>
             <PrivateRoute path="/pricedatatable">
               <PriceData />

@@ -560,12 +560,6 @@ const HeiknStockChart = (props) => {
                   <p className="d-lg-none">Log out</p>
                 </DropdownToggle>
                 <DropdownMenu className="dropdown-navbar" right tag="ul">
-                  {/* <NavLink tag="li">
-                    <DropdownItem className="nav-item">Profile</DropdownItem>
-                  </NavLink>
-                  <NavLink tag="li">
-                    <DropdownItem className="nav-item">Settings</DropdownItem>
-                  </NavLink> */}
                   <DropdownItem divider tag="li" />
                   <NavLink tag="li">
                     <DropdownItem className="nav-item" onClick={() => {
@@ -588,10 +582,6 @@ const HeiknStockChart = (props) => {
         </div>)
         : (<div className="graphs-container dark">
           {displayChart()}
-          {/* {(chartColumn.value === 1) && displayChart()}
-          {(chartColumn.value === 2) && displayChart()}
-          {(chartColumn.value === 4) && displayChart()}
-          {(chartColumn.value === 6) && displayChart()} */}
         </div>)
       }
     </div>

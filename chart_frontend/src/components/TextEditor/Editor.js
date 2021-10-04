@@ -207,68 +207,85 @@ export default class TextEditor extends Component {
       {
         label: 'ID',
         field: 'id',
+        wdith: 100,
+        attributes: {
+          'aria-controls': 'DataTable',
+          'aria-label': 'ID',
+        },
       },
       {
         label: 'BOT NAME',
         field: 'name',
+        width: 200,
       },
       {
         label: 'Time Frame',
         field: 'timeframe',
+        with: 200,
       },
       {
         label: 'Indicator',
         field: 'indicator',
+        with: 500,
       },
       {
         label: 'Watch List',
         field: 'watchlist',
-        sort: false,
+        with: 100,
       },
       {
         label: 'Position Sizing',
         field: 'position_sizing',
         sort: false,
+        with: 100,
       },
       {
         label: 'Order Routing',
         field: 'order_routing',
         sort: false,
+        with: 100,
       },
       {
         label: 'Data Source',
         field: 'data_source',
         sort: false,
+        with: 100,
       },
       {
         label: 'Live Trading',
         field: 'live_trading',
         sort: false,
+        with: 100,
       },
       {
         label: 'Starting Cash',
         field: 'starting_cash',
         sort: false,
+        with: 100,
       },
       {
         label: 'Hours',
         field: 'hours',
         sort: false,
+        with: 100,
       },
       {
         label: 'Macro Strategy',
         field: 'macro_strategy',
         sort: false,
+        with: 100,
       },
       {
         label: 'Indicator Signalling',
         field: 'indicator_signalling',
         sort: false,
+        with: 100,
       },
       {
         label: 'Asset Class',
         field: 'asset_class',
         sort: false,
+        with: 100,
       }
     ],
       botStatusDatatable: {
@@ -366,30 +383,45 @@ export default class TextEditor extends Component {
   
   loadBotConfigList = async () => {
     const res = await getBotConfigList();
-    const botConfigList = res.result.map((bot, index) => ({
-      id: index + 1,
-      bot_name: bot.bot_name,
-      timeframe: bot.timeframe,
-      indicator: bot.indicator,
-      watchlist: bot.watchlist,
-      position_sizing: bot.position_sizing,
-      order_routing: bot.order_routing,
-      data_source: bot.data_source,
-      live_trading: bot.live_trading,
-      starting_cash: bot.starting_cash,
-      hours: bot.hours,
-      name: bot.name,
-      macro_strategy: bot.macro_strategy,
-      indicator_signalling: bot.indicator_signalling,
-      asset_class: bot.asset_class,
-    }))
-    const data = {
-      columns: this.state.headerColumnsBotConfig,
-      rows: botConfigList
+    if (res.result) {
+      const botConfigList = res.result.map((bot, index) => ({
+        id: index + 1,
+        bot_name: bot.bot_name,
+        timeframe: bot.timeframe,
+        indicator: bot.indicator,
+        watchlist: bot.watchlist,
+        position_sizing: bot.position_sizing,
+        order_routing: bot.order_routing,
+        data_source: bot.data_source,
+        live_trading: bot.live_trading,
+        starting_cash: bot.starting_cash,
+        hours: bot.hours,
+        name: bot.name,
+        macro_strategy: bot.macro_strategy,
+        indicator_signalling: bot.indicator_signalling,
+        asset_class: bot.asset_class,
+      }))
+      const data = {
+        columns: this.state.headerColumnsBotConfig.map((col, index) => { 
+          if (index === 0) {
+            col.width = 50;
+          } else if (index === 1) {
+            col.width = 150;
+          } else if (index === 3) {
+            col.width = 300;
+          } else if ((index === 4) || (index === 5) || (index === 6) || (index === 7) || (index === 8) || (index === 9)) {
+            col.width = 150;
+          } else if ((index === 10) || (index === 11) || (index === 12) || (index === 13)) {
+            col.width = 200;
+          }
+          return col;
+        }),
+        rows: botConfigList
+      }
+      this.setState({
+        botConfigDatatable: data
+      })
     }
-    this.setState({
-      botConfigDatatable: data
-    })
   }
 
   loadModuleTypes = async () => {
@@ -796,8 +828,6 @@ export default class TextEditor extends Component {
               entries={10}
               pagesAmount={4}
               data={this.state.botStatusDatatable}
-              // searchTop searchBottom={false}
-              // bordered={true}
               dark={true}
               noBottomColumns={true}
               small={true}
@@ -813,14 +843,11 @@ export default class TextEditor extends Component {
                 entries={10}
                 pagesAmount={4}
                 data={this.state.botConfigDatatable}
-                // searchTop searchBottom={false}
-                // bordered={true}
-                dark={true}
                 noBottomColumns={true}
                 small={true}
                 sortable={false}
                 striped={true}
-                scrollY={true}
+                scrollX
               />;
             </Tab>
           </Tabs>

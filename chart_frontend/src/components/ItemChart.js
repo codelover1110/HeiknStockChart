@@ -126,26 +126,30 @@ const HeiknStockChartItem = (props) => {
 
     useEffect(() => {
       const get_tables = () => {
-        const requestOptions = {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({
-            'strategy': strategy.value
-          })
-        };
-        fetch(process.env.REACT_APP_BACKEND_URL + "/api/tables", requestOptions)
-          .then(response => response.json())
-          .then(data => {
-            let temp_data = []
-            data.tables.map((x) => {
-                temp_data.push({
-                    value: x,
-                    label: x
-                });
-                return null
+        try {
+          const requestOptions = {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+              'strategy': strategy.value
             })
-            setSymbolList(temp_data)
-          })
+          };
+          fetch(process.env.REACT_APP_BACKEND_URL + "/api/tables", requestOptions)
+            .then(response => response.json())
+            .then(data => {
+              let temp_data = []
+              data.tables.map((x) => {
+                  temp_data.push({
+                      value: x,
+                      label: x
+                  });
+                  return null
+              })
+              setSymbolList(temp_data)
+            })
+        } catch (error) {
+          console.log(error)  
+        }
       }
       
       if (!apiFlag) {
@@ -217,14 +221,6 @@ const HeiknStockChartItem = (props) => {
     const handleMicroStrategyChange = (e) => {
       setMicroStrategy(e);
     }
-
-    // const handleTradeStartDateChange = (e) => {
-    //   setTradeStartDate(e.target.value)
-    // }
-    
-    // const handleTradeEndDateChange = (e) => {
-    //   setTradeEndDate(e.target.value)
-    // }
 
     const selectDateRange = (startDate, endDate) => {
       setTradeStartDate(startDate)

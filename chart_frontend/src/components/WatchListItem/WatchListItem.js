@@ -7,7 +7,7 @@ import WatchListEditColumnWidget from 'components/WatchListEditColumnWidget/Watc
 import './WatchListItem.css'
 import Select from 'react-select'
 import {
-  getMultiFinancials, saveScannerView
+  getMultiFinancials, getScannerViewData, saveScannerView
 } from 'api/Api';
 
 const WatchListItem = (props) => {
@@ -152,6 +152,15 @@ const WatchListItem = (props) => {
   }
 
   useEffect(() => {
+    const getScannerAvailableFields = async () => {
+      const result = await getScannerViewData(props.chart_number)
+    }
+    
+    getScannerAvailableFields()
+
+  }, [props.chart_number])
+
+  useEffect(() => {
     const loadRows = async () => {
       const requestOptions = {
         method: 'POST',
@@ -166,7 +175,6 @@ const WatchListItem = (props) => {
         await fetch(process.env.REACT_APP_BACKEND_URL + "/scanner/watchlists/", requestOptions)
         .then(response => response.json())
         .then(async data => {
-          // console.log(data)
           
           rows = data.result
 
@@ -465,8 +473,6 @@ const WatchListItem = (props) => {
       dataPoints: [],
     };
     
-    // console.log('financial???????????????????????????????????????', financial)
-
     if (financial && financial.length) {
       financial.forEach((item) => {
         revenus.dataPoints.push({
@@ -621,7 +627,7 @@ const WatchListItem = (props) => {
             className=""
             onClick={() => {
               const symbols = selectedSymbols.map(symbol => symbol.value)
-              saveScannerView(props.chart_number, symbols, columnItems)
+              saveScannerView(props.chart_number, symbols, selectedColumns)
             }}
           >
             save default
