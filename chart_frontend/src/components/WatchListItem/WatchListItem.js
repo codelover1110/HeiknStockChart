@@ -11,6 +11,7 @@ import {
 } from 'api/Api';
 
 const WatchListItem = (props) => {
+  const [isConnected, setIsConnected] = useState(false)
   const [selectedColumns, setSelectedColumns] = useState(
     [
       {
@@ -160,43 +161,49 @@ const WatchListItem = (props) => {
         })
       };
       let rows = []
-      await fetch(process.env.REACT_APP_BACKEND_URL + "/scanner/watchlists/", requestOptions)
-      .then(response => response.json())
-      .then(async data => {
-        // console.log(data)
-        
-        rows = data.result
 
-        const financials = await getMultiFinancials(rows, 'income_statement')
-        loadMultiFinancials(financials)
+      try {
+        await fetch(process.env.REACT_APP_BACKEND_URL + "/scanner/watchlists/", requestOptions)
+        .then(response => response.json())
+        .then(async data => {
+          // console.log(data)
+          
+          rows = data.result
 
-        // setRowItems(data.tables)
-        // setIsUpdatedRows(true)
-        
-        let realData = [];
-        let symbols = [];
-        rows.forEach((row) => {
-          const object = {}
-          columns.forEach((col) => {
-            if (col.value === 'chart') {
-              object[col.value] = 'fetching ...'
-            } else {
-              object[col.value] = '0.00'
-            }
+          const financials = await getMultiFinancials(rows, 'income_statement')
+          loadMultiFinancials(financials)
+
+          // setRowItems(data.tables)
+          // setIsUpdatedRows(true)
+          
+          let realData = [];
+          let symbols = [];
+          rows.forEach((row) => {
+            const object = {}
+            columns.forEach((col) => {
+              if (col.value === 'chart') {
+                object[col.value] = 'fetching ...'
+              } else {
+                object[col.value] = '0.00'
+              }
+            })
+            object.symbol = row
+            symbols.push({
+              value: row,
+              label: row,
+            })
+            realData.push(object);
           })
-          object.symbol = row
-          symbols.push({
-            value: row,
-            label: row,
-          })
-          realData.push(object);
-        })
 
-        setSymbolOptions(symbols)
-        setSelectedSymbols(symbols)
-        setWatchListInitData(realData)
-        setIsInited(true);  
-      })
+          setSymbolOptions(symbols)
+          setSelectedSymbols(symbols)
+          setWatchListInitData(realData)
+          setIsInited(true);  
+        })  
+      } catch (error) {
+        console.log(error)
+      }
+      
     }
     if (!isInited) {
       setIsLoading(1);
@@ -259,7 +266,6 @@ const WatchListItem = (props) => {
     if (isChild) {
       return filtered[0].chartData[0]
     }
-    console.log('chartMultiData???????????????????', filtered[0].chartData)
     return filtered[0].chartData
   }
 
@@ -313,14 +319,36 @@ const WatchListItem = (props) => {
 
   const handleColumnSet = (columns) => {
     let cols = []
+    let temps = []
+    let colObjects = []
     Object.keys(columns).forEach((key) => {
       columns[key].children.forEach((col) => {
         cols.push(col.label)
+        temps.push(col.label)
       })
+
+      colObjects.push({
+        [columns[key].label]: temps
+      })
+      temps = []
     })
     setIsUpdatedCols(!isUpdatedCols)
     setColumnItems(cols)
     setSelectedColumns(columns)
+    
+    if (isConnected) {
+      const symbols = selectedSymbols.map( (o) => o.value )
+      
+      const content = {
+        action: 'change_fields',
+        chart_number: props.chart_number,
+        symbols,
+        fields: colObjects,
+      }
+
+      ws.send(JSON.stringify(content));
+      console.log('Filter options sent to BE', content)
+    }
   }
 
   const indicatorStyle = (key, item) => {
@@ -411,7 +439,7 @@ const WatchListItem = (props) => {
       dataPoints: [],
     };
     
-    console.log('financial???????????????????????????????????????', financial)
+    // console.log('financial???????????????????????????????????????', financial)
 
     if (financial && financial.length) {
       financial.forEach((item) => {
@@ -472,22 +500,39 @@ const WatchListItem = (props) => {
         setWs(socket)
         
         socket.onopen = () => {
+          setIsConnected(true);
           console.log('Opened Connection!')
         };
       
         socket.onmessage = (event) => {
-          const msg = JSON.parse(event.data)
-          setWatchListData(msg)
-          setIsUpdatedWatchList(true)
+          try {
+            const msg = JSON.parse(event.data)
+            setWatchListData(msg)
+            setIsUpdatedWatchList(true)
+          } catch (error) {
+            console.log(error)  
+          }
         };
-      
+        
         socket.onclose = () => {
           console.log('Closed Connection!')
         };
-  
+
       }
     }
   }, [isLoading])
+
+  // useEffect(() => {
+  //   const content = {
+  //     'chart_number': '1',
+  //     'symbols': ['DOG', 'CAT', 'PIG'],
+  //     'fields': ['rsi', 'ris2', 'rsi3', 'heik', 'heik2']
+  //   }
+  //   if (isConnected) {
+  //     ws.send(JSON.stringify(content));
+  //     console.log('Filter options sent to BE')
+  //   }
+  // }, [isConnected])
 
   const sortDataPointsByDate = (data) => {
     let sortedData = { ...data };
@@ -588,7 +633,7 @@ const WatchListItem = (props) => {
                         key={`${item.symbol}-${column.value}`}
                         className={`hunter-financial-table-column ${column.value === 'chart' ? 'table-chart-column' : ''} ${indicatorStyle(column.value, item)}`}
                       >
-                        {column.value !== 'symbol' && column.value !== 'chart' ? parseFloat(item[column.value]).toFixed(2) : item[column.value]}
+                        {column.value !== 'symbol' && column.value !== 'chart' ? (item[column.value] ? parseFloat(item[column.value]).toFixed(2): '') : item[column.value]}
                       </td>
                     )
                   )}
