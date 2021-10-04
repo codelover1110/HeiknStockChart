@@ -408,7 +408,7 @@ class Widget extends React.Component {
     currentNodes.forEach((current) => {
       if (current.value === key) {
         current.children.forEach((child) => {
-          console.log('item, currentNodes????', child, item)
+          // console.log('item, currentNodes????', child, item)
           if (child.value === item.value) {
             isExist = true
             return
@@ -474,7 +474,7 @@ class Widget extends React.Component {
       //   availableNodes.push(pushItem);
       // }
     });
-    console.log('availableNodes?????????????????????????????????', availableNodes)
+    // console.log('availableNodes?????????????????????????????????', availableNodes)
     this.setState({
       nodesAvailableItem: availableNodes,
       nodesFilteredAvailableItem: availableNodes,
