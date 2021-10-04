@@ -310,10 +310,37 @@ const WatchListItem = (props) => {
   }, [isUpdatedWatchList])
 
   useEffect(() => {
-    if (ws) {
-      // ws.send("set_time_frame", '1d, 3d')
-    }
-  }, [timeFrames])
+    
+    let cols = []
+    let temps = []
+    let colObjects = []
+
+    Object.keys(selectedColumns).forEach((key) => {
+      selectedColumns[key].children.forEach((col) => {
+        cols.push(col.label)
+        temps.push(col.label)
+      })
+
+      colObjects.push({
+        [selectedColumns[key].label]: temps
+      })
+      temps = []
+    })
+    
+    if (isConnected) {
+      const symbols = selectedSymbols.map( (o) => o.value )
+      
+      const content = {
+        action: 'create_fields',
+        chart_number: props.chart_number,
+        symbols,
+        fields: colObjects,
+      }
+
+      ws.send(JSON.stringify(content));
+      console.log('First Connection options sent to BE', content)
+    }  
+  }, [isConnected])
 
   const handleColumnSet = (columns) => {
     let cols = []
@@ -508,6 +535,7 @@ const WatchListItem = (props) => {
             const msg = JSON.parse(event.data)
             setWatchListData(msg)
             setIsUpdatedWatchList(true)
+            console.log('msg ???', msg)
           } catch (error) {
             console.log(error)  
           }
@@ -542,6 +570,14 @@ const WatchListItem = (props) => {
   const isSelectedSymbol = (symbol) => {
     const filtered = selectedSymbols.filter(o => o.value === symbol)
     return filtered.length ? true : false
+  }
+
+  const isValidNUmber = (number) => {
+    if (isNaN(parseFloat(number))) {
+      return false
+    }
+
+    return true
   }
 
   return (
@@ -620,7 +656,7 @@ const WatchListItem = (props) => {
                         key={`${item.symbol}-${column.value}`}
                         className={`hunter-financial-table-column ${column.value === 'chart' ? 'table-chart-column' : ''} ${indicatorStyle(column.value, item)}`}
                       >
-                        {column.value !== 'symbol' && column.value !== 'chart' ? (item[column.value] ? parseFloat(item[column.value]).toFixed(2): '') : item[column.value]}
+                        {isValidNUmber(item[column.value]) ? (item[column.value] || item[column.value] === '' ? parseFloat(item[column.value]).toFixed(2): '') : item[column.value]}
                       </td>
                     )
                   )}

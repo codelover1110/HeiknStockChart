@@ -240,8 +240,8 @@ const convertArraytoString = (src) => {
 }
 
 const convertStringtoArray = (src) => {
-  if (!src.length) {
-    return []
+  if (!src || !src.length) {
+    return null
   }
 
   const dest = src.split(',')
