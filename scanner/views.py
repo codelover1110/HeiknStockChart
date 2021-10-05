@@ -138,3 +138,17 @@ def view_values(request):
         except:
             return JsonResponse({"success": False, "message": "Failed to get scanner view values!"}, safe=True)
     return BAD_REQUEST()
+
+@csrf_exempt
+def ticker_details_list(request):
+    print (" ++++++ API: scanner/ticker_details_list ++++++")
+    if request.method == 'POST':
+        req = JSONParser().parse(request)
+        name = req['name']
+
+        try:
+            tickerlist = scanner.get_ticker_details_list(name)
+            return JsonResponse({"success": True, "result": tickerlist}, safe=True)
+        except:
+            return JsonResponse({"success": False, "message": "Failed to get watchlists!"}, safe=True)
+    return BAD_REQUEST()
