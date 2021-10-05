@@ -292,10 +292,17 @@ const WatchListItem = (props) => {
       return []
     }
     
+    let slicedChartData = filtered[0].chartData.map((chart) => {
+      chart.dataPoints.splice(0, chart.dataPoints.length - 50)//should update whenever
+      return chart
+    })
+
     if (isChild) {
-      return filtered[0].chartData[0]
+      return slicedChartData[0]
     }
-    return filtered[0].chartData
+
+
+    return slicedChartData
   }
 
   useEffect(() => {

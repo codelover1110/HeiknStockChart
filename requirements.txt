@@ -4,3 +4,8 @@ django-cors-headers
 asyncpg
 django-crispy-forms
 twilio
+websockets
+pandas
+djangorestframework
+ib_insync
+pandas-ta

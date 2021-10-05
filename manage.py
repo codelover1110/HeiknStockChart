@@ -9,9 +9,6 @@ from scanner.scanner.collector import PolygonManager
 def main():
     """Run administrative tasks."""
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backtestingApp.settings')
-    # p_manager = PolygonManager(5)
-    # p_manager.start()
-    # db_stream()
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
