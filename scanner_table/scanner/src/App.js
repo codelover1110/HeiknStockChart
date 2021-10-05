@@ -3,22 +3,45 @@ import ReactTable from 'react-table'
 import { makePropGetter } from 'react-table';
 import 'react-table/react-table.css'
 
+import io from "socket.io-client";
+
+
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      currentData: []
+      currentData: [],
+      isStarted: false,
     };
-    this.ws = new WebSocket("ws://127.0.0.1:8888/");
+    /// 20.157.7.76,  20.84.64.243
+    this.ws = new WebSocket("ws://20.157.7.76:9999/");
   }
 
+  // componentDidMount() {
+  //   if (!this.state.isStarted) {
+  //     const socket = io.connect('http://localhost:8000');
+  //     this.setState(socket)
+  //     if (socket) {
+  //       socket.emit('start_streaming', "run start");  
+  //     }
+  //     this.setState( {
+  //       isStarted: true,
+  //     })
+  //   }
+  // }
+
   render() {
-    this.ws.onopen = () => {
-      console.log('Opened Connection!')
-    };
+    // console.log("sending message", this.socket)
+    // this.socket.on('setFilters',  (args) => {console.log("filtered data received !!!!!", args)});
+    
+   
+    //  this.ws.onopen = () => {
+     //   console.log('Opened Connection!')
+    //   };
 
     this.ws.onmessage = (event) => {
       const msg = JSON.parse(event.data)
+      console.log('-------------------', msg)
       // const tdata = array()
       let tempCon = []
       msg.map(data => {

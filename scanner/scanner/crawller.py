@@ -8,6 +8,10 @@ import io
 import threading
 import random
 
+from scanner.models import (
+    update_symbol_candle
+)
+
 try:
    import queue
 except ImportError:
@@ -33,7 +37,7 @@ intervals = [
 ]
 
 class PolygonCrawller(object):
-    def __init__(self, symbols, interval, data_queue):
+    def __init__(self, symbols, interval, data_queue, db_update=False):
 
         self.symbols = symbols
         self.interval = interval
@@ -41,15 +45,16 @@ class PolygonCrawller(object):
         self.working = False
         self._stop = False
         self.data_queue = data_queue
+        self.db_update = db_update
 
 
         self.thread_start_time = None         
-        self.min_1_thread = threading.Thread(target=self.thread_func)
+        self.candle_thread = threading.Thread(target=self.thread_func)
 
     def start(self):
         self.thread_start_time = time.time()
-        if not self.min_1_thread.is_alive():
-            self.min_1_thread.start()
+        if not self.candle_thread.is_alive():
+            self.candle_thread.start()
 
     def stop(self):
         self._stop = True
@@ -64,7 +69,7 @@ class PolygonCrawller(object):
         self.working = True
 
     def __del__(self):
-        self.min_1_thread.join()
+        self.candle_thread.join()
         print ("deleted")
 
 
@@ -78,8 +83,9 @@ class PolygonCrawller(object):
             datasets = requests.get(polygon_url).json()
             api_candles = datasets['results'] if 'results' in datasets else []
             if len(api_candles) > 0:
-                last_idx = random.randint(0, len(api_candles)-1)
-                last_candle = api_candles[last_idx]
+                # last_idx = random.randint(0, len(api_candles)-1)
+                # last_candle = api_candles[last_idx]
+                last_candle = api_candles[-1]
                 last_candle['date'] = str(datetime.fromtimestamp((last_candle['t']/1000)))
                 del last_candle['t']
                 if 'op' in last_candle.keys():
@@ -101,16 +107,21 @@ class PolygonCrawller(object):
                 continue
             for sym_idx, symbol in enumerate(self.symbols):
                 new_candles = self.get_new_candle(symbol, self.interval[0], self.interval[1])
-
+                
                 if len(new_candles) > 0:
                     item = dict()
                     item['symbol'] = symbol
                     item['data'] = new_candles[0]
-                    self.data_queue.put(item)
-                    print ('interval: {}, put symbol: {} - {}'.format(self.interval[0] + " " + self.interval[1], symbol, sym_idx))
+                    if not self.db_update:
+                        self.data_queue.put(item)
+                        if self.data_queue.qsize() > 100:
+                            get_item = self.data_queue.get()
+                    else:
+                        update_symbol_candle(symbol, new_candles[0])
+                    # print ('interval: {}, put symbol: {} - {}'.format(self.interval[0] + " " + self.interval[1], symbol, sym_idx))
                 time.sleep(0.01)
 
             self.working = False
 
-            time.sleep(1)
+            time.sleep(60)
 

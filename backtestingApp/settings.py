@@ -29,9 +29,11 @@ ALLOWED_HOSTS = ['*']
 
 CSRF_COOKIE_SECURE = True
 CORS_ORIGIN_WHITELIST = (
+    'http://localhost:3000',
     'http://localhost:8081',
     'http://localhost:8080',
     'http://127.0.0.1:8081',
+    'http://127.0.0.1:3000',
     'http://127.0.0.1:80',
     'https://caats.ngrok.io',
     'http://localhost:8000',
@@ -54,6 +56,7 @@ INSTALLED_APPS = [
     'chartApis.apps.ChartapisConfig',
     'corsheaders',
     'codes',
+    'websocket',
     'users',
     'strategy',
     'news',
@@ -96,7 +99,9 @@ TEMPLATES = [
     },
 ]
 
+# WSGI_APPLICATION = 'backtestingApp.wsgi.app'
 WSGI_APPLICATION = 'backtestingApp.wsgi.application'
+
 
 
 # Database
