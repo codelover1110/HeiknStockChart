@@ -290,9 +290,10 @@ class Widget extends React.Component {
     const currentItems = cloneDeep(this.state.currentNodes);
     const totalNodes = cloneDeep(this.props.totalNodes);
 
+    
     let availableNodes = [];
     let newCurrentNodes = [];
-
+    
     if (checkedItems) {
       checkedItems.map((value) => {
         currentItems.map((availableItem) => {
@@ -304,9 +305,14 @@ class Widget extends React.Component {
                   currentChildItems.push(childItem);
                 }
               })
-    
+              
               if (currentChildItems.length > 0) {
-                newCurrentNodes.push({ ...availableItem, children: currentChildItems });
+                let filteredNode = newCurrentNodes.filter(node => node.value === availableItem.value)
+                if (filteredNode.length) {
+                  filteredNode[0].children.push( ...currentChildItems );
+                } else {
+                  newCurrentNodes.push({ ...availableItem, children: currentChildItems });
+                }
               }
             }
           } else {
@@ -316,16 +322,18 @@ class Widget extends React.Component {
           }
         })
       });
-  
+      
       // merge the new current nodes into original current nodes
-  
+
       const originCurrentNodes = cloneDeep(this.state.nodesAvailableItem);
       let totalNewCurrentNodes = [];
       newCurrentNodes.map((newCurrentNode) => {
         let exist = false;
+        let currentChildItems
         originCurrentNodes.map((currentNode) => {
+          
           if (currentNode.value === newCurrentNode.value) {
-            let currentChildItems = currentNode.children;
+            currentChildItems = currentNode.children;
             newCurrentNode.children.map((newChildItem) => {
               currentChildItems.push(newChildItem);
             });
@@ -347,7 +355,7 @@ class Widget extends React.Component {
           }
         }
       })
-  
+
       let totalCurrentNodes = totalNewCurrentNodes;
       originCurrentNodes.map((originNode) => {
         let exist = false;
@@ -725,7 +733,7 @@ class Widget extends React.Component {
                 </div>
               </div>
             </div>
-            <div class="right-box-footer">
+            <div className="right-box-footer">
               <div className="modal-btn btn-exchange" onClick={this.onRemoveItems}>
                 <span>{"<< Remove Item(s)"}</span>
               </div>
