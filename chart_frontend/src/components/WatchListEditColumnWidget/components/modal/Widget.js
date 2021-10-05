@@ -137,7 +137,6 @@ class Widget extends React.Component {
           }
         })
       }
-
     }
     
     this.setState({
@@ -416,7 +415,6 @@ class Widget extends React.Component {
     currentNodes.forEach((current) => {
       if (current.value === key) {
         current.children.forEach((child) => {
-          // console.log('item, currentNodes????', child, item)
           if (child.value === item.value) {
             isExist = true
             return
@@ -451,38 +449,7 @@ class Widget extends React.Component {
           }
         }
       }
-      
-      // if (pushItem.default) {
-      //   if ("children" in pushItem) {
-      //     if (pushItem.children.length > 0) {
-      //       let currentChildItems = [];
-      //       let availableChildItems = [];
-      //       pushItem.children.map((childItem) => {
-      //         if (childItem.default) {
-      //           currentChildItems.push(childItem);
-      //         } else {
-      //           availableChildItems.push(childItem);
-      //         }
-      //       });
-
-      //       if (currentChildItems.length > 0) {
-      //         defaultNodes.push({...pushItem, children: currentChildItems});
-      //       }
-
-      //       if (availableChildItems.length > 0) {
-      //         availableNodes.push({...pushItem, children: availableChildItems});
-      //       }
-      //     } else {
-      //       defaultNodes.push(pushItem);
-      //     }
-      //   } else {
-      //     defaultNodes.push(pushItem);
-      //   }
-      // } else {
-      //   availableNodes.push(pushItem);
-      // }
     });
-    // console.log('availableNodes?????????????????????????????????', availableNodes)
     this.setState({
       nodesAvailableItem: availableNodes,
       nodesFilteredAvailableItem: availableNodes,
