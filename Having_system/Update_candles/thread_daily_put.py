@@ -15,8 +15,8 @@ except ImportError:
 
 API_KEY = 'tuQt2ur25Y7hTdGYdqI2VrE4dueVA8Xk'
 # mongoclient = pymongo.MongoClient('mongodb://aliaksandr:BD20fc854X0LIfSv@cluster0-shard-00-00.35i8i.mongodb.net:27017,cluster0-shard-00-01.35i8i.mongodb.net:27017,cluster0-shard-00-02.35i8i.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-aoj781-shard-0&authSource=admin&retryWrites=true&w=majority')
-mongoclient = pymongo.MongoClient('mongodb://user:-Hz2f$!YBXbDcKG@cluster0-shard-00-00.vcom7.mongodb.net:27017,cluster0-shard-00-01.vcom7.mongodb.net:27017,cluster0-shard-00-02.vcom7.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-7w6acj-shard-0&authSource=admin&retryWrites=true&w=majority')
-# mongoclient = pymongo.MongoClient('mongodb://root:%2123QweAsd@20.84.64.243:27017')
+# mongoclient = pymongo.MongoClient('mongodb://user:-Hz2f$!YBXbDcKG@cluster0-shard-00-00.vcom7.mongodb.net:27017,cluster0-shard-00-01.vcom7.mongodb.net:27017,cluster0-shard-00-02.vcom7.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-7w6acj-shard-0&authSource=admin&retryWrites=true&w=majority')
+mongoclient = pymongo.MongoClient('mongodb://root:rootUser2021@20.84.64.243:27019')
 
 def get_symbols():
     url="https://pkgstore.datahub.io/core/nasdaq-listings/nasdaq-listed_csv/data/7665719fb51081ba0bd834fde71ce822/nasdaq-listed_csv.csv"
@@ -108,7 +108,7 @@ class DailyPutThread(object):
                 return default_date
         else:
             symbol_last_date = dict()
-            if False:
+            if True:
                 symbol_last_date['symbol'] = symbol
                 symbol_last_date['1_minute'] = default_date
                 symbol_last_date['2_minute'] = default_date
@@ -221,7 +221,7 @@ if __name__ == "__main__":
     thread_list = []
 
     # symbols = get_symbols()
-    symbols = ["GOOG", "ATVI", "AMD", "MSFT", "AMZN", "NVDA", "TSLA", "AAPL", ""]
+    symbols = ["GOOG", "ATVI", "AMD", "MSFT", "AMZN", "NVDA", "TSLA", "AAPL", "ADBE", ""]
     symbol_count = len(symbols)
     print ("symbols: ", symbol_count)
 
@@ -268,6 +268,7 @@ if __name__ == "__main__":
                 proc_time += 5
         time.sleep(10)
 
+    time.sleep(10)
     for thrd in thread_list:
         thrd.stop()
 

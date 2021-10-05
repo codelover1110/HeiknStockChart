@@ -1,4 +1,6 @@
 import sys
+
+# from numpy.lib import financial
 sys.path.append("..")
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -58,17 +60,81 @@ def available_items(request):
     except:
         return JsonResponse({"success": False, "message": "Failed to get available items for scanner!"}, safe=True)
 
+@csrf_exempt
+def multi_financials(request):
+    print (" ++++++ API: scanner/multi_financials ++++++")
+    if request.method == 'POST':
+        req = JSONParser().parse(request)
+        symbols = req['symbols']
+        financial_part = req['financial_part']
 
-# @csrf_exempt
-# def available_items(request):
-#     print (" ++++++ API: scanner/available_items ++++++")
-#     if request.method == 'POST':
-#         req = JSONParser().parse(request)
-#         symbol = req['symbol']
+        try:
+            multi_symbol_fynancials = scanner.get_multi_financials(symbols, financial_part)
+            return JsonResponse({"success": True, "results": multi_symbol_fynancials}, safe=True)
+        except:
+            return JsonResponse({"success": False, "message": "Failed to get multi symbol fynancials!"}, safe=True)
+    return BAD_REQUEST()
 
-#         try:
-#             financial_total_data = scanner.get_available_items(symbol)
-#             return JsonResponse({"success": True, "results": financial_total_data}, safe=True)
-#         except:
-#             return JsonResponse({"success": False, "message": "Failed to get financial total data!"}, safe=True)
-#     return BAD_REQUEST()
+@csrf_exempt
+def save_scanner_views(request):
+    print (" ++++++ API: scanner/save_scanner_views ++++++")
+    if request.method == 'POST':
+        req = JSONParser().parse(request)
+        # chart_number = req['chart_number']
+        # symbols = req['symbols']
+        # fields = req['fields']
+
+        try:
+            # scanner.save_scanner_views(chart_number, symbols, fields)
+            scanner.save_scanner_views1(req)
+            return JsonResponse({"success": True, "message": "Scanner view saved!"}, safe=True)
+        except:
+            return JsonResponse({"success": False, "message": "Failed to save scanner view!"}, safe=True)
+    return BAD_REQUEST()
+
+@csrf_exempt
+def scanner_views(request):
+    print (" ++++++ API: /scanner/scanner_views ++++++")
+    if request.method == 'POST':
+        req = JSONParser().parse(request)
+        chart_number = req['chart_number']
+
+        try:
+            scanner_views = scanner.get_scanner_views(chart_number)
+            return JsonResponse({"success": True, "result": scanner_views}, safe=True)
+        except:
+            return JsonResponse({"success": False, "message": "Failed to get scanner views!"}, safe=True)
+
+@csrf_exempt
+def watchlists(request):
+    print (" ++++++ API: scanner/watchlists ++++++")
+    if request.method == 'POST':
+        req = JSONParser().parse(request)
+        name = req['name']
+
+        try:
+            watchlists = scanner.get_watchlist(name)
+            return JsonResponse({"success": True, "result": watchlists}, safe=True)
+        except:
+            return JsonResponse({"success": False, "message": "Failed to get watchlists!"}, safe=True)
+    return BAD_REQUEST()
+
+@csrf_exempt
+def view_values(request):
+    print (" ++++++ API: scanner/view_values ++++++")
+    if request.method == 'POST':
+        req = JSONParser().parse(request)
+        symbol = req['symbol']
+        financial_fields = req['financial_fields']
+        detail_fields = req['detail_fields']
+
+        try:
+            financial_values = scanner.get_financial_fields_values(symbol, financial_fields)
+            detail_values = scanner.get_indicators_fields(symbol, detail_fields)
+            result = dict()
+            result['financial_values'] = financial_values
+            result['detail_vaules'] = detail_values
+            return JsonResponse({"success": True, "result": result}, safe=True)
+        except:
+            return JsonResponse({"success": False, "message": "Failed to get scanner view values!"}, safe=True)
+    return BAD_REQUEST()
