@@ -58,10 +58,10 @@ export var routes = [
     ],
   },
   {
-    name: "Scanner",
+    name: "Macket Watch",
     icon: "tim-icons icon-camera-18",
-    instance: "scanner",
-    pathname: '/scanner'
+    instance: "macket_watch",
+    pathname: '/macket_watch'
   },
   {
     name: "Data Tables",
@@ -93,6 +93,12 @@ export var routes = [
     icon: "tim-icons icon-coins",
     instance: "financial_data",
     pathname: '/financial_data'
+  },
+  {
+    name: "Scanner",
+    icon: "tim-icons icon-controller",
+    instance: "scanner",
+    pathname: '/scanner'
   },
 ]
 

@@ -43,6 +43,7 @@ function LinkManage() {
     { value: 'stress_test', label: 'Stress Test' },
     { value: 'optimization', label: 'Optimization' },
     { value: 'live_trading', label: 'Live Trade' },
+    { value: 'macket_watch', label: 'Macket Watch' },
     { value: 'scanner', label: 'Scanner' },
     { value: 'trade_data', label: 'Trade Data' },
     { value: 'hybrid_view', label: 'Hybrid View' },

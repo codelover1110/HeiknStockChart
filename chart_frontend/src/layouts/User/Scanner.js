@@ -4,13 +4,13 @@ import {
 } from "reactstrap";
 
 import Sidebar from "components/Sidebar/Sidebar.js";
-import WatchList from "components/WatchList"
+import ScannerComponent from 'components/Scanner/ScannerComponent.js'
 
 import { routes } from "routes.js";
 
 import { BackgroundColorContext } from "contexts/BackgroundColorContext";
 
-function TradeScanner() {
+function Scanner() {
   const [isShowSidebar, setShowSidebar] = React.useState(false);
   const [selectedInstance, setSelectedInstance] = React.useState('scanner');
   
@@ -27,25 +27,26 @@ function TradeScanner() {
       {({ color }) => (
         <React.Fragment>
           <div className="wrapper hunter-wrapper">
-          {!isShowSidebar && (
-            <Button
-              className ={"show-sidebar-toggle-area show-sidebar-icon"}
-              onClick={handleSidebarChange}
-            >
-              <i className="tim-icons icon-align-left-2"/>
-            </Button>
-          )}
-          {isShowSidebar && (
+            {!isShowSidebar && (
+              <Button
+                className ={"show-sidebar-toggle-area show-sidebar-icon"}
+                onClick={handleSidebarChange}
+              >
+                <i className="tim-icons icon-align-left-2"/>
+              </Button>
+            )}
+            {isShowSidebar && (
               <Sidebar
                 isAdminPage={false}
                 routes={routes}
+                subInstance={'tradedatatable'}
                 selectedInstance={selectedInstance}
                 handleSidebarChange={handleSidebarChange}
                 handleInstanceChange={handleInstanceChange}
               />
             )}
-            <div className="col-sm-12 hunter-watch-list-area">
-                <WatchList />
+            <div className="col-sm-12">
+                <ScannerComponent />
             </div>
           </div>
         </React.Fragment>
@@ -54,4 +55,4 @@ function TradeScanner() {
   );
 }
 
-export default TradeScanner;
+export default Scanner;
