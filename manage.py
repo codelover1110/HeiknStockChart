@@ -2,7 +2,9 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
-from scanner.collector import start_streaming
+from scanner.scanner.collector import start_stream as api_stream
+from scanner.scanner.db_collector import start_stream as db_stream
+from scanner.scanner.collector import PolygonManager
 
 def main():
     """Run administrative tasks."""
