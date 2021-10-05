@@ -4,11 +4,13 @@ import {
 } from "reactstrap";
 
 import Sidebar from "components/Sidebar/Sidebar.js";
-import OptimizationChartPage from "components/optimization-chart/OptimizationChartPage"
+import WatchList from "components/WatchList"
+
 import { routes } from "routes.js";
+
 import { BackgroundColorContext } from "contexts/BackgroundColorContext";
 
-function Optimization() {
+function MacketWatch() {
   const [isShowSidebar, setShowSidebar] = React.useState(false);
   const [selectedInstance, setSelectedInstance] = React.useState('macket_watch');
   
@@ -34,16 +36,16 @@ function Optimization() {
             </Button>
           )}
           {isShowSidebar && (
-            <Sidebar
-              isAdminPage={false}
-              routes={routes}
-              selectedInstance={selectedInstance}
-              handleSidebarChange={handleSidebarChange}
-              handleInstanceChange={handleInstanceChange}
-            />
+              <Sidebar
+                isAdminPage={false}
+                routes={routes}
+                selectedInstance={selectedInstance}
+                handleSidebarChange={handleSidebarChange}
+                handleInstanceChange={handleInstanceChange}
+              />
             )}
             <div className="col-sm-12 hunter-watch-list-area">
-              <OptimizationChartPage />
+                <WatchList />
             </div>
           </div>
         </React.Fragment>
@@ -52,4 +54,4 @@ function Optimization() {
   );
 }
 
-export default Optimization;
+export default MacketWatch;
