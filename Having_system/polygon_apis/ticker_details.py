@@ -30,7 +30,7 @@ def get_symbols():
 
 
 # mongoclient = pymongo.MongoClient('mongodb://user:-Hz2f$!YBXbDcKG@cluster0-shard-00-00.vcom7.mongodb.net:27017,cluster0-shard-00-01.vcom7.mongodb.net:27017,cluster0-shard-00-02.vcom7.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-7w6acj-shard-0&authSource=admin&retryWrites=true&w=majority')
-mongoclient = pymongo.MongoClient('mongodb://root:!23QweAsd@20.84.64.243:27017')
+mongoclient = pymongo.MongoClient('mongodb://root:rootUser2021@20.84.64.243:27019')
 
 DB_NAME = 'ticker_details'
 
@@ -42,7 +42,8 @@ class DailyPutThread(object):
         self._stop = False
 
 
-        self.thread_start_time = None         
+        self.thread_start_time = None  
+               
         self.min_1_thread = threading.Thread(target=self.thread_func)
 
     def start(self):

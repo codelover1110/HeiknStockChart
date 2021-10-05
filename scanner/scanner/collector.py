@@ -9,7 +9,8 @@ import requests
 import threading
 import pandas as pd 
 
-from scanner.crawller import PolygonCrawller, intervals
+from scanner.scanner.crawller import PolygonCrawller, intervals
+
 
 try:
    import queue
@@ -35,8 +36,8 @@ class PolygonManager(object):
         self.thread_count = thread_cnt
         self.thread_list = []
         self.state = False
-        self.symbols = get_symbols()
-        # self.symbols = ["GOOG", "ATVI", "AMD", "MSFT", "AMZN", "NVDA", "TSLA", "AAPL", ""]
+        # self.symbols = get_symbols()
+        self.symbols = ["GOOG", "ATVI", "AMD", "MSFT", "AMZN", "NVDA", "TSLA", "AAPL", ""]
     
         self.thread = threading.Thread(target=self.thread_func)
 
@@ -56,7 +57,7 @@ class PolygonManager(object):
             
             thread_symbols = self.symbols[start_symbol_idx : end_symbol_idx]
 
-            pc_thread = PolygonCrawller(thread_symbols, self.interval, last_symbol_candles)
+            pc_thread = PolygonCrawller(thread_symbols, self.interval, last_symbol_candles, db_update=True)
             
             self.thread_list.append(pc_thread)
             print ('create thread with {} symbols'.format(len(thread_symbols)))
@@ -109,6 +110,7 @@ async def handler(websocket, path):
         if not last_symbol_candles.empty():
             while not last_symbol_candles.empty():
                 candle = last_symbol_candles.get()
+                print ("web-socket => ", candle)
                 candles.append(candle)
             await websocket.send(json.dumps(candles))
         await asyncio.sleep(1)
@@ -117,12 +119,12 @@ def start_stream_loop(loop, server):
     loop.run_until_complete(server)
     loop.run_forever()
 
-def start_streaming():
-    p_manager = PolygonManager(10)
+def start_stream():
+    p_manager = PolygonManager(5)
     p_manager.start()
 
     send_loop = asyncio.new_event_loop()
-    start_server = websockets.serve(handler, "127.0.0.1", 8888, loop=send_loop)
+    start_server = websockets.serve(handler, "127.0.0.1", 9999, loop=send_loop)
     t1 = Thread(target=start_stream_loop, args=(send_loop, start_server))
     t1.start()
 
@@ -131,6 +133,18 @@ def start_streaming():
         asyncio.get_event_loop().run_until_complete(start_server)
         asyncio.get_event_loop().run_forever()
 
+def start_stream_db():
+    p_manager = PolygonManager(5)
+    p_manager.start()
 
+def get_updated():
+    candles = []    
+    if not last_symbol_candles.empty():
+        while not last_symbol_candles.empty():
+            candle = last_symbol_candles.get()
+            candles.append(candle)
+    
+    return candles
 if __name__ == "__main__":
-    start_streaming()
+#     start_stream()
+    print ("start")

@@ -14,9 +14,7 @@ except ImportError:
    import Queue as queue
 
 API_KEY = 'tuQt2ur25Y7hTdGYdqI2VrE4dueVA8Xk'
-# mongoclient = pymongo.MongoClient('mongodb://aliaksandr:BD20fc854X0LIfSv@cluster0-shard-00-00.35i8i.mongodb.net:27017,cluster0-shard-00-01.35i8i.mongodb.net:27017,cluster0-shard-00-02.35i8i.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-aoj781-shard-0&authSource=admin&retryWrites=true&w=majority')
-# mongoclient = pymongo.MongoClient('mongodb://user:-Hz2f$!YBXbDcKG@cluster0-shard-00-00.vcom7.mongodb.net:27017,cluster0-shard-00-01.vcom7.mongodb.net:27017,cluster0-shard-00-02.vcom7.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-7w6acj-shard-0&authSource=admin&retryWrites=true&w=majority')
-mongoclient = pymongo.MongoClient('mongodb://root:rootUser2021@20.84.64.243:27019')
+mongoclient = pymongo.MongoClient('mongodb://root:rootUser2021@20.84.64.243:27017')
 
 def get_symbols():
     url="https://pkgstore.datahub.io/core/nasdaq-listings/nasdaq-listed_csv/data/7665719fb51081ba0bd834fde71ce822/nasdaq-listed_csv.csv"
@@ -25,16 +23,16 @@ def get_symbols():
     symbols = companies['Symbol'].tolist()
     return symbols
 
-DB_NAME = 'stock_market_data'
+DB_NAME = 'nasdaq100'
 
 intervals = [
-    [['1', 'minute'], 1, False, 500],    # use 30 when get a year candles
-    [['2', 'minute'], 2, False, 500],    # use 60 when get a year candles
-    [['12', 'minute'], 12, False, 500],  # use 200 when get a year candles
-    [['1', 'hour'], 1*60, False, 500],
-    [['4', 'hour'], 4*60, False, 500],
-    [['12', 'hour'], 12*60, False, 500],
-    [['1', 'day'], 24*60, False, 500],
+    # [['1', 'minute'], 1, False, 30],    # use 30 when get a year candles
+    # [['1', 'hour'], 1*60, False, 500],
+    # [['2', 'minute'], 2, False, 60],    # use 60 when get a year candles
+    # [['12', 'minute'], 12, False, 200],  # use 200 when get a year candles
+    # [['4', 'hour'], 4*60, False, 500],
+    # [['12', 'hour'], 12*60, False, 500],
+    [['1', 'day'], 24*60, False, 1000],
 ]
 
 class DailyPutThread(object):
@@ -93,7 +91,7 @@ class DailyPutThread(object):
             ob_table.update_one({'_id': object_id},  {'$set': {key: last_candle_date}}) 
 
     def get_last_put_date(self, symbol, interval): 
-        default_date = datetime.strptime("2020-09-01 00:00:00", '%Y-%m-%d %H:%M:%S')
+        default_date = datetime.strptime("2015-01-21 00:00:00", '%Y-%m-%d %H:%M:%S')
         
         masterdb = mongoclient[DB_NAME]
         ob_table = masterdb['symbol_last_date']
@@ -176,7 +174,7 @@ class DailyPutThread(object):
                 # last_put_date = datetime.strptime("2021-09-06 00:00:00", '%Y-%m-%d %H:%M:%S')
 
                 masterdb = mongoclient[DB_NAME]
-                collection_name = 'backtest_'+self.interval[0]+"_"+self.interval[1]
+                collection_name = 'nasdaq100_'+self.interval[0]+"_"+self.interval[1]
                 ob_table = masterdb[collection_name]
                 
                 put_candle_count = 0
@@ -208,6 +206,10 @@ class DailyPutThread(object):
 
             time.sleep(1)
 
+def read_symbols():
+    file_name = 'qqq_tickers.csv'
+    df = pd.read_csv(file_name)
+    return df['Ticker'].tolist()
 
 if __name__ == "__main__":
     start_time = datetime.now()
@@ -220,8 +222,10 @@ if __name__ == "__main__":
     thread_count = 10
     thread_list = []
 
+    symbols = read_symbols()
+    symbols.append("")
     # symbols = get_symbols()
-    symbols = ["GOOG", "ATVI", "AMD", "MSFT", "AMZN", "NVDA", "TSLA", "AAPL", "ADBE", ""]
+    # symbols = ["GOOG", "ATVI", "AMD", "MSFT", "AMZN", "NVDA", "TSLA", "AAPL", ""]
     symbol_count = len(symbols)
     print ("symbols: ", symbol_count)
 
@@ -249,24 +253,23 @@ if __name__ == "__main__":
         thrd.start()
         time.sleep(0.5)
 
-    while True:
-        for item in intervals:
-            proc_time = 0
-            while True:
-                thread_states = []
+    # while True:
+    for item in intervals:
+        proc_time = 0
+        while True:
+            thread_states = []
+            for thrd in thread_list:
+                thread_working = thrd.get_thread_state()
+                thread_states.append(thread_working)
+            if True not in thread_states:
                 for thrd in thread_list:
-                    thread_working = thrd.get_thread_state()
-                    thread_states.append(thread_working)
-                if True not in thread_states:
-                    for thrd in thread_list:
-                        thrd.set_interval(item[0], item[1], item[2], item[3])
-                    break
-                else:
-                    print('< {} > {}'.format(proc_time, thread_states))
+                    thrd.set_interval(item[0], item[1], item[2], item[3])
+                break
+            else:
+                print('< {} > {}'.format(proc_time, thread_states))
 
-                time.sleep(5)
-                proc_time += 5
-        time.sleep(10)
+            time.sleep(5)
+            proc_time += 5
 
     time.sleep(10)
     for thrd in thread_list:

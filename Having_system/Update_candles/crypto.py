@@ -1,38 +1,62 @@
 import pymongo
 from datetime import datetime, timedelta
 import pandas as pd 
-import os
 import requests
 import time
 import io
-import csv
 import threading
-
+import json
 try:
    import queue
 except ImportError:
    import Queue as queue
 
-API_KEY = 'tuQt2ur25Y7hTdGYdqI2VrE4dueVA8Xk'
-# mongoclient = pymongo.MongoClient('mongodb://aliaksandr:BD20fc854X0LIfSv@cluster0-shard-00-00.35i8i.mongodb.net:27017,cluster0-shard-00-01.35i8i.mongodb.net:27017,cluster0-shard-00-02.35i8i.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-aoj781-shard-0&authSource=admin&retryWrites=true&w=majority')
-# mongoclient = pymongo.MongoClient('mongodb://user:-Hz2f$!YBXbDcKG@cluster0-shard-00-00.vcom7.mongodb.net:27017,cluster0-shard-00-01.vcom7.mongodb.net:27017,cluster0-shard-00-02.vcom7.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-7w6acj-shard-0&authSource=admin&retryWrites=true&w=majority')
-mongoclient = pymongo.MongoClient('mongodb://root:rootUser2021@20.84.64.243:27019')
+API_KEY = "tuQt2ur25Y7hTdGYdqI2VrE4dueVA8Xk"
+mongoclient = pymongo.MongoClient('mongodb://root:rootUser2021@20.84.64.243:27017')
 
-def get_symbols():
-    url="https://pkgstore.datahub.io/core/nasdaq-listings/nasdaq-listed_csv/data/7665719fb51081ba0bd834fde71ce822/nasdaq-listed_csv.csv"
-    s = requests.get(url).content
-    companies = pd.read_csv(io.StringIO(s.decode('utf-8')))
-    symbols = companies['Symbol'].tolist()
-    return symbols
 
-DB_NAME = 'stock_market_data'
+def monitoring_cryto_history():
+    all_count = 0
+    url = "https://api.polygon.io/v1/historic/crypto/BTC/USD/2020-10-14?limit=100&apiKey=" + API_KEY
+    # url = "https://api.polygon.io/v2/aggs/ticker/X:BTCUSD/range/1/day/2020-10-14/2020-10-14?adjusted=true&sort=asc&limit=120&apiKey=" + API_KEY
+    contents = json.loads(requests.get(url).content)
+    print (contents.keys())
+    # for key in contents.keys():
+    #     print ("===============> ", key)
+    #     print (contents[key])
+    print('symbol: ', contents['symbol'])
+    print ('map: ', contents['map'])
+    if contents["status"] == "success" and len(contents["ticks"]) > 0:
+        ticks = contents['ticks']
+        for tick in ticks:
+            tick['date'] = datetime.fromtimestamp(tick['t']/1e3)
+            print (tick)
+            break
+        print ('all count: {}'.format(len(ticks)))
+
+def monitoring_cryto_aggregates():
+    all_count = 0
+    url = "https://api.polygon.io/v2/aggs/ticker/X:BTCUSD/range/1/minute/2020-10-14/2020-10-14?adjusted=true&sort=asc&limit=50000&apiKey=" + API_KEY
+    contents = json.loads(requests.get(url).content)
+    print (contents.keys())
+
+    print('queryCount: ', contents['queryCount'])
+    print ('resultsCount: ', contents['resultsCount'])
+    if contents["status"] == "OK" and contents["resultsCount"] > 0:
+        results = contents['results']
+        for candle in results:
+            candle['date'] = datetime.fromtimestamp(candle['t']/1000)
+            print (candle)
+            # break
+
+DB_NAME = 'crypto_market_data'
 
 intervals = [
-    [['1', 'minute'], 1, False, 500],    # use 30 when get a year candles
-    [['2', 'minute'], 2, False, 500],    # use 60 when get a year candles
-    [['12', 'minute'], 12, False, 500],  # use 200 when get a year candles
-    [['1', 'hour'], 1*60, False, 500],
-    [['4', 'hour'], 4*60, False, 500],
+    [['1', 'minute'], 1, False, 31],    # use 30 when get a year candles
+    [['2', 'minute'], 2, False, 31],    # use 60 when get a year candles
+    [['12', 'minute'], 12, False, 60],  # use 200 when get a year candles
+    [['1', 'hour'], 1*60, False, 60],
+    [['4', 'hour'], 4*60, False, 200],
     [['12', 'hour'], 12*60, False, 500],
     [['1', 'day'], 24*60, False, 500],
 ]
@@ -93,7 +117,7 @@ class DailyPutThread(object):
             ob_table.update_one({'_id': object_id},  {'$set': {key: last_candle_date}}) 
 
     def get_last_put_date(self, symbol, interval): 
-        default_date = datetime.strptime("2020-09-01 00:00:00", '%Y-%m-%d %H:%M:%S')
+        default_date = datetime.strptime("2020-10-04 00:00:00", '%Y-%m-%d %H:%M:%S')
         
         masterdb = mongoclient[DB_NAME]
         ob_table = masterdb['symbol_last_date']
@@ -108,7 +132,7 @@ class DailyPutThread(object):
                 return default_date
         else:
             symbol_last_date = dict()
-            if True:
+            if False:
                 symbol_last_date['symbol'] = symbol
                 symbol_last_date['1_minute'] = default_date
                 symbol_last_date['2_minute'] = default_date
@@ -134,14 +158,14 @@ class DailyPutThread(object):
     def get_new_candles(self, symbol, interval, interval_unit, last_put_date):
         last_put_date_str = str(last_put_date.date())
         new_candles = []
+        sym_x = f"X:{symbol}USD"
         try:
             end_date = last_put_date+timedelta(days=self.time_delta)
             cur_date_str = str(end_date.date())
 
-            polygon_url = f"https://api.polygon.io/v2/aggs/ticker/{symbol}/range/{interval}/{interval_unit}/{last_put_date_str}/{cur_date_str}?adjusted=true&sort=asc&limit=50000&apiKey=tuQt2ur25Y7hTdGYdqI2VrE4dueVA8Xk"
+            polygon_url = f"https://api.polygon.io/v2/aggs/ticker/{sym_x}/range/{interval}/{interval_unit}/{last_put_date_str}/{cur_date_str}?adjusted=true&sort=asc&limit=50000&apiKey=" + API_KEY
             datasets = requests.get(polygon_url).json()
             api_candles = datasets['results'] if 'results' in datasets else []
-
             for candle in api_candles:
                 candle_date = datetime.fromtimestamp((candle['t']/1000))
                 if last_put_date < candle_date:
@@ -173,7 +197,6 @@ class DailyPutThread(object):
                 continue
             for sym_idx, symbol in enumerate(self.symbols):
                 last_put_date = self.get_last_put_date(symbol, self.interval)
-                # last_put_date = datetime.strptime("2021-09-06 00:00:00", '%Y-%m-%d %H:%M:%S')
 
                 masterdb = mongoclient[DB_NAME]
                 collection_name = 'backtest_'+self.interval[0]+"_"+self.interval[1]
@@ -217,11 +240,11 @@ if __name__ == "__main__":
     market_start_time = [9, 30]
     market_end_time = [16, 30]
     get_only_market_time = True
-    thread_count = 10
+    thread_count = 7
     thread_list = []
 
     # symbols = get_symbols()
-    symbols = ["GOOG", "ATVI", "AMD", "MSFT", "AMZN", "NVDA", "TSLA", "AAPL", "ADBE", ""]
+    symbols = ["BTC","ETH","DOGE","BCH","LTC", ""]
     symbol_count = len(symbols)
     print ("symbols: ", symbol_count)
 
@@ -266,9 +289,8 @@ if __name__ == "__main__":
 
                 time.sleep(5)
                 proc_time += 5
-        time.sleep(10)
 
-    time.sleep(10)
+        time.sleep(10)
     for thrd in thread_list:
         thrd.stop()
 
