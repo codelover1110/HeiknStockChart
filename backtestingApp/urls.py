@@ -6,6 +6,7 @@ from strategy import views as strategy_view
 from news import views as news_view
 from financials import views as financials_view
 from scanner import views as scanner_view
+from floats import views as floats_view
 
 admin.autodiscover()
 urlpatterns = [
@@ -62,6 +63,9 @@ urlpatterns = [
     ################ new scanner api ##################
     path('scanner/ticker_details_list/', scanner_view.ticker_details_list, name='ticker-details-details'),
     path('scanner/ticker_details_filter_options/', scanner_view.ticker_details_filter_options, name='ticker_details_filter_options'),
+    
+    ################ Floats api ##################
+    path('floats/float_details_list/', floats_view.float_details_list, name='ticker-details-details'),
     
     # app api
     url(r'^', include('users.urls')),
