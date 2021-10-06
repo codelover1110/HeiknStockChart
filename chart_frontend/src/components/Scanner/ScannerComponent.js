@@ -14,7 +14,7 @@ import {
 import { useHistory } from "react-router-dom";
 import { MDBDataTableV5 } from 'mdbreact';
 import { useAuth } from 'contexts/authContext';
-import { getAllSymbols, filterPriceData } from 'api/Api'
+import { getScannerDetails, getTickerScannerOptions } from 'api/Api'
 import { currentDateString } from 'utils/helper'
 
 const ScannerComponent = () => {
@@ -27,6 +27,7 @@ const ScannerComponent = () => {
   const [optionsExchange, setOptionsExchanges] = useState([])
   const [optionsSector, setOptionsSector] = useState([])
   const [optionsIndustry, setOptionsIndustry] = useState([])
+  const [scannerData, setScannerData] = useState([])
 
   const hearder_columns = useMemo(() => {
     return [
@@ -67,12 +68,60 @@ const ScannerComponent = () => {
 
   const [datatable, setDatatable] = React.useState({
     columns: hearder_columns,
-    rows: [
-    ],
+    rows: scannerData,
   });
 
   useEffect(() => {
-    
+    const loadWholeOptions = async () => {
+      const scannerDetails = await getScannerDetails()
+
+      if (scannerDetails.length) {
+        setDatatable({
+          columns: hearder_columns,
+          rows: scannerDetails,
+        })
+      }
+
+      const scannerOptions = await getTickerScannerOptions()
+      if (scannerOptions.success) {
+        const exchanges = scannerOptions.result.exchanges.map(exchange => {
+          if (exchange === '') {
+            return null
+          }
+          return ({
+            value: exchange,
+            label: exchange
+          })
+        })
+
+        const industries = []
+        scannerOptions.result.industry.map(industry => {
+          if (industry !== '' && industry !== null) {
+            industries.push({
+              value: industry,
+              label: industry
+            })
+          }
+        })
+
+        const sectors = []
+        scannerOptions.result.sector.forEach(sector => {
+          if (sector !== '' && sector !== null) {
+            sectors.push({
+              value: sector,
+              label: sector
+            })
+          }
+        })
+
+        setOptionsExchanges(exchanges)
+        setOptionsIndustry(industries)
+        setOptionsSector(sectors)
+
+      }
+    }
+
+    loadWholeOptions()  
   }, [])
 
   const handleSignout = () => {
@@ -133,7 +182,7 @@ const ScannerComponent = () => {
             </Nav>
           </Collapse>    
       </nav>
-      <div className="col-sm-12 hunter-data-table-container">
+      <div className="col-sm-12 hunter-data-table-container scanner-page-container">
         <div className="hunter-data-table-title">
           Scanner Table
         </div>
