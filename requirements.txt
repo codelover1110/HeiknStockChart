@@ -5,6 +5,7 @@ asyncpg
 django-crispy-forms
 twilio
 websockets
+websocket-client
 pandas
 djangorestframework
 ib_insync

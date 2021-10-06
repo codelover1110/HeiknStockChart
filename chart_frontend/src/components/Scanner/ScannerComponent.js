@@ -15,7 +15,6 @@ import { useHistory } from "react-router-dom";
 import { MDBDataTableV5 } from 'mdbreact';
 import { useAuth } from 'contexts/authContext';
 import { getScannerDetails, getTickerScannerOptions } from 'api/Api'
-import { currentDateString } from 'utils/helper'
 
 const ScannerComponent = () => {
   const auth = useAuth();
@@ -57,12 +56,12 @@ const ScannerComponent = () => {
     },  
     {
       label: 'Market Cap',
-      field: 'macket_cap',
+      field: 'marketcap',
       width: 200,
     },   
     {
       label: 'Cik Id',
-      field: 'cik_id',
+      field: 'cik',
     },
   ]}, [])
 
@@ -117,7 +116,6 @@ const ScannerComponent = () => {
         setOptionsExchanges(exchanges)
         setOptionsIndustry(industries)
         setOptionsSector(sectors)
-
       }
     }
 
@@ -129,16 +127,41 @@ const ScannerComponent = () => {
     history.push('/login')
   }
 
-  const handleSectorChange = (e) => {
+  const handleSectorChange = async (e) => {
     setSector(e)
+    
+    const scannerDetails = await getScannerDetails(exchange ? exchange.value : '', industry ? industry.value : '', e.value)
+
+    if (scannerDetails.length) {
+      setDatatable({
+        columns: hearder_columns,
+        rows: scannerDetails,
+      })
+    }
   }
 
-  const handleExchangeChange = (e) => {
+  const handleExchangeChange = async (e) => {
     setExchange(e)
+
+    const scannerDetails = await getScannerDetails(e.value, industry ? industry.value : '', sector ? sector.value : '')
+
+    if (scannerDetails.length) {
+      setDatatable({
+        columns: hearder_columns,
+        rows: scannerDetails,
+      })
+    }
   }
   
-  const handleIndustryChange = (e) => {
+  const handleIndustryChange = async (e) => {
     setIndustry(e)
+
+    const scannerDetails = await getScannerDetails(exchange ? exchange.value : '', e.value, sector ? sector.value : '')
+
+    setDatatable({
+      columns: hearder_columns,
+      rows: scannerDetails,
+    })
   }
   
   return (
@@ -155,32 +178,32 @@ const ScannerComponent = () => {
           </li>
         </div>
         <Collapse navbar isOpen={collapseOpen}>
-            <Nav className="ml-auto" navbar>
-              <UncontrolledDropdown nav>
-                <DropdownToggle
-                  caret
-                  color="default"
-                  nav
-                  onClick={(e) => e.preventDefault()}
-                >
-                  <div className="photo">
-                    <img
-                      alt="..."
-                      src={require("assets/img/anime3.png").default}
-                    />
-                  </div>
-                  <p className="d-lg-none">Log out</p>
-                </DropdownToggle>
-                <DropdownMenu className="dropdown-navbar" right tag="ul">
-                  <DropdownItem divider tag="li" />
-                  <NavLink tag="li">
-                    <DropdownItem className="nav-item" onClick={() => {handleSignout()}}>Log out</DropdownItem>
-                  </NavLink>
-                </DropdownMenu>
-              </UncontrolledDropdown>
-              <li className="separator d-lg-none" />
-            </Nav>
-          </Collapse>    
+          <Nav className="ml-auto" navbar>
+            <UncontrolledDropdown nav>
+              <DropdownToggle
+                caret
+                color="default"
+                nav
+                onClick={(e) => e.preventDefault()}
+              >
+                <div className="photo">
+                  <img
+                    alt="..."
+                    src={require("assets/img/anime3.png").default}
+                  />
+                </div>
+                <p className="d-lg-none">Log out</p>
+              </DropdownToggle>
+              <DropdownMenu className="dropdown-navbar" right tag="ul">
+                <DropdownItem divider tag="li" />
+                <NavLink tag="li">
+                  <DropdownItem className="nav-item" onClick={() => {handleSignout()}}>Log out</DropdownItem>
+                </NavLink>
+              </DropdownMenu>
+            </UncontrolledDropdown>
+            <li className="separator d-lg-none" />
+          </Nav>
+        </Collapse>    
       </nav>
       <div className="col-sm-12 hunter-data-table-container scanner-page-container">
         <div className="hunter-data-table-title">
