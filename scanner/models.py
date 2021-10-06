@@ -234,3 +234,62 @@ def get_watchlist(name):
 
     result = json.loads(wl['contents'])
     return result['tickers']
+
+def get_ticker_details_list(exchange, industry, sector):
+    news_db = mongoclient[DETAILS]
+    db_collection = news_db[DETAILS_COL_NAME]
+    
+
+    query_obj = dict()
+    if exchange != '':
+        query_obj['exchange'] = exchange
+    if industry != '':
+        query_obj['industry'] = industry
+    if sector != '':
+        query_obj['sector'] = sector
+    
+    details = list(db_collection.find(query_obj, {'_id': False}).sort('updated', pymongo.ASCENDING))
+    details_data = list(details)
+    return details_data
+
+def get_ticker_details_filter_options():
+    news_db = mongoclient[DETAILS]
+    db_collection = news_db[DETAILS_COL_NAME]
+
+    query_object = [{
+        "$facet": {
+            "exchange": [
+                {
+                    "$group" : {
+                        "_id" : "$exchange", 
+                    }
+                }
+            ],
+            "industry": [
+                {
+                    "$group" : {
+                        "_id" : "$industry", 
+                    }
+                }
+            ],
+            "sector": [
+                {
+                    "$group" : {
+                        "_id" : "$sector", 
+                    }
+                }
+            ]
+        }
+    }]
+
+    agg_result = db_collection.aggregate(query_object)
+    agg_options = []
+    for doc in agg_result:
+        agg_options = doc
+    
+    options = dict()
+    options["exchanges"] = [item["_id"] for item in agg_options["exchange"]]
+    options["industry"] = [item["_id"] for item in agg_options["industry"]]
+    options['sector'] = [item["_id"] for item in agg_options["sector"]]
+
+    return options
