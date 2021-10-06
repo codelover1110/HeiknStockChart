@@ -625,7 +625,6 @@ export const saveScannerView = async (chart_number, symbols, fields) => {
 
   const apiURL = '/scanner/save_scanner_views/'
   try {
-    console.log('process.env.REACT_APP_BACKEND_URL + apiURL, requestOptions !!!!!!!!!!!!!!!!!!!!!!', process.env.REACT_APP_BACKEND_URL + apiURL, requestOptions)
     return await fetch(process.env.REACT_APP_BACKEND_URL + apiURL, requestOptions)
       .then(response => response.json())
       .then(data => {
