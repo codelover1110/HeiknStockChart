@@ -83,17 +83,26 @@ const ScannerComponent = () => {
 
       const scannerOptions = await getTickerScannerOptions()
       if (scannerOptions.success) {
-        const exchanges = scannerOptions.result.exchanges.map(exchange => {
+        const exchanges = [{
+          value: '',
+          label: 'All'
+        }]
+
+        scannerOptions.result.exchanges.map(exchange => {
           if (exchange === '') {
             return null
           }
-          return ({
+          exchanges.push({
             value: exchange,
             label: exchange
           })
         })
 
-        const industries = []
+        const industries = [{
+          value: '',
+          label: 'All'
+        }]
+
         scannerOptions.result.industry.map(industry => {
           if (industry !== '' && industry !== null) {
             industries.push({
@@ -103,7 +112,11 @@ const ScannerComponent = () => {
           }
         })
 
-        const sectors = []
+        const sectors = [{
+          value: '',
+          label: 'All'
+        }]
+        
         scannerOptions.result.sector.forEach(sector => {
           if (sector !== '' && sector !== null) {
             sectors.push({
