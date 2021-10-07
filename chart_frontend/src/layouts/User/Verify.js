@@ -47,7 +47,7 @@ const Verify = () => {
         if (res.verify) {
             const userInfo = {
                 email: res.user_email,
-                role: res.is_admin ? 'forward_test,stress_test,optimization,live_trade,scanner,trade_data' : res.role,
+                role: res.is_admin ? 'forward_test,stress_test,optimization,live_trade,macket_watch,trade_data' : res.role,
                 is_admin: res.is_admin,
             }
             localStorage.setItem('user-info', JSON.stringify(userInfo))

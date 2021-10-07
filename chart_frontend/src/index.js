@@ -28,9 +28,11 @@ import ProvideAuth from 'contexts/authContext'
 import PrivateRoute from 'layouts/Auth/PrivateRoute'
 import SignUp from 'layouts/User/SignUp'
 import Verify from 'layouts/User/Verify'
+import Floats from "layouts/User/Floats";
 import ForgotPassword from 'layouts/User/ForgotPassword'
 import PasswordResetConfirm from 'layouts/User/PasswordResetConfirm'
-import TradeScanner from 'layouts/User/TradeScanner'
+import MacketWatch from 'layouts/User/MacketWatch'
+import Scanner from 'layouts/User/Scanner'
 import Optimization from 'layouts/User/Optimization'
 
 ReactDOM.render(
@@ -56,8 +58,11 @@ ReactDOM.render(
             <PrivateRoute path="/botmanagement">
               <FileManager/>
             </PrivateRoute>
-            <PrivateRoute path="/scanner">
-              <TradeScanner />
+            <PrivateRoute path="/floats">
+              <Floats />
+            </PrivateRoute>
+            <PrivateRoute path="/macket_watch">
+              <MacketWatch />
             </PrivateRoute>
             <PrivateRoute path="/optimization">
               <Optimization />
@@ -73,6 +78,9 @@ ReactDOM.render(
             </PrivateRoute>
             <PrivateRoute path="/financial_data">
               <FinancialDashboard />
+            </PrivateRoute>
+            <PrivateRoute path="/scanner">
+              <Scanner />
             </PrivateRoute>
             <PrivateRoute path="/">
               <HomePage />

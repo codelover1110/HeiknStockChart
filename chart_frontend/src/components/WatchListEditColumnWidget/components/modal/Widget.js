@@ -137,7 +137,6 @@ class Widget extends React.Component {
           }
         })
       }
-
     }
     
     this.setState({
@@ -290,9 +289,10 @@ class Widget extends React.Component {
     const currentItems = cloneDeep(this.state.currentNodes);
     const totalNodes = cloneDeep(this.props.totalNodes);
 
+    
     let availableNodes = [];
     let newCurrentNodes = [];
-
+    
     if (checkedItems) {
       checkedItems.map((value) => {
         currentItems.map((availableItem) => {
@@ -304,9 +304,14 @@ class Widget extends React.Component {
                   currentChildItems.push(childItem);
                 }
               })
-    
+              
               if (currentChildItems.length > 0) {
-                newCurrentNodes.push({ ...availableItem, children: currentChildItems });
+                let filteredNode = newCurrentNodes.filter(node => node.value === availableItem.value)
+                if (filteredNode.length) {
+                  filteredNode[0].children.push( ...currentChildItems );
+                } else {
+                  newCurrentNodes.push({ ...availableItem, children: currentChildItems });
+                }
               }
             }
           } else {
@@ -316,16 +321,18 @@ class Widget extends React.Component {
           }
         })
       });
-  
+      
       // merge the new current nodes into original current nodes
-  
+
       const originCurrentNodes = cloneDeep(this.state.nodesAvailableItem);
       let totalNewCurrentNodes = [];
       newCurrentNodes.map((newCurrentNode) => {
         let exist = false;
+        let currentChildItems
         originCurrentNodes.map((currentNode) => {
+          
           if (currentNode.value === newCurrentNode.value) {
-            let currentChildItems = currentNode.children;
+            currentChildItems = currentNode.children;
             newCurrentNode.children.map((newChildItem) => {
               currentChildItems.push(newChildItem);
             });
@@ -347,7 +354,7 @@ class Widget extends React.Component {
           }
         }
       })
-  
+
       let totalCurrentNodes = totalNewCurrentNodes;
       originCurrentNodes.map((originNode) => {
         let exist = false;
@@ -408,7 +415,6 @@ class Widget extends React.Component {
     currentNodes.forEach((current) => {
       if (current.value === key) {
         current.children.forEach((child) => {
-          // console.log('item, currentNodes????', child, item)
           if (child.value === item.value) {
             isExist = true
             return
@@ -443,38 +449,7 @@ class Widget extends React.Component {
           }
         }
       }
-      
-      // if (pushItem.default) {
-      //   if ("children" in pushItem) {
-      //     if (pushItem.children.length > 0) {
-      //       let currentChildItems = [];
-      //       let availableChildItems = [];
-      //       pushItem.children.map((childItem) => {
-      //         if (childItem.default) {
-      //           currentChildItems.push(childItem);
-      //         } else {
-      //           availableChildItems.push(childItem);
-      //         }
-      //       });
-
-      //       if (currentChildItems.length > 0) {
-      //         defaultNodes.push({...pushItem, children: currentChildItems});
-      //       }
-
-      //       if (availableChildItems.length > 0) {
-      //         availableNodes.push({...pushItem, children: availableChildItems});
-      //       }
-      //     } else {
-      //       defaultNodes.push(pushItem);
-      //     }
-      //   } else {
-      //     defaultNodes.push(pushItem);
-      //   }
-      // } else {
-      //   availableNodes.push(pushItem);
-      // }
     });
-    // console.log('availableNodes?????????????????????????????????', availableNodes)
     this.setState({
       nodesAvailableItem: availableNodes,
       nodesFilteredAvailableItem: availableNodes,
@@ -725,7 +700,7 @@ class Widget extends React.Component {
                 </div>
               </div>
             </div>
-            <div class="right-box-footer">
+            <div className="right-box-footer">
               <div className="modal-btn btn-exchange" onClick={this.onRemoveItems}>
                 <span>{"<< Remove Item(s)"}</span>
               </div>

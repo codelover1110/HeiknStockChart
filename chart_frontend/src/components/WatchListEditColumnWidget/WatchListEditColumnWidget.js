@@ -129,6 +129,42 @@ const WatchListEditColumnWidget = (props) => {
           });
         }
 
+        nodes.push({
+          label: "Ticker Prices",
+          value: "parent_value_5",
+          children: [
+              {
+                  label: "o",
+                  value: "child_value_5_1",
+                  default: true
+              },
+              {
+                  label: "h",
+                  value: "child_value_5_2",
+                  default: true
+              },    
+              {
+                  label: "l",
+                  value: "child_value_5_3",
+                  default: true
+              },    
+              {
+                  label: "c",
+                  value: "child_value_5_4",
+                  default: true
+              },    
+              {
+                  label: "v",
+                  value: "child_value_5_5",
+                  default: true
+              },    
+              {
+                  label: "mark",
+                  value: "child_value_5_6",
+                  default: true
+              }    
+          ]
+        })
       }
       setTotalNodes(nodes);
     };

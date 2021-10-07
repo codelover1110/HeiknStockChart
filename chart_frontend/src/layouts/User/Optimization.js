@@ -10,7 +10,7 @@ import { BackgroundColorContext } from "contexts/BackgroundColorContext";
 
 function Optimization() {
   const [isShowSidebar, setShowSidebar] = React.useState(false);
-  const [selectedInstance, setSelectedInstance] = React.useState('scanner');
+  const [selectedInstance, setSelectedInstance] = React.useState('macket_watch');
   
   const handleSidebarChange = () => {
     setShowSidebar(!isShowSidebar);
