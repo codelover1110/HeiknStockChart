@@ -16,18 +16,16 @@ except ImportError:
    import Queue as queue
 
 
-# socket = "ws://127.0.0.1:9999/"
-socket = "ws://20.84.64.243:9999"
-
+socket = "ws://127.0.0.1:9999/"
+# socket = "ws://20.84.64.243:9999"
+# CEI, PLTR, RKLB
 test_info = {
         "action": "create_fields",
         "chart_number": 4,
         "symbols": [
-            "AMD",
-            "TSLA",
-            "MSFT",
-            "GOOG",
-            "AMZN"
+            "CEI",
+            "PLTR",
+            "RKLB"
         ],
         "fields": [
             {
@@ -103,5 +101,5 @@ if __name__ == "__main__":
     ps = StreamClient(socket)
     ps.start()
 
-    time.sleep(40)
+    time.sleep(600)
     ps.stop()

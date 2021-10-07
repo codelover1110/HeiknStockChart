@@ -47,6 +47,7 @@ async def delete_text_channels(guild):
             channel = discord.utils.get(guild.channels, name=channel_name)
             await channel.delete()
             print ('Channel "{}" is deleted!'.format(channel_name))
+            await asyncio.sleep(0.5)
 
 @client.event
 async def on_ready():

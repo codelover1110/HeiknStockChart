@@ -231,7 +231,22 @@ def get_watchlist(name):
     db_collection = scanner_db[WATCHLIST_COL_NAME]
     wl = db_collection.find_one({'name': name}, {"_id": 0})
     print (wl)
+    tickers = wl['contents'].split('\n')
+    tickers.remove('')
 
+    return tickers
+
+def get_all_scanner_symbols():
+    scanner_db = mongoclient[SCANNER_DB]
+    db_collection = scanner_db[SCANNER_VIEWS]
+    symbol_lists = list(db_collection.find({}, {"_id": 0, "symbols": 1}))
+
+    result = []
+    for symbols in symbol_lists:
+        for symbol in symbols:
+            if symbol not in result:
+                result.append(symbol)
+    return result
     result = json.loads(wl['contents'])
     return result['tickers']
 

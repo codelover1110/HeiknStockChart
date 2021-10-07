@@ -21,9 +21,10 @@ SCANNER_VIEWS = 'scanner_views'
 PARAMETERS_DB = 'parameters'
 INDICATORS_COL_NAME = 'indicators'
 
+mongoclient = pymongo.MongoClient('mongodb://root:rootUser2021@20.84.64.243:27017')
+
 class DBManager(object):
     def __init__(self, symbols, fields):
-        self.mongoclient = pymongo.MongoClient('mongodb://root:rootUser2021@20.84.64.243:27017')
         self.financial_fields = get_fields_data(fields, 'Stock Financials')
         self.detail_fields = get_fields_data(fields, 'Ticker Details')
         self.symbols = symbols
@@ -71,11 +72,17 @@ class DBManager(object):
     def scanner_preload(self):
         return self.scanner_data
 
+    def get_symbol_preload(self, symbol):
+        for pre_load in self.scanner_data:
+            if pre_load['symbol'] == symbol:
+                return pre_load['data']
+
+
     def get_financial_fields_values(self, symbol, field_list):
         fields = {'_id': 0}
         for field in field_list:
             fields[field] = 1
-        financials_db = self.mongoclient[FINANCIALS]
+        financials_db = mongoclient[FINANCIALS]
         db_collection = financials_db[FINANCIALS_COL_NAME]
         financials = db_collection.find_one({'ticker': symbol}, fields)
         return financials
@@ -84,7 +91,34 @@ class DBManager(object):
         fields = {'_id': 0}
         for field in field_list:
             fields[field] = 1
-        news_db = self.mongoclient[DETAILS]
+        news_db = mongoclient[DETAILS]
         db_collection = news_db[DETAILS_COL_NAME]
         details = db_collection.find_one({'symbol': symbol}, fields)
         return details
+
+def get_all_scanner_symbols():
+    scanner_db = mongoclient[SCANNER_DB]
+    db_collection = scanner_db[SCANNER_VIEWS]
+    symbol_lists = list(db_collection.find({}, {"_id": 0, "symbols": 1}))
+    result = []
+    for symbols in symbol_lists:
+        for symbol in symbols['symbols']:
+            if symbol not in result:
+                result.append(symbol)
+    return result
+
+def get_all_scanner_fields():
+    financials_db = mongoclient[FINANCIALS]
+    db_collection = financials_db[FINANCIALS_COL_NAME]
+    financials = db_collection.find_one({}, {'_id': False})
+    financial_keys = financials.keys()
+
+    detail_db = mongoclient[DETAILS]
+    db_collection = detail_db[DETAILS_COL_NAME]
+    details = db_collection.find_one({}, {'_id': False})
+    detail_kyes = details.keys()
+    return [
+        {'Stock Financials': financial_keys},
+        {'Ticker Details': detail_kyes}
+    ]
+    

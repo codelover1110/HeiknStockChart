@@ -72,11 +72,17 @@ class ScannerClient(object):
   
     def filter_fields(self, rsi_candle):
         default_fields = ['rsi', 'rsi2', 'rsi3', 'heik', 'heik2', 'rsi_color', 'rsi2_color', 'rsi3_color', 'heik_color', 'hiek2_color']
-        fields = get_fields_data(self.scanner_info['fields'], 'Indicators')
         filtered = dict()
+        fields = get_fields_data(self.scanner_info['fields'], 'Indicators')
         for field in fields:
             if field in rsi_candle.keys():
                 filtered[field] = rsi_candle[field]
+
+        fields = get_fields_data(self.scanner_info['fields'], 'Trade Details')
+        for field in fields:
+            if field in rsi_candle.keys():
+                filtered[field] = rsi_candle[field]
+        
         for field in default_fields:
             if field not in fields:
                 filtered[field] = rsi_candle[field]
@@ -137,6 +143,5 @@ if __name__ == "__main__":
             except KeyboardInterrupt:
                 sc_1.stop()
                 sc_2.stop()
-                print ("****************************")
                 sys.exit(0)
 

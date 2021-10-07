@@ -8,31 +8,11 @@ from scanner_client_mgr import ScannerClientManager
 
 candle_update_queue = queue.Queue()
 
-# def new_client_joined(client, server):
-# 	print ("Connect client: ",client)
-
-# def client_left(client, server):
-# 	print ("client left: ", client)
-# 	sc_mgr.remove_scanner(client)
-
-# def receive_message(client, server, message):
-# 	scanner_info = json.loads(message)
-# 	sc_mgr.add_scanner(client, scanner_info)
-	
-# 	server.send_message(client, "stream sending ...")
-		
-# server = WebsocketServer(9998, host='127.0.0.1')
-# server.event_new_client_join(new_client_joined)
-# server.event_client_left(client_left)
-# server.event_message_received(receive_message)
-
-# server.run_forever()
-
-
 class StockStreamServer(object):
 	def __init__(self, update_queue):
 		self.update_queue = update_queue
-		self.removing_client = []
+		self.removing_client = queue.Queue()
+		self.closed_client = []
 		self.sc_mgr = ScannerClientManager(self.update_queue)
 
 		self.server = WebsocketServer(9999, host='127.0.0.1')
@@ -53,7 +33,8 @@ class StockStreamServer(object):
 	def client_left(self, client, server):
 		print ("client left: ", client)
 		# self.sc_mgr.remove_scanner(client)
-		self.removing_client.append(client)
+		self.closed_client.append(client)
+		self.removing_client.put(client)
 
 	def receive_message(self, client, server, message):
 		scanner_info = json.loads(message)
@@ -70,19 +51,22 @@ class StockStreamServer(object):
 				while not self.update_queue.empty():
 					candle_update = self.update_queue.get()
 					client = candle_update['client']
-					if client in self.removing_client:
+					if client in self.closed_client:
 						continue
 					if self.sc_mgr.find_client_idx(client['id']) != -1:
 						del candle_update['client']
 						print (candle_update['symbol'])
 						message = json.dumps([candle_update])
-						self.server.send_message(client, message)
-			if len(self.removing_client) > 0:
-				for client in self.removing_client:
-					if self.sc_mgr.get_status():
-						while self.sc_mgr.get_status():
-							time.sleep(0.1)
+						try:
+							self.server.send_message(client, message)
+						except:
+							print ("can't send message. socket is closed: ", client)
+
+			if not self.removing_client.empty():
+				if not self.sc_mgr.is_removing():
+					client = self.removing_client.get()
 					self.sc_mgr.remove_scanner(client)
+
 			time.sleep(1)
 
 if __name__=="__main__":

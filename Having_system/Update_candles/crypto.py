@@ -175,7 +175,7 @@ class DailyPutThread(object):
         except:
             print ("......error in get_new_candles......")
 
-        return new_candles
+        return new_candles, sym_x
 
     def check_candle_in_maket_time(self, candle):
         year = int(candle['date'].strftime("%Y"))
@@ -204,7 +204,7 @@ class DailyPutThread(object):
                 
                 put_candle_count = 0
                 while True:
-                    new_candles = self.get_new_candles(symbol, self.interval[0], self.interval[1], last_put_date)
+                    new_candles, ticker = self.get_new_candles(symbol, self.interval[0], self.interval[1], last_put_date)
                     put_candles = []
                     for idx, candle in enumerate(new_candles):
                         if self.get_only_market_time:
@@ -214,6 +214,7 @@ class DailyPutThread(object):
                         candle['interval'] = self.int_value
                         candle['stock'] = symbol
                         candle['time_frame'] = self.interval[0] + "_" + self.interval[1]
+                        candle['ticker'] = ticker
                         put_candles.append(candle)  
 
                     if len(put_candles) > 0:
