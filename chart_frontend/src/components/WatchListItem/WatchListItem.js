@@ -372,6 +372,7 @@ const WatchListItem = (props) => {
         action: 'create_fields',
         chart_number: props.chart_number,
         symbols,
+        symbol_type: 'stock', // or 'crypto'
         fields: colObjects,
       }
 
