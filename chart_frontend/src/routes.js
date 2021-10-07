@@ -100,6 +100,12 @@ export var routes = [
     instance: "scanner",
     pathname: '/scanner'
   },
+  {
+    name: "Floats",
+    icon: "tim-icons icon-vector",
+    instance: "floats",
+    pathname: '/floats'
+  },
 ]
 
 export var adminRoutes = [

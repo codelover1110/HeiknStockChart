@@ -16,19 +16,73 @@ mongoclient = pymongo.MongoClient('mongodb://root:rootUser2021@20.84.64.243:2701
 FLOATS = "floats"
 FLOATSDETAILS = "floats_details"
 
-def get_floats_data():
+def get_floats_data(page_num, page_mounts, exchange, industry, sector):
     
-    fields = {'_id': 0}
+    fields = {
+        "_id": 0,
+    }
 
     floats_db = mongoclient[FLOATS]
     db_collection = floats_db[FLOATSDETAILS]
 
+    query_obj = dict()
+    query_obj['Note'] = { "$exists": False }
+    if exchange != '':
+        query_obj['Exchange'] = exchange
+    if industry != '':
+        query_obj['Industry'] = industry
+    if sector != '':
+        query_obj['Sector'] = sector
 
-    floats_list = list(db_collection.find({}, fields))
-    
-
+    page_total = db_collection.find(query_obj, fields).count()
+    floats_list = db_collection.find(query_obj, fields).skip(page_num).limit(page_mounts)
     floats = []
     for float_item in floats_list:
-        if 'Note' not in float_item:
-            floats.append(float_item)
-    return floats
+        floats.append(float_item)
+    return {
+        'floats': floats,
+        'page_total': page_total
+    }
+
+def get_float_details_filter_options():
+
+    news_db = mongoclient[FLOATS]
+    db_collection = news_db[FLOATSDETAILS]
+
+    query_object = [{
+        "$facet": {
+            "exchange": [
+                {
+                    "$group" : {
+                        "_id" : "$Exchange", 
+                    }
+                }
+            ],
+            "industry": [
+                {
+                    "$group" : {
+                        "_id" : "$Industry", 
+                    }
+                }
+            ],
+            "sector": [
+                {
+                    "$group" : {
+                        "_id" : "$Sector", 
+                    }
+                }
+            ]
+        }
+    }]
+
+    agg_result = db_collection.aggregate(query_object)
+    agg_options = []
+    for doc in agg_result:
+        agg_options = doc
+    
+    options = dict()
+    options["exchanges"] = [item["_id"] for item in agg_options["exchange"]]
+    options["industry"] = [item["_id"] for item in agg_options["industry"]]
+    options['sector'] = [item["_id"] for item in agg_options["sector"]]
+
+    return options

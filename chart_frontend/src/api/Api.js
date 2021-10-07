@@ -706,3 +706,50 @@ export const getTickerScannerOptions = async () => {
     }
   }
 }
+
+export const getFloatsFilterOptions = async () => {
+  const apiUrl = '/floats/float_details_filter_options/'
+
+  try {
+    return await fetch(process.env.REACT_APP_BACKEND_URL + apiUrl)
+      .then(response => response.json())
+      .then(data => {
+        return data
+      })  
+  } catch (e) {
+    return {
+      success: false,
+      message: e
+    }
+  }
+}
+
+export const getFloatsDetails = async (pageNumber, pageAmount, exchange='', industry='', sector='') => {
+  
+  const requestOptions = {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      'page_num': pageNumber,
+      'page_mounts': pageAmount,
+      'exchange': exchange,
+      'industry': industry,
+      'sector': sector,
+    })
+  };
+  
+  const apiURL = '/floats/float_details_list/'
+  
+  try {
+    return await fetch(process.env.REACT_APP_BACKEND_URL + apiURL, requestOptions)
+    .then(response => response.json())
+    .then(data => {
+      return data.results
+    })  
+  } catch (e) {
+    return {
+      success: false,
+      message: e
+    }
+  }
+}

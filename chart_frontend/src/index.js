@@ -28,6 +28,7 @@ import ProvideAuth from 'contexts/authContext'
 import PrivateRoute from 'layouts/Auth/PrivateRoute'
 import SignUp from 'layouts/User/SignUp'
 import Verify from 'layouts/User/Verify'
+import Floats from "layouts/User/Floats";
 import ForgotPassword from 'layouts/User/ForgotPassword'
 import PasswordResetConfirm from 'layouts/User/PasswordResetConfirm'
 import MacketWatch from 'layouts/User/MacketWatch'
@@ -56,6 +57,9 @@ ReactDOM.render(
             <Route path="/password-reset-confirm/:uuid/:token" render={(props) => <PasswordResetConfirm {...props} />} />
             <PrivateRoute path="/botmanagement">
               <FileManager/>
+            </PrivateRoute>
+            <PrivateRoute path="/floats">
+              <Floats />
             </PrivateRoute>
             <PrivateRoute path="/macket_watch">
               <MacketWatch />

@@ -64,8 +64,9 @@ urlpatterns = [
     path('scanner/ticker_details_list/', scanner_view.ticker_details_list, name='ticker-details-details'),
     path('scanner/ticker_details_filter_options/', scanner_view.ticker_details_filter_options, name='ticker_details_filter_options'),
     
-    ################ Floats api ##################
-    path('floats/float_details_list/', floats_view.float_details_list, name='ticker-details-details'),
+    ################ floats api ##################
+    path('floats/float_details_list/', floats_view.float_details_list, name='float_details_list'),
+    path('floats/float_details_filter_options/', floats_view.float_details_filter_options, name='float_details_filter_options'),
     
     # app api
     url(r'^', include('users.urls')),
