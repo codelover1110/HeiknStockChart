@@ -39,9 +39,6 @@ class ScannerClientManager(object):
         client_id = client_info['id']
         client_idx = self.find_client_idx(client_id)
         print ("____________________________________:", client_id)
-        print (self.client_list)
-        print (self.scanner_obj_list)
-        print ("__________________________________________")
         if client_idx != -1:
             scanner_obj = self.scanner_obj_list[client_idx]
             scanner_info = scanner_obj.get_scanner_info()
@@ -54,7 +51,7 @@ class ScannerClientManager(object):
             print ('        symbols: {}, fields: {}'.format(scanner_info['symbols'], scanner_info['fields']))
         self._removeing = False
 
-    def get_status(self):
+    def is_removing(self):
         return self._removeing
 
     def reset_scanner(self, client_info, scanner_info):

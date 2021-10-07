@@ -111,7 +111,6 @@ def watchlists(request):
     if request.method == 'POST':
         req = JSONParser().parse(request)
         name = req['name']
-
         try:
             watchlists = scanner.get_watchlist(name)
             return JsonResponse({"success": True, "result": watchlists}, safe=True)

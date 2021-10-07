@@ -18,8 +18,9 @@ except ImportError:
 
 stream_candles = queue.Queue()
 
-API_KEY = 'KFiYTNFlVvNCqBK12l0Gs322fZcenL2T'
-socket = "wss://delayed.polygon.io/stocks"
+API_KEY = 'tuQt2ur25Y7hTdGYdqI2VrE4dueVA8Xk'
+stock_websocket = "wss://delayed.polygon.io/stocks"
+crypto_websocket = "wss://socket.polygon.io/crypto"
 
 def get_symbols():
     url="https://pkgstore.datahub.io/core/nasdaq-listings/nasdaq-listed_csv/data/7665719fb51081ba0bd834fde71ce822/nasdaq-listed_csv.csv"
@@ -27,6 +28,8 @@ def get_symbols():
     companies = pd.read_csv(io.StringIO(content.decode('utf-8')))
     symbols = companies['Symbol'].tolist()
     return symbols
+
+        
 
 ################### websocket client for polygon ####################
 class PolygonStream(object):
@@ -39,7 +42,8 @@ class PolygonStream(object):
             socket_url, 
             on_open=self.on_open, 
             on_message=self.on_message,
-            on_close=self.on_close
+            on_close=self.on_close,
+            on_error=self.on_error
         )
 
         self.ws_thread = threading.Thread(target=self.ws.run_forever)
@@ -53,12 +57,13 @@ class PolygonStream(object):
         self._stop = True
 
     def make_symbol_params(self, symbols):
+        last_symbol = symbols[-1]
         param = ''
         for idx, symbol in enumerate(symbols):
             if idx == len(symbols)-1:
                 break
             param += "A."+symbol +","
-        param += "A." + symbol
+        param += "A." + last_symbol
         
         return param
 
@@ -115,21 +120,23 @@ class PolygonStream(object):
 
         channel_data = {
             "action": "subscribe",
-            "params": self.tickers # "A.*"
+            "params": self.tickers # "XA.*"
         }
-        # ws.send(json.dumps(channel_data))
+        ws.send(json.dumps(channel_data))
 
-        if True:
+        if False:
             while True:
                 candles = self.make_test_quote()
                 self.put_queue(candles)
                 time.sleep(0.5)
 
     def on_message(self, ws, message):
-        # print(message)
         candles = list(eval(message))
         candles = self.file_date_field(candles)
         self.put_queue(candles)
+
+    def on_error(self, ws, error):
+        print (error)
 
     def on_close(self, we):
         print ("closed connection!")
@@ -160,11 +167,11 @@ def start_stream():
 
 if __name__=="__main__":
     if False:
-        symbols = ["SQQQ", "PROG"]
-        symbols1 = ['AMZN', 'MSFT']
-        # symbols = get_symbols()
+        # symbols = ["SQQQ", "PROG"]
+        symbols1 = ['AFAM', 'ADES']
+        symbols = get_symbols()
 
-        ps = PolygonStream(socket, stream_candles, symbols)
+        ps = PolygonStream(crypto_websocket, stream_candles, symbols[:100])
         ps.start()
 
         cnt = 0
@@ -175,8 +182,9 @@ if __name__=="__main__":
                         candle = stream_candles.get()
                         print (candle)
                         cnt += 1
-                if cnt != 0 and cnt%100==0:
-                    print ('queue_side: {}, all_count: {}'.format(stream_candles.qsize(), cnt))
+                print (cnt)
+                # if cnt != 0 and cnt%100==0:
+                #     print ('queue_side: {}, all_count: {}'.format(stream_candles.qsize(), cnt))
                 
                 time.sleep(0.01)
 

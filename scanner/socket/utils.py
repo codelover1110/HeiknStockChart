@@ -144,3 +144,20 @@ def check_dict_none(dict_value, keys):
         return item
     else:
         return dict_value
+
+def get_default_scanner_view_fields():
+    default_fields = [
+            {
+                "Stock Financials": [ "period", "calendarDate" ]
+            },
+            {
+                "Ticker Details": [ "listdate", "cik" ]
+            },
+            {
+                "Indicators": [ "rsi", "rsi2", "rsi3", "heik", "heik2" ]
+            }
+        ]
+    return default_fields
+
+def get_candle_fields():
+    return ['c', 'date', 'h','l','o', 'percentChange', 'v', 'side', 'rsi', 'rsi2', 'rsi3', 'heik', 'heik2', 'rsi_color', 'rsi2_color', 'rsi3_color', 'heik_color', 'hiek2_color']

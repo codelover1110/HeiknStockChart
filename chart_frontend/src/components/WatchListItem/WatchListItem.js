@@ -200,7 +200,8 @@ const WatchListItem = (props) => {
           
           rows = data.result
 
-          const financials = await getMultiFinancials(rows, 'income_statement')
+          // const financials = await getMultiFinancials(rows, 'income_statement')
+          const financials = await getMultiFinancials(["SQQQ", "PROG", "CEI", "PLTR", "RKLB"], 'income_statement')
           loadMultiFinancials(financials)
 
           // setRowItems(data.tables)
