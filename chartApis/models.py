@@ -7,10 +7,12 @@ from .utils import define_start_date, check_candle_in_maket_time
 # azuremongo = mongoclient
 azuremongo = pymongo.MongoClient('mongodb://root:rootUser2021@20.84.64.243:27017')
 BACKTESTING_TRADES = 'backtesting_trades'
-ALL_TRADES_HISTORY = 'trading-history'
-# ALL_TRADES_HISTORY = 'trade-history'
+# ALL_TRADES_HISTORY = 'trading-history'
+ALL_TRADES_HISTORY = 'trade-history'
 STRATEGY_FILE = 'strategies'
-MARKET_DATA_DB = 'stock_market_data'
+# MARKET_DATA_DB = 'stock_market_data'
+MARKET_DATA_DB = 'chart_market_data'
+
 
 ############################################
 ## get all macro and micro strategy names ##
@@ -128,7 +130,7 @@ def get_stock_candles_for_strategy_all(candle_name, symbol, macro, micro, extend
     start_date, end_date = define_start_date(candle_name)
     
     # get candles
-    masterdb = azuremongo['stock_market_data']
+    masterdb = azuremongo[MARKET_DATA_DB]
     ob_table = masterdb[candle_name] 
     candle_result = ob_table.find({'date': {'$gte': start_date, '$lt': end_date}, 'stock': symbol})
     sort_candles = list(candle_result.sort('date', pymongo.ASCENDING))   

@@ -240,6 +240,36 @@ def join_append(candles, strategy_trades, strategy_name):
 
     return candles
 
+def get_chat_available_stratgies_no_interval(candle_name, micros):
+    # get candle interval 
+    interval_unit = candle_name.split('_')[-1]
+    candle_interval = 0        # minute
+    interval_num = candle_name.split('_')[1]
+    if interval_unit in 'minutes':
+        candle_interval = int(interval_num)
+    elif interval_unit in 'hours':
+        candle_interval = int(interval_num) * 60
+    elif interval_unit in 'days':
+        candle_interval = int(interval_num) * 24 * 60
+
+    result = []
+    for micro in micros:
+        micro = '1m-'
+        base_interval_str = micro[0:3]
+        base_interval = 0
+        if 'm' in base_interval_str:
+            base_interval = int(base_interval_str.split('m')[0])
+        elif 'h' in base_interval_str:
+            base_interval = int(base_interval_str.split('h')[0]) * 60
+        elif 'd' in base_interval_str:
+            base_interval = int(base_interval_str.split('d')[0]) * 24 * 60
+        
+        if base_interval >= candle_interval:
+            result.append(micro)
+    
+    return result
+
+
 def get_chat_available_stratgies(candle_name, micros):
     # get candle interval 
     interval_unit = candle_name.split('_')[-1]
@@ -388,8 +418,11 @@ def fill_missing_candles__(chat_candles, candle_name, macro, micro):
     # for strtg in strategy_names:
     #     if macro_name in strtg:
     #         macro_strategies.append(strtg)
+
+    print ('---------- candle_name: {}, macro: {}, micro: {}'.format(candle_name, macro, micro))
     micros = get_micro_strategies(macro)
-    available_strategies = get_chat_available_stratgies(candle_name, micros)
+    print ('--------- micros: {}'.format(micros))
+    available_strategies = get_chat_available_stratgies_no_interval(candle_name, micros)
     if micro in available_strategies:
         insert_candles = []
         for candle in chat_candles:
