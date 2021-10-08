@@ -16,9 +16,12 @@ try:
 except ImportError:
    import Queue as queue
 
+from define import *
 stream_candles = queue.Queue()
 
-API_KEY = 'tuQt2ur25Y7hTdGYdqI2VrE4dueVA8Xk'
+API_KEY_CRYPTO = 'tuQt2ur25Y7hTdGYdqI2VrE4dueVA8Xk'
+API_KEY_STOCK = 'tuQt2ur25Y7hTdGYdqI2VrE4dueVA8Xk'
+
 stock_websocket = "wss://delayed.polygon.io/stocks"
 crypto_websocket = "wss://socket.polygon.io/crypto"
 
@@ -33,8 +36,9 @@ def get_symbols():
 
 ################### websocket client for polygon ####################
 class PolygonStream(object):
-    def __init__(self, socket_url, candle_queue, symbols="AMZN"):
+    def __init__(self, socket_url, candle_queue, symbols=["AMZN"], symbol_type=SYMBOL_TYPE_STOCK):
         self.symbols = symbols
+        self.symbol_type = symbol_type
         self.candle_queue = candle_queue
         self.tickers = self.make_symbol_params(symbols)
         self._stop = False
@@ -62,29 +66,46 @@ class PolygonStream(object):
         for idx, symbol in enumerate(symbols):
             if idx == len(symbols)-1:
                 break
-            param += "A."+symbol +","
-        param += "A." + last_symbol
+
+            if self.symbol_type == SYMBOL_TYPE_STOCK:
+                param += "A."+symbol+","
+            elif self.symbol_type == SYMBOL_TYPE_CRYPTO:
+                param += "XA."+symbol+"-USD" + ","
+        if self.symbol_type == SYMBOL_TYPE_STOCK:
+            param += "A."+last_symbol
+        elif self.symbol_type == SYMBOL_TYPE_CRYPTO:
+            param += "XA."+last_symbol+"-USD"
         
         return param
 
     def put_queue(self, candles):
         if not self._stop:
             for candle in candles:
-                candle['symbol'] = candle['sym']
-                del candle['sym']
+                if self.symbol_type == SYMBOL_TYPE_STOCK:
+                    candle['symbol'] = candle['sym']
+                    del candle['sym']
+                elif self.symbol_type == SYMBOL_TYPE_CRYPTO:
+                    candle['symbol'] = candle['pair']
+                    del candle['pair']
                 self.candle_queue.put(candle)
                 if self.candle_queue.qsize() > 1000:
                     self.candle_queue.get()
 
-    def make_test_quote(self):
+    def make_test_quote(self, specific_symbol=None):
         symbol_cnt = len(self.symbols)
         sym_idx = random.randint(0, symbol_cnt-1)
+        symbol = ""
+        if specific_symbol is not None:
+            symbol = specific_symbol
+        else:
+            symbol = self.symbols[sym_idx]
         candle_count = random.randint(1, 5)
         result = []
         for i in range(candle_count):
             fake_candle = {
                 "ev": "A",
-                "sym": self.symbols[sym_idx],
+                "sym": symbol,
+                "pair": symbol+"-USD", 
                 "v": random.randint(3300, 4000),
                 "av": random.randint(490293, 840293),
                 "op": random.randint(1, 10),
@@ -109,31 +130,47 @@ class PolygonStream(object):
             result.append(candle)
         return result
 
+    def buffering_symbols(self):
+        for symbol in self.symbols:
+            for i in range(10):
+                candles = self.make_test_quote(symbol)
+                self.put_queue(candles)
+            
+            time.sleep(0.01)
+
     def on_open(self, ws):
         print ("opened")
+        api_key = ""
+        if self.symbol_type == SYMBOL_TYPE_STOCK:
+            api_key = API_KEY_STOCK
+        elif self.symbol_type == SYMBOL_TYPE_CRYPTO:
+            api_key = API_KEY_CRYPTO
         auth_data = {
             "action": "auth",
-            "params": API_KEY
+            "params": api_key
         }
 
         ws.send(json.dumps(auth_data))
 
         channel_data = {
             "action": "subscribe",
-            "params": self.tickers # "XA.*"
+            "params": self.tickers  #"XA.*"
         }
         ws.send(json.dumps(channel_data))
+
+        self.buffering_symbols()
 
         if False:
             while True:
                 candles = self.make_test_quote()
                 self.put_queue(candles)
-                time.sleep(0.5)
+                time.sleep(0.01)
 
     def on_message(self, ws, message):
         candles = list(eval(message))
         candles = self.file_date_field(candles)
         self.put_queue(candles)
+        
 
     def on_error(self, ws, error):
         print (error)
@@ -167,11 +204,10 @@ def start_stream():
 
 if __name__=="__main__":
     if False:
-        # symbols = ["SQQQ", "PROG"]
-        symbols1 = ['AFAM', 'ADES']
-        symbols = get_symbols()
+        symbols1 = ['BTC', 'ETH', 'DOGE', 'BCH', 'LTC']
+        # symbols = get_symbols()
 
-        ps = PolygonStream(crypto_websocket, stream_candles, symbols[:100])
+        ps = PolygonStream(crypto_websocket, stream_candles, symbols1, symbol_type=SYMBOL_TYPE_CRYPTO)
         ps.start()
 
         cnt = 0
@@ -180,11 +216,10 @@ if __name__=="__main__":
                 if not stream_candles.empty():
                     while not stream_candles.empty():
                         candle = stream_candles.get()
-                        print (candle)
+                        print (candle['symbol'])
                         cnt += 1
-                print (cnt)
-                # if cnt != 0 and cnt%100==0:
-                #     print ('queue_side: {}, all_count: {}'.format(stream_candles.qsize(), cnt))
+                if cnt != 0 and cnt%100==0:
+                    print ('queue_side: {}, all_count: {}'.format(stream_candles.qsize(), cnt))
                 
                 time.sleep(0.01)
 

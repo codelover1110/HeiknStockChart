@@ -11,6 +11,7 @@ stream_queue = queue.Queue()
 
 API_KEY = 'KFiYTNFlVvNCqBK12l0Gs322fZcenL2T'
 socket = "wss://delayed.polygon.io/stocks"
+crypto_websocket = "wss://socket.polygon.io/crypto"
 TICKERS = ''
 
 def make_symbol_params(symbols):
@@ -33,15 +34,15 @@ def on_open(ws):
 
     channel_data = {
         "action": "subscribe",
-        "params":  "A.*" # TICKERS
+        "params":  "XA.*" # TICKERS
     }
     ws.send(json.dumps(channel_data))
 
 def on_message(ws, message):
     print ("received a message")
-    print (message)
-    candle = json.load(message)
-    print (candle)
+    print ("--------------", message)
+    candles = list(eval(message))
+    print (candles)
 
     # stream_queue.put()
 
@@ -55,10 +56,10 @@ def start_stream_loop(loop, server):
     loop.run_forever()
 
 if __name__=="__main__":
-    symbols = ["TSLA"] #["GOOG", "ATVI", "AMD", "MSFT", "AMZN", "NVDA", "TSLA", "AAPL"]
+    symbols = ["GOOG", "ATVI", "AMD", "MSFT", "AMZN", "NVDA", "TSLA", "AAPL"]
     TICKERS = make_symbol_params(symbols)
     ws = websocket.WebSocketApp(
-            socket, 
+            crypto_websocket, 
             on_open=on_open, 
             on_message=on_message,
             on_close=on_close

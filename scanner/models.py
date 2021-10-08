@@ -33,7 +33,16 @@ INDICATORS_COL_NAME = 'indicators'
 def get_stock_financials_fields():
     fields = {
         "_id": 0,
-        "ticker": 0,
+        "calendarDate": 1,
+        "currentRatio": 1,
+        "debt": 1,
+        "period": 1,
+        "updated": 1,
+        "assetsCurrent": 1, 
+        "assets": 1, 
+        "profitMargin": 1, 
+        "shares": 1,
+        "taxAssets": 1
     }
 
     financials_db = mongoclient[FINANCIALS]
@@ -95,8 +104,16 @@ def get_ticker_news_fields():
 def get_ticker_details_fields():
     fields = {
         "_id": 0,
-        "tags": 0,
-        "similar": 0
+        "country": 1, 
+        "phone": 1,
+        "url": 1,
+        "hq_state": 1,
+        "type": 1, 
+        "updated": 1, 
+        "active": 1, 
+        "ceo": 1,
+        "exchangeSymbol": 1,
+        "name": 1
     }
 
     news_db = mongoclient[DETAILS]
@@ -126,7 +143,6 @@ def get_available_items():
     result = dict()
     result['stock_financials'] = get_stock_financials_fields()
     result['indicators'] = get_indicators_fields()
-    # result['ticker_news'] = get_ticker_news_fields()
     result['ticker_details'] = get_ticker_details_fields()
     return result
 

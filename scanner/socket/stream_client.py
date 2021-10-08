@@ -17,44 +17,19 @@ except ImportError:
 
 
 socket = "ws://127.0.0.1:9999/"
+# socket = "ws://52.191.3.0:9999"
 # socket = "ws://20.84.64.243:9999"
-# CEI, PLTR, RKLB
+# ["BTC", "ETH", "LTC"],   ["AMD", "AMZN", "GOOG"]
 test_info = {
         "action": "create_fields",
         "chart_number": 4,
-        "symbols": [
-            "CEI",
-            "PLTR",
-            "RKLB"
-        ],
+        "symbol_type": "crypto",
+        "symbols":  ["BTC", "ETH", "LTC"],
         "fields": [
-            {
-                "Stock Financials": [
-                    "period",
-                    "calendarDate"
-                ]
-            },
-            {
-                "Ticker News": [
-                    "id",
-                    "title"
-                ]
-            },
-            {
-                "Ticker Details": [
-                    "listdate",
-                    "cik"
-                ]
-            },
-            {
-                "Indicators": [
-                    "rsi",
-                    "rsi2",
-                    "rsi3",
-                    "heik",
-                    "heik2"
-                ]
-            }
+            { "Stock Financials":   [ "period","calendarDate" ] },
+            { "Ticker News":        [ "id", "title" ] },
+            { "Ticker Details":   [ "listdate", "cik" ] },
+            { "Indicators": [ "rsi", "rsi2", "rsi3", "heik", "heik2" ] }
         ]
     }
 
@@ -84,11 +59,6 @@ class StreamClient(object):
     
     def on_open(self, ws):
         print ("Open Connection!")
-        scanner_info = {
-            'chart_number': '1',
-            'symbols': ['DOG', 'CAT', 'PIG'],
-            'fields': ['rsi', 'ris2', 'rsi3', 'heik', 'heik2']
-        }
         ws.send(json.dumps(test_info))
 
     def on_message(self, ws, message):
@@ -98,8 +68,10 @@ class StreamClient(object):
         print ("closed connection!")
 
 if __name__ == "__main__":
+    ps_list = []
     ps = StreamClient(socket)
     ps.start()
 
-    time.sleep(600)
+    time.sleep(130)
     ps.stop()
+    time.sleep(0.1)

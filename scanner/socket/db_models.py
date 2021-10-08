@@ -6,25 +6,12 @@ from ib_insync import util
 import json
 
 from utils import get_fields_data, combine_dict, check_dict_none
+from define import *
 
-NEWS = 'sticker_news'
-NEWS_COL_NAME = 'news_meta_data'
-FINANCIALS = 'financials_data'
-FINANCIALS_COL_NAME = 'financials'
-DETAILS = 'ticker_details'
-DETAILS_COL_NAME = 'detail_meta_data'
-PARAMETERS = 'parame'
-
-SCANNER_DB = 'scanner'
-SCANNER_VIEWS = 'scanner_views'
-
-PARAMETERS_DB = 'parameters'
-INDICATORS_COL_NAME = 'indicators'
 
 mongoclient = pymongo.MongoClient('mongodb://root:rootUser2021@20.84.64.243:27017')
-
 class DBManager(object):
-    def __init__(self, symbols, fields):
+    def __init__(self, symbols, fields, symbol_type=SYMBOL_TYPE_STOCK):
         self.financial_fields = get_fields_data(fields, 'Stock Financials')
         self.detail_fields = get_fields_data(fields, 'Ticker Details')
         self.symbols = symbols
@@ -107,18 +94,46 @@ def get_all_scanner_symbols():
                 result.append(symbol)
     return result
 
+def get_watch_list_symbols(symbol_type):
+    def add_symbols(src, dst):
+        for sym in dst:
+            if not sym in src:
+                src.append(sym)
+        return src
+
+    scanner_db = mongoclient[PARAMETERS_DB]
+    db_collection = scanner_db[WATCHLIST_COL_NAME]
+    watch_lists = list(db_collection.find({}, {"_id": 0}))
+    crypto_symbols = []
+    stock_symbols = []
+    for wl in watch_lists:
+        name = wl['name']
+        tickers = wl['contents'].split('\n')
+        if '' in tickers:
+            tickers.remove('')
+        if 'crypto' in name.lower():
+            add_symbols(crypto_symbols,tickers)
+        else:
+            add_symbols(stock_symbols,tickers)
+    if symbol_type == SYMBOL_TYPE_STOCK:
+        return stock_symbols
+    elif symbol_type == SYMBOL_TYPE_CRYPTO:
+        return crypto_symbols
+
 def get_all_scanner_fields():
     financials_db = mongoclient[FINANCIALS]
     db_collection = financials_db[FINANCIALS_COL_NAME]
-    financials = db_collection.find_one({}, {'_id': False})
+    financials = db_collection.find_one({}, SCANNER_FINANCIAL_DETAIL_FIELDS)
     financial_keys = financials.keys()
 
     detail_db = mongoclient[DETAILS]
     db_collection = detail_db[DETAILS_COL_NAME]
-    details = db_collection.find_one({}, {'_id': False})
+    details = db_collection.find_one({}, SCANNER_TICKER_DETAIL_FIELDS)
     detail_kyes = details.keys()
     return [
         {'Stock Financials': financial_keys},
         {'Ticker Details': detail_kyes}
     ]
+
+
     

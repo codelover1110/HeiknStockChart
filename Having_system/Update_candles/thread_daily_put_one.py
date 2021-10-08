@@ -16,7 +16,7 @@ except ImportError:
 API_KEY = 'tuQt2ur25Y7hTdGYdqI2VrE4dueVA8Xk'
 # mongoclient = pymongo.MongoClient('mongodb://aliaksandr:BD20fc854X0LIfSv@cluster0-shard-00-00.35i8i.mongodb.net:27017,cluster0-shard-00-01.35i8i.mongodb.net:27017,cluster0-shard-00-02.35i8i.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-aoj781-shard-0&authSource=admin&retryWrites=true&w=majority')
 # mongoclient = pymongo.MongoClient('mongodb://user:-Hz2f$!YBXbDcKG@cluster0-shard-00-00.vcom7.mongodb.net:27017,cluster0-shard-00-01.vcom7.mongodb.net:27017,cluster0-shard-00-02.vcom7.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-7w6acj-shard-0&authSource=admin&retryWrites=true&w=majority')
-mongoclient = pymongo.MongoClient('mongodb://root:rootUser2021@20.84.64.243:27018')
+mongoclient = pymongo.MongoClient('mongodb://root:rootUser2021@20.84.64.243:27017')
 
 def get_symbols():
     url="https://pkgstore.datahub.io/core/nasdaq-listings/nasdaq-listed_csv/data/7665719fb51081ba0bd834fde71ce822/nasdaq-listed_csv.csv"
@@ -31,10 +31,10 @@ intervals = [
     [['1', 'minute'], 1, False, 30],    # use 30 when get a year candles
     [['1', 'hour'], 1*60, False, 500],
     [['1', 'day'], 24*60, False, 500],
-    [['2', 'minute'], 2, False, 60],    # use 60 when get a year candles
-    [['12', 'minute'], 12, False, 200],  # use 200 when get a year candles
-    [['4', 'hour'], 4*60, False, 500],
-    [['12', 'hour'], 12*60, False, 500],
+    # [['2', 'minute'], 2, False, 60],    # use 60 when get a year candles
+    # [['12', 'minute'], 12, False, 200],  # use 200 when get a year candles
+    # [['4', 'hour'], 4*60, False, 500],
+    # [['12', 'hour'], 12*60, False, 500],
 ]
 
 class DailyPutThread(object):
@@ -222,7 +222,7 @@ if __name__ == "__main__":
     thread_list = []
 
     symbols = get_symbols()
-    # symbols = ["GOOG", "ATVI", "AMD", "MSFT", "AMZN", "NVDA", "TSLA", "AAPL", ""]
+    symbols.extend(["AXP", "KO", "COST", "V", "BAC", ""])
     symbol_count = len(symbols)
     print ("symbols: ", symbol_count)
 
@@ -250,25 +250,25 @@ if __name__ == "__main__":
         thrd.start()
         time.sleep(0.5)
 
-    # while True:
-    for item in intervals:
-        proc_time = 0
-        while True:
-            thread_states = []
-            for thrd in thread_list:
-                thread_working = thrd.get_thread_state()
-                thread_states.append(thread_working)
-            if True not in thread_states:
+    while True:
+        for item in intervals:
+            proc_time = 0
+            while True:
+                thread_states = []
                 for thrd in thread_list:
-                    thrd.set_interval(item[0], item[1], item[2], item[3])
-                break
-            else:
-                print('< {} > {}'.format(proc_time, thread_states))
+                    thread_working = thrd.get_thread_state()
+                    thread_states.append(thread_working)
+                if True not in thread_states:
+                    for thrd in thread_list:
+                        thrd.set_interval(item[0], item[1], item[2], item[3])
+                    break
+                else:
+                    print('< {} > {}'.format(proc_time, thread_states))
 
-            time.sleep(5)
-            proc_time += 5
+                time.sleep(5)
+                proc_time += 5
 
-    time.sleep(10)
+        time.sleep(10)
     for thrd in thread_list:
         thrd.stop()
 
