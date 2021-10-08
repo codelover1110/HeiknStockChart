@@ -38,6 +38,20 @@ const HeiknStockChart = (props) => {
       value: 'markettime', label: 'market time',
     }
   );
+
+  const [selectedSymbolType, setSelectedSymbolType] = useState({
+    value: 'stock',
+    label: 'stock'
+  })
+
+  const optionsSymbolType = [
+    {
+      value: 'stock', label: 'stock',
+    },
+    {
+      value: 'crypto', label: 'crypto',
+    }
+  ]
   
   const [optionsViewTypes, setOptionsViewTypes] = useState([
     { value: 'charting', label: 'Charting' },
@@ -63,7 +77,7 @@ const HeiknStockChart = (props) => {
     }
   ]);
   
-  const [optionsMarketTime, setOptionsMarketTime] = useState([
+  const [optionsMarketTime] = useState([
     {
       value: 'markettime', label: 'market time',
     },
@@ -352,6 +366,10 @@ const HeiknStockChart = (props) => {
     return 4
   }
 
+  const handleSymbolTypeChange = (e) => {
+    setSelectedSymbolType(e)
+  }
+
   const handleSignout = () => {
     auth.signout()
     history.push('/login')
@@ -362,7 +380,8 @@ const HeiknStockChart = (props) => {
       <div className={`row ${calculateHeightStyle()}`}>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
           {microStrategy && symbol && (
-            < StockChart 
+            < StockChart
+              selectedSymbolType={selectedSymbolType.value}
               extendMarketTime={extendMarketTime.value}
               selectedInstance={selectedInstance}
               selectedTradeDB='heikfilter-2mins-trades'
@@ -494,6 +513,14 @@ const HeiknStockChart = (props) => {
                 onChange={handleMarketTimeChange}
                 options={optionsMarketTime}
                 placeholder="Market Time"
+              />
+            </div>
+            <div className="select-option">
+              <Select
+                value={selectedSymbolType}
+                onChange={handleSymbolTypeChange}
+                options={optionsSymbolType}
+                placeholder="Select Symbol Type"
               />
             </div>
             <div className="select-option">

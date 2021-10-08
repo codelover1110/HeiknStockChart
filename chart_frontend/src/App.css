@@ -723,6 +723,7 @@ pre {
 .watch-list-data-table-header {
   height: 30px;
   margin-bottom: 0px;
+  background-color: #212529;
 }
 
 .watch-list-edit-column-widget {

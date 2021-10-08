@@ -91,6 +91,26 @@ const FinancialDataTable = (props) => {
     }
   }, [data, selectedAggregationType, selectedStockType]);
 
+  const formatNumber = (num) => {
+    return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
+  }
+
+  const formatData = (rows) => {
+    const newRows = []
+    rows.map((row) => {
+      let newObject = {}
+      Object.keys(row).map(key => {
+        if ((key === 'TTM') || (typeof(row[key]) !== 'string') && parseInt(row[key]) !== NaN) {
+          newObject[key] = formatNumber(row[key])
+        } else {
+          newObject[key] = row[key]
+        }
+      })
+      newRows.push(newObject)
+    })
+    return newRows
+  }
+
   return (
     <div className="hunter-chart-container">
       <div className="col-sm-12 hunter-data-table-container financial-data-table">
@@ -137,7 +157,7 @@ const FinancialDataTable = (props) => {
               </>
             ) : (
               <MDBTableBody
-                rows={datatable.rows[0]}
+                rows={formatData(datatable.rows[0])}
                 class={
                   selectedStockType === 'Income Statement'
                     ? 'financial-table-body-1'
