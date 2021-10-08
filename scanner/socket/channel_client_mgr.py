@@ -146,8 +146,6 @@ class ChannelClientManager(object):
                 while not self.input_all_stream_queue.empty():
                     candle = self.input_all_stream_queue.get()
                     self.join_db_data(candle)
-                    if self.symbol_type ==  SYMBOL_TYPE_CRYPTO:
-                        print (candle)
 
             time.sleep(0.01)
 
@@ -158,8 +156,6 @@ class ChannelClientManager(object):
             if not self.db_join_candle_queue.empty():
                 while not self.db_join_candle_queue.empty():
                     db_candle = self.db_join_candle_queue.get()
-                    if self.symbol_type == SYMBOL_TYPE_CRYPTO:
-                        print (self.symbol_type, " : ", db_candle['symbol'])
                     for channel_obj in self.channels:
                         if db_candle['symbol'] in channel_obj.get_channel_symbols():
                             channel_obj.put_db_joined_candle(db_candle.copy())
