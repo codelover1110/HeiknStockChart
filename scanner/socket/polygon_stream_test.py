@@ -34,7 +34,7 @@ def on_open(ws):
 
     channel_data = {
         "action": "subscribe",
-        "params":  "XA.*" # TICKERS
+        "params":  TICKERS # "XA.*" # 
     }
     ws.send(json.dumps(channel_data))
 
@@ -56,10 +56,10 @@ def start_stream_loop(loop, server):
     loop.run_forever()
 
 if __name__=="__main__":
-    symbols = ["GOOG", "ATVI", "AMD", "MSFT", "AMZN", "NVDA", "TSLA", "AAPL"]
+    symbols = ["GOOG"]
     TICKERS = make_symbol_params(symbols)
     ws = websocket.WebSocketApp(
-            crypto_websocket, 
+            socket, 
             on_open=on_open, 
             on_message=on_message,
             on_close=on_close
