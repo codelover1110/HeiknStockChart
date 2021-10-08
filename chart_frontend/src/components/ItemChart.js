@@ -280,14 +280,14 @@ const HeiknStockChartItem = (props) => {
                 />
               </div>)
           }
-          <div className="select-option">
+          {/* <div className="select-option">
             <Select
               value={selectedSymbolType}
               onChange={handleSymbolTypeChange}
               options={optionsSymbolType}
               placeholder="Select Symbol Type"
             />
-          </div>
+          </div> */}
           {(selectedInstance.value !== 'live_trading') &&
             (<div className="select-option">
                 <Select

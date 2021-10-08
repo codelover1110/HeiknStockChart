@@ -1,8 +1,9 @@
-export const filterPriceData = async (symbol, timeFrame, tradeStartDate, tradeEndDate) => {
+export const filterPriceData = async (selectedSymbolType, symbol, timeFrame, tradeStartDate, tradeEndDate) => {
   const requestOptions = {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
+      'selectedSymbolType': selectedSymbolType,
       'symbol': symbol,
       'time_frame': timeFrame,
       'start': tradeStartDate,
@@ -28,11 +29,12 @@ export const filterPriceData = async (symbol, timeFrame, tradeStartDate, tradeEn
     })
 }
 
-export const filterTradesData = async (symbol, macroStrategy, microStrategy, tradeStartDate, tradeEndDate) => {
+export const filterTradesData = async (selectedSymbolType, symbol, macroStrategy, microStrategy, tradeStartDate, tradeEndDate) => {
   const requestOptions = {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
+      'selectedSymbolType': selectedSymbolType,
       'symbol': symbol,
       'macroStrategy': macroStrategy,
       'microStrategy': microStrategy,

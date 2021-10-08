@@ -33,6 +33,20 @@ const PriceDataTable = () => {
     { value: "1d", label: "1d" }
   ])
 
+  const [selectedSymbolType, setSelectedSymbolType] = useState({
+    value: 'stock',
+    label: 'stock'
+  })
+
+  const optionsSymbolType = [
+    {
+      value: 'stock', label: 'stock',
+    },
+    {
+      value: 'crypto', label: 'crypto',
+    }
+  ]
+
   const hearder_columns = useMemo(() => {
     return [
     {
@@ -79,7 +93,7 @@ const PriceDataTable = () => {
 
   useEffect(() => {
     const getPriceTrades = async (symbol, timeFrame, tradeStartDate, tradeEndDate) => {
-      const trades_data = await filterPriceData(symbol, timeFrame, tradeStartDate, tradeEndDate);
+      const trades_data = await filterPriceData(selectedSymbolType.value, symbol, timeFrame, tradeStartDate, tradeEndDate);
       setDatatable({
         columns: hearder_columns,
         rows: trades_data
@@ -88,7 +102,7 @@ const PriceDataTable = () => {
 
     getPriceTrades(symbol.value, timeFrame.value, tradeStartDate, tradeEndDate)
 
-  }, [symbol, timeFrame, hearder_columns, tradeStartDate, tradeEndDate])
+  }, [selectedSymbolType, symbol, timeFrame, hearder_columns, tradeStartDate, tradeEndDate])
 
   useEffect(() => {
       const getSymbols = async () => {
@@ -114,6 +128,10 @@ const PriceDataTable = () => {
   const selectDateRange = (startDate, endDate) => {
     setTradeStartDate(startDate)
     setTradeEndDate(endDate)
+  }
+
+  const handleSymbolTypeChange = (e) => {
+    setSelectedSymbolType(e)
   }
 
   return (
@@ -168,6 +186,14 @@ const PriceDataTable = () => {
           Price Data Table
         </div>
         <div className="hunter-search-filter-area">
+          {/* <div className="select-option">
+            <Select
+              value={selectedSymbolType}
+              onChange={handleSymbolTypeChange}
+              options={optionsSymbolType}
+              placeholder="Select Symbol Type"
+            />
+          </div> */}
           <div className="select-option">
             <Select
               value={symbol}
