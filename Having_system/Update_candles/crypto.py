@@ -11,6 +11,9 @@ try:
 except ImportError:
    import Queue as queue
 
+from define import *
+from db_models import get_watch_list_symbols
+
 API_KEY = "tuQt2ur25Y7hTdGYdqI2VrE4dueVA8Xk"
 mongoclient = pymongo.MongoClient('mongodb://root:rootUser2021@20.84.64.243:27017')
 
@@ -49,7 +52,8 @@ def monitoring_cryto_aggregates():
             print (candle)
             # break
 
-DB_NAME = 'crypto_market_data'
+DB_NAME = 'chart_market_data'
+LAST_UPDATE_DATE_COL = "crypto_symbol_last_date"
 
 intervals = [
     [['1', 'minute'], 1, False, 31],    # use 30 when get a year candles
@@ -108,7 +112,7 @@ class DailyPutThread(object):
 
     def update_last_put_date(self, symbol, interval, last_candle_date):
         masterdb = mongoclient[DB_NAME]
-        ob_table = masterdb['symbol_last_date']
+        ob_table = masterdb[LAST_UPDATE_DATE_COL]
         symbol_last_update_date = ob_table.find_one({"symbol": symbol})
 
         if symbol_last_update_date is not None:
@@ -120,7 +124,7 @@ class DailyPutThread(object):
         default_date = datetime.strptime("2020-10-04 00:00:00", '%Y-%m-%d %H:%M:%S')
         
         masterdb = mongoclient[DB_NAME]
-        ob_table = masterdb['symbol_last_date']
+        ob_table = masterdb[LAST_UPDATE_DATE_COL]
         last_date_doc = ob_table.find_one({"symbol": symbol})
         if last_date_doc is not None:
             key = interval[0] + "_" + interval[1]
@@ -245,9 +249,11 @@ if __name__ == "__main__":
     thread_list = []
 
     # symbols = get_symbols()
-    symbols = ["BTC","ETH","DOGE","BCH","LTC", ""]
+    # symbols = ["BTC","ETH","DOGE","BCH","LTC", ""]
+    symbols = get_watch_list_symbols(SYMBOL_TYPE_CRYPTO)
+    symbols.append("")
     symbol_count = len(symbols)
-    print ("symbols: ", symbol_count)
+    print (symbols, "symbols: ", symbol_count)
 
     thread_symbol_count = int(symbol_count / thread_count) + 1
     for idx in range(thread_count):
@@ -273,25 +279,25 @@ if __name__ == "__main__":
         thrd.start()
         time.sleep(0.5)
 
-    while True:
-        for item in intervals:
-            proc_time = 0
-            while True:
-                thread_states = []
+    # while True:
+    for item in intervals:
+        proc_time = 0
+        while True:
+            thread_states = []
+            for thrd in thread_list:
+                thread_working = thrd.get_thread_state()
+                thread_states.append(thread_working)
+            if True not in thread_states:
                 for thrd in thread_list:
-                    thread_working = thrd.get_thread_state()
-                    thread_states.append(thread_working)
-                if True not in thread_states:
-                    for thrd in thread_list:
-                        thrd.set_interval(item[0], item[1], item[2], item[3])
-                    break
-                else:
-                    print('< {} > {}'.format(proc_time, thread_states))
+                    thrd.set_interval(item[0], item[1], item[2], item[3])
+                break
+            else:
+                print('< {} > {}'.format(proc_time, thread_states))
 
-                time.sleep(5)
-                proc_time += 5
+            time.sleep(5)
+            proc_time += 5
 
-        time.sleep(10)
+    time.sleep(10)
     for thrd in thread_list:
         thrd.stop()
 

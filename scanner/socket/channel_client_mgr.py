@@ -52,6 +52,7 @@ class ChannelClientManager(object):
             sym_last_candles = dict()
             sym_last_candles['symbol'] = symbol
             sym_last_candles['last_candles'] = []
+            sym_last_candles['last_rsi_candle'] = None
             self.symbol_last_candles.append(sym_last_candles)
 
         self.polygon_stream_client = PolygonStream(self.socket_url, self.input_all_stream_queue, self.symbols, self.symbol_type)
@@ -100,6 +101,16 @@ class ChannelClientManager(object):
     def is_removing(self):
         return self._removing
 
+    def send_last_symbol_data(self, client_info, scanner_info):
+        client_symbols = scanner_info['symbols']
+        for sym_last_candles in self.symbol_last_candles:
+            if sym_last_candles['symbol'] in client_symbols:
+                symbol_last_rsi_candle = sym_last_candles['last_rsi_candle']
+                for idx, channel_obj in enumerate(self.channels):
+                    client = channel_obj.get_channel_client_info()
+                    if client_info['id'] == client['id']:
+                        channel_obj.put_db_joined_candle(symbol_last_rsi_candle.copy())
+
     def find_client_idx(self, client_id):
         for idx, channel_obj in enumerate(self.channels):
             client = channel_obj.get_channel_client_info()
@@ -128,8 +139,11 @@ class ChannelClientManager(object):
                     update_item = dict()
                     update_item['symbol'] = symbol
                     update_item['data'] = combine_dict(last_candle, symbol_preload)
+
+                    sym_last_candles['last_rsi_candle'] = update_item
+                    
                     self.db_join_candle_queue.put(update_item)
-                    if self.db_join_candle_queue.qsize() > 1000:
+                    if self.db_join_candle_queue.qsize() > 10000:
                         self.db_join_candle_queue.get()
                     
 

@@ -65,13 +65,14 @@ class StockStreamServer(object):
 
 	def client_left(self, client, server):
 		print ("client left: ", client)
-		cc_mgr = self.get_cc_mgr_by_client(client)
-		if cc_mgr is not None:
-			cc_mgr.set_channel_stop(client)
-			self.closed_client.append(client)
-			if len(self.closed_client) > 1000:
-				self.closed_client = self.closed_client[-100:]
-			self.remove_client_list.put(client)
+		if client is not None:
+			cc_mgr = self.get_cc_mgr_by_client(client)
+			if cc_mgr is not None:
+				cc_mgr.set_channel_stop(client)
+				self.closed_client.append(client)
+				if len(self.closed_client) > 1000:
+					self.closed_client = self.closed_client[-100:]
+				self.remove_client_list.put(client)
 
 	def receive_message(self, client, server, message):
 		scanner_info = json.loads(message)
@@ -125,6 +126,7 @@ class StockStreamServer(object):
 					symbol_type = scanner_info['symbol_type']
 					cc_mgr = self.get_cc_mgr_by_symbol_type(symbol_type)
 					cc_mgr.add_new_channel(client, scanner_info)
+					cc_mgr.send_last_symbol_data(client, scanner_info)
 					time.sleep(0.1)
 
 			if not self.remove_client_list.empty():

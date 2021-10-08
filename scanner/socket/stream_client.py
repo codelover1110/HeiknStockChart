@@ -72,6 +72,6 @@ if __name__ == "__main__":
     ps = StreamClient(socket)
     ps.start()
 
-    time.sleep(130)
+    time.sleep(10)
     ps.stop()
     time.sleep(0.1)

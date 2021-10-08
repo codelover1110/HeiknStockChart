@@ -88,7 +88,7 @@ class PolygonStream(object):
                     candle['symbol'] = candle['pair']
                     del candle['pair']
                 self.candle_queue.put(candle)
-                if self.candle_queue.qsize() > 1000:
+                if self.candle_queue.qsize() > 10000:
                     self.candle_queue.get()
 
     def make_test_quote(self, specific_symbol=None):
@@ -101,26 +101,26 @@ class PolygonStream(object):
             symbol = self.symbols[sym_idx]
         candle_count = random.randint(1, 5)
         result = []
-        for i in range(candle_count):
-            fake_candle = {
-                "ev": "A",
-                "sym": symbol,
-                "pair": symbol+"-USD", 
-                "v": random.randint(3300, 4000),
-                "av": random.randint(490293, 840293),
-                "op": random.randint(1, 10),
-                "vw": random.randint(10, 30),
-                "o": random.randint(30, 50),
-                "c": random.randint(50, 70),
-                "h": random.randint(70, 90),
-                "l": random.randint(90, 110),
-                "a": random.randint(110, 130),
-                "z": random.randint(100, 1000),
-                "s": random.randint(1610044640000, 1610544640000),
-                "e": random.randint(1610044700000, 1610544700000),
-            }
-            fake_candle['date'] = str(datetime.fromtimestamp(int(fake_candle['s']/1000)))
-            result.append(fake_candle)
+        # for i in range(candle_count):
+        fake_candle = {
+            "ev": "A",
+            "sym": symbol,
+            "pair": symbol+"-USD", 
+            "v": random.randint(3300, 4000),
+            "av": random.randint(490293, 840293),
+            "op": random.randint(1, 10),
+            "vw": random.randint(10, 30),
+            "o": random.randint(30, 50),
+            "c": random.randint(50, 70),
+            "h": random.randint(70, 90),
+            "l": random.randint(90, 110),
+            "a": random.randint(110, 130),
+            "z": random.randint(100, 1000),
+            "s": random.randint(1610044640000, 1610544640000),
+            "e": random.randint(1610044700000, 1610544700000),
+        }
+        fake_candle['date'] = str(datetime.fromtimestamp(int(fake_candle['s']/1000)))
+        result.append(fake_candle)
         return result
 
     def file_date_field(self, candles):
@@ -131,12 +131,13 @@ class PolygonStream(object):
         return result
 
     def buffering_symbols(self):
+        print (self.symbol_type, " buffering start ...")
         for symbol in self.symbols:
-            for i in range(10):
-                candles = self.make_test_quote(symbol)
+            for i in range(25):
+                candles = self.make_test_quote(specific_symbol=symbol)
                 self.put_queue(candles)
-            
             time.sleep(0.01)
+        print (self.symbol_type, " buffering end!")
 
     def on_open(self, ws):
         print ("opened")
@@ -204,10 +205,10 @@ def start_stream():
 
 if __name__=="__main__":
     if False:
-        symbols1 = ['BTC', 'ETH', 'DOGE', 'BCH', 'LTC']
+        symbols1 = ['GOOG'] # ['BTC', 'ETH', 'DOGE', 'BCH', 'LTC']
         # symbols = get_symbols()
 
-        ps = PolygonStream(crypto_websocket, stream_candles, symbols1, symbol_type=SYMBOL_TYPE_CRYPTO)
+        ps = PolygonStream(crypto_websocket, stream_candles, symbols1, symbol_type=SYMBOL_TYPE_STOCK)
         ps.start()
 
         cnt = 0
