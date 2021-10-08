@@ -155,7 +155,6 @@ def get_live_data_extended(request):
     
     return JsonResponse({'chart_data': verdict}, status=status.HTTP_201_CREATED)
 
-
 # strategy management api
 @csrf_exempt
 def get_script_file(request):
@@ -189,7 +188,6 @@ def update_script_file(request):
             return JsonResponse({'success': True, "message": "strategy file is updated"}, status=status.HTTP_201_CREATED)
         else:
             return JsonResponse({'success': False, "message": "update failed"}, status=status.HTTP_201_CREATED)
-
 
 @csrf_exempt
 def get_script_list(request):
