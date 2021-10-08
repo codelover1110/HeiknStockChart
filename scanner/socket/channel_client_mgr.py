@@ -10,18 +10,20 @@ from pymongo.message import _do_batched_write_command
 
 from polygon_stream_client import PolygonStream
 from utils import Filter as rsi_heik_v1_fitler_1
-from db_models import DBManager, get_all_scanner_symbols, get_all_scanner_fields
+from db_models import DBManager, get_watch_list_symbols, get_all_scanner_fields
 from utils import get_candle_fields, combine_dict, get_fields_data
+from define import *
 
 stock_websocket = "wss://delayed.polygon.io/stocks"
 crypto_websocket = "wss://socket.polygon.io/crypto"
 output_stream_queue = queue.Queue()
 
 class ChannelClientManager(object):
-    def __init__(self, output_queue):
-        self.symbols = ["AMZN"]
+    def __init__(self, socket, output_queue, symbol_type=SYMBOL_TYPE_STOCK):
+        self.stock_symbols = ["AMZN"]
         self.fields = None
-        self.socket_url = stock_websocket 
+        self.symbol_type = symbol_type
+        self.socket_url = socket 
         self.input_all_stream_queue = queue.Queue()
         self.db_join_candle_queue = queue.Queue()
         self.output_stream_queue = output_queue
@@ -39,8 +41,11 @@ class ChannelClientManager(object):
         self.init()
 
     def init(self):
-        self.symbols = get_all_scanner_symbols()
-        self.symbols.extend(["SQQQ", "PROG", "CEI", "PLTR", "RKLB"])
+        self.symbols = get_watch_list_symbols(self.symbol_type)
+        print ("symbols: ", self.symbols)
+        # if self.symbol_type == SYMBOL_TYPE_STOCK:
+        #     self.symbols = ["GOOG", "ATVI", "AMD", "MSFT", "AMZN", "NVDA", "TSLA", "AAPL", "ADBE"]
+        print ("pre-loading database fields for ", self.symbol_type, " ...")
         default_fields = get_all_scanner_fields()
 
         for symbol in self.symbols:
@@ -49,8 +54,9 @@ class ChannelClientManager(object):
             sym_last_candles['last_candles'] = []
             self.symbol_last_candles.append(sym_last_candles)
 
-        self.polygon_stream_client = PolygonStream(self.socket_url, self.input_all_stream_queue, self.symbols)
+        self.polygon_stream_client = PolygonStream(self.socket_url, self.input_all_stream_queue, self.symbols, self.symbol_type)
         self.db_scanner = DBManager(self.symbols, default_fields)
+        print ("------- done")
     
     def start(self):
         self.polygon_stream_client.start()
@@ -107,7 +113,10 @@ class ChannelClientManager(object):
                 channel_obj.stop()
 
     def join_db_data(self, candle):
-        symbol = candle['symbol']
+        if self.symbol_type == SYMBOL_TYPE_CRYPTO:
+            symbol = candle['symbol'].replace('-USD', '')
+        elif self.symbol_type == SYMBOL_TYPE_STOCK:
+            symbol = candle['symbol']
         for idx, sym_last_candles in enumerate(self.symbol_last_candles):
             if sym_last_candles['symbol'] == symbol:
                 last_candles = sym_last_candles['last_candles']
@@ -116,11 +125,12 @@ class ChannelClientManager(object):
                     df = util.df(last_candles)
                     last_candle = rsi_heik_v1_fitler_1(df)
                     symbol_preload = self.db_scanner.get_symbol_preload(symbol)
-                    
                     update_item = dict()
                     update_item['symbol'] = symbol
                     update_item['data'] = combine_dict(last_candle, symbol_preload)
                     self.db_join_candle_queue.put(update_item)
+                    if self.db_join_candle_queue.qsize() > 1000:
+                        self.db_join_candle_queue.get()
                     
 
                     self.symbol_last_candles[idx]['last_candles'] = last_candles[-24:]
@@ -136,8 +146,10 @@ class ChannelClientManager(object):
                 while not self.input_all_stream_queue.empty():
                     candle = self.input_all_stream_queue.get()
                     self.join_db_data(candle)
+                    if self.symbol_type ==  SYMBOL_TYPE_CRYPTO:
+                        print (candle)
 
-            time.sleep(0.5)
+            time.sleep(0.01)
 
     def seperate_stream_to_channels(self):
         while True:
@@ -146,11 +158,13 @@ class ChannelClientManager(object):
             if not self.db_join_candle_queue.empty():
                 while not self.db_join_candle_queue.empty():
                     db_candle = self.db_join_candle_queue.get()
+                    if self.symbol_type == SYMBOL_TYPE_CRYPTO:
+                        print (self.symbol_type, " : ", db_candle['symbol'])
                     for channel_obj in self.channels:
                         if db_candle['symbol'] in channel_obj.get_channel_symbols():
                             channel_obj.put_db_joined_candle(db_candle.copy())
 
-            time.sleep(0.5)
+            time.sleep(0.01)
 
 class ChannelClient(object):
     def __init__(self, output_queue, scanner_info, client_info):

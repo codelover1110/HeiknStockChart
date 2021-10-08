@@ -6,18 +6,18 @@ import threading
 
 from base_websocket_server import WebsocketServer, WebSocketHandler
 from channel_client_mgr import ChannelClientManager
-
-candle_update_queue = queue.Queue()
+from define import *
 
 class StockStreamServer(object):
-	def __init__(self, update_queue):
-		self.update_queue = update_queue
+	def __init__(self):
+		self.update_queue = queue.Queue()
 		self.remove_client_list = queue.Queue()
 		self.new_client_list = queue.Queue()
 		self.closed_client = []
 		self._stop = False
-		self.cc_mgr = ChannelClientManager(self.update_queue)
-
+		self.stock_cc_mgr = ChannelClientManager(STOCK_WEBSOCKET_URL, self.update_queue, SYMBOL_TYPE_STOCK)
+		self.crypto_cc_mgr = ChannelClientManager(CRYPTO_WEBSOCKET_URL, self.update_queue, SYMBOL_TYPE_CRYPTO)
+		
 		self.server = WebsocketServer(9999, host='127.0.0.1')
 		self.server.event_new_client_join(self.new_client_joined)
 		self.server.event_client_left(self.client_left)
@@ -25,41 +25,75 @@ class StockStreamServer(object):
 
 		self.socket_thread = threading.Thread(target=self.server.run_forever)
 		self.send_thread = threading.Thread(target=self.thread_func)
+		self.client_action_thread = threading.Thread(target=self.look_client_action)
 	
 	def start(self):
-		self.cc_mgr.start()
+		self.stock_cc_mgr.start()
+		self.crypto_cc_mgr.start()
 		self.socket_thread.start()
 		self.send_thread.start()
+		self.client_action_thread.start()
 
 	def stop(self):
 		self._stop = True
 		try:
-			time.sleep(0.2)
+			self.stock_cc_mgr.stop()
+			self.crypto_cc_mgr.stop()
+			time.sleep(1)
 			self.socket_thread.join()
 			self.send_thread.join()
+			self.client_action_thread.join()
 		except:
 			pass
+
+	def get_cc_mgr_by_symbol_type(self, symbol_type):
+		if symbol_type == SYMBOL_TYPE_STOCK:
+			return self.stock_cc_mgr
+		elif symbol_type == SYMBOL_TYPE_CRYPTO:
+			return self.crypto_cc_mgr
+		
+	def get_cc_mgr_by_client(self, client):
+		if self.stock_cc_mgr.find_client_idx(client['id']) != -1:
+			return self.stock_cc_mgr
+		elif self.crypto_cc_mgr.find_client_idx(client['id']) != -1:
+			return self.crypto_cc_mgr
+		else:
+			return None
 
 	def new_client_joined(self, client, server):
 		print ("Connect client: ",client)
 
 	def client_left(self, client, server):
 		print ("client left: ", client)
-		self.cc_mgr.set_channel_stop(client)
-		self.closed_client.append(client)
-		self.remove_client_list.put(client)
+		cc_mgr = self.get_cc_mgr_by_client(client)
+		if cc_mgr is not None:
+			cc_mgr.set_channel_stop(client)
+			self.closed_client.append(client)
+			if len(self.closed_client) > 1000:
+				self.closed_client = self.closed_client[-100:]
+			self.remove_client_list.put(client)
 
 	def receive_message(self, client, server, message):
 		scanner_info = json.loads(message)
 		print ("scanner_info:", scanner_info)
 		action = scanner_info['action']
-		if self.cc_mgr.find_client_idx(client['id']) == -1:
+		symbol_type = scanner_info['symbol_type'] 
+		cc_mgr = self.get_cc_mgr_by_symbol_type(symbol_type)
+		if cc_mgr.find_client_idx(client['id']) == -1:
 			self.new_client_list.put([client, scanner_info])
-			# self.cc_mgr.add_new_channel(client, scanner_info)
+		elif action == CHANNEL_ACTION_CHANGE_FIELDS:
+			cc_mgr.reset_channel(client, scanner_info)
+		elif action == CHANNEL_ACTION_CHANGE_SYMBOL_TYPE:
+			old_cc_mgr = self.get_cc_mgr_by_client(client)
+			old_cc_mgr.set_channel_stop(client)
+			self.closed_client.append(client)
+			self.remove_client_list.put(client)
+			
+			new_cc_mgr = self.get_cc_mgr_by_symbol_type(symbol_type)
+			if new_cc_mgr.find_client_idx(client['id']) == -1:
+				self.new_client_list.put([client, scanner_info])
 
-		elif action == 'change_fields':
-			self.cc_mgr.reset_channel(client, scanner_info)
-		
+
 	def thread_func(self):
 		while True:
 			if self._stop:
@@ -67,36 +101,41 @@ class StockStreamServer(object):
 			if not self.update_queue.empty():
 				while not self.update_queue.empty():
 					candle_update = self.update_queue.get()
-					# print (candle_update.keys())
 					try:
 						client = candle_update['client']
 						if client in self.closed_client:
 							continue
-						if self.cc_mgr.find_client_idx(client['id']) != -1:
+						cc_mgr = self.get_cc_mgr_by_client(client)
+						if cc_mgr is not None:
 							del candle_update['client']
 							message = json.dumps([candle_update])
 							self.server.send_message(client, message)
-							# print ('client: {}, message: {}'.format(client['id'], message))
 					except:
 						print ("can't send message.", 'client: {}, message: {}'.format(client['id'], candle_update))
-						pass
 
-			if not self.remove_client_list.empty():
-				while not self.remove_client_list.empty():
-					client = self.remove_client_list.get()
-					self.cc_mgr.remove_channel(client)
-					time.sleep(0.01)
-			
+	def look_client_action(self):
+		while True:
+			if self._stop:
+				break
+
 			if not self.new_client_list.empty():
 				while not self.new_client_list.empty():
 					new_client = self.new_client_list.get()
 					client, scanner_info = new_client[0], new_client[1]
-					self.cc_mgr.add_new_channel(client, scanner_info)
-					time.sleep(0.01)
+					symbol_type = scanner_info['symbol_type']
+					cc_mgr = self.get_cc_mgr_by_symbol_type(symbol_type)
+					cc_mgr.add_new_channel(client, scanner_info)
+					time.sleep(0.1)
 
+			if not self.remove_client_list.empty():
+				while not self.remove_client_list.empty():
+					client = self.remove_client_list.get()
+					cc_mgr = self.get_cc_mgr_by_client(client)
+					cc_mgr.remove_channel(client)
+					time.sleep(0.1)
 
 			time.sleep(0.1)
 
 if __name__=="__main__":
-	stream_server = StockStreamServer(candle_update_queue)
+	stream_server = StockStreamServer()
 	stream_server.start()
