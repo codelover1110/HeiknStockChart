@@ -144,7 +144,7 @@ const TradeDataTable = () => {
 
   useEffect(() => {
     const get_trades = async (symbol, macroStrat, microStrat, tradeStartDate, tradeEndDate) => {
-      const trades_data = await filterTradesData(selectedSymbolType, symbol, macroStrat, microStrat, tradeStartDate, tradeEndDate);
+      const trades_data = await filterTradesData(selectedSymbolType.value, symbol, macroStrat, microStrat, tradeStartDate, tradeEndDate);
       setDatatable({
         columns: hearder_columns,
         rows: trades_data
@@ -156,7 +156,7 @@ const TradeDataTable = () => {
       macroStrategy ? macroStrategy.value : '',
       microStrategy ? microStrategy.value : '', 
       tradeStartDate, tradeEndDate)
-  }, [symbol, macroStrategy, microStrategy, hearder_columns, tradeStartDate, tradeEndDate])
+  }, [selectedSymbolType, symbol, macroStrategy, microStrategy, hearder_columns, tradeStartDate, tradeEndDate])
 
   useEffect(() => {
       const getSymbols = async () => {
@@ -272,14 +272,14 @@ const TradeDataTable = () => {
           Trade Data Table
         </div>
         <div className="hunter-search-filter-area">
-          <div className="select-option">
+          {/* <div className="select-option">
             <Select
               value={selectedSymbolType}
               onChange={handleSymbolTypeChange}
               options={optionsSymbolType}
               placeholder="Select Symbol Type"
             />
-          </div>
+          </div> */}
           <div className="select-option">
             <Select
               value={symbol}

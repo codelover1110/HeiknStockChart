@@ -515,14 +515,14 @@ const HeiknStockChart = (props) => {
                 placeholder="Market Time"
               />
             </div>
-            <div className="select-option">
+            {/* <div className="select-option">
               <Select
                 value={selectedSymbolType}
                 onChange={handleSymbolTypeChange}
                 options={optionsSymbolType}
                 placeholder="Select Symbol Type"
               />
-            </div>
+            </div> */}
             <div className="select-option">
               <Select
                 value={strategy}
