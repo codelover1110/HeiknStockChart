@@ -1,3 +1,14 @@
+.hunter-custom-table-chart-th {
+    height: 70px;
+    min-width: 200px;
+    text-align: center;
+    background-color: #212529;
+}
+
 .hunter-custom-table-description-td {
     min-width: 1000px;
+}
+
+.hunter-custom-table-td {
+    text-align: center;
 }

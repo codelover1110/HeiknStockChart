@@ -492,7 +492,7 @@ const ScannerComponent = () => {
           <MDBTableHead  className="watch-list-data-table-header">
             <tr>
               {hearder_columns.map((item) => (
-                <th key={item.label} className={`hunter-custom-table-chart-th'`}>{item.label}</th>
+                <th key={item.label} className={`hunter-custom-table-chart-th`}>{item.label}</th>
               ))}
             </tr>
           </MDBTableHead>
@@ -505,7 +505,7 @@ const ScannerComponent = () => {
                   (
                     <td 
                       key={`${item.symbol}-${column.field}`}
-                      className={`${column.field === 'Description' ? 'hunter-custom-table-description-td' : ''}`}
+                      className={`${column.field === 'Description' ? 'hunter-custom-table-description-td' : ''} hunter-custom-table-td`}
                     >
                       {item[column.field]}
                     </td>

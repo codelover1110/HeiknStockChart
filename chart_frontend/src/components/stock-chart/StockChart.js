@@ -15,6 +15,7 @@ const StockChart = (props) => {
     microStrategy,
     selectedInstance,
     selectedTradeDB,
+    selectedSymbolType,
     chartPeriod,
     startDate,
     endDate,
@@ -65,6 +66,7 @@ const StockChart = (props) => {
           body: JSON.stringify({
             'db_name': dbname,
             'symbol': symbol,
+            'symbol_type': selectedSymbolType,
             'macro': strategy.value,
             'micro': (selectedInstance !== 'live_trading') ? microStrategy : '',
           })
@@ -99,6 +101,7 @@ const StockChart = (props) => {
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({
             'symbols': symbols,
+            'symbol_type': selectedSymbolType,
             "macro": strategy.value,
             "micro": microStrategy,
             'start_date': startDate,
