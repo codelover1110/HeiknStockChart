@@ -13,10 +13,13 @@ try:
 except ImportError:
    import Queue as queue
 
+from define import *
+from db_models import get_watch_list_symbols
+
 API_KEY = 'tuQt2ur25Y7hTdGYdqI2VrE4dueVA8Xk'
 # mongoclient = pymongo.MongoClient('mongodb://aliaksandr:BD20fc854X0LIfSv@cluster0-shard-00-00.35i8i.mongodb.net:27017,cluster0-shard-00-01.35i8i.mongodb.net:27017,cluster0-shard-00-02.35i8i.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-aoj781-shard-0&authSource=admin&retryWrites=true&w=majority')
 # mongoclient = pymongo.MongoClient('mongodb://user:-Hz2f$!YBXbDcKG@cluster0-shard-00-00.vcom7.mongodb.net:27017,cluster0-shard-00-01.vcom7.mongodb.net:27017,cluster0-shard-00-02.vcom7.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-7w6acj-shard-0&authSource=admin&retryWrites=true&w=majority')
-mongoclient = pymongo.MongoClient('mongodb://root:rootUser2021@20.84.64.243:27019')
+mongoclient = pymongo.MongoClient('mongodb://root:rootUser2021@20.84.64.243:27017')
 
 def get_symbols():
     url="https://pkgstore.datahub.io/core/nasdaq-listings/nasdaq-listed_csv/data/7665719fb51081ba0bd834fde71ce822/nasdaq-listed_csv.csv"
@@ -25,7 +28,8 @@ def get_symbols():
     symbols = companies['Symbol'].tolist()
     return symbols
 
-DB_NAME = 'stock_market_data'
+DB_NAME = 'chart_market_data'
+LAST_UPDATE_DATE_COL = "stock_symbol_last_date"
 
 intervals = [
     [['1', 'minute'], 1, False, 500],    # use 30 when get a year candles
@@ -84,7 +88,7 @@ class DailyPutThread(object):
 
     def update_last_put_date(self, symbol, interval, last_candle_date):
         masterdb = mongoclient[DB_NAME]
-        ob_table = masterdb['symbol_last_date']
+        ob_table = masterdb[LAST_UPDATE_DATE_COL]
         symbol_last_update_date = ob_table.find_one({"symbol": symbol})
 
         if symbol_last_update_date is not None:
@@ -96,7 +100,7 @@ class DailyPutThread(object):
         default_date = datetime.strptime("2020-09-01 00:00:00", '%Y-%m-%d %H:%M:%S')
         
         masterdb = mongoclient[DB_NAME]
-        ob_table = masterdb['symbol_last_date']
+        ob_table = masterdb[LAST_UPDATE_DATE_COL]
         last_date_doc = ob_table.find_one({"symbol": symbol})
         if last_date_doc is not None:
             key = interval[0] + "_" + interval[1]
@@ -108,7 +112,7 @@ class DailyPutThread(object):
                 return default_date
         else:
             symbol_last_date = dict()
-            if True:
+            if False:
                 symbol_last_date['symbol'] = symbol
                 symbol_last_date['1_minute'] = default_date
                 symbol_last_date['2_minute'] = default_date
@@ -221,9 +225,11 @@ if __name__ == "__main__":
     thread_list = []
 
     # symbols = get_symbols()
-    symbols = ["GOOG", "ATVI", "AMD", "MSFT", "AMZN", "NVDA", "TSLA", "AAPL", "ADBE", ""]
+    # symbols = ["GOOG", "ATVI", "AMD", "MSFT", "AMZN", "NVDA", "TSLA", "AAPL", "ADBE", ""]
+    symbols = get_watch_list_symbols(SYMBOL_TYPE_STOCK)
+    symbols.append("")
     symbol_count = len(symbols)
-    print ("symbols: ", symbol_count)
+    print (symbols, "symbols: ", symbol_count)
 
     thread_symbol_count = int(symbol_count / thread_count) + 1
     for idx in range(thread_count):
@@ -249,24 +255,23 @@ if __name__ == "__main__":
         thrd.start()
         time.sleep(0.5)
 
-    while True:
-        for item in intervals:
-            proc_time = 0
-            while True:
-                thread_states = []
+    # while True:
+    for item in intervals:
+        proc_time = 0
+        while True:
+            thread_states = []
+            for thrd in thread_list:
+                thread_working = thrd.get_thread_state()
+                thread_states.append(thread_working)
+            if True not in thread_states:
                 for thrd in thread_list:
-                    thread_working = thrd.get_thread_state()
-                    thread_states.append(thread_working)
-                if True not in thread_states:
-                    for thrd in thread_list:
-                        thrd.set_interval(item[0], item[1], item[2], item[3])
-                    break
-                else:
-                    print('< {} > {}'.format(proc_time, thread_states))
+                    thrd.set_interval(item[0], item[1], item[2], item[3])
+                break
+            else:
+                print('< {} > {}'.format(proc_time, thread_states))
 
-                time.sleep(5)
-                proc_time += 5
-        time.sleep(10)
+            time.sleep(5)
+            proc_time += 5
 
     time.sleep(10)
     for thrd in thread_list:
