@@ -18,7 +18,7 @@ class StockStreamServer(object):
 		self.stock_cc_mgr = ChannelClientManager(STOCK_WEBSOCKET_URL, self.update_queue, SYMBOL_TYPE_STOCK)
 		self.crypto_cc_mgr = ChannelClientManager(CRYPTO_WEBSOCKET_URL, self.update_queue, SYMBOL_TYPE_CRYPTO)
 		
-		self.server = WebsocketServer(9999, host='127.0.0.1')
+		self.server = WebsocketServer(9999, host='0.0.0.0')
 		self.server.event_new_client_join(self.new_client_joined)
 		self.server.event_client_left(self.client_left)
 		self.server.event_message_received(self.receive_message)
