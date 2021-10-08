@@ -15,7 +15,7 @@ class StockStreamServer(object):
 		self.closed_client = []
 		self.sc_mgr = ScannerClientManager(self.update_queue)
 
-		self.server = WebsocketServer(9999, host='127.0.0.1')
+		self.server = WebsocketServer(9999, host='0.0.0.0')
 		self.server.event_new_client_join(self.new_client_joined)
 		self.server.event_client_left(self.client_left)
 		self.server.event_message_received(self.receive_message)
