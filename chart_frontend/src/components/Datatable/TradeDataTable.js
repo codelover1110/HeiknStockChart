@@ -36,6 +36,20 @@ const TradeDataTable = () => {
   
   const [optionsSymbol, setOptionsSymbol] = useState([])
 
+  const [selectedSymbolType, setSelectedSymbolType] = useState({
+    value: 'stock',
+    label: 'stock'
+  })
+
+  const optionsSymbolType = [
+    {
+      value: 'stock', label: 'stock',
+    },
+    {
+      value: 'crypto', label: 'crypto',
+    }
+  ]
+
   const hearder_columns = useMemo(() => {
     return [
     {
@@ -130,7 +144,7 @@ const TradeDataTable = () => {
 
   useEffect(() => {
     const get_trades = async (symbol, macroStrat, microStrat, tradeStartDate, tradeEndDate) => {
-      const trades_data = await filterTradesData(symbol, macroStrat, microStrat, tradeStartDate, tradeEndDate);
+      const trades_data = await filterTradesData(selectedSymbolType, symbol, macroStrat, microStrat, tradeStartDate, tradeEndDate);
       setDatatable({
         columns: hearder_columns,
         rows: trades_data
@@ -159,6 +173,10 @@ const TradeDataTable = () => {
 
   const handleSymbolChange = (e) => {
     setSymbol(e)
+  }
+
+  const handleSymbolTypeChange = (e) => {
+    setSelectedSymbolType(e)
   }
   
   const handleMacroStrategy = (e) => {
@@ -254,6 +272,14 @@ const TradeDataTable = () => {
           Trade Data Table
         </div>
         <div className="hunter-search-filter-area">
+          <div className="select-option">
+            <Select
+              value={selectedSymbolType}
+              onChange={handleSymbolTypeChange}
+              options={optionsSymbolType}
+              placeholder="Select Symbol Type"
+            />
+          </div>
           <div className="select-option">
             <Select
               value={symbol}

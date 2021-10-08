@@ -298,17 +298,25 @@ const ScannerComponent = () => {
   const loadFloatsFilterOption = async () => {
     const scannerOptions = await getFloatsFilterOptions()
     if (scannerOptions.success) {
-      const exchanges = scannerOptions.result.exchanges.map(exchange => {
+      const exchanges = [{
+        value: '',
+        label: 'All'
+      }]
+      scannerOptions.result.exchanges.map(exchange => {
         if (exchange === '') {
           return null
         }
-        return ({
+        exchanges.push({
           value: exchange,
           label: exchange
         })
       })
 
-      const industries = []
+      const industries = [{
+        value: '',
+        label: 'All'
+      }]
+
       scannerOptions.result.industry.map(industry => {
         if (industry !== '' && industry !== null) {
           industries.push({
@@ -318,7 +326,10 @@ const ScannerComponent = () => {
         }
       })
 
-      const sectors = []
+      const sectors = [{
+        value: '',
+        label: 'All'
+      }]
       scannerOptions.result.sector.forEach(sector => {
         if (sector !== '' && sector !== null) {
           sectors.push({
@@ -481,7 +492,7 @@ const ScannerComponent = () => {
           <MDBTableHead  className="watch-list-data-table-header">
             <tr>
               {hearder_columns.map((item) => (
-                <th key={item.label} className={`hunter-custom-table-chart-th'`}>{item.label}</th>
+                <th key={item.label} className={`hunter-custom-table-chart-th`}>{item.label}</th>
               ))}
             </tr>
           </MDBTableHead>
@@ -494,7 +505,7 @@ const ScannerComponent = () => {
                   (
                     <td 
                       key={`${item.symbol}-${column.field}`}
-                      className={`${column.field === 'Description' ? 'hunter-custom-table-description-td' : ''}`}
+                      className={`${column.field === 'Description' ? 'hunter-custom-table-description-td' : ''} hunter-custom-table-td`}
                     >
                       {item[column.field]}
                     </td>
