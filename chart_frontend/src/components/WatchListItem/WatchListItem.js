@@ -225,6 +225,7 @@ const WatchListItem = (props) => {
             realData.push(object);
           })
 
+          updateChangeSymbol(symbols)
           setSymbolOptions(symbols)
           setSelectedSymbols(symbols)
           setWatchListInitData(realData)
@@ -381,6 +382,41 @@ const WatchListItem = (props) => {
     }  
   }, [isConnected])
 
+  const updateChangeSymbol = (symbolList) => {
+    let cols = []
+    let temps = []
+    let colObjects = []
+    const columns = selectedColumns
+    Object.keys(columns).forEach((key) => {
+      columns[key].children.forEach((col) => {
+        cols.push(col.label)
+        temps.push(col.label)
+      })
+
+      colObjects.push({
+        [columns[key].label]: temps
+      })
+      temps = []
+    })
+    // setIsUpdatedCols(!isUpdatedCols)
+    // setColumnItems(cols)
+    // setSelectedColumns(columns)
+    
+    if (isConnected) {
+      const symbols = symbolList.map( (o) => o.value )
+      
+      const content = {
+        action: selectedWatchList.value === 'crypto' ? 'create_fields' : 'change_fields',
+        chart_number: props.chart_number,
+        symbols,
+        symbol_type: selectedWatchList.value === 'crypto' ? 'crypto' : 'stock',
+        fields: colObjects,
+      }
+      
+      ws.send(JSON.stringify(content));
+    }  
+  }
+
   const handleColumnSet = (columns) => {
     let cols = []
     let temps = []
@@ -407,11 +443,10 @@ const WatchListItem = (props) => {
         action: 'change_fields',
         chart_number: props.chart_number,
         symbols,
+        symbol_type: selectedWatchList.value === 'crypto' ? 'crypto' : 'stock',
         fields: colObjects,
       }
-
       ws.send(JSON.stringify(content));
-      console.log('Filter options sent to BE', content)
     }
   }
 
@@ -461,7 +496,8 @@ const WatchListItem = (props) => {
     setTimeFrames(e)
   }
   
-  const handleWatchListChange = (e) => {
+  const handleWatchListChange = async (e) => {
+    await createWebSocket(true)
     setIsUpdatedWatchList(true)
     setSelectedWatchList(e)
   }
@@ -556,32 +592,65 @@ const WatchListItem = (props) => {
     setIsLoading(2);
   };
 
+  const createWebSocket = ( async (isUpdate) => {
+    if (ws) {
+      if (isUpdate) {
+        ws.close()
+      } else {
+        return
+      }
+    }
+
+    const socket = new WebSocket(process.env.REACT_APP_SOCKET_URL);
+    setWs(socket)
+    
+    socket.onopen = () => {
+      setIsConnected(true);
+      console.log('Opened Connection!')
+    };
+  
+    socket.onmessage = (event) => {
+      try {
+        const msg = JSON.parse(event.data)
+        setWatchListData(msg)
+        setIsUpdatedWatchList(true)
+      } catch (error) {
+        console.log(error)  
+      }
+    };
+    
+    socket.onclose = () => {
+      console.log('Closed Connection!')
+    };
+  })
+
   useEffect (() => {
     if (isLoading === 2) {
-      if (!ws) {
-        const socket = new WebSocket(process.env.REACT_APP_SOCKET_URL);
-        setWs(socket)
+      createWebSocket(false)
+      // if (!ws) {
+      //   const socket = new WebSocket(process.env.REACT_APP_SOCKET_URL);
+      //   setWs(socket)
         
-        socket.onopen = () => {
-          setIsConnected(true);
-          console.log('Opened Connection!')
-        };
+      //   socket.onopen = () => {
+      //     setIsConnected(true);
+      //     console.log('Opened Connection!')
+      //   };
       
-        socket.onmessage = (event) => {
-          try {
-            const msg = JSON.parse(event.data)
-            setWatchListData(msg)
-            setIsUpdatedWatchList(true)
-          } catch (error) {
-            console.log(error)  
-          }
-        };
+      //   socket.onmessage = (event) => {
+      //     try {
+      //       const msg = JSON.parse(event.data)
+      //       setWatchListData(msg)
+      //       setIsUpdatedWatchList(true)
+      //     } catch (error) {
+      //       console.log(error)  
+      //     }
+      //   };
         
-        socket.onclose = () => {
-          console.log('Closed Connection!')
-        };
+      //   socket.onclose = () => {
+      //     console.log('Closed Connection!')
+      //   };
 
-      }
+      // }
     }
   }, [isLoading])
 
