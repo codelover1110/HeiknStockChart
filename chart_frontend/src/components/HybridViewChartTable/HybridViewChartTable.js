@@ -22,15 +22,15 @@ const HybridViewChartTable = (props) => {
   const auth = useAuth();
   const { selectedInstance } = props
   const history = useHistory();
-  const [symbol, setSymbol] = useState({ value: 'MSFT', label: 'MSFT' });
+  const [symbol, setSymbol] = useState(null);//{ value: 'MSFT', label: 'MSFT' }
   const [indicators, setIndicators] = useState([]);
   const [isShowMicro, setIsShowMicro] = useState(true);
   const [symbolList, setSymbolList] = useState([])
   const [isGetSymbolList] = useState(false)
   const [collapseOpen,] = React.useState(false)
   const [selectedViewType, setSelectedViewType] = useState({ value: 'charting', label: 'Charting' });
-  const [microStrategy, setMicroStrategy] = useState({ value: '2m', label: '2m' });
-  const [strategy, setStrategy] = useState({ value: 'heikfilter', label: 'heikfilter' });
+  const [microStrategy, setMicroStrategy] = useState(null);//{ value: '2m', label: '2m' }
+  const [strategy, setStrategy] = useState(null);//{ value: 'heikfilter', label: 'heikfilter' }
   const [strategyList, setStrategyList] = useState([]);
   const [user] = useState(JSON.parse(localStorage.getItem('user-info')));
   const [extendMarketTime, setExtendMarketTime] = useState(
@@ -91,9 +91,10 @@ const HybridViewChartTable = (props) => {
             }
           }))
           setOptionsStrategy(strategyOptions);
+          setStrategy(strategyOptions[0]);
           if (data.result.length) {
             data.result.forEach((item) => {
-              if (item.macro === 'heikfilter') {
+              // if (item.macro === 'heikfilter') {
                 const microStrategyOptions = item.micro.map(o => {
                   return {
                     value: o,
@@ -101,6 +102,7 @@ const HybridViewChartTable = (props) => {
                   }
                 })
                 setOptionsMicroStrategy( microStrategyOptions )
+                setMicroStrategy(microStrategyOptions[0])
 
                 const symbolOptions = item.symbols.map(o => {
                   return {
@@ -109,7 +111,8 @@ const HybridViewChartTable = (props) => {
                   }
                 })
                 setSymbolList(symbolOptions)
-              }
+                setSymbol(symbolOptions[0])
+              // }
             })
           }
         })   
@@ -147,15 +150,10 @@ const HybridViewChartTable = (props) => {
 
   useEffect(() => {
     disableScroll.on();
-    if (user.is_admin || user?.role.length) {
-      if(!isGetSymbolList) {
-        getStrategyList();
-      }  
-    }
     return () => {
       disableScroll.off();
     }
-  }, [getStrategyList, isGetSymbolList, user])
+  }, [getStrategyList, user])
   
   useEffect(() => {
     const handleInstanceChange = (value) => {

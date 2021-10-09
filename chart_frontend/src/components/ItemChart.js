@@ -88,7 +88,7 @@ const HeiknStockChartItem = (props) => {
           setOptionsStrategy(strategyOptions);
           if (data.result.length) {
             data.result.forEach((item) => {
-              if (item.macro === 'heikfilter') {
+              // if (item.macro === 'heikfilter') {
                 const microStrategyOptions = item.micro.map(o => {
                   return {
                     value: o,
@@ -105,7 +105,7 @@ const HeiknStockChartItem = (props) => {
                 })
                 setSymbolList(symbolOptions)
                 // setSymbol(symbolOptions[0])
-              }
+              // }
             })
           }
         })   
@@ -210,7 +210,7 @@ const HeiknStockChartItem = (props) => {
                 label: '2m'
               })
             } else {
-              setMicroStrategy(microStrategyOptions[2])
+              setMicroStrategy(microStrategyOptions[0])
             }
 
             const symbolOptions = item.symbols.map(o => {

@@ -92,7 +92,38 @@ const FinancialDataTable = (props) => {
   }, [data, selectedAggregationType, selectedStockType]);
 
   const formatNumber = (num) => {
-    return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
+    let number = parseInt(num)
+    if (number > 0) {
+      if ( number / 1000 < 999 ) {
+        return `${number / 1000} Th`
+      } else if ( number / 1000000 < 999 ) {
+        return `${number / 1000000} M`
+      } else if ( number / 1000000000 < 999 ) {
+        return `${number / 1000000000} B`
+      } else if ( number / 1000000000000 < 999 ) {
+        return `${number / 1000000000000} Tr`
+      } else if ( number / 1000000000000000 < 999 ) {
+        return `${number / 1000000000000000} Q`
+      }
+    } else if (number < 0) {
+      number = -number;
+      if ( number < 1000 ) {
+        return `-${number}`
+      }
+      else if ( number / 1000 < 999 ) {
+        return `-${number / 1000} Th`
+      } else if ( number / 1000000 < 999 ) {
+        return `-${number / 1000000} M`
+      } else if ( number / 1000000000 < 999 ) {
+        return `-${number / 1000000000} B`
+      } else if ( number / 1000000000000 < 999 ) {
+        return `-${number / 1000000000000} Tr`
+      } else if ( number / 1000000000000000 < 999 ) {
+        return `-${number / 1000000000000000} Q`
+      }
+    }
+
+    return number
   }
 
   const formatData = (rows) => {
