@@ -10,7 +10,7 @@ CHANNEL_ACTION_CHANGE_SYMBOL_TYPE = 'change_symbol_type'
 
 NEWS = 'sticker_news'
 NEWS_COL_NAME = 'news_meta_data'
-FINANCIALS = 'financials_data'
+FINANCIALS = 'financials_data_1008'
 FINANCIALS_COL_NAME = 'financials'
 DETAILS = 'ticker_details'
 DETAILS_COL_NAME = 'detail_meta_data'

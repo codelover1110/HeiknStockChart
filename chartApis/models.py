@@ -57,7 +57,10 @@ def get_micro_strategies(macro_name):
         {
             "$group":{
                 "_id": "$micro_strategy",
-            }
+            },
+        },
+        {
+            "$sort": {"_id": -1}
         }
     ]
     masterdb = azuremongo[BACKTESTING_TRADES]
