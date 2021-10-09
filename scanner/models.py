@@ -15,7 +15,7 @@ mongoclient = pymongo.MongoClient('mongodb://root:rootUser2021@20.84.64.243:2701
 
 NEWS = 'sticker_news'
 NEWS_COL_NAME = 'news_meta_data'
-FINANCIALS = 'financials_data'
+FINANCIALS = 'financials_data_1008'
 FINANCIALS_COL_NAME = 'financials'
 DETAILS = 'ticker_details'
 DETAILS_COL_NAME = 'detail_meta_data'
