@@ -1,17 +1,24 @@
 export var routes = [
   {
-    name: "Forward test",
-    icon: "tim-icons icon-chart-pie-36",
-    instance: "forward_test",
+    name: "Admin",
+    icon: "tim-icons icon-app",
+    instance: "admin_tab",
     items: [
       {
         id: 0,
         label: 'Bot Management',
         instance: "systemfilemanager",
         pathname: '/botmanagement'
-      },
+      }
+    ],
+  },
+  {
+    name: "Forward test",
+    icon: "tim-icons icon-chart-pie-36",
+    instance: "forward_test",
+    items: [
       {
-        id: 1,
+        id: 0,
         label: 'View',
         instance: "view",
         pathname: '/'

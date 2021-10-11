@@ -162,7 +162,8 @@ const StockChart = (props) => {
       <>
         <div className="select-wrape">
           <div>
-            <strong>{chartPeriod} [NASDAQ]</strong>
+            <strong>{chartPeriod} </strong>
+            {/* [NASDAQ] */}
           </div>
         </div>
         {(chartColumn === 1) && displayChart()}
