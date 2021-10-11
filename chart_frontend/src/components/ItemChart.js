@@ -25,6 +25,7 @@ const HeiknStockChartItem = (props) => {
     value: 'stock',
     label: 'stock'
   })
+
   const [symbol, setSymbol] = useState(initSymbol)
   const [multiSymbol, setMultiSymbol] = useState([initSymbol])
   const [strategy, setStrategy] = useState(initStrategy ? initStrategy : {})
@@ -103,7 +104,7 @@ const HeiknStockChartItem = (props) => {
                     label: o,
                   }
                 })
-                setSymbolList(symbolOptions)
+                setSymbolList([{ label: "All", value: "*" }, ...symbolOptions]);
                 // setSymbol(symbolOptions[0])
               // }
             })
@@ -158,7 +159,7 @@ const HeiknStockChartItem = (props) => {
               });
               return null
             })
-            setSymbolList(temp_data)
+            setSymbolList([{ label: "All", value: "*" }, ...temp_data]);
           })
       } catch (error) {
         console.log(error)  
@@ -185,8 +186,19 @@ const HeiknStockChartItem = (props) => {
     }
   }
     
-  const handlMultiSymbolChange = (e) => {
-    setMultiSymbol(e)
+  const handlMultiSymbolChange = (e, event) => {
+    if (event.action === 'select-option' && event.option.value === '*') {
+      setMultiSymbol(symbolList)  
+    } else if (event.action === 'deselect-option' && event.option.value === '*') {
+      setMultiSymbol([])
+    } else if (event.action === 'deselect-option') {
+      setMultiSymbol(e.filter((o) => o.value !== '*'))
+    }
+    else if (e.length === symbolList.length - 1) {
+      setMultiSymbol(symbolList)
+    } else {
+      setMultiSymbol(e)
+    }
   }
 
   const handleStrategyChange = async (e) => {
@@ -219,7 +231,7 @@ const HeiknStockChartItem = (props) => {
                 label: o,
               }
             })
-            setSymbolList(symbolOptions)
+            setSymbolList([{ label: "All", value: "*" }, ...symbolOptions]);
             setSymbol(symbolOptions[0])
           }
         })

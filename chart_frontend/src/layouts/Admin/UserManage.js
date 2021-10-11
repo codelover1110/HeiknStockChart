@@ -39,6 +39,7 @@ function UserManage() {
   );
   const [selectedInstance, setSelectedInstance] = React.useState('usermanage');
   const optionsRole = [
+    { value: 'admin_tab', label: 'Admin Bot Management' },
     { value: 'forward_test', label: 'Forward Test' },
     { value: 'stress_test', label: 'Stress Test' },
     { value: 'optimization', label: 'Optimization' },

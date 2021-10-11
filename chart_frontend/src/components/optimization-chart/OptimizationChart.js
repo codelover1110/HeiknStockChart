@@ -60,7 +60,8 @@ const OptimizationChart = (props) => {
           <>
             <div className="select-wrape">
               <div>
-                <strong>{chartPeriod} [NASDAQ]</strong>
+                <strong>{chartPeriod}</strong>
+                {/* [NASDAQ] */}
               </div>
             </div>
             {displayPerformanceChart()}
