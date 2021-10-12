@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from "react";
 import ReactApexChart from "react-apexcharts";
 
-const getWiningData = (chartData, isAverage) => {
-  return chartData.map((d) => isAverage ? d.avgWinning / 100 : d.winning )
+const getWiningData = (chartData, isAverage, isTotal) => {
+  return chartData.map((d) => isAverage ? d.avgWinning / 100 : !isTotal ? d.winning : d.totWinning)
 }
 
-const getLosingData = (chartData, isAverage) => {
-  return chartData.map((d) => isAverage ? d.avgLosing / 100 : d.losing)
+const getLosingData = (chartData, isAverage, isTotal) => {
+  return chartData.map((d) => isAverage ? d.avgLosing / 100 : !isTotal ? d.losing : d.totLosing)
 }
 
 const getSymbols = (chartData) => {
   return chartData.map((d) => d.symbol)
 }
 
-const optionCreator = (chartData, isAverage) => {
+const optionCreator = (chartData, isAverage, isTotal) => {
   return {
     chart: {
       type: "bar",
@@ -42,7 +42,7 @@ const optionCreator = (chartData, isAverage) => {
     },
     colors: ["#00ff00", `rgba(255,0,0, ${1 ? 0.5 : 1})`],
     title: {
-      text: isAverage ? "Winning & Losing Avg Percent" : "Wining & Losing Trades",
+      text: isAverage ? "Winning & Losing Avg Percent" : !isTotal ? "Winning & Losing Trades" : "Winning & Losing Total",
       align: "left",
       offsetX: 8,
       offsetY: -2,
@@ -129,27 +129,27 @@ const optionCreator = (chartData, isAverage) => {
 };
 
 export default function GroupApexBar(props) {
-  const { data: chartData, isAverage } = props;
-  const [options, setOptions] = useState(optionCreator(chartData, isAverage));
+  const { data: chartData, isAverage, isTotal } = props;
+  const [options, setOptions] = useState(optionCreator(chartData, isAverage, isTotal));
   const [series, setSeries] = useState([
     {
-      data: getWiningData(chartData, isAverage)
+      data: getWiningData(chartData, isAverage, isTotal)
     },
     {
-      data: getLosingData(chartData, isAverage)
+      data: getLosingData(chartData, isAverage, isTotal)
     }
   ]);
 
   useEffect(() => {
-    setOptions(optionCreator(chartData, isAverage))
+    setOptions(optionCreator(chartData, isAverage, isTotal))
     setSeries([
       {
-        name: isAverage ? 'Winning Average' : 'Winning',
-        data: getWiningData(chartData, isAverage)
+        name: isAverage ? 'Winning Average' : !isTotal ? 'Winning' : 'Total Winning',
+        data: getWiningData(chartData, isAverage, isTotal)
       },
       {
-        name: isAverage ? 'Losing Average' : 'Losing',
-        data: getLosingData(chartData, isAverage)
+        name: isAverage ? 'Losing Average' : !isTotal ? 'Losing' : 'Total Losing',
+        data: getLosingData(chartData, isAverage, isTotal)
       }
     ])
   }, [chartData, isAverage])

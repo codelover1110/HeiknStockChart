@@ -11,6 +11,7 @@ const OptimizationChart = (props) => {
     endDate,
   } = props;
 
+  const [exchange, setExchange] = useState('')
   const [chartData, setChartData] = useState(null)
 	
   useEffect(() => {
@@ -36,6 +37,7 @@ const OptimizationChart = (props) => {
           .then(response => response.json())
           .then(data => {
             setChartData(data['chart_data'])
+            setExchange(data['exchange'])
           })    
       } catch (error) {
         console.log(error)
@@ -60,7 +62,7 @@ const OptimizationChart = (props) => {
           <>
             <div className="select-wrape">
               <div>
-                <strong>{chartPeriod}</strong>
+                <strong>{chartPeriod}{exchange}</strong>
                 {/* [NASDAQ] */}
               </div>
             </div>

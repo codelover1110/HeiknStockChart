@@ -40,6 +40,7 @@ const HeiknStockChartItem = (props) => {
   const [optionsViewTypes, setOptionsViewTypes] = useState([
     { value: 'charting', label: 'Charting' },
     { value: 'performance', label: 'Performance' },
+    { value: 'sliced_charting', label: 'Sliced Chatting'}
   ])    
 
   const [optionsMicroStrategy, setOptionsMicroStrategy] = useState([])
@@ -82,14 +83,9 @@ const HeiknStockChartItem = (props) => {
               label: o.macro,
             }
           }))
-          // setStrategy({
-          //   value: 'heikfilter',
-          //   label: 'heikfilter'
-          // });
           setOptionsStrategy(strategyOptions);
           if (data.result.length) {
-            data.result.forEach((item) => {
-              // if (item.macro === 'heikfilter') {
+            let item = data.result[0]
                 const microStrategyOptions = item.micro.map(o => {
                   return {
                     value: o,
@@ -106,8 +102,6 @@ const HeiknStockChartItem = (props) => {
                 })
                 setSymbolList([{ label: "All", value: "*" }, ...symbolOptions]);
                 // setSymbol(symbolOptions[0])
-              // }
-            })
           }
         })   
     },
@@ -134,6 +128,7 @@ const HeiknStockChartItem = (props) => {
       setOptionsViewTypes([
         { value: 'charting', label: 'Charting' },
         { value: 'performance', label: 'Performance' },
+        { value: 'sliced_charting', label: 'Sliced Chatting'}
       ])
     }
   }, [selectedInstance])
@@ -176,7 +171,9 @@ const HeiknStockChartItem = (props) => {
   const handleViewTypeChange = (e) => {
     setSelectedViewType(e)
     if (e.value === 'charting') {
-      handleChartRedirect(true)
+      handleChartRedirect(0)
+    } else if (e.value === 'sliced_charting') {
+      handleChartRedirect(2)
     }
   }
 
