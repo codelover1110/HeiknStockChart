@@ -1,11 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { MDBTable, MDBTableBody, MDBTableHead } from 'mdbreact';
+import { useCsvDownloadUpdate } from 'contexts/CsvDownloadContext';
 
 const FinancialDataTable = (props) => {
   const { data, selectedStockType, selectedAggregationType } = props;
 
   const [datatable, setDatatable] = useState();
   const [sorted, setSorted] = useState(0);
+
+  const updateCsvDownload = useCsvDownloadUpdate();
+
+  const wrapSetDatatable = (data) => {
+    setDatatable(data)
+    updateCsvDownload([...data.rows[0]])
+  }
 
   const handleSortClicked = (label) => {
     const sort = sorted === 0 || sorted === 2 ? 1 : 2;
@@ -38,11 +46,13 @@ const FinancialDataTable = (props) => {
       }
     }
     setSorted(sort);
-    setDatatable({
+    wrapSetDatatable({
       columns: datatable.columns,
       rows,
     });
   };
+
+
 
   useEffect(() => {
     if (data) {
@@ -66,7 +76,7 @@ const FinancialDataTable = (props) => {
               field: calendarDateKey,
             });
           }
-  
+
           const keys = Object.keys(item);
           keys.map((key, index) => {
             if (!(index in rows)) {
@@ -84,7 +94,7 @@ const FinancialDataTable = (props) => {
       } else {
         rows = [rows];
       }
-      setDatatable({
+      wrapSetDatatable({
         columns,
         rows,
       });
