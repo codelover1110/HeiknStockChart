@@ -18,7 +18,10 @@ import { useAuth } from 'contexts/authContext';
 import { getFloatsDetails, getFloatsFilterOptions } from 'api/Api'
 import "./FloatsComponent.css"
 
-const ScannerComponent = () => {
+import { useCsvDownloadUpdate } from "contexts/CsvDownloadContext";
+import ButtonCsvDownload from 'components/ButtonCsvDownload'
+
+const FloatsComponent = () => {
   const auth = useAuth();
   const history = useHistory();
   const [collapseOpen,] = React.useState(false)
@@ -54,7 +57,7 @@ const ScannerComponent = () => {
     {
       label: 'Name',
       field: 'Name',
-    },  
+    },
     {
       label: 'SharesFloat',
       field: 'SharesFloat',
@@ -62,7 +65,7 @@ const ScannerComponent = () => {
     {
       label: 'ShortPercentFloat',
       field: 'ShortPercentFloat',
-    },   
+    },
     {
       label: 'Description',
       field: 'Description',
@@ -282,13 +285,22 @@ const ScannerComponent = () => {
     rows: scannerData,
   });
 
+  const updateCsvDownload = useCsvDownloadUpdate();
+
+  const wrapSetDatatable = (data) => {
+    setDatatable(data)
+    updateCsvDownload([...data.rows])
+  }
+
+
+
   const loadFloatDetails = async (pageNum) => {
     console.log("pageNum", pageNum)
     const floatDetails = await getFloatsDetails(pageNum, pageAmount)
 
     if (floatDetails) {
       setWholeRows(floatDetails.page_total)
-      setDatatable({
+      wrapSetDatatable({
         columns: hearder_columns,
         rows: floatDetails.floats,
       })
@@ -347,7 +359,7 @@ const ScannerComponent = () => {
 
   useEffect(() => {
     loadFloatDetails(currentPage)
-    loadFloatsFilterOption() 
+    loadFloatsFilterOption()
   }, [])
 
   const handleSignout = () => {
@@ -359,7 +371,7 @@ const ScannerComponent = () => {
     setCurrentPage(currentPage - 1)
     loadFloatDetails(currentPage - 1)
   }
-  
+
   const handleNextClick = () => {
     setCurrentPage(currentPage + 1)
     loadFloatDetails(currentPage + 1)
@@ -367,12 +379,12 @@ const ScannerComponent = () => {
 
   const handleSectorChange = async (e) => {
     setSector(e)
-    
+
     const floatDetails = await getFloatsDetails(currentPage, pageAmount, exchange ? exchange.value : '', industry ? industry.value : '', e.value)
 
     if (floatDetails) {
       setWholeRows(floatDetails.page_total)
-      setDatatable({
+      wrapSetDatatable({
         columns: hearder_columns,
         rows: floatDetails.floats,
       })
@@ -386,19 +398,19 @@ const ScannerComponent = () => {
 
     if (floatDetails) {
       setWholeRows(floatDetails.page_total)
-      setDatatable({
+      wrapSetDatatable({
         columns: hearder_columns,
         rows: floatDetails.floats,
       })
     }
   }
-  
+
   const handleIndustryChange = async (e) => {
     setIndustry(e)
 
     const floatDetails = await getFloatsDetails(currentPage, pageAmount, exchange ? exchange.value : '', e.value, sector ? sector.value : '')
     setWholeRows(floatDetails.page_total)
-    setDatatable({
+    wrapSetDatatable({
       columns: hearder_columns,
       rows: floatDetails.floats,
     })
@@ -443,7 +455,7 @@ const ScannerComponent = () => {
             </UncontrolledDropdown>
             <li className="separator d-lg-none" />
           </Nav>
-        </Collapse>    
+        </Collapse>
       </nav>
       <div className="col-sm-12 hunter-data-table-container scanner-page-container">
         <div className="hunter-data-table-title">
@@ -474,8 +486,9 @@ const ScannerComponent = () => {
               placeholder="Industry"
             />
           </div>
+          <ButtonCsvDownload filename={"floats.csv"}>Csv Download</ButtonCsvDownload>
         </div>
-        <MDBTable 
+        <MDBTable
           hover
           small={true}
           maxHeight="500px"
@@ -501,9 +514,9 @@ const ScannerComponent = () => {
             >
             {datatable.rows.map((item) => (
               <tr key={`row-${item.Symbol}`}>
-                {hearder_columns.map((column) => 
+                {hearder_columns.map((column) =>
                   (
-                    <td 
+                    <td
                       key={`${item.symbol}-${column.field}`}
                       className={`${column.field === 'Description' ? 'hunter-custom-table-description-td' : ''} hunter-custom-table-td`}
                     >
@@ -528,4 +541,4 @@ const ScannerComponent = () => {
   );
 };
 
-export default ScannerComponent;
+export default FloatsComponent;

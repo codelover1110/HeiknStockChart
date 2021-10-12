@@ -5,6 +5,7 @@ import {
 
 import Sidebar from "components/Sidebar/Sidebar.js";
 import FloatsComponent from 'components/Floats/FloatsComponent.js'
+import { CsvDownloadProvider } from "contexts/CsvDownloadContext";
 
 import { routes } from "routes.js";
 
@@ -13,7 +14,7 @@ import { BackgroundColorContext } from "contexts/BackgroundColorContext";
 function Floats() {
   const [isShowSidebar, setShowSidebar] = React.useState(false);
   const [selectedInstance, setSelectedInstance] = React.useState('floats');
-  
+
   const handleSidebarChange = () => {
     setShowSidebar(!isShowSidebar);
   };
@@ -21,7 +22,7 @@ function Floats() {
   const handleInstanceChange = (instance) => {
     setSelectedInstance(instance)
   }
-  
+
   return (
     <BackgroundColorContext.Consumer>
       {({ color }) => (
@@ -46,7 +47,9 @@ function Floats() {
               />
             )}
             <div className="col-sm-12">
+              <CsvDownloadProvider>
                 <FloatsComponent />
+              </CsvDownloadProvider>
             </div>
           </div>
         </React.Fragment>
