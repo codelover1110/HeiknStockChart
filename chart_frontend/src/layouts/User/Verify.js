@@ -12,11 +12,11 @@ const Verify = () => {
     const [isLoading, setIsLoading] = useState(false)
     const [message, setMessage] = useState('')
     const userId = history.location.state ? history.location.state.userId : null
-    
+
     const handleCodeChange = (e) => {
         setCode(e.target.value)
     }
-    
+
     useEffect(() => {
         const listener = event => {
             if (event.code === "Enter" || event.code === "NumpadEnter") {
@@ -47,7 +47,7 @@ const Verify = () => {
         if (res.verify) {
             const userInfo = {
                 email: res.user_email,
-                role: res.is_admin ? 'forward_test,stress_test,optimization,live_trade,macket_watch,trade_data' : res.role,
+                role: res.is_admin ? 'forward_test,stress_test,optimization,live_trade,market_watch,trade_data' : res.role,
                 is_admin: res.is_admin,
             }
             localStorage.setItem('user-info', JSON.stringify(userInfo))
@@ -92,7 +92,7 @@ const Verify = () => {
                     Verify
                 </button>
             </div>
-            {error !== -1 && 
+            {error !== -1 &&
                 <div class="alert alert-primary" role="alert">
                     <div className="alert-container">
                         <div className="alert-content">
@@ -100,7 +100,7 @@ const Verify = () => {
                         </div>
                         <button type="button" className="btn btn-primary modal-close-button hunter-modal-small-button" onClick={() => { handleModalClose() }}>Close</button>
                     </div>
-                </div>   
+                </div>
             }
         </div>
     );

@@ -15,8 +15,8 @@ import FinancialDashboard from "layouts/User/FinancialDashboard";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import "assets/scss/black-dashboard-react.scss";
 import "assets/demo/demo.css";
-import '@fortawesome/fontawesome-free/css/all.min.css'; 
-import'bootstrap-css-only/css/bootstrap.min.css'; 
+import '@fortawesome/fontawesome-free/css/all.min.css';
+import'bootstrap-css-only/css/bootstrap.min.css';
 import 'mdbreact/dist/css/mdb.css';
 import "./App.css";
 import "assets/css/nucleo-icons.css";
@@ -31,7 +31,7 @@ import Verify from 'layouts/User/Verify'
 import Floats from "layouts/User/Floats";
 import ForgotPassword from 'layouts/User/ForgotPassword'
 import PasswordResetConfirm from 'layouts/User/PasswordResetConfirm'
-import MacketWatch from 'layouts/User/MacketWatch'
+import MarketWatch from 'layouts/User/MarketWatch'
 import Scanner from 'layouts/User/Scanner'
 import Optimization from 'layouts/User/Optimization'
 
@@ -61,8 +61,8 @@ ReactDOM.render(
             <PrivateRoute path="/floats">
               <Floats />
             </PrivateRoute>
-            <PrivateRoute path="/macket_watch">
-              <MacketWatch />
+            <PrivateRoute path="/market_watch">
+              <MarketWatch />
             </PrivateRoute>
             <PrivateRoute path="/optimization">
               <Optimization />

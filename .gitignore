@@ -6,3 +6,6 @@ node_modules/
 *.pyc
 
 */__pycache__/*
+
+chart_frontend/.env
+chart_frontend/yarn.lock

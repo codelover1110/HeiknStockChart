@@ -67,8 +67,8 @@ export var routes = [
   {
     name: "Market Watch",
     icon: "tim-icons icon-camera-18",
-    instance: "macket_watch",
-    pathname: '/macket_watch'
+    instance: "market_watch",
+    pathname: '/market_watch'
   },
   {
     name: "Data Tables",

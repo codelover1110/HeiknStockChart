@@ -392,6 +392,8 @@ const FinancialDashboard = () => {
     }
   }, [selectedHeaderNav, selectedStockType, symbol]);
 
+  console.log('selectedHeaderNav', selectedHeaderNav)
+
   return (
     <div className="financial-dashboard-container">
       {!isShowSidebar && (
@@ -430,6 +432,7 @@ const FinancialDashboard = () => {
             setSelectedStockType={setSelectedStockType}
             selectedHeaderNav={selectedHeaderNav}
           />
+          <button>Test</button>
         </div>
       )}
       {selectedHeaderNav === 'Data Table' ? (
