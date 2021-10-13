@@ -474,6 +474,7 @@ const FinancialDashboard = () => {
             </div>
           </div>
         )}
+      </div>
     </CsvDownloadProvider>
   );
 };
