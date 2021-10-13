@@ -3,7 +3,6 @@ export const filterPriceData = async (selectedSymbolType, symbol, timeFrame, tra
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
-      'selectedSymbolType': selectedSymbolType,
       'symbol': symbol,
       'time_frame': timeFrame,
       'start': tradeStartDate,
@@ -846,7 +845,7 @@ export const getIndicators = async () => {
     headers: {'Content-Type': 'application/json'},
   };
 
-  const apiURL = '/api/indicator_list/'
+  const apiURL = '/api/indicator_list'
   try {
     return await fetch(process.env.REACT_APP_BACKEND_URL + apiURL, requestOptions)
     .then(response => response.json())

@@ -15,7 +15,7 @@ import {
 } from "reactstrap";
 import { useAuth } from 'contexts/authContext';
 import disableScroll from 'disable-scroll';
-import { getSymbolsByMicroStrategy } from 'api/Api'
+import { getSymbolsByMicroStrategy, getIndicators } from 'api/Api'
 
 const HeiknStockChart = (props) => {
   const auth = useAuth();
@@ -181,6 +181,19 @@ const HeiknStockChart = (props) => {
     },
     [],
   )
+
+  useEffect(async () => {
+    const result = await getIndicators()
+    if (result.success) {
+      const indicatorList = result.data.map((o) => (
+        {
+          value: o,
+          label: o
+        }
+      ))
+      // setOptionsIndicator(indicatorList)
+    }
+  }, [])  
 
   useEffect(() => {
     disableScroll.on();

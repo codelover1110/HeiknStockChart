@@ -44,7 +44,7 @@ function UserManage() {
     { value: 'stress_test', label: 'Stress Test' },
     { value: 'optimization', label: 'Optimization' },
     { value: 'live_trade', label: 'Live Trade' },
-    { value: 'macket_watch', label: 'Macket' },
+    { value: 'market_watch', label: 'Market' },
     { value: 'scanner', label: 'Scanner' },
     { value: 'trade_data', label: 'Trade Data'},
   ]
