@@ -3,6 +3,8 @@ import Chart from '../trades-chart/TradesChart';
 import PerformanceChart from '../performance-chart/PerformanceChart'
 import { TypeChooser } from "react-stockcharts/lib/helper";
 
+import { getDataReq, getDataExtendedReq, getBacktestingResultReq, getDataSliceReq, getDataExtendedSliceReq } from 'api/Api';
+
 const StockChart = (props) => {
   const { 
     chartColumn,
@@ -57,78 +59,67 @@ const StockChart = (props) => {
   }, [viewType])
 
   useEffect(() => {
-    const get_data = (symbol) => {
+    const get_data = async (symbol) => {
       if (viewType !== 'performance') {
         if (!dbname) {
           return;
         }
-        const requestOptions = {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({
-            'db_name': dbname,
-            'symbol': symbol,
-            'symbol_type': selectedSymbolType,
-            'macro': strategy.value,
-            'micro': (selectedInstance !== 'live_trading') ? microStrategy : '',
-          })
-        };
-        setChartData(null)
-        let apiName = '/api/get_data';
-        if (extendMarketTime === 'extend_markettime') {
-          if (isSliced) {
-            apiName = '/api/get_data_extended_slice'
-          } else {
-            apiName = '/api/get_data_extended'
-          }
-        } else if (isSliced) {
-          apiName = '/api/get_data_slice'
-        } else {
-          apiName = '/api/get_data'
+        const requestBody = {
+          'db_name': dbname,
+          'symbol': symbol,
+          'symbol_type': selectedSymbolType,
+          'macro': strategy.value,
+          'micro': (selectedInstance !== 'live_trading') ? microStrategy : '',
         }
+        let dataRes;
+        setChartData(null)
         try {
-          fetch(process.env.REACT_APP_BACKEND_URL + apiName, requestOptions)
-          .then(response => response.json())
-          .then(data => {
+          if (extendMarketTime === 'extend_markettime') {
+            if (isSliced) {
+              dataRes = await getDataExtendedSliceReq(requestBody);
+            } else {
+              dataRes = await getDataExtendedReq(requestBody);
+            }
+          } else if (isSliced) {
+            dataRes = await getDataSliceReq(requestBody);
+          } else {
+            dataRes = await getDataReq(requestBody);
+          }
+          if (dataRes.success) {
+            let data = dataRes.data;
             data['chart_data']['columns'] = ["date", "open", "high", "low", "close", "volume", "split", "dividend", "absoluteChange", "percentChange"]
             data['chart_data'].map((x) => {
               let converDate = new Date(x.date)
               x.date = converDate
               return null
             })
-            setExchange(data['chart_data']['exchange'])
             setChartData(data['chart_data'])
-          })
-        } catch (error) {
-          console.log(error)    
+          }
+        } catch (e) {
+          console.error(e)
         }
       } else {
         const symbols = multiSymbol.map((symbol) => symbol.value);
         if (!symbols.length | !microStrategy) {
           return;
         }
-        const requestOptions = {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({
-            'symbols': symbols,
-            'symbol_type': selectedSymbolType,
-            "macro": strategy.value,
-            "micro": microStrategy,
-            'start_date': startDate,
-            'end_date': endDate,
-          })
-        };
+        
+        const requestBody = {
+          'symbols': symbols,
+          'symbol_type': selectedSymbolType,
+          "macro": strategy.value,
+          "micro": microStrategy,
+          'start_date': startDate,
+          'end_date': endDate,
+        }
+
         try {
-          fetch(process.env.REACT_APP_BACKEND_URL+'/api/get_backtesting_result', requestOptions)
-            .then(response => response.json())
-            .then(data => {
-              setChartData(data.chart_data)
-              setExchange(data.chart_data.exchange)
-              console.log('data???', data.chart_data, data.chart_data.exchange)
-            })
+          const backtestingResultRes = await getBacktestingResultReq(requestBody);
+          if (backtestingResultRes.success) {
+            setChartData(backtestingResultRes.data['chart_data'])
+          }
         } catch (error) {
-          console.log(error)
+          console.error(error)
         }
       }
     }
