@@ -279,25 +279,25 @@ if __name__ == "__main__":
         thrd.start()
         time.sleep(0.5)
 
-    # while True:
-    for item in intervals:
-        proc_time = 0
-        while True:
-            thread_states = []
-            for thrd in thread_list:
-                thread_working = thrd.get_thread_state()
-                thread_states.append(thread_working)
-            if True not in thread_states:
+    while True:
+        for item in intervals:
+            proc_time = 0
+            while True:
+                thread_states = []
                 for thrd in thread_list:
-                    thrd.set_interval(item[0], item[1], item[2], item[3])
-                break
-            else:
-                print('< {} > {}'.format(proc_time, thread_states))
+                    thread_working = thrd.get_thread_state()
+                    thread_states.append(thread_working)
+                if True not in thread_states:
+                    for thrd in thread_list:
+                        thrd.set_interval(item[0], item[1], item[2], item[3])
+                    break
+                else:
+                    print('< {} > {}'.format(proc_time, thread_states))
 
-            time.sleep(5)
-            proc_time += 5
+                time.sleep(5)
+                proc_time += 5
 
-    time.sleep(10)
+        time.sleep(10)
     for thrd in thread_list:
         thrd.stop()
 

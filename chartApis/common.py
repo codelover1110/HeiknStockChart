@@ -325,6 +325,7 @@ def calc_percentEfficiency(symbols, db_data):
     pE = []
     wLA = []
     lS = []
+    totWL = []
     for symbol in symbols:
         pair_pE = {}
         sym_pE = []
@@ -377,6 +378,11 @@ def calc_percentEfficiency(symbols, db_data):
             "avgWinning": avgWinning,
             "avgLosing": abs(avgLosing)
         })
+        totWL.append({
+            "symbol": symbol,
+            "totWinning": round( sum(winningT), 3),
+            "totLosing": round(abs(sum(losingT)), 3)
+        })
 
         # Calculation Long and Short
         short = 0
@@ -408,7 +414,8 @@ def calc_percentEfficiency(symbols, db_data):
     return {
         "pE": pE,
         "wLA": wLA,
-        "lS": lS
+        "lS": lS,
+        "totWL": totWL
     }
 
 def fill_missing_candles__(chat_candles, candle_name, macro, micro):

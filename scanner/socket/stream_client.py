@@ -23,8 +23,8 @@ socket = "ws://52.191.3.0:9999"
 test_info = {
         "action": "create_fields",
         "chart_number": 4,
-        "symbol_type": "crypto",
-        "symbols":  ["BTC", "ETH", "LTC"],
+        "symbol_type": "stock",
+        "symbols": ["AMD", "AMZN", "GOOG"],
         "fields": [
             { "Stock Financials":   [ "period","calendarDate" ] },
             { "Ticker News":        [ "id", "title" ] },
@@ -72,6 +72,6 @@ if __name__ == "__main__":
     ps = StreamClient(socket)
     ps.start()
 
-    time.sleep(10)
+    time.sleep(30)
     ps.stop()
     time.sleep(0.1)

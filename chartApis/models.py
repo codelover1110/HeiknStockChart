@@ -1,18 +1,16 @@
 from datetime import datetime
 import pymongo
+
+from Having_system.Update_candles.define import INDICATORS_COL_NAME, PARAMETERS_DB
 from .utils import define_start_date, check_candle_in_maket_time
 
-# mongoclient = pymongo.MongoClient('mongodb://aliaksandr:BD20fc854X0LIfSv@cluster0-shard-00-00.35i8i.mongodb.net:27017,cluster0-shard-00-01.35i8i.mongodb.net:27017,cluster0-shard-00-02.35i8i.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-aoj781-shard-0&authSource=admin&retryWrites=true&w=majority')
-# mongo_client = pymongo.MongoClient('mongodb://user:-Hz2f$!YBXbDcKG@cluster0-shard-00-00.vcom7.mongodb.net:27017,cluster0-shard-00-01.vcom7.mongodb.net:27017,cluster0-shard-00-02.vcom7.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-7w6acj-shard-0&authSource=admin&retryWrites=true&w=majority')
-# azuremongo = mongoclient
 azuremongo = pymongo.MongoClient('mongodb://root:rootUser2021@20.84.64.243:27017')
 BACKTESTING_TRADES = 'backtesting_trades'
 # ALL_TRADES_HISTORY = 'trading-history'
 ALL_TRADES_HISTORY = 'trade-history'
 STRATEGY_FILE = 'strategies'
-# MARKET_DATA_DB = 'stock_market_data'
 MARKET_DATA_DB = 'chart_market_data'
-
+STOCK_MARKET_DATA_ALL = 'stock_market_data_all'
 
 ############################################
 ## get all macro and micro strategy names ##
@@ -92,9 +90,18 @@ def get_macro_strategies():
         result.append(doc['_id'])
     return  result
 
-#####################################
-### get macro strategy names only ### 
-#####################################
+def get_indicator_list():
+    masterdb = azuremongo[PARAMETERS_DB]
+    ob_table = masterdb[INDICATORS_COL_NAME]
+    indicator_names = list(ob_table.find({}, {'name': 1, '_id': 0}))
+    result = []
+    for indicator in indicator_names:
+        result.append(indicator['name'])
+    return  result
+
+##################################
+### get macro strategy symbols ### 
+##################################
 def get_strategy_symbols(macro_name):
     query = [
         {   
@@ -114,6 +121,27 @@ def get_strategy_symbols(macro_name):
         result.append(doc['_id'])
     return  result
 
+######################################
+### get symbols for micro strategy ### 
+######################################
+def get_micro_strategy_symbols(macro_name, micro_name):
+    query = [
+        {   
+            "$match":{ 'macro_strategy': macro_name, 'micro_strategy': micro_name } 
+        },
+        {
+            "$group":{
+                "_id": "$symbol",
+            }
+        }
+    ]
+    masterdb = azuremongo[BACKTESTING_TRADES]
+    ob_table = masterdb[ALL_TRADES_HISTORY]
+    agg_result = ob_table.aggregate(query)
+    result = []
+    for doc in agg_result:
+        result.append(doc['_id'])
+    return  result
 
 ###################################################
 ### generate all strateies from macro and micro ### 
@@ -272,7 +300,7 @@ def get_table_list_db(strategy_name):
 #######################################
 def get_symbol_candles(symbol, start_date, end_date, time_frame):
     if True:   # for 1 miniutes db
-        masterdb = azuremongo[MARKET_DATA_DB]
+        masterdb = azuremongo[STOCK_MARKET_DATA_ALL]
         if time_frame == '1m':
             db_collection = masterdb['backtest_1_minute']
         elif time_frame == '1h':

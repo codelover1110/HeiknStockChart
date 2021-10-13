@@ -14,7 +14,7 @@ def recent_news(request):
 
     try:
         recent_news = news.get_recent_news()
-        return JsonResponse({"success": True, "result": recent_news}, safe=True)
+        return JsonResponse({"success": True, "results": recent_news}, safe=True)
     except:
         return JsonResponse({"success": False, "message": "Failed to get recent news!"}, safe=True)
 

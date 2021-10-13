@@ -10,11 +10,15 @@ import numpy as np
 import pandas as pd
 pd.options.mode.chained_assignment = None  # default='warn'
 
+from .utils import get_symbol_exchange
+
 from .models import (
             get_stock_candles_for_strategy_all,
             get_micro_strategies, 
             get_macro_strategies, 
             get_strategy_symbols, 
+            get_micro_strategy_symbols,
+            get_indicator_list,
             get_backtesting_symbols, 
             get_backtesting_result,
             get_data_trades_db,
@@ -60,11 +64,20 @@ def backtesting_result(request):
         
         wL = calc_winningLosing(symbols, list_db_data)
         pE_wLA_lS = calc_percentEfficiency(symbols, list_db_data)
+        if len(symbols) > 0:
+            exchange = get_symbol_exchange(symbols[0])
+        else:
+            exchange = ""
+
+
+
         bastestData = {
             'percentEfficiency': pE_wLA_lS['pE'],
             'winningLosing': wL,
             "winningLosingAvg": pE_wLA_lS['wLA'],
-            "longShort": pE_wLA_lS['lS']
+            "longShort": pE_wLA_lS['lS'],
+            "totWinLose": pE_wLA_lS['totWL'],
+            "exchange": exchange
         }
 
         return JsonResponse({'chart_data': bastestData}, status=status.HTTP_201_CREATED)
@@ -121,6 +134,26 @@ def get_strategies_list(request):
     return JsonResponse({"result": strategies}, status=status.HTTP_201_CREATED)    
 
 @csrf_exempt
+def micro_strategy_symbols(request):
+    print (" ++++++ API: micro_strategy_symbols ++++++")
+    if request.method == 'POST':
+        request_data = JSONParser().parse(request)
+        macro = request_data['macro']
+        micro = request_data['micro']
+        micro_symbols = get_micro_strategy_symbols(macro, micro)
+        result = []
+        for symbol in micro_symbols:
+            result.append(symbol)
+        return JsonResponse({"result": result}, status=status.HTTP_201_CREATED)    
+
+@csrf_exempt
+def indicator_list(request):
+    print (" ++++++ API: indicator_list ++++++")
+    indicator_list = get_indicator_list()
+    return JsonResponse({"result": indicator_list}, status=status.HTTP_201_CREATED)    
+
+
+@csrf_exempt
 def get_live_data(request):
     print (" ++++++ API: get_live_data ++++++")
     request_data = JSONParser().parse(request)
@@ -134,9 +167,26 @@ def get_live_data(request):
     chat_candles = get_chat_data_rsi_heik_v11(candles)
     verdict = join_append(chat_candles, strategy_trades, strategy)
     verdict = fill_missing_candles__(verdict, db_name, macro, micro)
+    exchange = get_symbol_exchange(symbol)
     
-    return JsonResponse({'chart_data': verdict}, status=status.HTTP_201_CREATED)
+    return JsonResponse({'chart_data': verdict, 'exchange': exchange}, status=status.HTTP_201_CREATED)
 
+@csrf_exempt
+def get_live_data_slice(request):
+    print (" ++++++ API: get_live_data_slice ++++++")
+    request_data = JSONParser().parse(request)
+    db_name = request_data['db_name']
+    symbol = request_data['symbol']
+    macro = request_data['macro']
+    micro = request_data['micro']
+    strategy = '{}-{}-trades'.format(macro, micro)
+    candles, strategy_trades = get_stock_candles_for_strategy_all(db_name, symbol, macro, micro)
+    chat_candles = get_chat_data_rsi_heik_v11(candles)
+    verdict = join_append(chat_candles, strategy_trades, strategy)
+    verdict = fill_missing_candles__(verdict, db_name, macro, micro)
+    exchange = get_symbol_exchange(symbol)
+        
+    return JsonResponse({'chart_data': verdict[-25:], 'exchange': exchange}, status=status.HTTP_201_CREATED)
 
 @csrf_exempt
 def get_live_data_extended(request):
@@ -152,8 +202,26 @@ def get_live_data_extended(request):
     chat_candles = get_chat_data_rsi_heik_v11(candles)
     verdict = join_append(chat_candles, strategy_trades, strategy)
     verdict = fill_missing_candles__(verdict, db_name, macro, micro)
+    exchange = get_symbol_exchange(symbol)
     
-    return JsonResponse({'chart_data': verdict}, status=status.HTTP_201_CREATED)
+    return JsonResponse({'chart_data': verdict, 'exchange': exchange}, status=status.HTTP_201_CREATED)
+
+@csrf_exempt
+def get_live_data_extended_slice(request):
+    print (" ++++++ API: get_live_data_extended_slice ++++++")
+    request_data = JSONParser().parse(request)
+    db_name = request_data['db_name']
+    symbol = request_data['symbol']
+    macro = request_data['macro']
+    micro = request_data['micro']
+    strategy = '{}-{}-trades'.format(macro, micro)
+    candles, strategy_trades = get_stock_candles_for_strategy_all(db_name, symbol, macro, micro, extended=True)
+    chat_candles = get_chat_data_rsi_heik_v11(candles)
+    verdict = join_append(chat_candles, strategy_trades, strategy)
+    verdict = fill_missing_candles__(verdict, db_name, macro, micro)
+    exchange = get_symbol_exchange(symbol)
+    
+    return JsonResponse({'chart_data': verdict[-25:], 'exchange': exchange}, status=status.HTTP_201_CREATED)
 
 # strategy management api
 @csrf_exempt
