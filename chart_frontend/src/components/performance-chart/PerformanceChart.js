@@ -12,7 +12,6 @@ class PerformanceChart extends React.Component {
 
 		if (mainData == null) {
 			return <div>Loading...</div>
-		} else {
 		}
 
 		return (
@@ -24,14 +23,17 @@ class PerformanceChart extends React.Component {
 				<TypeChooser>
 					{type => <GroupApexBar type={type} data={mainData.winningLosingAvg} isAverage={true}/>}
 				</TypeChooser>
-				<MultiLineChart chartData={mainData.percentEfficiency} isPercent={false}/>
+				<TypeChooser>
+					{type => <GroupApexBar type={type} data={mainData.totWinLose} isTotal={true} isAverage={false}/>}
+				</TypeChooser>
+				{/* <MultiLineChart chartData={mainData.percentEfficiency} isPercent={false}/> */}
 			</div>
 		);
 	}
 }
 
 PerformanceChart.propTypes = {
-	data: PropTypes.array.isRequired,
+	data: PropTypes.object.isRequired,
 	width: PropTypes.number.isRequired,
 	ratio: PropTypes.number.isRequired,
 	type: PropTypes.oneOf(["svg", "hybrid"]).isRequired,

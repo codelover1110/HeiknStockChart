@@ -17,28 +17,8 @@ class App extends React.Component {
     this.ws = new WebSocket("ws://20.157.7.76:9999/");
   }
 
-  // componentDidMount() {
-  //   if (!this.state.isStarted) {
-  //     const socket = io.connect('http://localhost:8000');
-  //     this.setState(socket)
-  //     if (socket) {
-  //       socket.emit('start_streaming', "run start");  
-  //     }
-  //     this.setState( {
-  //       isStarted: true,
-  //     })
-  //   }
-  // }
-
   render() {
-    // console.log("sending message", this.socket)
-    // this.socket.on('setFilters',  (args) => {console.log("filtered data received !!!!!", args)});
     
-   
-    //  this.ws.onopen = () => {
-     //   console.log('Opened Connection!')
-    //   };
-
     this.ws.onmessage = (event) => {
       const msg = JSON.parse(event.data)
       console.log('-------------------', msg)

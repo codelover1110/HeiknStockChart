@@ -11,6 +11,7 @@ import {
 } from 'api/Api';
 
 const WatchListItem = (props) => {
+  const { allViewData, setAllViewData } = props;
   const [isConnected, setIsConnected] = useState(false)
   const [selectedColumns, setSelectedColumns] = useState(
     [
@@ -417,6 +418,38 @@ const WatchListItem = (props) => {
     }  
   }
 
+  const loadview = async () => {
+    const result = await getScannerViewData(props.chart_number)
+    if (result) {
+      let columns = result.fields;
+      if (columns) {
+        let cols = []
+        let temps = []
+        let colObjects = []
+        Object.keys(columns).forEach((key) => {
+          columns[key].children.forEach((col) => {
+            cols.push(col.label)
+            temps.push(col.label)
+          })
+
+          colObjects.push({
+            [columns[key].label]: temps
+          })
+          temps = []
+        })
+        setColumnItems(cols)
+        setSelectedColumns(columns)
+        setIsUpdatedCols(!isUpdatedCols)
+
+        allViewData.forEach(view => {
+          if (view.chart_number === props.chart_number) {
+            view.fields = [...columns]
+          }
+        })
+      }
+    }
+  }
+
   const handleColumnSet = (columns) => {
     let cols = []
     let temps = []
@@ -446,6 +479,14 @@ const WatchListItem = (props) => {
         symbol_type: selectedWatchList.value === 'crypto' ? 'crypto' : 'stock',
         fields: colObjects,
       }
+
+      allViewData.forEach(view => {
+        if (view.chart_number === props.chart_number) {
+          view.symbols = content.symbols
+          view.fields = [...columns]
+        }
+      })
+
       ws.send(JSON.stringify(content));
     }
   }
@@ -627,30 +668,6 @@ const WatchListItem = (props) => {
   useEffect (() => {
     if (isLoading === 2) {
       createWebSocket(false)
-      // if (!ws) {
-      //   const socket = new WebSocket(process.env.REACT_APP_SOCKET_URL);
-      //   setWs(socket)
-        
-      //   socket.onopen = () => {
-      //     setIsConnected(true);
-      //     console.log('Opened Connection!')
-      //   };
-      
-      //   socket.onmessage = (event) => {
-      //     try {
-      //       const msg = JSON.parse(event.data)
-      //       setWatchListData(msg)
-      //       setIsUpdatedWatchList(true)
-      //     } catch (error) {
-      //       console.log(error)  
-      //     }
-      //   };
-        
-      //   socket.onclose = () => {
-      //     console.log('Closed Connection!')
-      //   };
-
-      // }
     }
   }, [isLoading])
 
@@ -696,7 +713,7 @@ const WatchListItem = (props) => {
       </Modal>
       <div className="watch-list-item-wrap hunter-watch-list-item-wrap">
         <div className="watch-list-item-header">
-          <div className="select-multi-option mr-1 ml-1">
+          <div className="select-multi-option mr-1 ml-1 macket-select-options">
             <Select
               name="filters"
               placeholder="Time Frame"
@@ -705,10 +722,10 @@ const WatchListItem = (props) => {
               options={timeFrameOptions}
             />
           </div>
-          <div className="select-multi-option mr-1">
+          <div className="select-multi-option mr-1 macket-select-options">
             <Select
               name="filters"
-              placeholder="Time Frame"
+              placeholder="Watch List"
               value={selectedWatchList}
               onChange={handleWatchListChange}
               options={selectedWatchListOptions}
@@ -730,7 +747,16 @@ const WatchListItem = (props) => {
               alert('Fields saved successfully!!!')
             }}
           >
-            save default
+            save view
+          </Button>
+          <Button
+            size="sm"
+            className=""
+            onClick={async () => {
+              loadview()
+            }}
+          >
+            load view
           </Button>
         </div>
         <div className="watch-list-item-content">

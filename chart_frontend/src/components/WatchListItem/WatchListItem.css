@@ -78,3 +78,7 @@ button {
     width: 150px;
     border-radius: 3px;
 }
+
+.macket-select-options {
+    max-width: 30px;
+}

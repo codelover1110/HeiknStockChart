@@ -2,7 +2,7 @@ import React, { useCallback, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Select from 'react-select'
 import "react-datetime/css/react-datetime.css";
-import StockChart from "../stock-chart/StockChart"
+import StockChart from "./stock-chart/StockChart"
 import { useHistory } from "react-router-dom";
 import {
   Collapse,
@@ -15,22 +15,21 @@ import {
 } from "reactstrap";
 import { useAuth } from 'contexts/authContext';
 import disableScroll from 'disable-scroll';
-import HybridViewTable from "./HybridViewTable"
 
-const HybridViewChartTable = (props) => {
+const HeiknStockSlicedChart = (props) => {
 
   const auth = useAuth();
-  const { selectedInstance } = props
+  const { selectedInstance, handleChartRedirect } = props
   const history = useHistory();
-  const [symbol, setSymbol] = useState(null);//{ value: 'MSFT', label: 'MSFT' }
+  const [symbol, setSymbol] = useState(null);
   const [indicators, setIndicators] = useState([]);
   const [isShowMicro, setIsShowMicro] = useState(true);
   const [symbolList, setSymbolList] = useState([])
-  const [isGetSymbolList] = useState(false)
   const [collapseOpen,] = React.useState(false)
-  const [selectedViewType, setSelectedViewType] = useState({ value: 'charting', label: 'Charting' });
-  const [microStrategy, setMicroStrategy] = useState(null);//{ value: '2m', label: '2m' }
-  const [strategy, setStrategy] = useState(null);//{ value: 'heikfilter', label: 'heikfilter' }
+  const [chartColumn, setChartColumn] = useState({ value: 6, label: '6' })
+  const [selectedViewType, setSelectedViewType] = useState({ value: 'sliced_charting', label: 'Sliced Charting' });
+  const [microStrategy, setMicroStrategy] = useState(null);
+  const [strategy, setStrategy] = useState(null);
   const [strategyList, setStrategyList] = useState([]);
   const [user] = useState(JSON.parse(localStorage.getItem('user-info')));
   const [extendMarketTime, setExtendMarketTime] = useState(
@@ -38,10 +37,25 @@ const HybridViewChartTable = (props) => {
       value: 'markettime', label: 'market time',
     }
   );
+
+  const [selectedSymbolType, setSelectedSymbolType] = useState({
+    value: 'stock',
+    label: 'stock'
+  })
+
+  const optionsSymbolType = [
+    {
+      value: 'stock', label: 'stock',
+    },
+    {
+      value: 'crypto', label: 'crypto',
+    }
+  ]
   
   const [optionsViewTypes, setOptionsViewTypes] = useState([
     { value: 'charting', label: 'Charting' },
     { value: 'performance', label: 'Performance' },
+    { value: 'sliced_charting', label: 'Sliced Charting' },
   ])
 
   const [optionsMicroStrategy, setOptionsMicroStrategy] = useState([])
@@ -56,12 +70,6 @@ const HybridViewChartTable = (props) => {
       value: 'RSI', label: 'RSI',
     },
     {
-      value: 'RSI2', label: 'RSI2',
-    },
-    {
-      value: 'RSI3', label: 'RSI3',
-    },
-    {
       value: 'HEIK1', label: 'HEIK1',
     },
     {
@@ -69,7 +77,7 @@ const HybridViewChartTable = (props) => {
     }
   ]);
   
-  const [optionsMarketTime, setOptionsMarketTime] = useState([
+  const [optionsMarketTime] = useState([
     {
       value: 'markettime', label: 'market time',
     },
@@ -78,22 +86,43 @@ const HybridViewChartTable = (props) => {
     }
   ]);
 
+  const optionsColumn = [
+    {
+      value: 1, label: '1',
+    },
+    {
+      value: 2, label: '2',
+    },
+    {
+      value: 4, label: '4',
+    },
+    {
+      value: 6, label: '6',
+    }
+  ]
+
   const getStrategyList = useCallback(
     () => {
-      fetch(process.env.REACT_APP_BACKEND_URL + "/api/get_strategy_list")
-        .then(response => response.json())
-        .then(data => {
-          setStrategyList(data.result);
-          const strategyOptions = data.result.map((o => {
-            return {
-              value: o.macro,
-              label: o.macro,
-            }
-          }))
-          setOptionsStrategy(strategyOptions);
-          setStrategy(strategyOptions[0]);
-          if (data.result.length) {
-            data.result.forEach((item) => {
+      try {
+        fetch(process.env.REACT_APP_BACKEND_URL + "/api/get_strategy_list")
+          .then(response => response.json())
+          .then(data => {
+            console.log('data???', data)
+            setStrategyList(data.result);
+            const strategyOptions = data.result.map((o => {
+              return {
+                value: o.macro,
+                label: o.macro,
+              }
+            }))
+            // setStrategy({
+            //   value: 'heikfilter',
+            //   label: 'heikfilter'
+            // });
+            setOptionsStrategy(strategyOptions);
+            setStrategy(strategyOptions[0]);
+            if (data.result.length) {
+              let item = data.result[0]
               const microStrategyOptions = item.micro.map(o => {
                 return {
                   value: o,
@@ -111,9 +140,11 @@ const HybridViewChartTable = (props) => {
               })
               setSymbolList(symbolOptions)
               setSymbol(symbolOptions[0])
-            })
-          }
-        })   
+            }
+          })   
+      } catch (error) {
+        console.log(error)
+      }
     },
     [],
   )
@@ -140,7 +171,7 @@ const HybridViewChartTable = (props) => {
             return null
           })
           setSymbolList(temp_data)
-          setSymbol(temp_data[0])
+          // setSymbol(temp_data[0])
         })
     },
     [],
@@ -162,10 +193,13 @@ const HybridViewChartTable = (props) => {
           { value: 'no_strategy', label: 'No Srategy' },
         ])
         return
+      } else if (value === 'forward_test') {
+        // setStrategy({ value: 'heikfilter', label: 'heikfilter' });
+        // setSymbol({ value: 'MSFT', label: 'MSFT' });
       }
       getStrategyList()
       setIsShowMicro(true);
-    }
+    } 
     if (!user.is_admin && !user?.role.length) {
       return;
     }
@@ -181,6 +215,7 @@ const HybridViewChartTable = (props) => {
       setOptionsViewTypes([
         { value: 'charting', label: 'Charting' },
         { value: 'performance', label: 'Performance' },
+        { value: 'sliced_charting', label: 'Sliced Charting' },
       ])
     }
   }, [selectedInstance, getStrategyList, get_tables, user.is_admin, user.role?.length])
@@ -192,15 +227,18 @@ const HybridViewChartTable = (props) => {
         selectedInstance,
         viewType: value,
         initStrategy: strategy,
-        initMicroStrategy: { value: '2m', label: '2m' },
+        initMicroStrategy: microStrategy,//{ value: '2m', label: '2m' }
         initIndicators: indicators,
         initSymbol: symbol,
       }
       if (value) {
+        handleChartRedirect(1)
         history.push({
           state: locationState,
         });
       }
+    } else if (value.value === 'charting') {
+      handleChartRedirect(0)
     }
   }
 
@@ -231,8 +269,15 @@ const HybridViewChartTable = (props) => {
 
             const is_2m = microStrategyOptions.filter((o => o.value === '2m'))
 
-            setMicroStrategy(microStrategyOptions[0])
-            
+            if (is_2m.length) {
+              setMicroStrategy({
+                value: '2m',
+                label: '2m'
+              })
+            } else {
+              setMicroStrategy(microStrategyOptions[0])
+            }
+
             const symbolOptions = item.symbols.map(o => {
               return {
                 value: o,
@@ -240,7 +285,8 @@ const HybridViewChartTable = (props) => {
               }
             })
             setSymbolList(symbolOptions)
-            setSymbol({value: 'MSFT', label: 'MSFT'})
+            setSymbol(symbolOptions[0])
+            // setSymbol({value: 'MSFT', label: 'MSFT'})
           }
         })
       }
@@ -258,8 +304,67 @@ const HybridViewChartTable = (props) => {
     setIndicators(options);
   }
 
+  const handleChartsColumnChange = (option) => {
+    if (option.value === 4 || option.value === 6) {
+      setIndicators([])
+      setOptionsIndicator([
+        {
+          value: 'VOLUME', label: 'VOLUME',
+        },
+        {
+          value: 'RSI', label: 'RSI',
+        },
+        {
+          value: 'HEIK1', label: 'HEIK1',
+        },
+        {
+          value: 'HEIK2', label: 'HEIK2',
+        }
+      ])
+    } else {
+      setIndicators([])
+      setOptionsIndicator([
+        {
+          value: 'VOLUME', label: 'VOLUME',
+        },
+        {
+          value: 'RSI', label: 'RSI',
+        },
+        {
+          value: 'RSI2', label: 'RSI2',
+        },
+        {
+          value: 'RSI3', label: 'RSI3',
+        },
+        {
+          value: 'HEIK1', label: 'HEIK1',
+        },
+        {
+          value: 'HEIK2', label: 'HEIK2',
+        }
+      ])
+    }
+    setChartColumn(option)
+  }
+
+  const calculateHeightStyle = () => {
+    if (chartColumn.value === 1 || chartColumn.value === 2) {
+      return 'full-height'
+    }
+    return 'half-height'
+  }
+
   const calculateGridColumn = () => {
-    return 12
+    if (chartColumn.value === 1) {
+      return 12
+    } else if ((chartColumn.value === 2) || (chartColumn.value === 4)) {
+      return 6
+    }
+    return 4
+  }
+
+  const handleSymbolTypeChange = (e) => {
+    setSelectedSymbolType(e)
   }
 
   const handleSignout = () => {
@@ -269,10 +374,11 @@ const HybridViewChartTable = (props) => {
 
   const displayChart = () => {
     return (
-      <div className={`row full-height`}>
+      <div className={`row ${calculateHeightStyle()}`}>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
           {microStrategy && symbol && (
-            < StockChart 
+            < StockChart
+              selectedSymbolType={selectedSymbolType.value}
               extendMarketTime={extendMarketTime.value}
               selectedInstance={selectedInstance}
               selectedTradeDB='heikfilter-2mins-trades'
@@ -281,10 +387,11 @@ const HybridViewChartTable = (props) => {
               indicators={indicators}
               strategy={strategy}
               isHomePage={true}
-              chartColumn={1}
+              chartColumn={chartColumn.value}
               microStrategy={microStrategy.value}
               startDate={null}
               endDate={null}
+              isSliced={true}
             />
           )}
         </div>
@@ -299,10 +406,11 @@ const HybridViewChartTable = (props) => {
             indicators={indicators}
             strategy={strategy}
             isHomePage={true}
-            chartColumn={1}
+            chartColumn={chartColumn.value}
             microStrategy={microStrategy.value}
             startDate={null}
             endDate={null}
+            isSliced={true}
           />)}
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
@@ -316,10 +424,11 @@ const HybridViewChartTable = (props) => {
               indicators={indicators}
               strategy={strategy}
               isHomePage={true}
-              chartColumn={1}
+              chartColumn={chartColumn.value}
               microStrategy={microStrategy.value}
               startDate={null}
               endDate={null}
+              isSliced={true}
             />)}
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
@@ -333,10 +442,11 @@ const HybridViewChartTable = (props) => {
               indicators={indicators}
               strategy={strategy}
               isHomePage={true}
-              chartColumn={1}
+              chartColumn={chartColumn.value}
               microStrategy={microStrategy.value}
               startDate={null}
               endDate={null}
+              isSliced={true}
             />)}
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
@@ -350,10 +460,11 @@ const HybridViewChartTable = (props) => {
               indicators={indicators}
               strategy={strategy}
               isHomePage={true}
-              chartColumn={1}
+              chartColumn={chartColumn.value}
               microStrategy={microStrategy.value}
               startDate={null}
               endDate={null}
+              isSliced={true}
             />)}
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
@@ -367,16 +478,17 @@ const HybridViewChartTable = (props) => {
             indicators={indicators}
             strategy={strategy}
             isHomePage={true}
-            chartColumn={1}
+            chartColumn={chartColumn.value}
             microStrategy={microStrategy.value}
             startDate={null}
             endDate={null}
+            isSliced={true}
           />)}
         </div>
       </div>
     )
   }
-  
+
   return (
     <div className="hunter-chart-container">
       <nav className="navbar navbar-expand navbar-dark bg-dark hunter-nav-bar">
@@ -385,55 +497,81 @@ const HybridViewChartTable = (props) => {
             Violette AM - Client Portal
           </a>
         </div>
-        <div className="navbar-nav mr-auto">
-          <li className="nav-item">
-            <Link to={"/chart"} className="nav-link"></Link>
-          </li>
-          {/* <div className="select-option">
-            <Select
-              value={extendMarketTime}
-              onChange={handleMarketTimeChange}
-              options={optionsMarketTime}
-              placeholder="Market Time"
-            />
-          </div> */}
-          <div className="select-option">
-            <Select
-              value={strategy}
-              onChange={handleStrategy}
-              options={optionsStratgy}
-              placeholder="Macro Strategy"
-            />
-          </div>
-          {isShowMicro && (
+        {(user.is_admin || (user.role?.length)) && (
+          <div className="navbar-nav mr-auto">
+            <li className="nav-item">
+              <Link to={"/chart"} className="nav-link"></Link>
+            </li>
             <div className="select-option">
               <Select
-                value={microStrategy}
-                onChange={handleMicroStrategyChange}
-                options={optionsMicroStrategy}
-                placeholder="Micro Strategy"
+                value={selectedViewType}
+                onChange={handleViewTypeChange}
+                options={optionsViewTypes}
+                placeholder="Charting"
               />
-            </div>  
-          )}
-          <div className="select-option">
-            <Select
-              value={symbol}
-              onChange={handlSymbolChange}
-              options={symbolList}
-              placeholder="Symbol"
-            />
+            </div>
+            <div className="select-option">
+              <Select
+                value={extendMarketTime}
+                onChange={handleMarketTimeChange}
+                options={optionsMarketTime}
+                placeholder="Market Time"
+              />
+            </div>
+            {/* <div className="select-option">
+              <Select
+                value={selectedSymbolType}
+                onChange={handleSymbolTypeChange}
+                options={optionsSymbolType}
+                placeholder="Select Symbol Type"
+              />
+            </div> */}
+            <div className="select-option">
+              <Select
+                value={strategy}
+                onChange={handleStrategy}
+                options={optionsStratgy}
+                placeholder="Macro Strategy"
+              />
+            </div>
+            {isShowMicro && (
+              <div className="select-option">
+                <Select
+                  value={microStrategy}
+                  onChange={handleMicroStrategyChange}
+                  options={optionsMicroStrategy}
+                  placeholder="Micro Strategy"
+                />
+              </div>  
+            )}
+            <div className="select-option">
+              <Select
+                value={symbol}
+                onChange={handlSymbolChange}
+                options={symbolList}
+                placeholder="Symbol"
+              />
+            </div>
+            <div className="select-multi-option">
+              <Select
+                name="filters"
+                placeholder="Indicators"
+                value={indicators}
+                onChange={handleIndicatorsChange}
+                options={optionsIndicator}
+                isMulti={true}
+              />
+            </div>
+            <div className="select-option">
+              <Select
+                value={chartColumn}
+                onChange={handleChartsColumnChange}
+                options={optionsColumn}
+                placeholder="Columns"
+              />
+            </div>
           </div>
-          <div className="select-multi-option">
-            <Select
-              name="filters"
-              placeholder="Indicators"
-              value={indicators}
-              onChange={handleIndicatorsChange}
-              options={optionsIndicator}
-              isMulti={true}
-            />
-          </div>
-        </div>
+        )}
         <Collapse navbar isOpen={collapseOpen}>
             <Nav className="ml-auto" navbar>
               <UncontrolledDropdown>
@@ -464,20 +602,20 @@ const HybridViewChartTable = (props) => {
             </Nav>
           </Collapse>    
       </nav>
-      <div className="display-flex-j-c">
-        <div className="graphs-container half-width dark">
+      {!user.is_admin && !user?.role.length
+        ? (<div className="development-in-content dark">
+            No Permission
+          </div>)
+        : selectedInstance === 'stress_test' || selectedInstance === 'optimization' 
+        ? (<div className="development-in-content dark">
+          In development
+        </div>)
+        : (<div className="graphs-container dark">
           {displayChart()}
-        </div>
-        <div className="half-width dark">
-          <HybridViewTable
-            symbol={symbol}
-            macroStrategy={strategy}
-            microStrategy={microStrategy}
-          />
-        </div>
-      </div>
+        </div>)
+      }
     </div>
   );
 };
 
-export default HybridViewChartTable;
+export default HeiknStockSlicedChart;

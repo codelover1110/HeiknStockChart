@@ -1,11 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { MDBTable, MDBTableBody, MDBTableHead } from 'mdbreact';
+import { useCsvDownloadUpdate } from 'contexts/CsvDownloadContext';
 
 const FinancialDataTable = (props) => {
   const { data, selectedStockType, selectedAggregationType } = props;
 
   const [datatable, setDatatable] = useState();
   const [sorted, setSorted] = useState(0);
+
+  const updateCsvDownload = useCsvDownloadUpdate();
+
+  const wrapSetDatatable = (data) => {
+    setDatatable(data)
+    updateCsvDownload([...data.rows[0]])
+  }
 
   const handleSortClicked = (label) => {
     const sort = sorted === 0 || sorted === 2 ? 1 : 2;
@@ -38,11 +46,13 @@ const FinancialDataTable = (props) => {
       }
     }
     setSorted(sort);
-    setDatatable({
+    wrapSetDatatable({
       columns: datatable.columns,
       rows,
     });
   };
+
+
 
   useEffect(() => {
     if (data) {
@@ -66,7 +76,7 @@ const FinancialDataTable = (props) => {
               field: calendarDateKey,
             });
           }
-  
+
           const keys = Object.keys(item);
           keys.map((key, index) => {
             if (!(index in rows)) {
@@ -84,7 +94,7 @@ const FinancialDataTable = (props) => {
       } else {
         rows = [rows];
       }
-      setDatatable({
+      wrapSetDatatable({
         columns,
         rows,
       });
@@ -92,7 +102,38 @@ const FinancialDataTable = (props) => {
   }, [data, selectedAggregationType, selectedStockType]);
 
   const formatNumber = (num) => {
-    return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
+    let number = parseInt(num)
+    if (number > 0) {
+      if ( number / 1000 < 999 ) {
+        return `${number / 1000} Th`
+      } else if ( number / 1000000 < 999 ) {
+        return `${number / 1000000} M`
+      } else if ( number / 1000000000 < 999 ) {
+        return `${number / 1000000000} B`
+      } else if ( number / 1000000000000 < 999 ) {
+        return `${number / 1000000000000} Tr`
+      } else if ( number / 1000000000000000 < 999 ) {
+        return `${number / 1000000000000000} Q`
+      }
+    } else if (number < 0) {
+      number = -number;
+      if ( number < 1000 ) {
+        return `-${number}`
+      }
+      else if ( number / 1000 < 999 ) {
+        return `-${number / 1000} Th`
+      } else if ( number / 1000000 < 999 ) {
+        return `-${number / 1000000} M`
+      } else if ( number / 1000000000 < 999 ) {
+        return `-${number / 1000000000} B`
+      } else if ( number / 1000000000000 < 999 ) {
+        return `-${number / 1000000000000} Tr`
+      } else if ( number / 1000000000000000 < 999 ) {
+        return `-${number / 1000000000000000} Q`
+      }
+    }
+
+    return number
   }
 
   const formatData = (rows) => {

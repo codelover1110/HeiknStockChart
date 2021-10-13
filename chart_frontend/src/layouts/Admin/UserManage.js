@@ -39,11 +39,12 @@ function UserManage() {
   );
   const [selectedInstance, setSelectedInstance] = React.useState('usermanage');
   const optionsRole = [
+    { value: 'admin_tab', label: 'Admin Bot Management' },
     { value: 'forward_test', label: 'Forward Test' },
     { value: 'stress_test', label: 'Stress Test' },
     { value: 'optimization', label: 'Optimization' },
     { value: 'live_trade', label: 'Live Trade' },
-    { value: 'macket_watch', label: 'Macket Watch' },
+    { value: 'macket_watch', label: 'Macket' },
     { value: 'scanner', label: 'Scanner' },
     { value: 'trade_data', label: 'Trade Data'},
   ]
@@ -137,11 +138,11 @@ function UserManage() {
     document.documentElement.classList.toggle("nav-open");
     setsidebarOpened(!sidebarOpened);
   };
-  
+
   const handleSidebarChange = () => {
     setShowSidebar(!isShowSidebar);
   };
-  
+
   const getBrandText = (path) => {
     for (let i = 0; i < adminRoutes.length; i++) {
       if (location.pathname.indexOf(adminRoutes[i].layout + adminRoutes[i].path) !== -1) {
@@ -186,7 +187,7 @@ function UserManage() {
   }
 
   const handleUpdateRoleModalClose = () => {
-    setIsShowUpdateRoleModal(false)  
+    setIsShowUpdateRoleModal(false)
   }
 
   const transformUserRole = (roles) => {
@@ -266,7 +267,7 @@ function UserManage() {
                 Update Role
               </Button>
             </Modal.Footer>
-            {error !== -1 && 
+            {error !== -1 &&
               <div className="alert alert-primary" role="alert">
                 <div className="alert-container">
                   <div className="alert-content">
@@ -274,7 +275,7 @@ function UserManage() {
                   </div>
                   <button type="button" className="btn btn-primary modal-close-button hunter-modal-small-button" onClick={() => { handleModalClose() }}>Close</button>
                 </div>
-              </div>   
+              </div>
             }
           </Modal>
             <div className={`main-panel ${!isShowSidebar ? 'full-width' : ''}`} ref={mainPanelRef} data={color}>

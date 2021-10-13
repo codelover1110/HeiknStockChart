@@ -19,11 +19,13 @@ const StockChart = (props) => {
     chartPeriod,
     startDate,
     endDate,
-    extendMarketTime
+    extendMarketTime,
+    isSliced
   } = props;
 
   const [dbname, setDbname] = useState('')
 	const [chartData, setChartData] = useState(null)
+  const [exchange, setExchange] = useState('')
 	
   useEffect(() => {
     if (selectedInstance === 'live_trading') {
@@ -74,7 +76,15 @@ const StockChart = (props) => {
         setChartData(null)
         let apiName = '/api/get_data';
         if (extendMarketTime === 'extend_markettime') {
-          apiName = '/api/get_data_extended';
+          if (isSliced) {
+            apiName = '/api/get_data_extended_slice'
+          } else {
+            apiName = '/api/get_data_extended'
+          }
+        } else if (isSliced) {
+          apiName = '/api/get_data_slice'
+        } else {
+          apiName = '/api/get_data'
         }
         try {
           fetch(process.env.REACT_APP_BACKEND_URL + apiName, requestOptions)
@@ -86,6 +96,7 @@ const StockChart = (props) => {
               x.date = converDate
               return null
             })
+            setExchange(data['chart_data']['exchange'])
             setChartData(data['chart_data'])
           })
         } catch (error) {
@@ -112,7 +123,9 @@ const StockChart = (props) => {
           fetch(process.env.REACT_APP_BACKEND_URL+'/api/get_backtesting_result', requestOptions)
             .then(response => response.json())
             .then(data => {
-              setChartData(data['chart_data'])
+              setChartData(data.chart_data)
+              setExchange(data.chart_data.exchange)
+              console.log('data???', data.chart_data, data.chart_data.exchange)
             })
         } catch (error) {
           console.log(error)
@@ -162,7 +175,7 @@ const StockChart = (props) => {
       <>
         <div className="select-wrape">
           <div>
-            <strong>{chartPeriod} [NASDAQ]</strong>
+            <strong>{chartPeriod} {exchange} </strong>
           </div>
         </div>
         {(chartColumn === 1) && displayChart()}
