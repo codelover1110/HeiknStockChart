@@ -12,8 +12,6 @@ class PerformanceChart extends React.Component {
 
 		if (mainData == null) {
 			return <div>Loading...</div>
-		} else {
-			console.log('mainData?????????????????????', mainData)
 		}
 
 		return (

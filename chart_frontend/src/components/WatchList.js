@@ -11,10 +11,14 @@ import {
   UncontrolledDropdown,
   NavLink,
   Nav,
+  Button,
 } from "reactstrap";
 import { useAuth } from 'contexts/authContext';
 import disableScroll from 'disable-scroll';
 import WatchListItem from 'components/WatchListItem/WatchListItem'
+import {
+  saveScannerAllViewData, getScannerAllViewData
+} from 'api/Api';
 
 const WatchList = (props) => {
 
@@ -39,8 +43,91 @@ const WatchList = (props) => {
     }
   ]
 
+  const defaultViewFields = [
+    {
+      label: "Indicators",
+      value: "parent_value_2",
+      children: [
+          {
+              label: "rsi",
+              value: "child_value_2_1",
+              default: true
+          },
+          {
+              label: "rsi2",
+              value: "child_value_2_2",
+              default: true
+          },
+          {
+              label: "rsi3",
+              value: "child_value_2_3",
+              default: false
+          },
+          {
+              label: "heik",
+              value: "child_value_2_4",
+              default: false
+          },
+          {
+              label: "heik2",
+              value: "child_value_2_5",
+              default: false
+          }
+      ],
+      "default": true
+    }
+  ];
+
+  const allViewDataDefault = [
+    {
+      "chart_number": 1,
+      "symbols": [],
+      "fields": defaultViewFields,
+    },
+    {
+      "chart_number": 2,
+      "symbols": [],
+      "fields": defaultViewFields,
+    },
+    {
+      "chart_number": 3,
+      "symbols": [],
+      "fields": defaultViewFields,
+    },
+    {
+      "chart_number": 4,
+      "symbols": [],
+      "fields": defaultViewFields,
+    },
+    {
+      "chart_number": 5,
+      "symbols": [],
+      "fields": defaultViewFields,
+    },
+    {
+      "chart_number": 6,
+      "symbols": [],
+      "fields": defaultViewFields,
+    }
+  ];
+
+  const [allViewData, setAllViewData] = useState(allViewDataDefault);
+
+  const loadLayout = async () => {
+    const result = await getScannerAllViewData();
+    if (!result.success || result.data == undefined) return;
+
+    const validViewDatas = result.data.filter(d => d.fields);
+    const chartNumbers = validViewDatas.map(d => d.chart_number);
+    const allViewDataFiltered = allViewData.filter(d => !chartNumbers.includes(d.chart_number));
+    const newAllViewData = [...allViewDataFiltered, ...validViewDatas];
+
+    setAllViewData(newAllViewData);
+  }
+
   useEffect(() => {
     disableScroll.on();
+    loadLayout()
     return () => {
       disableScroll.off();
     }
@@ -75,22 +162,52 @@ const WatchList = (props) => {
     return (
       <div className={`row ${calculateHeightStyle()}`}>
         <div className={`watch-list col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          <WatchListItem chart_number={1} chartColumn={chartColumn.value}/>
+          <WatchListItem 
+            chart_number={1}
+            chartColumn={chartColumn.value}
+            allViewData={allViewData}
+            setAllViewData={setAllViewData}
+          />
         </div>
         <div className={`watch-list col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          <WatchListItem chart_number={2} chartColumn={chartColumn.value}/>
+          <WatchListItem 
+            chart_number={2}
+            chartColumn={chartColumn.value}
+            allViewData={allViewData}
+            setAllViewData={setAllViewData}
+          />
         </div>
         <div className={`watch-list col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          <WatchListItem chart_number={3} chartColumn={chartColumn.value}/>
+          <WatchListItem
+            chart_number={3}
+            chartColumn={chartColumn.value}
+            allViewData={allViewData}
+            setAllViewData={setAllViewData}
+          />
         </div>
         <div className={`watch-list col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          <WatchListItem chart_number={4} chartColumn={chartColumn.value}/>
+          <WatchListItem 
+            chart_number={4}
+            chartColumn={chartColumn.value}
+            allViewData={allViewData}
+            setAllViewData={setAllViewData}
+          />
         </div>
         <div className={`watch-list col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          <WatchListItem chart_number={5} chartColumn={chartColumn.value}/>
+          <WatchListItem
+            chart_number={5}
+            chartColumn={chartColumn.value}
+            allViewData={allViewData}
+            setAllViewData={setAllViewData}
+          />
         </div>
         <div className={`watch-list col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          <WatchListItem chart_number={6} chartColumn={chartColumn.value}/>
+          <WatchListItem
+            chart_number={6}
+            chartColumn={chartColumn.value}
+            allViewData={allViewData}
+            setAllViewData={setAllViewData}
+          />
         </div>
       </div>
     )
@@ -116,6 +233,28 @@ const WatchList = (props) => {
                 options={optionsColumn}
                 placeholder="Columns"
               />
+            </div>
+            <div className="watch-list-nav-item">
+              <Button
+                size="sm"
+                color="danger"
+                onClick={async () => {
+                  const result = await saveScannerAllViewData(allViewData);
+                  if (result.success) alert('All fields saved successfully!!!');
+                }}
+              >
+                save layout
+              </Button>
+
+              <Button
+                size="sm"
+                color="danger"
+                onClick={() => {
+                  window.location.reload();
+                }}
+              >
+                load layout
+              </Button>
             </div>
           </div>
         )}

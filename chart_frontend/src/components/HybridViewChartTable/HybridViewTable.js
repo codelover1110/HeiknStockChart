@@ -73,8 +73,8 @@ const HybridViewTable = (props) => {
   });
 
   useEffect(() => {
-    const get_trades = async (symbol, macroStrat, microStrat, tradeStartDate, tradeEndDate) => {
-      const trades_data = await filterTradesData(symbol, macroStrat, microStrat, tradeStartDate, tradeEndDate);
+    const get_trades = async (macroStrat, microStrat, tradeStartDate, tradeEndDate) => {
+      const trades_data = await filterTradesData(macroStrat, microStrat, tradeStartDate, tradeEndDate);
       setDatatable({
         columns: hearder_columns,
         rows: trades_data
@@ -82,11 +82,10 @@ const HybridViewTable = (props) => {
     }
 
     get_trades(
-      symbol ? symbol.value : '',
       macroStrategy ? macroStrategy.value : '',
       microStrategy ? microStrategy.value : '', 
       tradeStartDate, tradeEndDate)
-  }, [symbol, macroStrategy, microStrategy, hearder_columns, tradeStartDate, tradeEndDate])
+  }, [macroStrategy, microStrategy, hearder_columns, tradeStartDate, tradeEndDate])
 
   const handleSignout = () => {
     auth.signout()
