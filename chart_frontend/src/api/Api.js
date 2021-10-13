@@ -492,11 +492,19 @@ export const getBotConfigList = async () => {
   }
 }
 
-export const getNewsFinancialData = async () => {
-  const apiUrl = '/news/recent_news/'
+export const getNewsFinancialData = async (symbol) => {
+  const requestOptions = {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      'symbol': symbol,
+    })
+  };
+  
+  const apiUrl = '/news/symbol_news/'
 
   try {
-    return await fetch(process.env.REACT_APP_BACKEND_URL + apiUrl)
+    return await fetch(process.env.REACT_APP_BACKEND_URL + apiUrl, requestOptions)
       .then(response => response.json())
       .then(data => {
         return data

@@ -44,7 +44,7 @@ function LinkManage() {
     { value: 'stress_test', label: 'Stress Test' },
     { value: 'optimization', label: 'Optimization' },
     { value: 'live_trading', label: 'Live Trade' },
-    { value: 'market_watch', label: 'Market Watch' },
+    { value: 'macket_watch', label: 'Macket' },
     { value: 'scanner', label: 'Scanner' },
     { value: 'trade_data', label: 'Trade Data' },
     { value: 'hybrid_view', label: 'Hybrid View' },

@@ -17,7 +17,6 @@ import { useAuth } from 'contexts/authContext';
 import disableScroll from 'disable-scroll';
 
 const HeiknStockChart = (props) => {
-
   const auth = useAuth();
   const { selectedInstance, handleChartRedirect } = props
   const history = useHistory();
@@ -56,6 +55,7 @@ const HeiknStockChart = (props) => {
   const [optionsViewTypes, setOptionsViewTypes] = useState([
     { value: 'charting', label: 'Charting' },
     { value: 'performance', label: 'Performance' },
+    { value: 'sliced_charting', label: 'Sliced Chatting'}
   ])
 
   const [optionsMicroStrategy, setOptionsMicroStrategy] = useState([])
@@ -114,34 +114,34 @@ const HeiknStockChart = (props) => {
                 label: o.macro,
               }
             }))
-            // setStrategy({
-            //   value: 'heikfilter',
-            //   label: 'heikfilter'
-            // });
             setOptionsStrategy(strategyOptions);
             setStrategy(strategyOptions[0]);
             if (data.result.length) {
-              data.result.forEach((item) => {
-                // if (item.macro === 'heikfilter') {
-                  const microStrategyOptions = item.micro.map(o => {
-                    return {
-                      value: o,
-                      label: o,
-                    }
-                  })
-                  setOptionsMicroStrategy( microStrategyOptions )
-                  setMicroStrategy(microStrategyOptions[0])
-  
-                  const symbolOptions = item.symbols.map(o => {
-                    return {
-                      value: o,
-                      label: o,
-                    }
-                  })
-                  setSymbolList(symbolOptions)
-                  setSymbol(symbolOptions[0])
-                // }
-              })
+              let flag = true
+              let item = data.result[0]
+              if (flag) {
+                const microStrategyOptions = item.micro.map(o => {
+                  return {
+                    value: o,
+                    label: o,
+                  }
+                })
+                
+                setOptionsMicroStrategy( microStrategyOptions )
+                setMicroStrategy(microStrategyOptions[0])
+
+                const symbolOptions = item.symbols.map(o => {
+                  return {
+                    value: o,
+                    label: o,
+                  }
+                })
+                
+                setSymbolList(symbolOptions)
+                setSymbol(symbolOptions[0])
+
+              }
+              flag = false
             }
           })   
       } catch (error) {
@@ -217,6 +217,7 @@ const HeiknStockChart = (props) => {
       setOptionsViewTypes([
         { value: 'charting', label: 'Charting' },
         { value: 'performance', label: 'Performance' },
+        { value: 'sliced_charting', label: 'Sliced Chatting'}
       ])
     }
   }, [selectedInstance, getStrategyList, get_tables, user.is_admin, user.role?.length])
@@ -233,11 +234,13 @@ const HeiknStockChart = (props) => {
         initSymbol: symbol,
       }
       if (value) {
-        handleChartRedirect(false)
+        handleChartRedirect(1)
         history.push({
           state: locationState,
         });
       }
+    } else if (value.value === 'sliced_charting') {
+      handleChartRedirect(2)
     }
   }
 

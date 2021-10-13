@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import AdminNavbar from "components/Navbars/AdminNavbar";
 import { routes } from "routes.js";
 import Sidebar from "components/Sidebar/Sidebar";
@@ -6,15 +6,28 @@ import TextEditor from 'components/TextEditor/Editor';
 import {
   Button
 } from "reactstrap";
+import { useHistory } from "react-router-dom";
+
 export default function FileManager(){
+  const history = useHistory();
   const [isShowSidebar, setShowSidebar] = React.useState(true);
-  const [selectedInstance, setSelectedInstance] = React.useState('forward_test');
+  const [selectedInstance, setSelectedInstance] = React.useState('admin_tab');
+  const [user] = useState(JSON.parse(localStorage.getItem('user-info')));
+
   const handleSidebarChange = () => {
     setShowSidebar(!isShowSidebar);
   };
+  
   const handleInstanceChange = (instance) => {
     setSelectedInstance(instance)
-}
+  }
+
+  useEffect (() => {
+    console.log('user.is_admin???', user.is_admin)
+    if (!user.is_admin) {
+      history.pushState('/')
+    }
+  }, [user, history])
 
   return(
     <React.Fragment>        

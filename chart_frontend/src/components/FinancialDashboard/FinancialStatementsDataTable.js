@@ -28,7 +28,7 @@ const FinancialStatementsDataTable = (props) => {
     ],
     rows: [],
   });
-  const { data, symbols } = props;
+  const { data } = props;
   const [selectedRow, setSelectedRow] = useState('no select');
   const [isOpened, setIsOpened] = useState(false);
 

@@ -13,13 +13,14 @@ import { routes } from "routes.js";
 import { BackgroundColorContext } from "contexts/BackgroundColorContext";
 import HeiknStockChart from "components/HeiknStockChart"
 import HeiknStockChartItem from "components/ItemChart"
+import HeiknStockSlicedChart from "components/HeiknStockSlicedChart"
 
 var ps;
 
 function HomePage() {
   const history = useHistory();
   const initInstance = history.location.state ? history.location.state.initInstance : null;
-  const [isHomePage, setIsHomePage] = React.useState(true);
+  const [viewType, setViewType] = React.useState(0);
   const [isShowSidebar, setShowSidebar] = React.useState(false);
   const [selectedInstance, setSelectedInstance] = React.useState(
     initInstance ? initInstance : 'forward_test'
@@ -73,7 +74,7 @@ function HomePage() {
   }
 
   const handleChartRedirect = (flag) => {
-    setIsHomePage(flag);
+    setViewType(flag)
   }
   
   return (
@@ -99,15 +100,19 @@ function HomePage() {
                 handleInstanceChange={handleInstanceChange}
               />
             )}
-            {isHomePage
+            {viewType === 0 
              ? (
               <div className={`main-panel ${!isShowSidebar ? 'full-width' : ''}`} ref={mainPanelRef} data={color}>
                 <HeiknStockChart selectedInstance={selectedInstance} handleChartRedirect={handleChartRedirect}/>
               </div>
               )
-              : (
+              : viewType === 1 ? (
                 <div className={`main-panel ${!isShowSidebar ? 'full-width' : ''}`} ref={mainPanelRef} data={color}>
                  <HeiknStockChartItem selectedInstance={selectedInstance} handleChartRedirect={handleChartRedirect}/>
+                </div>
+              ) : (
+                <div className={`main-panel ${!isShowSidebar ? 'full-width' : ''}`} ref={mainPanelRef} data={color}>
+                 <HeiknStockSlicedChart selectedInstance={selectedInstance} handleChartRedirect={handleChartRedirect}/>
                 </div>
               )
             }

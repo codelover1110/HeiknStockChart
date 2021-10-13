@@ -90,10 +90,10 @@ const FinancialDashboard = () => {
     setIsLoading(1);
     setChartData();
     const getNewsFinancials = async () => {
-      const res = await getNewsFinancialData();
+      const res = await getNewsFinancialData(symbol.value);
       setFinancialStatements({
         columns: ['id', 'time', 'title'],
-        rows: res.result,
+        rows: res.results,
       });
     };
 
@@ -449,7 +449,6 @@ const FinancialDashboard = () => {
         ) : selectedHeaderNav === 'News' ? (
           <FinancialStatementsDataTable
             data={financialStatements}
-            symbols={optionsSymbol}
           />
         ) : (
           <div className="container custom-container chart-area">
@@ -475,7 +474,6 @@ const FinancialDashboard = () => {
             </div>
           </div>
         )}
-      </div>
     </CsvDownloadProvider>
   );
 };
