@@ -9,3 +9,4 @@ node_modules/
 
 chart_frontend/.env
 chart_frontend/yarn.lock
+chart_frontend/build/

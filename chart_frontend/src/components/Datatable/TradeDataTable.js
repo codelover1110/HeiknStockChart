@@ -17,8 +17,7 @@ import { useAuth } from 'contexts/authContext';
 import { getAllSymbols, filterTradesData } from 'api/Api'
 import { currentDateString } from 'utils/helper'
 import MultiRangeSlider from 'components/MultiRangeSlider/MultiRangeSlider'
-import { useCsvDownloadUpdate } from "contexts/CsvDownloadContext";
-import ButtonCsvDownload from 'components/ButtonCsvDownload'
+
 
 const TradeDataTable = () => {
   const auth = useAuth();
@@ -99,11 +98,8 @@ const TradeDataTable = () => {
     ],
   });
 
-  const updateCsvDownload = useCsvDownloadUpdate();
-
   const wrapSetDatatable = (data) => {
     setDatatable(data)
-    updateCsvDownload([...data.rows])
   }
 
   const getStrategyList = useCallback(
@@ -317,8 +313,6 @@ const TradeDataTable = () => {
             <MultiRangeSlider
               selectDateRange={selectDateRange}
             />
-
-            <ButtonCsvDownload filename={"trade.csv"}>Csv Download</ButtonCsvDownload>
           </div>
         </div>
         <MDBDataTableV5
