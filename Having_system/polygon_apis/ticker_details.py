@@ -30,7 +30,7 @@ def get_symbols():
 
 
 # mongoclient = pymongo.MongoClient('mongodb://user:-Hz2f$!YBXbDcKG@cluster0-shard-00-00.vcom7.mongodb.net:27017,cluster0-shard-00-01.vcom7.mongodb.net:27017,cluster0-shard-00-02.vcom7.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-7w6acj-shard-0&authSource=admin&retryWrites=true&w=majority')
-mongoclient = pymongo.MongoClient('mongodb://root:rootUser2021@20.84.64.243:27019')
+mongoclient = pymongo.MongoClient('mongodb://root:rootUser2021@20.84.64.243:27017')
 
 DB_NAME = 'ticker_details'
 
@@ -65,11 +65,15 @@ class DailyPutThread(object):
         print ("deleted")
 
     def get_details(self, symbol):
-            url = "https://api.polygon.io/v1/meta/symbols/" + symbol + "/company?apiKey=" + API_KEY
-            content = json.loads(requests.get(url).content)
-            if 'error' not in content.keys():
-                return content
-            else:
+            # url = "https://api.polygon.io/v1/meta/symbols/" + symbol + "/company?apiKey=" + API_KEY
+            url = "https://api.polygon.io/vX/reference/tickers/" + symbol + "?apiKey=" + API_KEY
+            try:
+                content = json.loads(requests.get(url).content)
+                if 'error' not in content.keys():
+                    return content
+                else:
+                    return ""
+            except:
                 return ""
 
     def thread_func(self):
@@ -81,7 +85,7 @@ class DailyPutThread(object):
                 continue
             for sym_idx, symbol in enumerate(self.symbols):
                 masterdb = mongoclient[DB_NAME]
-                collection_name = 'detail_meta_data'
+                collection_name = 'ticker_detail_meta_data'
                 ob_table = masterdb[collection_name]
                 
                 symbol_details = self.get_details(symbol)
@@ -94,17 +98,41 @@ class DailyPutThread(object):
 
             time.sleep(1)
 
+def read_symbols():
+    file_name = '../Update_candles/nasdaq_screener_1633384666001.csv'
+    df = pd.read_csv(file_name)
+    return df['Symbol'].tolist()
+
+def get_db_symbols():
+    masterdb = mongoclient[DB_NAME]
+    collection_name = 'ticker_detail_meta_data'
+    ob_table = masterdb[collection_name]
+    db_symbols = list(ob_table.find({}, {"symbol": 1, "_id": 0}))
+    result = []
+    for sym in db_symbols:
+        result.append(sym['symbol'])
+    return result
+    
 
 if __name__ == "__main__":
     start_time = datetime.now()
     
-    thread_count = 10
+    thread_count = 5
     thread_list = []
 
-    symbols = get_symbols()
+    # symbols = get_symbols()
     # symbols = ["GOOG", "ATVI", "AMD", "MSFT", "AMZN", "NVDA", "TSLA", "AAPL", ""]
-    symbol_count = len(symbols)
+    symbols_8k = read_symbols()
+    if False:
+        db_symbols = get_db_symbols()
+        ns = []
+        for sym in symbols_8k:
+            if not sym in db_symbols:
+                ns.append(sym)
+        symbols_8k = ns
+    symbol_count = len(symbols_8k)
     print ("symbols: ", symbol_count)
+    symbols = symbols_8k
 
     thread_symbol_count = int(symbol_count / thread_count) + 1
     for idx in range(thread_count):
@@ -139,6 +167,8 @@ if __name__ == "__main__":
         time.sleep(5)
         proc_time += 5
 
+
+    time.sleep(10)
     for thrd in thread_list:
         thrd.stop()
 
@@ -146,11 +176,5 @@ if __name__ == "__main__":
     end_time = datetime.now()
     print ('start at: {}, end_at: {}'.format(start_time, end_time))
         
-
-
     # monitoring()
     # get_published_dates()
-    
-
-
-    

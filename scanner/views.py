@@ -80,17 +80,25 @@ def save_scanner_views(request):
     print (" ++++++ API: scanner/save_scanner_views ++++++")
     if request.method == 'POST':
         req = JSONParser().parse(request)
-        # chart_number = req['chart_number']
-        # symbols = req['symbols']
-        # fields = req['fields']
-
         try:
-            # scanner.save_scanner_views(chart_number, symbols, fields)
             scanner.save_scanner_views1(req)
             return JsonResponse({"success": True, "message": "Scanner view saved!"}, safe=True)
         except:
             return JsonResponse({"success": False, "message": "Failed to save scanner view!"}, safe=True)
     return BAD_REQUEST()
+
+@csrf_exempt
+def save_all_views(request):
+    print (" ++++++ API: scanner/save_all_views ++++++")
+    if request.method == 'POST':
+        req = JSONParser().parse(request)
+        try:
+            scanner.save_all_scanner_views(req)
+            return JsonResponse({"success": True, "message": "All scanner view saved!"}, safe=True)
+        except:
+            return JsonResponse({"success": False, "message": "Failed to save all scanner view!"}, safe=True)
+    return BAD_REQUEST()
+
 
 @csrf_exempt
 def scanner_views(request):
@@ -106,6 +114,15 @@ def scanner_views(request):
             return JsonResponse({"success": False, "message": "Failed to get scanner views!"}, safe=True)
 
 @csrf_exempt
+def load_all_views(request):
+    print (" ++++++ API: /scanner/load_all_views ++++++")
+    try:
+        all_scanner_views = scanner.get_all_scanner_views()
+        return JsonResponse({"success": True, "result": all_scanner_views}, safe=True)
+    except:
+        return JsonResponse({"success": False, "message": "Failed to get all scanner views!"}, safe=True)
+
+@csrf_exempt
 def watchlists(request):
     print (" ++++++ API: scanner/watchlists ++++++")
     if request.method == 'POST':
@@ -117,6 +134,17 @@ def watchlists(request):
         except:
             return JsonResponse({"success": False, "message": "Failed to get watchlists!"}, safe=True)
     return BAD_REQUEST()
+
+@csrf_exempt
+def watchlists_all(request):
+    print (" ++++++ API: /scanner/watchlists_all ++++++")
+    try:
+        watch_list_all = scanner.get_watchlist_all()
+        print (watch_list_all)
+        return JsonResponse({"success": True, "result": watch_list_all}, safe=True)
+    except:
+        return JsonResponse({"success": False, "message": "Failed to get all watchlists!"}, safe=True)
+
 
 @csrf_exempt
 def view_values(request):

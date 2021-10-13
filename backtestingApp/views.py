@@ -51,9 +51,9 @@ def signup_view(request):
 
 @csrf_exempt 
 def auth_view(request):
+    print (" ++++++ API: signin/ ++++++")
     if request.method == "POST":
         request_data = JSONParser().parse(request)
-        # username = request_data['username']
         password = request_data['password']
         username = request_data['username']
         try:
@@ -75,6 +75,7 @@ def sendVerifyCodetoEmail(pk):
 
 @csrf_exempt 
 def verify_view(request):
+    print (" ++++++ API: verify/ ++++++")
     request_data = JSONParser().parse(request)
     user_id = request_data['user_id']
     num = request_data['num']

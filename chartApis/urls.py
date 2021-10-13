@@ -10,6 +10,10 @@ urlpatterns = [
     url(r'^api/get_data_trades$', views.get_data_trades),
     url(r'^api/get_table_candles$', views.get_table_candles),
     url(r'^api/get_strategy_list$', views.get_strategies_list),
+    url(r'^api/get_data_slice$', views.get_live_data_slice),
+    url(r'^api/get_data_extended_slice$', views.get_live_data_extended_slice),
+    url(r'^api/micro_strategy_symbols$', views.micro_strategy_symbols),
+    url(r'^api/indicator_list$', views.indicator_list),
 
     # strategy management api
     url(r'^api/get_script_file$', views.get_script_file),

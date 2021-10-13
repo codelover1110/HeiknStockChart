@@ -3,7 +3,7 @@ import pandas as pd
 pd.options.mode.chained_assignment = None  # default='warn'
 from datetime import datetime,date
 import pandas_ta as ta
-
+import requests
 
 def Wilders(df,column,period):
     """
@@ -159,5 +159,21 @@ def get_default_scanner_view_fields():
         ]
     return default_fields
 
+def get_symbols():
+    url="https://pkgstore.datahub.io/core/nasdaq-listings/nasdaq-listed_csv/data/7665719fb51081ba0bd834fde71ce822/nasdaq-listed_csv.csv"
+    s = requests.get(url).content
+    companies = pd.read_csv(io.StringIO(s.decode('utf-8')))
+    symbols = companies['Symbol'].tolist()
+    return symbols
+
 def get_candle_fields():
     return ['c', 'date', 'h','l','o', 'percentChange', 'v', 'side', 'rsi', 'rsi2', 'rsi3', 'heik', 'heik2', 'rsi_color', 'rsi2_color', 'rsi3_color', 'heik_color', 'hiek2_color']
+    
+def get_extra_stream_symbols(src_symbols, add_count):
+    symbols = get_symbols()
+    add_symbols = symbols[:add_count]
+    for sym in add_symbols:
+        if not sym in src_symbols:
+            src_symbols.append(sym)
+
+    return src_symbols

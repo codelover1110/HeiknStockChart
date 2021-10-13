@@ -18,7 +18,8 @@ NEWS_COL_NAME = 'news_meta_data'
 FINANCIALS = 'financials_data_1008'
 FINANCIALS_COL_NAME = 'financials'
 DETAILS = 'ticker_details'
-DETAILS_COL_NAME = 'detail_meta_data'
+# DETAILS_COL_NAME = 'detail_meta_data'
+DETAILS_COL_NAME = 'ticker_detail_meta_data'
 PARAMETERS = 'parame'
 
 SCANNER_DB = 'scanner'
@@ -218,7 +219,6 @@ def save_scanner_views(chart_number, symbols, fields):
         db_collection.insert_one(new_one)
 
 def save_scanner_views1(scanner_views):
-    print (scanner_views)
     scanner_db = mongoclient[SCANNER_DB]
     db_collection = scanner_db[SCANNER_VIEWS]
     s_views = db_collection.find_one({"chart_number": scanner_views['chart_number']})
@@ -228,12 +228,29 @@ def save_scanner_views1(scanner_views):
     else:
         db_collection.insert_one(scanner_views)
 
+def save_all_scanner_views(all_scanner_views):
+    scanner_db = mongoclient[SCANNER_DB]
+    db_collection = scanner_db[SCANNER_VIEWS]
+    for scanner_views in all_scanner_views:
+        s_views = db_collection.find_one({"chart_number": scanner_views['chart_number']})
+        if s_views is not None:
+            db_collection.update_one({"_id": s_views['_id']}, {"$set": scanner_views}, upsert=False)
+        else:
+            db_collection.insert_one(scanner_views)
+
 def get_scanner_views(chart_number):
     scanner_db = mongoclient[SCANNER_DB]
     db_collection = scanner_db[SCANNER_VIEWS]
     scanner_views = db_collection.find_one({'chart_number': chart_number}, {'_id': False})
 
     return scanner_views
+
+def get_all_scanner_views():
+    scanner_db = mongoclient[SCANNER_DB]
+    db_collection = scanner_db[SCANNER_VIEWS]
+    all_scanner_views = list(db_collection.find({}, {'_id': False}))
+
+    return all_scanner_views
     
 def get_scanner_initials():
     scanner_db = mongoclient[SCANNER_DB]
@@ -251,6 +268,26 @@ def get_watchlist(name):
     tickers.remove('')
 
     return tickers
+
+def get_watchlist_all():
+    scanner_db = mongoclient[PARAMETERS_DB]
+    db_collection = scanner_db[WATCHLIST_COL_NAME]
+    wls = list(db_collection.find({}, {"_id": 0}))
+    result = []
+    for wl in wls: 
+        wl_name = wl['name']
+        tickers = wl['contents'].split('\n')
+        if '' in tickers:
+            tickers.remove('')
+        wl_item = dict()
+        wl_item['name'] = wl_name
+        wl_item['tickers'] = tickers
+        print (wl_item)
+        result.append(wl_item)
+
+    print ("---------", result)
+
+    return result
 
 def get_all_scanner_symbols():
     scanner_db = mongoclient[SCANNER_DB]

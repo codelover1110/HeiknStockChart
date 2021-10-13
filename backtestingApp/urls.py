@@ -57,7 +57,10 @@ urlpatterns = [
     path('scanner/multi_financials/', scanner_view.multi_financials, name='multi-financials'),
     path('scanner/save_scanner_views/', scanner_view.save_scanner_views, name='save-scanner-views'),
     path('scanner/scanner_views/', scanner_view.scanner_views, name='scanner-views'),
+    path('scanner/load_all_views/', scanner_view.load_all_views, name='load-all-views'),
+    path('scanner/save_all_views/', scanner_view.save_all_views, name='save-all-views'),
     path('scanner/watchlists/', scanner_view.watchlists, name='watchlists'),
+    path('scanner/watchlists_all/', scanner_view.watchlists_all, name='watchlists-all'),
     path('scanner/view_values/', scanner_view.view_values, name='view-values'),
 
     ################ new scanner api ##################
