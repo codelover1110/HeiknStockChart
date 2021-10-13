@@ -123,6 +123,14 @@
   font-size: 12px;
 }
 
+.macket-select-options.select-multi-option {
+  min-width: 100px;
+  z-index: 1000;
+  position: relative;
+  margin-right: 30px;
+  font-size: 12px;
+}
+
 #type {
   display: none;
 }

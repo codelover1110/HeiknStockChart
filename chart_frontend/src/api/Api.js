@@ -29,13 +29,11 @@ export const filterPriceData = async (selectedSymbolType, symbol, timeFrame, tra
     })
 }
 
-export const filterTradesData = async (selectedSymbolType, symbol, macroStrategy, microStrategy, tradeStartDate, tradeEndDate) => {
+export const filterTradesData = async (macroStrategy, microStrategy, tradeStartDate, tradeEndDate) => {
   const requestOptions = {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
-      'selectedSymbolType': selectedSymbolType,
-      'symbol': symbol,
       'macroStrategy': macroStrategy,
       'microStrategy': microStrategy,
       'tradeStartDate': tradeStartDate,
@@ -756,6 +754,108 @@ export const getFloatsDetails = async (pageNumber, pageAmount, exchange='', indu
     .then(data => {
       return data.results
     })  
+  } catch (e) {
+    return {
+      success: false,
+      message: e
+    }
+  }
+}
+
+export const saveScannerAllViewData = async (allViewData) => {
+  const requestOptions = {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(allViewData)
+  };
+
+  const apiURL = '/scanner/save_all_views/'
+  try {
+    return await fetch(process.env.REACT_APP_BACKEND_URL + apiURL, requestOptions)
+      .then(response => response.json())
+      .then(data => {
+        return {
+          success: true,
+          data: data.results
+        }
+      })
+  } catch (e) {
+    return {
+      success: false,
+      message: e
+    }
+  }
+}
+
+export const getScannerAllViewData = async (chart_number) => {
+  const requestOptions = {
+    method: 'GET',
+    headers: {'Content-Type': 'application/json'},
+  };
+
+  const apiURL = '/scanner/load_all_views/'
+  try {
+    return await fetch(process.env.REACT_APP_BACKEND_URL + apiURL, requestOptions)
+    .then(response => response.json())
+    .then(data => {
+        return {
+          success: true,
+          data: data.result,
+        }
+      })
+  } catch (e) {
+    return {
+      success: false,
+      message: e
+    }
+  }
+}
+
+export const getSymbolsByMicroStrategy = async (macroStrat, microStrat) => {
+  const requestOptions = {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      'macro': macroStrat,
+      'micro': microStrat
+    })
+  };
+
+  const apiURL = '/api/micro_strategy_symbols'
+
+  try {
+    return await fetch(process.env.REACT_APP_BACKEND_URL + apiURL, requestOptions)
+      .then(response => response.json())
+      .then(data => {
+        return {
+          success: true,
+          data: data.result
+        }
+      })
+  } catch (e) {
+    return {
+      success: false,
+      message: e
+    }
+  }
+}
+
+export const getIndicators = async () => {
+  const requestOptions = {
+    method: 'GET',
+    headers: {'Content-Type': 'application/json'},
+  };
+
+  const apiURL = '/api/indicator_list/'
+  try {
+    return await fetch(process.env.REACT_APP_BACKEND_URL + apiURL, requestOptions)
+    .then(response => response.json())
+    .then(data => {
+        return {
+          success: true,
+          data: data.result,
+        }
+      })
   } catch (e) {
     return {
       success: false,

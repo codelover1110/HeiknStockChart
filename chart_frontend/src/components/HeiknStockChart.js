@@ -15,6 +15,7 @@ import {
 } from "reactstrap";
 import { useAuth } from 'contexts/authContext';
 import disableScroll from 'disable-scroll';
+import { getSymbolsByMicroStrategy } from 'api/Api'
 
 const HeiknStockChart = (props) => {
   const auth = useAuth();
@@ -106,7 +107,7 @@ const HeiknStockChart = (props) => {
       try {
         fetch(process.env.REACT_APP_BACKEND_URL + "/api/get_strategy_list")
           .then(response => response.json())
-          .then(data => {
+          .then(async data => {
             setStrategyList(data.result);
             const strategyOptions = data.result.map((o => {
               return {
@@ -130,16 +131,18 @@ const HeiknStockChart = (props) => {
                 setOptionsMicroStrategy( microStrategyOptions )
                 setMicroStrategy(microStrategyOptions[0])
 
-                const symbolOptions = item.symbols.map(o => {
-                  return {
-                    value: o,
-                    label: o,
-                  }
-                })
-                
-                setSymbolList(symbolOptions)
-                setSymbol(symbolOptions[0])
-
+                const result = await getSymbolsByMicroStrategy(strategyOptions[0].value, microStrategyOptions[0].value)
+                if (result.success) {
+                  const symbolOptions = result.data.map(o => {
+                    return {
+                      value: o,
+                      label: o,
+                    }
+                  })
+                  
+                  setSymbolList(symbolOptions)
+                  setSymbol(symbolOptions[0])
+                }
               }
               flag = false
             }
