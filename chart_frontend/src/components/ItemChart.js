@@ -8,6 +8,7 @@ import disableScroll from 'disable-scroll';
 
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
 import MultiRangeSlider from 'components/MultiRangeSlider/MultiRangeSlider'
+import { getIndicators } from 'api/Api'
 
 const HeiknStockChartItem = (props) => {
     
@@ -56,20 +57,20 @@ const HeiknStockChartItem = (props) => {
     }
   ]
     
-  const optionsIndicator = [
+  const [optionsIndicator, setOptionsIndicator] = useState([
     {
-      value: 'VOLUME', label: 'VOLUME',
+      value: 'volume', label: 'VOLUME',
     },
     {
-      value: 'RSI', label: 'RSI',
+      value: 'rsi', label: 'RSI',
     },
     {
-      value: 'MACD', label: 'MACD',
+      value: 'macd', label: 'MACD',
     },
     {
-      value: 'SMA', label: 'SMA',
+      value: 'sma', label: 'SMA',
     }
-  ]
+  ])
 
   const getStrategyList = useCallback(
     () => {
@@ -107,6 +108,19 @@ const HeiknStockChartItem = (props) => {
     },
     [],
   )
+
+  useEffect(async () => {
+    const result = await getIndicators()
+    if (result.success) {
+      const indicatorList = result.data.map((o) => (
+        {
+          value: o,
+          label: o
+        }
+      ))
+      setOptionsIndicator(indicatorList)
+    }
+  }, [])  
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user-info'))

@@ -1,4 +1,107 @@
-export const filterPriceData = async (selectedSymbolType, symbol, timeFrame, tradeStartDate, tradeEndDate) => {
+import Axios from 'axios';
+
+const http  = Axios.create({
+  baseURL: process.env.REACT_APP_BACKEND_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+const request = async (req) => {
+  const config = {
+    method: req.method,
+    url: req.path,
+    params: req.params,
+    data: req.body,
+    headers: req.headers,
+  }
+  try {
+    const response = await http.request(config);
+    return {
+      success: true,
+      data: response.data,
+    }
+  } catch (err) {
+    console.error(`request ${req.path}:`, err);
+    return {
+      success: false,
+      data: err,
+    }
+  }
+}
+
+export const getStrategyListReq = async () => {
+  const req = {
+    method: 'GET',
+    path: 'api/get_strategy_list'
+  }
+
+  return await request(req);
+}
+
+export const getTablesReq = async (strategy) => {
+  const req = {
+    method: 'POST',
+    path: 'api/tables',
+    body: {
+      strategy,
+    }
+  }
+
+  return await request(req);
+}
+
+export const getDataReq = async (body) => {
+  const req = {
+    method: 'POST',
+    path: 'api/get_data',
+    body,
+  }
+
+  return await request(req);
+}
+
+export const getDataSliceReq = async (body) => {
+  const req = {
+    method: 'POST',
+    path: 'api/get_data_slice',
+    body,
+  }
+
+  return await request(req);
+}
+
+export const getDataExtendedSliceReq = async (body) => {
+  const req = {
+    method: 'POST',
+    path: 'api/get_data_extended_slice',
+    body,
+  }
+
+  return await request(req);
+}
+
+export const getDataExtendedReq = async (body) => {
+  const req = {
+    method: 'POST',
+    path: 'api/get_data_extended',
+    body,
+  }
+
+  return await request(req);
+}
+
+export const getBacktestingResultReq = async (body) => {
+  const req = {
+    method: 'POST',
+    path: 'api/get_backtesting_result',
+    body,
+  }
+
+  return await request(req);
+}
+
+export const filterPriceData = async (selectedSymbolType, symbol, timeFrame, tradeStartDate, tradeEndDate, pageNum, pageMounts) => {
   const requestOptions = {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
@@ -6,7 +109,9 @@ export const filterPriceData = async (selectedSymbolType, symbol, timeFrame, tra
       'symbol': symbol,
       'time_frame': timeFrame,
       'start': tradeStartDate,
-      'end': tradeEndDate
+      'end': tradeEndDate,
+      "page_num": pageNum,
+      "page_mounts": pageMounts
     })
   };
 
