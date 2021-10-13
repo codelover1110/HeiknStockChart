@@ -5,7 +5,6 @@ import {
 
 import Sidebar from "components/Sidebar/Sidebar.js";
 import TradeDataTable from "components/Datatable/TradeDataTable"
-import { CsvDownloadProvider } from 'contexts/CsvDownloadContext';
 import { routes } from "routes.js";
 
 import { BackgroundColorContext } from "contexts/BackgroundColorContext";
@@ -46,9 +45,7 @@ function TradeData() {
               />
             )}
             <div className="col-sm-12">
-              <CsvDownloadProvider>
                 <TradeDataTable />
-              </CsvDownloadProvider>
             </div>
           </div>
         </React.Fragment>
