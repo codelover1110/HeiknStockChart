@@ -37,7 +37,7 @@ function LinkManage() {
   const [selectedLink, setSelectedLink] = useState('')
   const [email, setEmail] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  
+
   const optionsRole = [
     { value: 'admin_tab', label: 'Admin Bot Management' },
     { value: 'forward_test', label: 'Forward Test' },
@@ -58,7 +58,7 @@ function LinkManage() {
       history.push('/')
     }
   }, [user, history])
-  
+
   React.useEffect(() => {
     if (navigator.platform.indexOf("Win") > -1) {
       document.documentElement.className += " perfect-scrollbar-on";
@@ -99,7 +99,7 @@ function LinkManage() {
       })
       setLinkList(linklist)
     }
-    
+
     fetchActiveLinks()
   }, [])
 
@@ -121,7 +121,7 @@ function LinkManage() {
     document.documentElement.classList.toggle("nav-open");
     setsidebarOpened(!sidebarOpened);
   };
-  
+
   const handleSidebarChange = () => {
     setShowSidebar(!isShowSidebar);
   };
@@ -141,7 +141,7 @@ function LinkManage() {
 
   const handleCreateLinkModalClose = () => {
     setRoles([])
-    setShowCreateLinkModal(false)  
+    setShowCreateLinkModal(false)
   }
 
   const handleCreateLinkClick = () => {
@@ -159,7 +159,7 @@ function LinkManage() {
       roleValues = roleValues + coma + role.value
       coma = ','
     })
-    
+
     setIsLoading(true)
     let links = await createSignUpLink(roleValues);
     setIsLoading(false)
@@ -179,9 +179,9 @@ function LinkManage() {
     })
 
     setLinkList(linklist)
-    setShowCreateLinkModal(false)  
+    setShowCreateLinkModal(false)
   }
-  
+
   const showSendEmailModal = async () => {
     setIsShowSendModal(true);
   }
@@ -224,7 +224,7 @@ function LinkManage() {
       field: 'action',
     }
   ];
-  
+
   const [linklist, setLinkList] = useState()
 
   const handleEmailChange = (e) => {
@@ -311,7 +311,7 @@ function LinkManage() {
                 </div>
                 <div className="col-sm-6 hunter-mdb-table-container">
                   <div className="create-button-bar">
-                    <MDBBtn color="blue" size="md" onClick={handleCreateLinkClick}>Create</MDBBtn>                    
+                    <MDBBtn color="blue" size="md" onClick={handleCreateLinkClick}>Create</MDBBtn>
                   </div>
                   <MDBTable btn>
                     <MDBTableHead columns={columns} color="dark"/>

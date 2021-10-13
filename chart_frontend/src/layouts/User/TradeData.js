@@ -5,7 +5,7 @@ import {
 
 import Sidebar from "components/Sidebar/Sidebar.js";
 import TradeDataTable from "components/Datatable/TradeDataTable"
-
+import { CsvDownloadProvider } from 'contexts/CsvDownloadContext';
 import { routes } from "routes.js";
 
 import { BackgroundColorContext } from "contexts/BackgroundColorContext";
@@ -13,7 +13,7 @@ import { BackgroundColorContext } from "contexts/BackgroundColorContext";
 function TradeData() {
   const [isShowSidebar, setShowSidebar] = React.useState(false);
   const [selectedInstance, setSelectedInstance] = React.useState('trade_data');
-  
+
   const handleSidebarChange = () => {
     setShowSidebar(!isShowSidebar);
   };
@@ -21,7 +21,7 @@ function TradeData() {
   const handleInstanceChange = (instance) => {
     setSelectedInstance(instance)
   }
-  
+
   return (
     <BackgroundColorContext.Consumer>
       {({ color }) => (
@@ -46,7 +46,9 @@ function TradeData() {
               />
             )}
             <div className="col-sm-12">
+              <CsvDownloadProvider>
                 <TradeDataTable />
+              </CsvDownloadProvider>
             </div>
           </div>
         </React.Fragment>

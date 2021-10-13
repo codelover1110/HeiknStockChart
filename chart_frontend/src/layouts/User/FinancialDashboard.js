@@ -15,6 +15,9 @@ import StockTypes from 'components/FinancialDashboard/StockTypes';
 import FinancialDataTable from 'components/FinancialDashboard/FinancialDataTable';
 import FinancialStatementsDataTable from 'components/FinancialDashboard/FinancialStatementsDataTable';
 
+import { CsvDownloadProvider } from 'contexts/CsvDownloadContext';
+import ButtonCsvDownload from 'components/ButtonCsvDownload'
+
 import { getNewsFinancialData } from 'api/Api';
 
 import {
@@ -381,6 +384,9 @@ const FinancialDashboard = () => {
       } else if (selectedStockType === 'Cash Flow Statement') {
         getCashForDataTable();
       }
+
+      // update database for csv download
+
     } else if (selectedHeaderNav === 'Chart') {
       if (selectedStockType === 'Income Statement') {
         getIncome();
@@ -393,80 +399,82 @@ const FinancialDashboard = () => {
   }, [selectedHeaderNav, selectedStockType, symbol]);
 
   return (
-    <div className="financial-dashboard-container">
-      {!isShowSidebar && (
-        <Button
-          className={'show-sidebar-toggle-area show-sidebar-icon'}
-          onClick={handleSidebarChange}
-        >
-          <i className="tim-icons icon-align-left-2" />
-        </Button>
-      )}
-      {isShowSidebar && (
-        <Sidebar
-          isAdminPage={false}
-          routes={routes}
-          subInstance={'tradedatatable'}
-          selectedInstance={selectedInstance}
-          handleSidebarChange={handleSidebarChange}
-          handleInstanceChange={handleInstanceChange}
-        />
-      )}
-      <Header
-        selectedHeaderNav={selectedHeaderNav}
-        setSelectedHeaderNav={setSelectedHeaderNav}
-        symbol={symbol}
-        setSymbol={setSymbol}
-        optionsSymbol={optionsSymbol}
-      />
-      {selectedHeaderNav !== 'News' && (
-        <div className="filter-types-section">
-          <GraphTypes
-            selectedAggregationType={selectedAggregationType}
-            setSelectedAggregationType={setSelectedAggregationType}
+    <CsvDownloadProvider>
+      <div className="financial-dashboard-container">
+        {!isShowSidebar && (
+          <Button
+            className={'show-sidebar-toggle-area show-sidebar-icon'}
+            onClick={handleSidebarChange}
+          >
+            <i className="tim-icons icon-align-left-2" />
+          </Button>
+        )}
+        {isShowSidebar && (
+          <Sidebar
+            isAdminPage={false}
+            routes={routes}
+            subInstance={'tradedatatable'}
+            selectedInstance={selectedInstance}
+            handleSidebarChange={handleSidebarChange}
+            handleInstanceChange={handleInstanceChange}
           />
-          <StockTypes
-            selectedStockType={selectedStockType}
-            setSelectedStockType={setSelectedStockType}
-            selectedHeaderNav={selectedHeaderNav}
-          />
-        </div>
-      )}
-      {selectedHeaderNav === 'Data Table' ? (
-        <FinancialDataTable
-          data={datatable}
-          selectedStockType={selectedStockType}
-          selectedAggregationType={selectedAggregationType}
+        )}
+        <Header
+          selectedHeaderNav={selectedHeaderNav}
+          setSelectedHeaderNav={setSelectedHeaderNav}
+          symbol={symbol}
+          setSymbol={setSymbol}
+          optionsSymbol={optionsSymbol}
         />
-      ) : selectedHeaderNav === 'News' ? (
-        <FinancialStatementsDataTable
-          data={financialStatements}
-        />
-      ) : (
-        <div className="container custom-container chart-area">
-          <div className="row justify-content-center">
-            {chartData ? (
-              chartData.map((data) => (
-                <div
-                  key={data.label}
-                  className="col-lg-4 col-md-4 col-sm-6 col-xs-12 group-bar-chart"
-                >
-                  <BarChart
-                    data={data}
-                    chartData={chartData}
-                    globalAggregationType={selectedAggregationType}
-                  />
-                </div>
-              ))
-            ) : isLoading === 2 ? (
-              <div className="no-data">No data</div>
-            ) : (
-              <div className="no-data">Fetching...</div>
-            )}
+        {selectedHeaderNav !== 'News' && (
+          <div className="filter-types-section">
+            <GraphTypes
+              selectedAggregationType={selectedAggregationType}
+              setSelectedAggregationType={setSelectedAggregationType}
+            />
+            <StockTypes
+              selectedStockType={selectedStockType}
+              setSelectedStockType={setSelectedStockType}
+              selectedHeaderNav={selectedHeaderNav}
+            />
+            {selectedHeaderNav == 'Data Table' && (<ButtonCsvDownload filename={"financial.csv"}>Csv Download</ButtonCsvDownload>)}
           </div>
-        </div>
-      )}
-    </div>
+        )}
+        {selectedHeaderNav === 'Data Table' ? (
+          <FinancialDataTable
+            data={datatable}
+            selectedStockType={selectedStockType}
+            selectedAggregationType={selectedAggregationType}
+          />
+        ) : selectedHeaderNav === 'News' ? (
+          <FinancialStatementsDataTable
+            data={financialStatements}
+          />
+        ) : (
+          <div className="container custom-container chart-area">
+            <div className="row justify-content-center">
+              {chartData ? (
+                chartData.map((data) => (
+                  <div
+                    key={data.label}
+                    className="col-lg-4 col-md-4 col-sm-6 col-xs-12 group-bar-chart"
+                  >
+                    <BarChart
+                      data={data}
+                      chartData={chartData}
+                      globalAggregationType={selectedAggregationType}
+                    />
+                  </div>
+                ))
+              ) : isLoading === 2 ? (
+                <div className="no-data">No data</div>
+              ) : (
+                <div className="no-data">Fetching...</div>
+              )}
+            </div>
+          </div>
+        )}
+    </CsvDownloadProvider>
   );
 };
 
