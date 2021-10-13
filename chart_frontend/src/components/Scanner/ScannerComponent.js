@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import Select from 'react-select'
 import { Link } from "react-router-dom";
 import "react-datetime/css/react-datetime.css";
+
 import {
   Collapse,
   DropdownToggle,
@@ -15,6 +16,8 @@ import { useHistory } from "react-router-dom";
 import { MDBDataTableV5 } from 'mdbreact';
 import { useAuth } from 'contexts/authContext';
 import { getScannerDetails, getTickerScannerOptions } from 'api/Api'
+import { useCsvDownloadUpdate } from "contexts/CsvDownloadContext";
+import ButtonCsvDownload from 'components/ButtonCsvDownload'
 
 const ScannerComponent = () => {
   const auth = useAuth();
@@ -53,12 +56,12 @@ const ScannerComponent = () => {
       label: 'Country',
       field: 'country',
       width: 200,
-    },  
+    },
     {
       label: 'Market Cap',
       field: 'marketcap',
       width: 200,
-    },   
+    },
     {
       label: 'Cik Id',
       field: 'cik',
@@ -70,12 +73,19 @@ const ScannerComponent = () => {
     rows: scannerData,
   });
 
+  const updateCsvDownload = useCsvDownloadUpdate();
+
+  const wrapSetDatatable = (data) => {
+    setDatatable(data)
+    updateCsvDownload([...data.rows])
+  }
+
   useEffect(() => {
     const loadWholeOptions = async () => {
       const scannerDetails = await getScannerDetails()
 
       if (scannerDetails.length) {
-        setDatatable({
+        wrapSetDatatable({
           columns: hearder_columns,
           rows: scannerDetails,
         })
@@ -116,7 +126,7 @@ const ScannerComponent = () => {
           value: '',
           label: 'All'
         }]
-        
+
         scannerOptions.result.sector.forEach(sector => {
           if (sector !== '' && sector !== null) {
             sectors.push({
@@ -132,7 +142,7 @@ const ScannerComponent = () => {
       }
     }
 
-    loadWholeOptions()  
+    loadWholeOptions()
   }, [])
 
   const handleSignout = () => {
@@ -142,11 +152,11 @@ const ScannerComponent = () => {
 
   const handleSectorChange = async (e) => {
     setSector(e)
-    
+
     const scannerDetails = await getScannerDetails(exchange ? exchange.value : '', industry ? industry.value : '', e.value)
 
     if (scannerDetails.length) {
-      setDatatable({
+      wrapSetDatatable({
         columns: hearder_columns,
         rows: scannerDetails,
       })
@@ -159,24 +169,24 @@ const ScannerComponent = () => {
     const scannerDetails = await getScannerDetails(e.value, industry ? industry.value : '', sector ? sector.value : '')
 
     if (scannerDetails.length) {
-      setDatatable({
+      wrapSetDatatable({
         columns: hearder_columns,
         rows: scannerDetails,
       })
     }
   }
-  
+
   const handleIndustryChange = async (e) => {
     setIndustry(e)
 
     const scannerDetails = await getScannerDetails(exchange ? exchange.value : '', e.value, sector ? sector.value : '')
 
-    setDatatable({
+    wrapSetDatatable({
       columns: hearder_columns,
       rows: scannerDetails,
     })
   }
-  
+
   return (
     <div className="hunter-chart-container">
       <nav className="navbar navbar-expand navbar-dark bg-dark hunter-nav-bar">
@@ -216,7 +226,7 @@ const ScannerComponent = () => {
             </UncontrolledDropdown>
             <li className="separator d-lg-none" />
           </Nav>
-        </Collapse>    
+        </Collapse>
       </nav>
       <div className="col-sm-12 hunter-data-table-container scanner-page-container">
         <div className="hunter-data-table-title">
@@ -247,8 +257,9 @@ const ScannerComponent = () => {
               placeholder="Industry"
             />
           </div>
+          <ButtonCsvDownload filename={"scanner.csv"}>Csv Download</ButtonCsvDownload>
         </div>
-        <MDBDataTableV5 
+        <MDBDataTableV5
           hover
           maxHeight="500px"
           entriesOptions={[10, 25, 50, 100]}

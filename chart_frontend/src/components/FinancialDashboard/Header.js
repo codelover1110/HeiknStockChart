@@ -1,11 +1,11 @@
 import React from 'react';
 import Select from 'react-select';
-
+import { useCsvDownload } from 'contexts/CsvDownloadContext';
 
 const Header = (props) => {
   const { selectedHeaderNav, setSelectedHeaderNav, symbol, setSymbol, optionsSymbol } = props;
 
-  
+
   const handleNavClicked = (item) => {
     setSelectedHeaderNav(item);
   }
@@ -14,7 +14,8 @@ const Header = (props) => {
     setSymbol(e);
   };
 
-  
+  const csvData = useCsvDownload()
+  console.log('csvData', csvData)
 
   return (
     <div className="container custom-container">

@@ -9,11 +9,12 @@ import ScannerComponent from 'components/Scanner/ScannerComponent.js'
 import { routes } from "routes.js";
 
 import { BackgroundColorContext } from "contexts/BackgroundColorContext";
+import { CsvDownloadProvider } from "contexts/CsvDownloadContext";
 
 function Scanner() {
   const [isShowSidebar, setShowSidebar] = React.useState(false);
   const [selectedInstance, setSelectedInstance] = React.useState('scanner');
-  
+
   const handleSidebarChange = () => {
     setShowSidebar(!isShowSidebar);
   };
@@ -21,7 +22,7 @@ function Scanner() {
   const handleInstanceChange = (instance) => {
     setSelectedInstance(instance)
   }
-  
+
   return (
     <BackgroundColorContext.Consumer>
       {({ color }) => (
@@ -46,7 +47,9 @@ function Scanner() {
               />
             )}
             <div className="col-sm-12">
+              <CsvDownloadProvider>
                 <ScannerComponent />
+              </CsvDownloadProvider>
             </div>
           </div>
         </React.Fragment>

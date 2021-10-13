@@ -17,6 +17,8 @@ import { useAuth } from 'contexts/authContext';
 import { getAllSymbols, filterTradesData } from 'api/Api'
 import { currentDateString } from 'utils/helper'
 import MultiRangeSlider from 'components/MultiRangeSlider/MultiRangeSlider'
+import { useCsvDownloadUpdate } from "contexts/CsvDownloadContext";
+import ButtonCsvDownload from 'components/ButtonCsvDownload'
 
 const TradeDataTable = () => {
   const auth = useAuth();
@@ -28,12 +30,12 @@ const TradeDataTable = () => {
   const [tradeStartDate, setTradeStartDate] = useState('2021-01-01')
   const [tradeEndDate, setTradeEndDate] = useState(currentDateString())
   const [strategyList, setStrategyList] = useState([]);
-  
+
   const [optionsStrategy, setOptionsStrategy] = useState([])
   const [optionsMacroStrategy, setOptionsMacroStrategy] = useState([])
 
   const [optionsMicroStrategy, setOptionsMicroStrategy] = useState([])
-  
+
   const [optionsSymbol, setOptionsSymbol] = useState([])
 
   const [selectedSymbolType, setSelectedSymbolType] = useState({
@@ -76,13 +78,13 @@ const TradeDataTable = () => {
       label: 'Side',
       field: 'side',
       width: 270,
-    },  
+    },
     {
       label: 'Quantity',
       field: 'quantity',
       sort: 'quantity',
       width: 100,
-    },   
+    },
     {
       label: 'Price',
       field: 'price',
@@ -96,6 +98,13 @@ const TradeDataTable = () => {
     rows: [
     ],
   });
+
+  const updateCsvDownload = useCsvDownloadUpdate();
+
+  const wrapSetDatatable = (data) => {
+    setDatatable(data)
+    updateCsvDownload([...data.rows])
+  }
 
   const getStrategyList = useCallback(
     () => {
@@ -133,7 +142,7 @@ const TradeDataTable = () => {
               }
             })
           }
-        })   
+        })
     },
     [],
   )
@@ -145,7 +154,7 @@ const TradeDataTable = () => {
   useEffect(() => {
     const get_trades = async (symbol, macroStrat, microStrat, tradeStartDate, tradeEndDate) => {
       const trades_data = await filterTradesData(selectedSymbolType.value, symbol, macroStrat, microStrat, tradeStartDate, tradeEndDate);
-      setDatatable({
+      wrapSetDatatable({
         columns: hearder_columns,
         rows: trades_data
       })
@@ -154,7 +163,7 @@ const TradeDataTable = () => {
     get_trades(
       symbol ? symbol.value : '',
       macroStrategy ? macroStrategy.value : '',
-      microStrategy ? microStrategy.value : '', 
+      microStrategy ? microStrategy.value : '',
       tradeStartDate, tradeEndDate)
   }, [selectedSymbolType, symbol, macroStrategy, microStrategy, hearder_columns, tradeStartDate, tradeEndDate])
 
@@ -178,7 +187,7 @@ const TradeDataTable = () => {
   const handleSymbolTypeChange = (e) => {
     setSelectedSymbolType(e)
   }
-  
+
   const handleMacroStrategy = (e) => {
     if (e) {
       if (strategyList.length) {
@@ -210,7 +219,7 @@ const TradeDataTable = () => {
     }
 
   }
-  
+
   const handleMicroStrategy = (e) => {
     setMicroStrategy(e)
   }
@@ -265,7 +274,7 @@ const TradeDataTable = () => {
               </UncontrolledDropdown>
               <li className="separator d-lg-none" />
             </Nav>
-          </Collapse>    
+          </Collapse>
       </nav>
       <div className="col-sm-12 hunter-data-table-container">
         <div className="hunter-data-table-title">
@@ -308,9 +317,11 @@ const TradeDataTable = () => {
             <MultiRangeSlider
               selectDateRange={selectDateRange}
             />
+
+            <ButtonCsvDownload filename={"trade.csv"}>Csv Download</ButtonCsvDownload>
           </div>
         </div>
-        <MDBDataTableV5 
+        <MDBDataTableV5
           hover
           maxHeight="500px"
           entriesOptions={[10, 25, 50, 100]}

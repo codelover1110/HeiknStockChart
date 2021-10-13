@@ -10,10 +10,10 @@ import { routes } from "routes.js";
 
 import { BackgroundColorContext } from "contexts/BackgroundColorContext";
 
-function MacketWatch() {
+function MarketWatch() {
   const [isShowSidebar, setShowSidebar] = React.useState(false);
-  const [selectedInstance, setSelectedInstance] = React.useState('macket_watch');
-  
+  const [selectedInstance, setSelectedInstance] = React.useState('market_watch');
+
   const handleSidebarChange = () => {
     setShowSidebar(!isShowSidebar);
   };
@@ -21,7 +21,7 @@ function MacketWatch() {
   const handleInstanceChange = (instance) => {
     setSelectedInstance(instance)
   }
-  
+
   return (
     <BackgroundColorContext.Consumer>
       {({ color }) => (
@@ -54,4 +54,4 @@ function MacketWatch() {
   );
 }
 
-export default MacketWatch;
+export default MarketWatch;
