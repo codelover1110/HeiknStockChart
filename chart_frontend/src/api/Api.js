@@ -101,7 +101,7 @@ export const getBacktestingResultReq = async (body) => {
   return await request(req);
 }
 
-export const filterPriceData = async (selectedSymbolType, symbol, timeFrame, tradeStartDate, tradeEndDate, pageNum, pageMounts) => {
+export const filterPriceData = async (symbol, timeFrame, tradeStartDate, tradeEndDate) => {
   const requestOptions = {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
@@ -110,8 +110,6 @@ export const filterPriceData = async (selectedSymbolType, symbol, timeFrame, tra
       'time_frame': timeFrame,
       'start': tradeStartDate,
       'end': tradeEndDate,
-      "page_num": pageNum,
-      "page_mounts": pageMounts
     })
   };
 

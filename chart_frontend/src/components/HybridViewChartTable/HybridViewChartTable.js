@@ -15,7 +15,8 @@ import {
 } from "reactstrap";
 import { useAuth } from 'contexts/authContext';
 import disableScroll from 'disable-scroll';
-import HybridViewTable from "./HybridViewTable"
+import HybridViewTable from "./HybridViewTable";
+import { getSymbolsByMicroStrategy } from 'api/Api';
 
 const HybridViewChartTable = (props) => {
 
@@ -103,14 +104,19 @@ const HybridViewChartTable = (props) => {
               setOptionsMicroStrategy( microStrategyOptions )
               setMicroStrategy(microStrategyOptions[0])
 
-              const symbolOptions = item.symbols.map(o => {
-                return {
-                  value: o,
-                  label: o,
-                }
-              })
-              setSymbolList(symbolOptions)
-              setSymbol(symbolOptions[0])
+              const result = getSymbolsByMicroStrategy(strategyOptions[0].value, microStrategyOptions[0].value)
+              
+              if (result.success) {
+                const symbolOptions = result.data.map(o => {
+                  return {
+                    value: o,
+                    label: o,
+                  }
+                })
+                
+                setSymbolList(symbolOptions)
+                setSymbol(symbolOptions[0])
+              }
             })
           }
         })   
@@ -183,7 +189,7 @@ const HybridViewChartTable = (props) => {
         { value: 'performance', label: 'Performance' },
       ])
     }
-  }, [selectedInstance, getStrategyList, get_tables, user.is_admin, user.role?.length])
+  }, [selectedInstance, user.is_admin, user.role?.length])
 
   const handleViewTypeChange = (value) => {
     setSelectedViewType(value)
@@ -239,8 +245,9 @@ const HybridViewChartTable = (props) => {
                 label: o,
               }
             })
+
             setSymbolList(symbolOptions)
-            setSymbol({value: 'MSFT', label: 'MSFT'})
+            setSymbol(symbolOptions[0])
           }
         })
       }
