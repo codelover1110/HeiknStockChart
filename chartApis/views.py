@@ -69,8 +69,6 @@ def backtesting_result(request):
         else:
             exchange = ""
 
-
-
         bastestData = {
             'percentEfficiency': pE_wLA_lS['pE'],
             'winningLosing': wL,
@@ -117,8 +115,13 @@ def get_table_candles(request):
         end_date = request_data['end']
         time_frame = request_data['time_frame']
 
-        candles = get_symbol_candles(symbol, start_date, end_date, time_frame)
-        return JsonResponse({"candles": candles}, status=status.HTTP_201_CREATED)
+        try:
+            page_num = request_data['page_num']
+            page_mounts = request_data['page_mounts']
+            candles, page_total = get_symbol_candles(symbol, start_date, end_date, time_frame, page_num, page_mounts)    
+        except:
+            candles, page_total = get_symbol_candles(symbol, start_date, end_date, time_frame)
+        return JsonResponse({"candles": candles, "page_total": page_total}, status=status.HTTP_201_CREATED)
 
 @csrf_exempt
 def get_strategies_list(request):

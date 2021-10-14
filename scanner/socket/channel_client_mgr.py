@@ -132,6 +132,7 @@ class ChannelClientManager(object):
                 if len(last_candles) > 24:
                     df = util.df(last_candles)
                     last_candle = rsi_heik_v1_fitler_1(df)
+                    
                     symbol_preload = self.db_scanner.get_symbol_preload(symbol)
                     update_item = dict()
                     update_item['symbol'] = symbol
