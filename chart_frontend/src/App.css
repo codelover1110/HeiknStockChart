@@ -755,3 +755,7 @@ pre {
 .search-multi-option {
   margin-right: 10px
 }
+
+.hunter-csv-download-button {
+  height: 38px
+}

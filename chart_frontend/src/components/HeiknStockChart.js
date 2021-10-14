@@ -301,9 +301,21 @@ const HeiknStockChart = (props) => {
     }
   }
   
-  const handleMicroStrategyChange = (e) => {
+  const handleMicroStrategyChange = async (e) => {
     if (e) {
       setMicroStrategy(e)
+      const result = await getSymbolsByMicroStrategy(strategy.value, e.value)
+      if (result.success) {
+        const symbolOptions = result.data.map(o => {
+          return {
+            value: o,
+            label: o,
+          }
+        })
+        
+        setSymbolList(symbolOptions)
+        setSymbol(symbolOptions[0])
+      }
     }
   }
   

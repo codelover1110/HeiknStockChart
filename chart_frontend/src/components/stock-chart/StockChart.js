@@ -67,7 +67,6 @@ const StockChart = (props) => {
         const requestBody = {
           'db_name': dbname,
           'symbol': symbol,
-          'symbol_type': selectedSymbolType,
           'macro': strategy.value,
           'micro': (selectedInstance !== 'live_trading') ? microStrategy : '',
         }
@@ -106,7 +105,6 @@ const StockChart = (props) => {
         
         const requestBody = {
           'symbols': symbols,
-          'symbol_type': selectedSymbolType,
           "macro": strategy.value,
           "micro": microStrategy,
           'start_date': startDate,
@@ -127,7 +125,7 @@ const StockChart = (props) => {
     if (symbol || multiSymbol.length) {
       get_data(symbol)
     }
-  }, [extendMarketTime, selectedInstance, dbname, viewType, symbol, multiSymbol, microStrategy, startDate, endDate, strategy.value])
+  }, [extendMarketTime, selectedInstance, dbname, viewType, symbol, multiSymbol, startDate, endDate, strategy.value])
     
   const displayPerformanceChart = (type) => {
     return (

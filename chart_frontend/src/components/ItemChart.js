@@ -8,7 +8,7 @@ import disableScroll from 'disable-scroll';
 
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
 import MultiRangeSlider from 'components/MultiRangeSlider/MultiRangeSlider'
-import { getIndicators } from 'api/Api'
+import { getSymbolsByMicroStrategy, getIndicators } from 'api/Api'
 
 const HeiknStockChartItem = (props) => {
     
@@ -22,11 +22,6 @@ const HeiknStockChartItem = (props) => {
     : { value: 'charting', label: 'Charting' }
   );
     
-  const [selectedSymbolType, setSelectedSymbolType] = useState({
-    value: 'stock',
-    label: 'stock'
-  })
-
   const [symbol, setSymbol] = useState(initSymbol)
   const [multiSymbol, setMultiSymbol] = useState([initSymbol])
   const [strategy, setStrategy] = useState(initStrategy ? initStrategy : {})
@@ -193,7 +188,7 @@ const HeiknStockChartItem = (props) => {
 
   const handlSymbolChange = (e) => {
     if (e) {
-      setSymbol(e)
+        setSymbol(e)
     }
   }
     
@@ -254,17 +249,34 @@ const HeiknStockChartItem = (props) => {
     setIndicators(options);
   }
 
-  const handleMicroStrategyChange = (e) => {
+  const handleMicroStrategyChange = async (e) => {
     setMicroStrategy(e);
+    const result = await getSymbolsByMicroStrategy(strategy.value, e.value)
+      if (result.success) {
+        const symbolOptions = result.data.map(o => {
+          return {
+            value: o,
+            label: o,
+          }
+        })
+        
+        if (selectedViewType.value !== 'performance') {
+          setSymbolList(symbolOptions)
+          setSymbol(symbolOptions[0])
+        } else {
+          setSymbolList([{ label: "All", value: "*" }, ...symbolOptions]);
+          if (symbolOptions.length) {
+            setMultiSymbol([symbolOptions[0]])
+          } else {
+            setMultiSymbol([])
+          }
+        }
+      }
   }
 
   const selectDateRange = (startDate, endDate) => {
     setTradeStartDate(startDate)
     setTradeEndDate(endDate)
-  }
-
-  const handleSymbolTypeChange = (e) => {
-    setSelectedSymbolType(e)
   }
 
   return (
@@ -352,9 +364,8 @@ const HeiknStockChartItem = (props) => {
         </div>
       </nav>
       <div className="graphs-container dark">
-        {viewType && (
+        {multiSymbol && viewType && (
           < StockChart
-            selectedSymbolType={selectedSymbolType.value}
             selectedInstance ={selectedInstance.value}
             viewType={selectedViewType.value}
             microStrategy={microStrategy.value}

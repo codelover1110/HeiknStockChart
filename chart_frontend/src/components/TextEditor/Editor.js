@@ -265,7 +265,7 @@ export default class TextEditor extends Component {
       },
       {
         label: 'Hours',
-        field: 'hours',
+        field: 'extended_hours',
         sort: false,
         with: 100,
       },
