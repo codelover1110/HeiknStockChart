@@ -1,5 +1,11 @@
+from io import StringIO
 from datetime import datetime
 import pymongo
+import tempfile
+import pandas
+from wsgiref.util import FileWrapper
+from zipfile import ZipFile
+
 
 from Having_system.Update_candles.define import INDICATORS_COL_NAME, PARAMETERS_DB
 from .utils import define_start_date, check_candle_in_maket_time
@@ -21,7 +27,7 @@ def get_strategies_names():
             "macro_strategy": [
                 {
                     "$group" : {
-                        "_id" : "$macro_strategy", 
+                        "_id" : "$macro_strategy",
                         "num_total" : {"$sum" : 1}
                     }
                 }
@@ -29,7 +35,7 @@ def get_strategies_names():
             "micro_strategy": [
                 {
                     "$group" : {
-                        "_id" : "$micro_strategy", 
+                        "_id" : "$micro_strategy",
                         "num_total" : {"$sum" : 1}
                     }
                 }
@@ -45,12 +51,12 @@ def get_strategies_names():
 
 
 ###################################################
-### get micro strategy names for specific macro ### 
+### get micro strategy names for specific macro ###
 ###################################################
 def get_micro_strategies(macro_name):
     query = [
-        {   
-            "$match":{ 'macro_strategy': macro_name } 
+        {
+            "$match":{ 'macro_strategy': macro_name }
         },
         {
             "$group":{
@@ -71,13 +77,13 @@ def get_micro_strategies(macro_name):
 
 
 #####################################
-### get macro strategy names only ### 
+### get macro strategy names only ###
 #####################################
 def get_macro_strategies():
     query = [
         {
             "$group" : {
-                "_id" : "$macro_strategy", 
+                "_id" : "$macro_strategy",
                 "num_total" : {"$sum" : 1}
             }
         }
@@ -100,12 +106,12 @@ def get_indicator_list():
     return  result
 
 ##################################
-### get macro strategy symbols ### 
+### get macro strategy symbols ###
 ##################################
 def get_strategy_symbols(macro_name):
     query = [
-        {   
-            "$match":{ 'macro_strategy': macro_name } 
+        {
+            "$match":{ 'macro_strategy': macro_name }
         },
         {
             "$group":{
@@ -122,12 +128,12 @@ def get_strategy_symbols(macro_name):
     return  result
 
 ######################################
-### get symbols for micro strategy ### 
+### get symbols for micro strategy ###
 ######################################
 def get_micro_strategy_symbols(macro_name, micro_name):
     query = [
-        {   
-            "$match":{ 'macro_strategy': macro_name, 'micro_strategy': micro_name } 
+        {
+            "$match":{ 'macro_strategy': macro_name, 'micro_strategy': micro_name }
         },
         {
             "$group":{
@@ -144,7 +150,7 @@ def get_micro_strategy_symbols(macro_name, micro_name):
     return  result
 
 ###################################################
-### generate all strateies from macro and micro ### 
+### generate all strateies from macro and micro ###
 ###################################################
 def get_strategy_name_only():
     strategies = get_strategies_names()
@@ -154,18 +160,18 @@ def get_strategy_name_only():
     for macro in macros:
         for micro in micros:
             strategy_names.append('{}-{}-trades'.format(macro['_id'], micro['_id']))
-    
+
     return strategy_names
 
 def get_stock_candles_for_strategy_all(candle_name, symbol, macro, micro, extended=False):
     start_date, end_date = define_start_date(candle_name)
-    
+
     # get candles
     masterdb = azuremongo[MARKET_DATA_DB]
-    ob_table = masterdb[candle_name] 
+    ob_table = masterdb[candle_name]
     candle_result = ob_table.find({'date': {'$gte': start_date, '$lt': end_date}, 'stock': symbol})
-    sort_candles = list(candle_result.sort('date', pymongo.ASCENDING))   
-    
+    sort_candles = list(candle_result.sort('date', pymongo.ASCENDING))
+
     candles = []
     if extended:
         candles = sort_candles
@@ -182,13 +188,13 @@ def get_stock_candles_for_strategy_all(candle_name, symbol, macro, micro, extend
         if candle['date'] not in result_dates:
             result_candles.append(candle)
             result_dates.append(candle['date'])
-    
+
     if macro == 'no_strategy':
         find_trades_query = {
             'date': {'$gte': start_date, '$lt': end_date},
             'symbol': symbol
-        }    
-    else:  
+        }
+    else:
         find_trades_query = {
             'date': {'$gte': start_date, '$lt': end_date},
             'micro_strategy': micro,
@@ -196,7 +202,7 @@ def get_stock_candles_for_strategy_all(candle_name, symbol, macro, micro, extend
             'symbol': symbol
         }
     masterdb = azuremongo[BACKTESTING_TRADES]
-    ob_table = masterdb[ALL_TRADES_HISTORY] 
+    ob_table = masterdb[ALL_TRADES_HISTORY]
     trade_result = ob_table.find(find_trades_query)
     strategy_trades = list(trade_result.sort('date', pymongo.ASCENDING))
 
@@ -219,11 +225,11 @@ def get_backtesting_symbols(macro, micro, start_date, end_date):
         {
             "$facet":{
                 "symbols":[
-                    {   
-                        "$match":{ 
-                            'date': {'$gte': start_date_obj, '$lt': end_date_obj}, 
-                            'macro_strategy': macro, 
-                            'micro_strategy': micro 
+                    {
+                        "$match":{
+                            'date': {'$gte': start_date_obj, '$lt': end_date_obj},
+                            'macro_strategy': macro,
+                            'micro_strategy': micro
                         }
                     },
                     {
@@ -255,8 +261,8 @@ def get_backtesting_result(symbols, macro, micro, start_date, end_date):
     start_date_obj = datetime.strptime(start_date, '%Y-%m-%d')
     end_date_obj = datetime.strptime(end_date, '%Y-%m-%d')
     query = {
-            'date': {'$gte': start_date_obj, '$lt': end_date_obj}, 
-            'macro_strategy': macro, 
+            'date': {'$gte': start_date_obj, '$lt': end_date_obj},
+            'macro_strategy': macro,
             'micro_strategy': micro,
             'symbol':{'$in': symbols}
         }
@@ -275,7 +281,7 @@ def get_data_trades_db(start_date, end_date, macro, micro, symbol):
         query_obj['macro_strategy'] = macro
     if micro != '':
         query_obj['micro_strategy'] = micro
-    
+
     startDate = datetime.strptime(start_date, '%Y-%m-%d')
     endDate = datetime.strptime(end_date, '%Y-%m-%d')
     query_obj['date'] = {"$gte": startDate, "$lt": endDate}
@@ -296,7 +302,7 @@ def get_table_list_db(strategy_name):
     return tables_name
 
 #######################################
-### get candles for specific symbol ### 
+### get candles for specific symbol ###
 #######################################
 def get_symbol_candles(symbol, start_date, end_date, time_frame):
     if True:   # for 1 miniutes db
@@ -307,7 +313,7 @@ def get_symbol_candles(symbol, start_date, end_date, time_frame):
             db_collection = masterdb['backtest_1_hour']
         elif time_frame == '1d':
             db_collection = masterdb['backtest_1_day']
-        else: 
+        else:
             return []
 
         cur_date = datetime.now().date()
@@ -355,21 +361,89 @@ def update_strartegy_file(file_name, content, user_id=1, update_date=datetime.no
     _id = strtg['_id']
 
     ob_table.update({'_id': _id},  {'$set': {"file_name": file_name, "content": content, "update_date": update_date}})
-    return True 
+    return True
 
 def get_strategy_file(file_name):
     masterdb = azuremongo[BACKTESTING_TRADES]
     ob_table = masterdb[STRATEGY_FILE]
-    
+
     strtg = ob_table.find_one({"file_name": file_name}, {'_id': False})
     return strtg
 
 def get_strategy_list(user_id=1):
     masterdb = azuremongo[BACKTESTING_TRADES]
     ob_table = masterdb[STRATEGY_FILE]
-    
+
     strategies = ob_table.find({"user_id": user_id}, {'_id': False})
     result = list(strategies.sort('update_date', pymongo.ASCENDING))
     return result
 
-    
+
+def api_get_databases():
+    return azuremongo.list_database_names()
+
+def api_get_collections(db_name):
+    return azuremongo[db_name].collection_names()
+
+def api_delete_collection(db_name, collection_name):
+    db = azuremongo[db_name]
+    collection = db[collection_name]
+    collection.drop()
+    return True
+
+def api_delete_database(db_name):
+    db = azuremongo[db_name]
+    db.drop()
+    return True
+
+def api_export_database(db_name):
+    print('api_export_database', db_name)
+
+    collections = api_get_collections(db_name)
+    tempdir = tempfile.mkdtemp()
+
+    target_zipfile = tempdir + '/' + db_name + '.zip'
+    print('Target Zip file: ', target_zipfile)
+    zipObj = ZipFile(target_zipfile, 'w')
+
+
+    for collection_name in collections:
+        csv_file_path = tempdir + '/' + collection_name + '.csv'
+        print(csv_file_path)
+        dataframe = get_csv_collection(db_name, collection_name)
+        dataframe.to_csv(csv_file_path)
+
+        zipObj.write(csv_file_path)
+
+    zipObj.close()
+
+    zipfile = open(target_zipfile, 'rb')
+
+    return FileWrapper(zipfile)
+
+def api_export_collection(db_name, collection_name):
+    print('++++ api_export_collection +++ ', db_name, collection_name)
+    docs = get_csv_collection(db_name, collection_name)
+    csv_export = docs.to_csv(sep=",")
+    return csv_export
+
+def get_csv_collection(db_name, collection_name):
+    db = azuremongo[db_name]
+    collection = db[collection_name]
+
+    cursor = collection.find()
+    mongo_docs = list(cursor)
+
+    series_obj = pandas.Series({"a key":"a value"})
+    print ("series_obj:", type(series_obj))
+
+    docs = pandas.DataFrame(columns=[])
+    for num, doc in enumerate( mongo_docs ):
+        doc["_id"] = str(doc["_id"])
+        doc_id = doc["_id"]
+
+        print('Process csv data', db_name, collection_name, doc_id)
+        series_obj = pandas.Series( doc, name=doc_id )
+        docs = docs.append( series_obj )
+
+    return docs

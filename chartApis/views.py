@@ -1,8 +1,13 @@
+from io import StringIO
+
 from django.shortcuts import render
 from django.http.response import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from rest_framework.parsers import JSONParser 
+from django.http import HttpResponse
+from wsgiref.util import FileWrapper
+
+from rest_framework.parsers import JSONParser
 from rest_framework import status
 
 from ib_insync import *
@@ -14,12 +19,12 @@ from .utils import get_symbol_exchange
 
 from .models import (
             get_stock_candles_for_strategy_all,
-            get_micro_strategies, 
-            get_macro_strategies, 
-            get_strategy_symbols, 
+            get_micro_strategies,
+            get_macro_strategies,
+            get_strategy_symbols,
             get_micro_strategy_symbols,
             get_indicator_list,
-            get_backtesting_symbols, 
+            get_backtesting_symbols,
             get_backtesting_result,
             get_data_trades_db,
             get_symbol_candles,
@@ -27,13 +32,20 @@ from .models import (
             update_strartegy_file,
             get_table_list_db,
             get_strategy_file,
-            get_strategy_list)
+            get_strategy_list,
+            api_get_databases,
+            api_get_collections,
+            api_delete_database,
+            api_delete_collection,
+            api_export_database,
+            api_export_collection,
+            )
 
 from .common import (
             get_chat_data_rsi_heik_v11,
-            join_append, 
-            calc_percentEfficiency, 
-            calc_winningLosing, 
+            join_append,
+            calc_percentEfficiency,
+            calc_winningLosing,
             fill_missing_candles__)
 
 @csrf_exempt
@@ -50,7 +62,7 @@ def backtesting_symbols(request):
         return JsonResponse({'strategy_symbols': symbols}, status=status.HTTP_201_CREATED)
 
 
-@csrf_exempt    
+@csrf_exempt
 def backtesting_result(request):
     print (" ++++++ API: backtesting_result ++++++")
     if request.method == 'POST':
@@ -61,7 +73,7 @@ def backtesting_result(request):
         end_date = request_data['end_date']
         symbols = request_data['symbols']
         list_db_data = get_backtesting_result(symbols, macro, micro, start_date, end_date)
-        
+
         wL = calc_winningLosing(symbols, list_db_data)
         pE_wLA_lS = calc_percentEfficiency(symbols, list_db_data)
         if len(symbols) > 0:
@@ -83,19 +95,19 @@ def backtesting_result(request):
         return JsonResponse({'chart_data': bastestData}, status=status.HTTP_201_CREATED)
 
 
-@csrf_exempt 
+@csrf_exempt
 def get_table_list(request):
     print (" ++++++ API: get_table_list ++++++")
-    if request.method == 'POST':        
+    if request.method == 'POST':
         request_data = JSONParser().parse(request)
         strategy_name = request_data['strategy']
         tables_name = get_table_list_db(strategy_name)
         return JsonResponse({'tables': tables_name}, status=status.HTTP_201_CREATED)
 
-@csrf_exempt 
+@csrf_exempt
 def get_data_trades(request):
     print (" ++++++ API: get_data_trades ++++++")
-    if request.method == 'POST':        
+    if request.method == 'POST':
         request_data = JSONParser().parse(request)
         if not 'symbol' in request_data:
             symbol = ''
@@ -131,7 +143,7 @@ def get_strategies_list(request):
         item['micro'] = get_micro_strategies(macro)
         item['symbols'] = get_strategy_symbols(macro)
         strategies.append(item)
-    return JsonResponse({"result": strategies}, status=status.HTTP_201_CREATED)    
+    return JsonResponse({"result": strategies}, status=status.HTTP_201_CREATED)
 
 @csrf_exempt
 def micro_strategy_symbols(request):
@@ -144,13 +156,13 @@ def micro_strategy_symbols(request):
         result = []
         for symbol in micro_symbols:
             result.append(symbol)
-        return JsonResponse({"result": result}, status=status.HTTP_201_CREATED)    
+        return JsonResponse({"result": result}, status=status.HTTP_201_CREATED)
 
 @csrf_exempt
 def indicator_list(request):
     print (" ++++++ API: indicator_list ++++++")
     indicator_list = get_indicator_list()
-    return JsonResponse({"result": indicator_list}, status=status.HTTP_201_CREATED)    
+    return JsonResponse({"result": indicator_list}, status=status.HTTP_201_CREATED)
 
 
 @csrf_exempt
@@ -168,7 +180,7 @@ def get_live_data(request):
     verdict = join_append(chat_candles, strategy_trades, strategy)
     verdict = fill_missing_candles__(verdict, db_name, macro, micro)
     exchange = get_symbol_exchange(symbol)
-    
+
     return JsonResponse({'chart_data': verdict, 'exchange': exchange}, status=status.HTTP_201_CREATED)
 
 @csrf_exempt
@@ -185,7 +197,7 @@ def get_live_data_slice(request):
     verdict = join_append(chat_candles, strategy_trades, strategy)
     verdict = fill_missing_candles__(verdict, db_name, macro, micro)
     exchange = get_symbol_exchange(symbol)
-        
+
     return JsonResponse({'chart_data': verdict[-25:], 'exchange': exchange}, status=status.HTTP_201_CREATED)
 
 @csrf_exempt
@@ -203,7 +215,7 @@ def get_live_data_extended(request):
     verdict = join_append(chat_candles, strategy_trades, strategy)
     verdict = fill_missing_candles__(verdict, db_name, macro, micro)
     exchange = get_symbol_exchange(symbol)
-    
+
     return JsonResponse({'chart_data': verdict, 'exchange': exchange}, status=status.HTTP_201_CREATED)
 
 @csrf_exempt
@@ -220,7 +232,7 @@ def get_live_data_extended_slice(request):
     verdict = join_append(chat_candles, strategy_trades, strategy)
     verdict = fill_missing_candles__(verdict, db_name, macro, micro)
     exchange = get_symbol_exchange(symbol)
-    
+
     return JsonResponse({'chart_data': verdict[-25:], 'exchange': exchange}, status=status.HTTP_201_CREATED)
 
 # strategy management api
@@ -262,6 +274,67 @@ def get_script_list(request):
     print (" ++++++ API: get_script_list ++++++")
     strategies = get_strategy_list()
     return JsonResponse({'strategy_files': strategies}, status=status.HTTP_201_CREATED)
+
+
+@csrf_exempt
+def get_databases(request):
+    print(" ++++++ API: get_database_names ++++++")
+    databases = api_get_databases()
+    return JsonResponse({'success': True, 'data': databases}, status=status.HTTP_201_CREATED)
+
+
+@csrf_exempt
+def get_collections(request):
+    print(" ++++++ API: api_get_collections ++++++")
+    db_name = request.GET['db_name']
+    collections = api_get_collections(db_name)
+    return JsonResponse({'success': True, 'data': collections}, status=status.HTTP_201_CREATED)
+
+
+@csrf_exempt
+def delete_database(request):
+    print(" ++++++ API: api_delete_database ++++++")
+    db_name = request.GET['db_name']
+    result = api_delete_database(db_name)
+    return JsonResponse({'success': True, 'data': result}, status=status.HTTP_201_CREATED)
+
+@csrf_exempt
+def delete_collection(request):
+    print(" ++++++ API: api_delete_collection ++++++")
+    db_name = request.GET['db_name']
+    collection_name = request.GET['collection_name']
+    result = api_delete_collection(db_name, collection_name)
+    return JsonResponse({'success': True, 'data': result}, status=status.HTTP_201_CREATED)
+
+
+@csrf_exempt
+def export_database(request):
+    print(" ++++++ API: api_export_database ++++++")
+    db_name = request.GET['db_name']
+    result = api_export_database(db_name)
+
+
+    # filelike = StringIO("This is an example file-like object"*10)
+    response = HttpResponse(result, content_type='application/csv')
+    response['Content-Disposition'] = 'attachment; filename="%s"' % 'hoangxuanhao.csv'
+
+    return response
+
+    # return JsonResponse({'success': True, 'data': result}, status=status.HTTP_201_CREATED)
+
+
+@csrf_exempt
+def export_collection(request):
+    print(" ++++++ API: api_export_collection ++++++")
+    db_name = request.GET['db_name']
+    collection_name = request.GET['collection_name']
+    result = api_export_collection(db_name, collection_name)
+
+    # filelike = StringIO("This is an example file-like object"*10)
+    response = HttpResponse(result, content_type='application/csv')
+    response['Content-Disposition'] = 'attachment; filename="%s"' % 'hoangxuanhao.csv'
+
+    return response
 
 
 def index(request):
