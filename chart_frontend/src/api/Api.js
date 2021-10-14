@@ -101,7 +101,7 @@ export const getBacktestingResultReq = async (body) => {
   return await request(req);
 }
 
-export const filterPriceData = async (selectedSymbolType, symbol, timeFrame, tradeStartDate, tradeEndDate, pageNum, pageMounts) => {
+export const filterPriceData = async (symbol, timeFrame, tradeStartDate, tradeEndDate) => {
   const requestOptions = {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
@@ -110,8 +110,6 @@ export const filterPriceData = async (selectedSymbolType, symbol, timeFrame, tra
       'time_frame': timeFrame,
       'start': tradeStartDate,
       'end': tradeEndDate,
-      "page_num": pageNum,
-      "page_mounts": pageMounts
     })
   };
 
@@ -171,7 +169,7 @@ export const getAllSymbols = async () => {
       'strategy': 'no_strategy'
     })
   };
-  
+
   return await fetch(process.env.REACT_APP_BACKEND_URL + "/api/tables", requestOptions)
     .then(response => response.json())
     .then(data => {
@@ -207,7 +205,7 @@ export const createSignUpLink = async (roles) => {
           res = data
         })
       }
-    })  
+    })
   return res
 }
 
@@ -228,12 +226,12 @@ export const sendSignUpLink = async (email, link) => {
       link
     })
   };
-  
+
   return await fetch(process.env.REACT_APP_BACKEND_URL + "/send-signup-link", requestOptions)
     .then(response => response.json())
     .then(data => {
       return true
-    })  
+    })
 }
 
 export const forgotPassword = async (email) => {
@@ -245,12 +243,12 @@ export const forgotPassword = async (email) => {
       url: process.env.REACT_APP_BACKEND_URL
     })
   };
-  
+
   return await fetch(process.env.REACT_APP_BACKEND_URL + "/password_reset/", requestOptions)
     .then(response => response.json())
     .then(data => {
       return data
-    })    
+    })
 }
 
 export const getStrategyOptions = async () => {
@@ -271,12 +269,12 @@ export const passwordConfirmReset = async (password1, password2, pathname) => {
       pathname: pathname
     })
   };
-  
+
   return await fetch(process.env.REACT_APP_BACKEND_URL + "/password_reset_confirm/", requestOptions)
     .then(response => response.json())
     .then(data => {
       return data
-    })    
+    })
 }
 
 export const getScriptFileNames = async() => {
@@ -395,7 +393,7 @@ const transformingProcessConfigFromParam = (settings) => {
 
 export const saveConfigFile = async(settings) => {
   const data = transformingProcessConfigToQuery(settings)
-  
+
   const requestOptions = {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
@@ -403,7 +401,7 @@ export const saveConfigFile = async(settings) => {
       config_collection: 'bot_configs',
       config: data
     })
-  };  
+  };
 
   const api = '/strategy/create_one_config_detail/';
 
@@ -531,12 +529,12 @@ export const getBotStatusList = async () => {
       "config_collection": "bot_status"
     })
   };
-  
+
   return await fetch(process.env.REACT_APP_BACKEND_URL + "/strategy/bot_status_list/", requestOptions)
     .then(response => response.json())
     .then(data => {
       return data
-    })  
+    })
 }
 
 export const updateBotStatus = async (botName, botAction) => {
@@ -548,10 +546,10 @@ export const updateBotStatus = async (botName, botAction) => {
       "name": botName
     })
   };
-  
-  const apiUrl = botAction === 'start' 
+
+  const apiUrl = botAction === 'start'
     ? '/strategy/bot_run/'
-    : botAction === 'pause' 
+    : botAction === 'pause'
     ? '/strategy/bot_pause/'
     : '/strategy/bot_stop/'
 
@@ -560,7 +558,7 @@ export const updateBotStatus = async (botName, botAction) => {
       .then(response => response.json())
       .then(data => {
         return data
-      })  
+      })
   } catch (e) {
     return {
       success: false,
@@ -577,7 +575,7 @@ export const getBotConfigList = async () => {
       "config_collection": "bot_configs",
     })
   };
-  
+
   const apiUrl = '/strategy/config_details/'
 
   try {
@@ -585,7 +583,7 @@ export const getBotConfigList = async () => {
       .then(response => response.json())
       .then(data => {
         return data
-      })  
+      })
   } catch (e) {
     return {
       success: false,
@@ -602,7 +600,7 @@ export const getNewsFinancialData = async (symbol) => {
       'symbol': symbol,
     })
   };
-  
+
   const apiUrl = '/news/symbol_news/'
 
   try {
@@ -610,7 +608,7 @@ export const getNewsFinancialData = async (symbol) => {
       .then(response => response.json())
       .then(data => {
         return data
-      })  
+      })
   } catch (e) {
     return {
       success: false,
@@ -690,7 +688,7 @@ export const getStockModalData = async () => {
       .then(response => response.json())
       .then(data => {
         return data
-      })  
+      })
   } catch (e) {
     return {
       success: false,
@@ -715,7 +713,7 @@ export const getMultiFinancials = async (symbols, statement_type) => {
       .then(response => response.json())
       .then(data => {
         return data.results
-      })  
+      })
   } catch (e) {
     return {
       success: false,
@@ -741,13 +739,13 @@ export const saveScannerView = async (chart_number, symbols, fields) => {
       .then(response => response.json())
       .then(data => {
         return data.results
-      })  
+      })
   } catch (e) {
     return {
       success: false,
       message: e
     }
-  }    
+  }
 }
 
 export const getScannerViewData = async (chart_number) => {
@@ -765,7 +763,7 @@ export const getScannerViewData = async (chart_number) => {
     .then(response => response.json())
     .then(data => {
         return data.result
-      })  
+      })
   } catch (e) {
     return {
       success: false,
@@ -775,7 +773,7 @@ export const getScannerViewData = async (chart_number) => {
 }
 
 export const getScannerDetails = async (exchange='', industry='', sector='') => {
-  
+
   const requestOptions = {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
@@ -785,15 +783,15 @@ export const getScannerDetails = async (exchange='', industry='', sector='') => 
       'sector': sector
     })
   };
-  
+
   const apiURL = '/scanner/ticker_details_list/'
-  
+
   try {
     return await fetch(process.env.REACT_APP_BACKEND_URL + apiURL, requestOptions)
     .then(response => response.json())
     .then(data => {
       return data.result
-    })  
+    })
   } catch (e) {
     return {
       success: false,
@@ -810,7 +808,7 @@ export const getTickerScannerOptions = async () => {
       .then(response => response.json())
       .then(data => {
         return data
-      })  
+      })
   } catch (e) {
     return {
       success: false,
@@ -827,7 +825,7 @@ export const getFloatsFilterOptions = async () => {
       .then(response => response.json())
       .then(data => {
         return data
-      })  
+      })
   } catch (e) {
     return {
       success: false,
@@ -837,7 +835,7 @@ export const getFloatsFilterOptions = async () => {
 }
 
 export const getFloatsDetails = async (pageNumber, pageAmount, exchange='', industry='', sector='') => {
-  
+
   const requestOptions = {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
@@ -849,15 +847,15 @@ export const getFloatsDetails = async (pageNumber, pageAmount, exchange='', indu
       'sector': sector,
     })
   };
-  
+
   const apiURL = '/floats/float_details_list/'
-  
+
   try {
     return await fetch(process.env.REACT_APP_BACKEND_URL + apiURL, requestOptions)
     .then(response => response.json())
     .then(data => {
       return data.results
-    })  
+    })
   } catch (e) {
     return {
       success: false,
@@ -959,6 +957,155 @@ export const getIndicators = async () => {
           success: true,
           data: data.result,
         }
+      })
+  } catch (e) {
+    return {
+      success: false,
+      message: e
+    }
+  }
+}
+
+export const apiGetDatabases = async() => {
+  const requestOptions = {
+    method: 'GET',
+    header: {'Content-Type': 'application/json'},
+  }
+
+  const apiURL = '/api/get_databases'
+  try {
+    return await fetch(process.env.REACT_APP_BACKEND_URL + apiURL, requestOptions)
+    .then(response => response.json())
+    .then(data => {
+      return data
+    })
+  } catch (e) {
+    return {
+      success: false,
+      message: e
+    }
+  }
+}
+
+export const apiGetCollections = async(dbName) => {
+  const requestOptions = {
+    method: 'GET',
+    header: {'Content-Type': 'application/json'},
+  }
+
+  let apiURL = new URL(process.env.REACT_APP_BACKEND_URL + '/api/get_collections')
+  apiURL.search = new URLSearchParams({db_name: dbName}).toString()
+
+  try {
+    return await fetch(apiURL, requestOptions)
+      .then(response => response.json())
+      .then(data => {
+        return data
+      })
+  } catch (e) {
+    return {
+      success: false,
+      message: e
+    }
+  }
+}
+
+export const apiDeleteCollection = async(dbName, collectionName) => {
+  const requestOptions = {
+    method: 'GET',
+    header: {'Content-Type': 'application/json'},
+  }
+
+  let apiURL = new URL(process.env.REACT_APP_BACKEND_URL + '/api/delete_collection')
+  apiURL.search = new URLSearchParams({db_name: dbName, collection_name: collectionName}).toString()
+
+  try {
+    return await fetch(apiURL, requestOptions)
+      .then(response => response.json())
+      .then(data => {
+        return data
+      })
+  } catch (e) {
+    return {
+      success: false,
+      message: e
+    }
+  }
+}
+
+
+export const apiDeleteDatabase = async(dbName) => {
+  const requestOptions = {
+    method: 'GET',
+    header: {'Content-Type': 'application/json'},
+  }
+
+  let apiURL = new URL(process.env.REACT_APP_BACKEND_URL + '/api/delete_database')
+  apiURL.search = new URLSearchParams({db_name: dbName}).toString()
+
+  try {
+    return await fetch(apiURL, requestOptions)
+      .then(response => response.json())
+      .then(data => {
+        return data
+      })
+  } catch (e) {
+    return {
+      success: false,
+      message: e
+    }
+  }
+}
+
+
+export const apiExportDatabase = async(dbName) => {
+  const requestOptions = {
+    method: 'GET',
+    header: {'Content-Type': 'application/json'},
+  }
+
+  let apiURL = new URL(process.env.REACT_APP_BACKEND_URL + '/api/export_database')
+  apiURL.search = new URLSearchParams({db_name: dbName}).toString()
+
+  try {
+    return await fetch(apiURL, requestOptions)
+      .then(response => {
+        response.blob().then(blob => {
+          let url = window.URL.createObjectURL(blob);
+          let a = document.createElement("a");
+          a.href = url;
+          a.download = `${dbName}.zip`;
+          a.click();
+        })
+      })
+  } catch (e) {
+    return {
+      success: false,
+      message: e
+    }
+  }
+}
+
+
+export const apiExportCollection = async(dbName, collectionName) => {
+  const requestOptions = {
+    method: 'GET',
+    header: {'Content-Type': 'application/json'},
+  }
+
+  let apiURL = new URL(process.env.REACT_APP_BACKEND_URL + '/api/export_collection')
+  apiURL.search = new URLSearchParams({db_name: dbName, collection_name: collectionName}).toString()
+
+  try {
+    return await fetch(apiURL, requestOptions)
+      .then(response => {
+        response.blob().then(blob => {
+          let url = window.URL.createObjectURL(blob);
+          let a = document.createElement("a");
+          a.href = url;
+          a.download = `${dbName}_${collectionName}.csv`;
+          a.click();
+        })
       })
   } catch (e) {
     return {
