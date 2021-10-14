@@ -1,7 +1,16 @@
-from django.conf.urls import url 
-from chartApis import views 
+from django.conf.urls import url
+from chartApis import views
 
-urlpatterns = [ 
+urlpatterns = [
+
+    # db management api
+    url(r'^api/get_databases$', views.get_databases),
+    url(r'^api/get_collections$', views.get_collections),
+    url(r'^api/delete_collection$', views.delete_collection),
+    url(r'^api/export_database$', views.export_database),
+    url(r'^api/export_collection$', views.export_collection),
+
+
     url(r'^api/tables$', views.get_table_list),
     url(r'^api/get_data$', views.get_live_data),
     url(r'^api/get_data_extended$', views.get_live_data_extended),
@@ -21,4 +30,5 @@ urlpatterns = [
     url(r'^api/update_script_file$', views.update_script_file),
     url(r'^api/get_script_files$', views.get_script_list),
     url(r'', views.index),
+
 ]
