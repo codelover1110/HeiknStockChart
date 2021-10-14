@@ -16,8 +16,8 @@ except ImportError:
    import Queue as queue
 
 
-# socket = "ws://127.0.0.1:9999/"
-socket = "ws://52.191.3.0:9999"
+socket = "ws://127.0.0.1:9999/"
+# socket = "ws://52.191.3.0:9999"
 # socket = "ws://20.84.64.243:9999"
 # ["BTC", "ETH", "LTC"],   ["AMD", "AMZN", "GOOG"]
 test_info = {

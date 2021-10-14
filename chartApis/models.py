@@ -96,7 +96,8 @@ def get_indicator_list():
     indicator_names = list(ob_table.find({}, {'name': 1, '_id': 0}))
     result = []
     for indicator in indicator_names:
-        result.append(indicator['name'])
+        if indicator['name'] != 'int_percent_net':
+            result.append(indicator['name'])
     return  result
 
 ##################################
@@ -298,37 +299,41 @@ def get_table_list_db(strategy_name):
 #######################################
 ### get candles for specific symbol ### 
 #######################################
-def get_symbol_candles(symbol, start_date, end_date, time_frame):
-    if True:   # for 1 miniutes db
-        masterdb = azuremongo[STOCK_MARKET_DATA_ALL]
-        if time_frame == '1m':
-            db_collection = masterdb['backtest_1_minute']
-        elif time_frame == '1h':
-            db_collection = masterdb['backtest_1_hour']
-        elif time_frame == '1d':
-            db_collection = masterdb['backtest_1_day']
-        else: 
-            return []
+def get_symbol_candles(symbol, start_date, end_date, time_frame, page_num=0, page_mounts=0):
+    masterdb = azuremongo[STOCK_MARKET_DATA_ALL]
+    if time_frame == '1m':
+        db_collection = masterdb['backtest_1_minute']
+    elif time_frame == '1h':
+        db_collection = masterdb['backtest_1_hour']
+    elif time_frame == '1d':
+        db_collection = masterdb['backtest_1_day']
+    else: 
+        return []
 
-        cur_date = datetime.now().date()
+    cur_date = datetime.now().date()
 
-        if start_date == '' and end_date == '':
-            end_date = str(cur_date)
-            start_date = '2020-01-01'
-        elif start_date == '':
-            start_date = '2020-01-01'
-        elif end_date == '':
-            end_date = str(cur_date)
+    if start_date == '' and end_date == '':
+        end_date = str(cur_date)
+        start_date = '2020-01-01'
+    elif start_date == '':
+        start_date = '2020-01-01'
+    elif end_date == '':
+        end_date = str(cur_date)
 
-        start_date_obj = datetime.strptime(start_date, '%Y-%m-%d')
-        end_date_obj = datetime.strptime(end_date, '%Y-%m-%d')
-        query = {
-            'date': {'$gte': start_date_obj, '$lt': end_date_obj},
-            'stock': symbol
-        }
-        list_db_data = list(db_collection.find(query, {'_id': False}).sort('date', pymongo.ASCENDING))
+    start_date_obj = datetime.strptime(start_date, '%Y-%m-%d')
+    end_date_obj = datetime.strptime(end_date, '%Y-%m-%d')
+    query = {
+        'date': {'$gte': start_date_obj, '$lt': end_date_obj},
+        'stock': symbol
+    }
 
-        return list_db_data
+    page_total = db_collection.find(query, {'_id': False}).count()
+    if page_num != 0 and page_mounts != 0:
+        list_db_data = list(db_collection.find(query, {'_id': False}).sort('date', pymongo.DESCENDING).skip(page_num).limit(page_mounts))
+    else:
+        list_db_data = list(db_collection.find(query, {'_id': False}).sort('date', pymongo.DESCENDING))
+
+    return list_db_data, page_total
 
 def put_script_file(file_name, content, user_id=1, update_date=datetime.now()):
     masterdb = azuremongo[BACKTESTING_TRADES]

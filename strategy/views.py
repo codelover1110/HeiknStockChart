@@ -75,8 +75,8 @@ def save_script_file(request):
     print (" ++++++ API: save_script_file ++++++")
     if request.method == 'POST':
         req = JSONParser().parse(request)
-        file_name = req['file_name']
-        content = req['content']
+        file_name = req['name']
+        content = req['contents']
 
         try:
             save_strategy(file_name, content)

@@ -30,6 +30,12 @@ def define_color(value, candle, pre_candle):
         else:
             return "d_r" # dark red
 
+def define_percent_color(percent_value):
+    if percent_value > 0:
+        return 'green'
+    else:
+        return 'red'
+
 def get_chat_data_from_candles(candles):
     result_data = []
     for idx in range(0, len(candles)-25):
@@ -129,6 +135,10 @@ def get_chat_data_rsi_heik_v11(candles):
         heik = rsi3 - pre_rs3
         pre_heik = dataConverter(np.nan_to_num(heik_diff.iat[-1]))
         heik2 = heik - pre_heik
+
+        percent_down = 100*((data.o - data.l)/data.o)
+        percent_up = 100*((data.h - data.o)/data.o)
+        percent_net = percent_up - percent_down
         
         result_data.append({
             'close': float(data.c),
@@ -140,6 +150,9 @@ def get_chat_data_rsi_heik_v11(candles):
             'volume': int(data.v),
             'RSI': rsi,
             'side': side,
+            'percent_up': {'bearPower': percent_up, 'bullPower': percent_up, 'color': define_percent_color(percent_up)},
+            'percent_down': {'bearPower': percent_down, 'bullPower': percent_down, 'color': define_percent_color(percent_down)},
+            'percent_net': {'bearPower': percent_net, 'bullPower': percent_net, 'color': define_percent_color(percent_net)},
             'rsi': {'bearPower': rsi, 'bullPower': rsi, 'side': side},
             'rsi2': {'bearPower': rsi2, 'bullPower': rsi2, 'color': define_color(rsi2, rsi, pre_rsi)},
             'rsi3': {'bearPower': rsi3, 'bullPower': rsi3, 'color': define_color(rsi3, rsi2, pre_rs2)},
@@ -168,6 +181,9 @@ def get_chat_data_rsi_heik_v1_non(candles):
             'volume': int(data.v),
             'RSI': 0,
             'side': "",
+            'percent_up': {'bearPower': 0, 'bullPower': 0, 'color': ''},
+            'percent_down': {'bearPower': 0, 'bullPower': 0, 'color': ''},
+            'percent_net': {'bearPower': 0, 'bullPower': 0, 'color': ''},
             'rsi': {'bearPower': 0, 'bullPower': 0, 'color': ''},
             'rsi2': {'bearPower': 0, 'bullPower': 0, 'color': ""},
             'rsi3': {'bearPower': 0, 'bullPower': 0, 'color': ''},

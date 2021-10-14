@@ -1,9 +1,6 @@
 import numpy as np
 import pandas as pd
-pd.options.mode.chained_assignment = None  # default='warn'
-from datetime import datetime,date
 import pandas_ta as ta
-
 
 def Wilders(df,column,period):
     """
@@ -15,7 +12,7 @@ def Wilders(df,column,period):
     df =  df.ta.rma(length = period)
     return df
 
-def Filter(df, barSize=1, stock="AMZN"):
+def Rsi2(df):
     """
     Implementation of strategy, given a dataframe with OHLC candle data,
     bucket stock into buy,sell,hold,wait
@@ -26,10 +23,8 @@ def Filter(df, barSize=1, stock="AMZN"):
     length2 = 3
     length3 = 9
 
-    # df["diff"] = df["close"].diff()
-    # df["absdiff"] = abs(df["close"].diff())
-    df["diff"] = df["c"].diff()
-    df["absdiff"] = abs(df["c"].diff())
+    df["diff"] = df["close"].diff()
+    df["absdiff"] = abs(df["close"].diff())
 
     df["NetChgAvg"] = Wilders(df,"diff",14)
     df["TotChgAvg"] = Wilders(df,"absdiff",14)
@@ -42,10 +37,4 @@ def Filter(df, barSize=1, stock="AMZN"):
 
     df["rsi1"] = df["x2"] - df["xs"]
     df["rsi2"] = df["rsi1"].diff()
-    df["rsi3"] = df["rsi2"].diff()
-
-    df = df.reset_index()
-
-    hadf = ta.ha(df["o"], df["h"], df["l"], df["c"]) 
-    return hadf
-   
+    return df["rsi2"]

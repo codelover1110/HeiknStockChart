@@ -27,6 +27,12 @@ def define_color(df, value):
         else:
             return "d_r" # dark red
 
+def define_percent_color(percent_value):
+    if percent_value > 0:
+        return 'green'
+    else:
+        return 'red'
+
 def dataConverter(value):
     obj = np.nan_to_num(value)
 
@@ -91,6 +97,10 @@ def Filter(df, barSize=1, stock="AMZN"):
     else:
         side = "wait"
 
+    percent_down = 100*((lastdf.o - lastdf.l)/lastdf.o)
+    percent_up = 100*((lastdf.h - lastdf.o)/lastdf.o)
+    percent_net = percent_up - percent_down
+
     result = {
         'c': float(lastdf.c),
         'date': lastdf.date,
@@ -100,11 +110,6 @@ def Filter(df, barSize=1, stock="AMZN"):
         'percentChange': "",
         'v': int(lastdf.v),
         'side': side,
-        # 'rsi': {'bearPower': lastdf.RSI, 'bullPower': lastdf.RSI, 'color': side},
-        # 'rsi2': {'bearPower': lastdf.rsi2, 'bullPower': lastdf.rsi2, 'color': define_color(df["rsi2"], lastdf.rsi2)},
-        # 'rsi3': {'bearPower': lastdf.rsi3, 'bullPower': lastdf.rsi3, 'color': define_color(df["rsi3"], lastdf.rsi3)},
-        # 'heik': {'bearPower': heik.iloc[-1], 'bullPower': heik.iloc[-1], 'color': define_color(heik, heik.iloc[-1])},
-        # 'heik2': {'bearPower': heik_diff.iloc[-1], 'bullPower': heik_diff.iloc[-1], 'color': define_color(heik_diff, heik_diff.iloc[-1])},
         'rsi': lastdf.RSI,
         'rsi2': lastdf.rsi2,
         'rsi3': lastdf.rsi3,
@@ -114,7 +119,13 @@ def Filter(df, barSize=1, stock="AMZN"):
         'rsi2_color': define_color(df["rsi2"], lastdf.rsi2),
         'rsi3_color': define_color(df["rsi3"], lastdf.rsi3),
         'heik_color': define_color(heik, heik.iloc[-1]),
-        'hiek2_color': define_color(heik_diff, heik_diff.iloc[-1])
+        'hiek2_color': define_color(heik_diff, heik_diff.iloc[-1]),
+        'percent_up': percent_up,
+        'percent_down': percent_down,
+        'percent_net': percent_net,
+        'percent_up_color': define_percent_color(percent_up),
+        'percent_down_color': define_percent_color(percent_down),
+        'percent_net_color': define_percent_color(percent_net)
     }
 
     return result
@@ -166,8 +177,15 @@ def get_symbols():
     symbols = companies['Symbol'].tolist()
     return symbols
 
+
+
 def get_candle_fields():
-    return ['c', 'date', 'h','l','o', 'percentChange', 'v', 'side', 'rsi', 'rsi2', 'rsi3', 'heik', 'heik2', 'rsi_color', 'rsi2_color', 'rsi3_color', 'heik_color', 'hiek2_color']
+    return ['c', 'date', 'h','l','o', 'percentChange', 'v', 'side', 
+        'rsi', 'rsi2', 'rsi3', 'heik', 'heik2', 
+        'rsi_color', 'rsi2_color', 'rsi3_color', 'heik_color', 'hiek2_color',
+        'percent_up', 'percent_down', 'percent_net', 
+        'percent_up_color','percent_down_color', 'percent_net_color'
+    ]
     
 def get_extra_stream_symbols(src_symbols, add_count):
     symbols = get_symbols()
