@@ -9,11 +9,12 @@ import PriceDataTable from "components/Datatable/PriceDataTable"
 import { routes } from "routes.js";
 
 import { BackgroundColorContext } from "contexts/BackgroundColorContext";
+import { CsvDownloadProvider } from 'contexts/CsvDownloadContext';
 
 function PriceData() {
   const [isShowSidebar, setShowSidebar] = React.useState(false);
   const [selectedInstance, setSelectedInstance] = React.useState('trade_data');
-  
+
   const handleSidebarChange = () => {
     setShowSidebar(!isShowSidebar);
   };
@@ -21,7 +22,7 @@ function PriceData() {
   const handleInstanceChange = (instance) => {
     setSelectedInstance(instance)
   }
-  
+
   return (
     <BackgroundColorContext.Consumer>
       {({ color }) => (
@@ -46,7 +47,9 @@ function PriceData() {
               />
             )}
             <div className="col-sm-12">
+              <CsvDownloadProvider>
                 <PriceDataTable />
+              </CsvDownloadProvider>
             </div>
           </div>
         </React.Fragment>

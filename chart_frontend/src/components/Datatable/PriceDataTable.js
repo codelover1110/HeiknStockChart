@@ -17,6 +17,8 @@ import { useAuth } from 'contexts/authContext';
 import { getAllSymbols, filterPriceData } from 'api/Api'
 import { currentDateString } from 'utils/helper'
 import MultiRangeSlider from 'components/MultiRangeSlider/MultiRangeSlider'
+import { useCsvDownloadUpdate } from "contexts/CsvDownloadContext"
+import ButtonCsvDownload from 'components/ButtonCsvDownload'
 
 const PriceDataTable = () => {
   const auth = useAuth();
@@ -72,12 +74,12 @@ const PriceDataTable = () => {
       label: 'L',
       field: 'l',
       width: 200,
-    },  
+    },
     {
       label: 'V',
       field: 'v',
       width: 200,
-    },   
+    },
     {
       label: 'Date',
       field: 'date',
@@ -91,10 +93,17 @@ const PriceDataTable = () => {
     ],
   });
 
+  const updateCsvDownload = useCsvDownloadUpdate();
+
+  const wrapSetDatatable = (data) => {
+    setDatatable(data)
+    updateCsvDownload([...data.rows])
+  }
+
   useEffect(() => {
     const getPriceTrades = async (symbol, timeFrame, tradeStartDate, tradeEndDate) => {
       const trades_data = await filterPriceData(selectedSymbolType.value, symbol, timeFrame, tradeStartDate, tradeEndDate);
-      setDatatable({
+      wrapSetDatatable({
         columns: hearder_columns,
         rows: trades_data
       })
@@ -120,11 +129,11 @@ const PriceDataTable = () => {
   const handleSymbolChange = (e) => {
     setSymbol(e)
   }
-  
+
   const handleTimeFrameChange = (e) => {
     setTimeFrame(e)
   }
-  
+
   const selectDateRange = (startDate, endDate) => {
     setTradeStartDate(startDate)
     setTradeEndDate(endDate)
@@ -179,7 +188,7 @@ const PriceDataTable = () => {
               </UncontrolledDropdown>
               <li className="separator d-lg-none" />
             </Nav>
-          </Collapse>    
+          </Collapse>
       </nav>
       <div className="col-sm-12 hunter-data-table-container">
         <div className="hunter-data-table-title">
@@ -214,9 +223,10 @@ const PriceDataTable = () => {
             <MultiRangeSlider
               selectDateRange={selectDateRange}
             />
+            <ButtonCsvDownload filename={"price.csv"}>Csv Download</ButtonCsvDownload>
           </div>
         </div>
-        <MDBDataTableV5 
+        <MDBDataTableV5
           hover
           maxHeight="500px"
           entriesOptions={[10, 25, 50, 100]}

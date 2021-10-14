@@ -713,7 +713,7 @@ const WatchListItem = (props) => {
       </Modal>
       <div className="watch-list-item-wrap hunter-watch-list-item-wrap">
         <div className="watch-list-item-header">
-          <div className="select-multi-option mr-1 ml-1 macket-select-options">
+          <div className="select-multi-option mr-1 ml-1 market-select-options">
             <Select
               name="filters"
               placeholder="Time Frame"
@@ -722,7 +722,7 @@ const WatchListItem = (props) => {
               options={timeFrameOptions}
             />
           </div>
-          <div className="select-multi-option mr-1 macket-select-options">
+          <div className="select-multi-option mr-1 market-select-options">
             <Select
               name="filters"
               placeholder="Watch List"

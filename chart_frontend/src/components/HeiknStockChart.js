@@ -15,7 +15,7 @@ import {
 } from "reactstrap";
 import { useAuth } from 'contexts/authContext';
 import disableScroll from 'disable-scroll';
-import { getSymbolsByMicroStrategy } from 'api/Api'
+import { getStrategyListReq, getTablesReq, getSymbolsByMicroStrategy, getIndicators } from 'api/Api'
 
 const HeiknStockChart = (props) => {
   const auth = useAuth();
@@ -65,18 +65,20 @@ const HeiknStockChart = (props) => {
 
   const [optionsIndicator, setOptionsIndicator] = useState([
     {
-      value: 'VOLUME', label: 'VOLUME',
+      value: 'volume', label: 'VOLUME',
     },
     {
-      value: 'RSI', label: 'RSI',
+      value: 'rsi1', label: 'RSI1',
     },
     {
-      value: 'HEIK1', label: 'HEIK1',
+      value: 'heik', label: 'HEIK1',
     },
     {
-      value: 'HEIK2', label: 'HEIK2',
+      value: 'heik_diff', label: 'HEIK2',
     }
   ]);
+  
+  const [optionsIndicatorExtend, setOptionsIndicatorExtend] = useState([]);
   
   const [optionsMarketTime] = useState([
     {
@@ -103,84 +105,84 @@ const HeiknStockChart = (props) => {
   ]
 
   const getStrategyList = useCallback(
-    () => {
-      try {
-        fetch(process.env.REACT_APP_BACKEND_URL + "/api/get_strategy_list")
-          .then(response => response.json())
-          .then(async data => {
-            setStrategyList(data.result);
-            const strategyOptions = data.result.map((o => {
+    async () => {
+      const strategyListRes = await getStrategyListReq();
+      if (strategyListRes.success) {
+        const data = strategyListRes.data;
+        setStrategyList(data.result);
+        const strategyOptions = data.result.map((o => {
+          return {
+            value: o.macro,
+            label: o.macro,
+          }
+        }))
+        setOptionsStrategy(strategyOptions);
+        setStrategy(strategyOptions[0]);
+        if (data.result.length) {
+          let flag = true
+          let item = data.result[0]
+          if (flag) {
+            const microStrategyOptions = item.micro.map(o => {
               return {
-                value: o.macro,
-                label: o.macro,
+                value: o,
+                label: o,
               }
-            }))
-            setOptionsStrategy(strategyOptions);
-            setStrategy(strategyOptions[0]);
-            if (data.result.length) {
-              let flag = true
-              let item = data.result[0]
-              if (flag) {
-                const microStrategyOptions = item.micro.map(o => {
-                  return {
-                    value: o,
-                    label: o,
-                  }
-                })
-                
-                setOptionsMicroStrategy( microStrategyOptions )
-                setMicroStrategy(microStrategyOptions[0])
+            })
+            
+            setOptionsMicroStrategy( microStrategyOptions )
+            setMicroStrategy(microStrategyOptions[0])
 
-                const result = await getSymbolsByMicroStrategy(strategyOptions[0].value, microStrategyOptions[0].value)
-                if (result.success) {
-                  const symbolOptions = result.data.map(o => {
-                    return {
-                      value: o,
-                      label: o,
-                    }
-                  })
-                  
-                  setSymbolList(symbolOptions)
-                  setSymbol(symbolOptions[0])
+            const result = await getSymbolsByMicroStrategy(strategyOptions[0].value, microStrategyOptions[0].value)
+            if (result.success) {
+              const symbolOptions = result.data.map(o => {
+                return {
+                  value: o,
+                  label: o,
                 }
-              }
-              flag = false
+              })
+              
+              setSymbolList(symbolOptions)
+              setSymbol(symbolOptions[0])
             }
-          })   
-      } catch (error) {
-        console.log(error)
+          }
+          flag = false
+        }
       }
     },
     [],
   )
 
   const get_tables = useCallback(
-    (strategy) => {
-      const requestOptions = {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-          'strategy': strategy
+    async (strategy) => {
+      const tablesRes = await getTablesReq(strategy);
+      if (tablesRes.success) {
+        const data = tablesRes.data;
+        let temp_data = []
+        data.tables.map((x) => {
+          temp_data.push({
+            value: x,
+            label: x
+          });
+          return null
         })
-      };
-      
-      fetch(process.env.REACT_APP_BACKEND_URL + "/api/tables", requestOptions)
-        .then(response => response.json())
-        .then(data => {
-          let temp_data = []
-          data.tables.map((x) => {
-            temp_data.push({
-              value: x,
-              label: x
-            });
-            return null
-          })
-          setSymbolList(temp_data)
-          // setSymbol(temp_data[0])
-        })
+        setSymbolList(temp_data)
+      }
     },
     [],
   )
+
+  useEffect(async () => {
+    const result = await getIndicators()
+    if (result.success) {
+      const indicatorList = result.data.map((o) => (
+        {
+          value: o,
+          label: o
+        }
+      ))
+      setOptionsIndicatorExtend(indicatorList)
+    }
+  }, [])  
 
   useEffect(() => {
     disableScroll.on();
@@ -314,40 +316,21 @@ const HeiknStockChart = (props) => {
       setIndicators([])
       setOptionsIndicator([
         {
-          value: 'VOLUME', label: 'VOLUME',
+          value: 'volume', label: 'VOLUME',
         },
         {
-          value: 'RSI', label: 'RSI',
+          value: 'rsi1', label: 'RSI1',
         },
         {
-          value: 'HEIK1', label: 'HEIK1',
+          value: 'heik', label: 'HEIK1',
         },
         {
-          value: 'HEIK2', label: 'HEIK2',
+          value: 'heik_diff', label: 'HEIK2',
         }
       ])
     } else {
       setIndicators([])
-      setOptionsIndicator([
-        {
-          value: 'VOLUME', label: 'VOLUME',
-        },
-        {
-          value: 'RSI', label: 'RSI',
-        },
-        {
-          value: 'RSI2', label: 'RSI2',
-        },
-        {
-          value: 'RSI3', label: 'RSI3',
-        },
-        {
-          value: 'HEIK1', label: 'HEIK1',
-        },
-        {
-          value: 'HEIK2', label: 'HEIK2',
-        }
-      ])
+      setOptionsIndicator(optionsIndicatorExtend)
     }
     setChartColumn(option)
   }

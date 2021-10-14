@@ -50,22 +50,22 @@ const HybridViewChartTable = (props) => {
 
   const [optionsIndicator, setOptionsIndicator] = useState([
     {
-      value: 'VOLUME', label: 'VOLUME',
+      value: 'volume', label: 'VOLUME',
     },
     {
-      value: 'RSI', label: 'RSI',
+      value: 'rsi', label: 'RSI',
     },
     {
-      value: 'RSI2', label: 'RSI2',
+      value: 'rsi2', label: 'RSI2',
     },
     {
-      value: 'RSI3', label: 'RSI3',
+      value: 'rsi3', label: 'RSI3',
     },
     {
-      value: 'HEIK1', label: 'HEIK1',
+      value: 'heik', label: 'HEIK1',
     },
     {
-      value: 'HEIK2', label: 'HEIK2',
+      value: 'heik_diff', label: 'HEIK2',
     }
   ]);
   

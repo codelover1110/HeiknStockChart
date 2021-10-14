@@ -206,35 +206,35 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 
 	calculateOffset (indicator, isFullChart) {
 		if (!this.props.isHomePage || isFullChart) {
-			if (indicator === 'RSI') {
-				const filter = this.props.indicators.filter(indicator => ['RSI2', 'RSI3', 'HEIK1', 'HEIK2'].includes(indicator.value))
+			if (indicator === 'rsi1') {
+				const filter = this.props.indicators.filter(indicator => ['rsi2', 'rsi3', 'heik', 'heik_diff'].includes(indicator.value))
 				return 300 + filter.length * 70;
 			}
 	
-			if (indicator === 'RSI2') {
-				const filter = this.props.indicators.filter(indicator => ['RSI3', 'HEIK1', 'HEIK2'].includes(indicator.value))
+			if (indicator === 'rsi2') {
+				const filter = this.props.indicators.filter(indicator => ['rsi3', 'heik', 'heik_diff'].includes(indicator.value))
 				return 300 + filter.length * 70;
 			}
 
-			if (indicator === 'RSI3') {
-				const filter = this.props.indicators.filter(indicator => ['HEIK1', 'HEIK2'].includes(indicator.value))
+			if (indicator === 'rsi3') {
+				const filter = this.props.indicators.filter(indicator => ['heik', 'heik_diff'].includes(indicator.value))
 				return 300 + filter.length * 70;
 			}
 	
-			if (indicator === 'HEIK1') {
-				const filter = this.props.indicators.filter(indicator => ['HEIK2'].includes(indicator.value))
+			if (indicator === 'heik') {
+				const filter = this.props.indicators.filter(indicator => ['heik_diff'].includes(indicator.value))
 				return 300 + filter.length * 70;
 			}
 			
-			if (indicator === 'HEIK2') {
+			if (indicator === 'heik_diff') {
 				const filter = this.props.indicators.filter(indicator => [''].includes(indicator.value))
 				return 300 + filter.length * 70;
 			}
 			return 0	
 		}
-		if (indicator === 'RSI') {
+		if (indicator === 'rsi1') {
 			if (this.isIncludeIndicators(indicator)) {
-				if (this.isIncludeIndicators('VOLUME')) {
+				if (this.isIncludeIndicators('volume')) {
 					if (this.props.indicators.length > 1) {
 						return (this.props.indicators.length-1) * 50 + 50
 					}
@@ -248,16 +248,16 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 			}
 		}
 
-		if (indicator === 'HEIK1') {
+		if (indicator === 'heik') {
 			if (this.isIncludeIndicators(indicator)) {
-				if (this.isIncludeIndicators('HEIK2')) {
+				if (this.isIncludeIndicators('heik_diff')) {
 					return 130;
 				}
 				return 80;
 			}
 		}
 
-		if (indicator === 'HEIK2') {
+		if (indicator === 'heik_diff') {
 			return 60;
 		}
 
@@ -533,7 +533,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 				<Chart id={1}
 					height={
 						(!this.props.isHomePage || isFullChart)
-						? this.isIncludeIndicators('VOLUME') || this.props.indicators.length ? 250 : 400
+						? this.isIncludeIndicators('volume') || this.props.indicators.length ? 250 : 400
 						: 300 - this.props.indicators.length * 50
 					}
 					yExtents={[d => [d.high, d.low], ema20.accessor(), ema50.accessor()]}
@@ -588,7 +588,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 						usingProps={shortAnnotationProps} />
 
 				</Chart>
-				{this.isIncludeIndicators('VOLUME') && (
+				{this.isIncludeIndicators('volume') && (
 					<Chart id={2} height={(!this.props.isHomePage || isFullChart) ? 100 : 50}
 						yExtents={[d => d.volume]}
 						origin={(w, h) => [0, h - this.calculateMainHeightOffset(isFullChart)]}
@@ -605,12 +605,12 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 						<BarSeries yAccessor={d => d.volume} fill={d => d.close > d.open ? "#6BA583" : "#FF0000"} />
 					</Chart>
 				)}
-				{this.isIncludeIndicators('RSI') && (
+				{this.isIncludeIndicators('rsi1') && (
 					<Chart id={3} 
 						// height={(!this.props.isHomePage || isFullChart) ? 100 : 70}
 						height={70}
 						yExtents={[0, d => d.rsi.bearPower]}
-						origin={(w, h) => [0, h - this.calculateOffset('RSI', isFullChart)]}
+						origin={(w, h) => [0, h - this.calculateOffset('rsi1', isFullChart)]}
 						padding={{ top: 40, bottom: 10 }}
 					>
 						<XAxis axisAt="bottom" orient="bottom" stroke="white" tickStroke="white" />
@@ -638,12 +638,12 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 							origin={[-40, 35]}/>
 					</Chart>
 				)}
-				{this.isIncludeIndicators('RSI2') && (
+				{this.isIncludeIndicators('rsi2') && (
 					<Chart id={4} 
 						// height={(!this.props.isHomePage || isFullChart) ? 100 : 70}
 						height={70}
 						yExtents={[0, d => d.rsi2.bearPower]}
-						origin={(w, h) => [0, h - this.calculateOffset('RSI2', isFullChart)]}
+						origin={(w, h) => [0, h - this.calculateOffset('rsi2', isFullChart)]}
 						padding={{ top: 40, bottom: 10 }}
 					>
 						<XAxis axisAt="bottom" orient="bottom" stroke="white" tickStroke="white" />
@@ -673,12 +673,12 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 							origin={[-40, 35]}/>
 					</Chart>
 				)}
-				{this.isIncludeIndicators('RSI3') && (
+				{this.isIncludeIndicators('rsi3') && (
 					<Chart id={5} 
 						// height={(!this.props.isHomePage || isFullChart) ? 100 : 70}
 						height={70}
 						yExtents={[0, d => d.rsi3.bearPower]}
-						origin={(w, h) => [0, h - this.calculateOffset('RSI3', isFullChart)]}
+						origin={(w, h) => [0, h - this.calculateOffset('rsi3', isFullChart)]}
 						padding={{ top: 40, bottom: 10 }}
 					>
 						<XAxis axisAt="bottom" orient="bottom" stroke="white" tickStroke="white" />
@@ -708,12 +708,12 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 							origin={[-40, 35]}/>
 					</Chart>
 				)}
-				{this.isIncludeIndicators('HEIK1') && (
+				{this.isIncludeIndicators('heik') && (
 					<Chart id={6} 
 						// height={(!this.props.isHomePage || isFullChart) ? 100 : 70}
 						height={70}
 						yExtents={[0, d => d.heik.bearPower]}
-						origin={(w, h) => [0, h - this.calculateOffset('HEIK1', isFullChart)]}
+						origin={(w, h) => [0, h - this.calculateOffset('heik', isFullChart)]}
 						padding={{ top: 40, bottom: 10 }}
 					>
 						<XAxis axisAt="bottom" orient="bottom" stroke="white" tickStroke="white" />
@@ -743,12 +743,12 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 							origin={[-40, 35]}/>
 					</Chart>
 				)}
-				{this.isIncludeIndicators('HEIK2') && (
+				{this.isIncludeIndicators('heik_diff') && (
 					<Chart id={7} 
 						// height={(!this.props.isHomePage || isFullChart) ? 100 : 70}
 						height={70}
 						yExtents={[0, d => d.heik2.bearPower]}
-						origin={(w, h) => [0, h - this.calculateOffset('HEIK2', isFullChart)]}
+						origin={(w, h) => [0, h - this.calculateOffset('heik_diff', isFullChart)]}
 						padding={{ top: 40, bottom: 10 }}
 					>
 						<XAxis axisAt="bottom" orient="bottom" stroke="white" tickStroke="white" />
