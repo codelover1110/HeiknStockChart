@@ -9,6 +9,12 @@ export var routes = [
         label: 'Bot Management',
         instance: "systemfilemanager",
         pathname: '/botmanagement'
+      },
+      {
+        id: 0,
+        label: 'DB Management',
+        instance: "dbmanager",
+        pathname: '/db_management'
       }
     ],
   },

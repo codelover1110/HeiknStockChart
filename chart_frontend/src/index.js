@@ -34,6 +34,7 @@ import PasswordResetConfirm from 'layouts/User/PasswordResetConfirm'
 import MarketWatch from 'layouts/User/MarketWatch'
 import Scanner from 'layouts/User/Scanner'
 import Optimization from 'layouts/User/Optimization'
+import DBManagementDashboardWrapper from './components/DBManagement/DashboardWrapper'
 
 ReactDOM.render(
   <ThemeContextWrapper>
@@ -81,6 +82,9 @@ ReactDOM.render(
             </PrivateRoute>
             <PrivateRoute path="/scanner">
               <Scanner />
+            </PrivateRoute>
+            <PrivateRoute path="/db_management">
+              <DBManagementDashboardWrapper />
             </PrivateRoute>
             <PrivateRoute path="/">
               <HomePage />
