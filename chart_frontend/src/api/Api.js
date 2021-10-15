@@ -353,6 +353,13 @@ const convertStringtoArray = (src) => {
   }))
 }
 
+const convertStringtoHourObject = (src) => {
+  return {
+    value: src === 'true' ? true : false,
+    label: src
+  }
+}
+
 const transformingProcessConfigToQuery = (settings) => {
   return {
     bot_name: settings.bot_name,
@@ -364,7 +371,7 @@ const transformingProcessConfigToQuery = (settings) => {
     data_source: convertArraytoString(settings.data_source),
     live_trading: convertArraytoString(settings.live_trading),
     starting_cash: settings.starting_cash,
-    hours: convertArraytoString(settings.hours),
+    extended_hours: convertArraytoString(settings.extended_hours),
     name: settings.name,
     macro_strategy: convertArraytoString(settings.macro_strategy),
     indicator_signalling: convertArraytoString(settings.indicator_signalling),
@@ -374,7 +381,7 @@ const transformingProcessConfigToQuery = (settings) => {
 
 const transformingProcessConfigFromParam = (settings) => {
   return {
-    bot_name: settings.bot_name,
+    bot_name: settings.name,
     timeframe: convertStringtoArray(settings.timeframe),
     indicator: convertStringtoArray(settings.indicator),
     watchlist: convertStringtoArray(settings.watchlist),
@@ -383,7 +390,7 @@ const transformingProcessConfigFromParam = (settings) => {
     data_source: convertStringtoArray(settings.data_source),
     live_trading: convertStringtoArray(settings.live_trading),
     starting_cash: settings.starting_cash,
-    hours: convertStringtoArray(settings.hours),
+    extended_hours: convertStringtoHourObject(settings.extended_hours.toLowerCase()),
     name: settings.name,
     macro_strategy: convertStringtoArray(settings.macro_strategy),
     indicator_signalling: convertStringtoArray(settings.indicator_signalling),

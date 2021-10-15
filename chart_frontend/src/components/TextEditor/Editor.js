@@ -141,7 +141,7 @@ export default class TextEditor extends Component {
             label: "equities",
             value: "equities"
           }
-        ]
+        ],
       },
       processConfigSetting: {
         bot_name: '',
@@ -153,7 +153,7 @@ export default class TextEditor extends Component {
         data_source: null,
         live_trading: null,
         starting_cash: 10000,
-        hours: null,
+        extended_hours: null,
         name: '',
         macro_strategy: null,
         indicator_signalling: null,
@@ -265,7 +265,7 @@ export default class TextEditor extends Component {
       },
       {
         label: 'Hours',
-        field: 'extended_hours',
+        field: 'hours',
         sort: false,
         with: 100,
       },
@@ -395,7 +395,7 @@ export default class TextEditor extends Component {
         data_source: bot.data_source,
         live_trading: bot.live_trading,
         starting_cash: bot.starting_cash,
-        hours: bot.hours,
+        hours: bot.extended_hours,
         name: bot.name,
         macro_strategy: bot.macro_strategy,
         indicator_signalling: bot.indicator_signalling,
