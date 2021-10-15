@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { apiGetCollections, apiDeleteCollection, apiExportCollection } from "api/Api"
+import { apiGetCollections, apiDeleteCollection } from "api/Api"
 import { useActiveDatabase } from 'contexts/DBDashboardContext'
 import DBCollection from './Collection';
 import { MDBTable, MDBTableBody, MDBTableHead } from 'mdbreact';
@@ -33,13 +33,6 @@ function DBCollectionList() {
     }
   }
 
-  const exportCollection = (collectionName) => {
-    apiExportCollection(dbName, collectionName).then((response) => {
-      console.log('apiExportCollection::response')
-      console.log(response)
-    })
-  }
-
   let index = 1
 
 
@@ -57,9 +50,8 @@ function DBCollectionList() {
           {isLoading && <Spinner color="info" />}
           {collections && collections.map((collectionName) => {
             return (
-              <DBCollection index={index++} key={collectionName} name={collectionName}
+              <DBCollection index={index++} key={collectionName} dbname={dbName} name={collectionName}
                 onDeleteClick={() => deleteCollection(collectionName)}
-                onSaveClick={() => exportCollection(collectionName)}
               />
             )
           })}
