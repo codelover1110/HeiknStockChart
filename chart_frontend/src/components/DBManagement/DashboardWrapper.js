@@ -32,7 +32,7 @@ const DashboardWrapper = () => {
   return (
     <React.Fragment>
       <AdminNavbar nav="true"/>
-      <div className="wrapper hunter-wrapper">
+      <div className="dashboard-wrapper">
           {!isShowSidebar && (
             <Button
               className ={"show-sidebar-toggle-area show-sidebar-icon"}

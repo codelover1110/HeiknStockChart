@@ -11,7 +11,7 @@ const DBSidebar = () => {
     <>
       <MDBCard style={{backgroundColor: '#343a40'}}>
         <MDBCardHeader>DATABASES</MDBCardHeader>
-        <MDBCardBody style={{ overflowY: 'auto', maxHeight: '45em'}}>
+        <MDBCardBody style={{ overflowY: 'auto'}}>
           <MDBNav>
             <MDBNavItem>
               {isLoading && <Spinner color="info" />}
