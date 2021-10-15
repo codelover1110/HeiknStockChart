@@ -16,7 +16,7 @@ function DBContent(props) {
     <>
       <DBControlBar />
       <MDBCard style={{backgroundColor: colors.lightBlue}}>
-        <MDBCardBody style={{ overflowY: 'auto', maxHeight: '40em'}}>
+        <MDBCardBody style={{ overflowY: 'auto' }}>
           {currentDb && <DBCollectionList />}
           {!currentDb && <DBDatabaseList />}
         </MDBCardBody>
