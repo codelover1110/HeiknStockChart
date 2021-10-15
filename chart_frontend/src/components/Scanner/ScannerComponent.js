@@ -14,6 +14,7 @@ import {
 } from "reactstrap";
 import { useHistory } from "react-router-dom";
 import { MDBDataTableV5 } from 'mdbreact';
+import Pagination from 'react-bootstrap/Pagination'
 import { useAuth } from 'contexts/authContext';
 import { getScannerDetails, getTickerScannerOptions } from 'api/Api'
 import { useCsvDownloadUpdate } from "contexts/CsvDownloadContext";
@@ -30,6 +31,10 @@ const ScannerComponent = () => {
   const [optionsSector, setOptionsSector] = useState([])
   const [optionsIndustry, setOptionsIndustry] = useState([])
   const [scannerData, setScannerData] = useState([])
+
+  const [pageAmount, setPageAmount] = useState(10)
+  const [currentPage, setCurrentPage] = useState(1);
+  const [wholeRows, setWholeRows] = useState(0);
 
   const hearder_columns = useMemo(() => {
     return [
@@ -82,7 +87,7 @@ const ScannerComponent = () => {
 
   useEffect(() => {
     const loadWholeOptions = async () => {
-      const scannerDetails = await getScannerDetails()
+      const scannerDetails = await getScannerDetails('', '', '', currentPage, pageAmount)
 
       if (scannerDetails.length) {
         wrapSetDatatable({
@@ -187,6 +192,26 @@ const ScannerComponent = () => {
     })
   }
 
+  const loadScannerDetails = async () => {
+    const result = await getScannerDetails(exchange ? exchange.value : '', industry ? industry.value : '', sector ? sector.value : '', currentPage, pageAmount)
+
+    wrapSetDatatable({
+      columns: hearder_columns,
+      rows: result.scannerDetails,
+    })
+    setWholeRows(result.page_total)
+  }
+
+  const handlePrevClick = () => {
+    setCurrentPage(currentPage - 1)
+    loadScannerDetails(currentPage - 1)
+  }
+
+  const handleNextClick = () => {
+    setCurrentPage(currentPage + 1)
+    loadScannerDetails(currentPage + 1)
+  }
+
   return (
     <div className="hunter-chart-container">
       <nav className="navbar navbar-expand navbar-dark bg-dark hunter-nav-bar">
@@ -257,7 +282,9 @@ const ScannerComponent = () => {
               placeholder="Industry"
             />
           </div>
-          <ButtonCsvDownload filename={"scanner.csv"}>Csv Download</ButtonCsvDownload>
+          <div className='input-group date hunter-date-time-picker' id='datetimepicker1'>
+            <ButtonCsvDownload filename={"scanner.csv"}>Csv Download</ButtonCsvDownload>
+          </div>
         </div>
         <MDBDataTableV5
           hover
@@ -272,6 +299,14 @@ const ScannerComponent = () => {
           striped={true}
           scrollY={true}
         />;
+        <Pagination>
+          <Pagination.Item>{(currentPage-1)*10 + 1}</Pagination.Item>
+          <Pagination.Item>{(currentPage) * 10}</Pagination.Item>
+          <Pagination.Item> of </Pagination.Item>
+          <Pagination.Item> { wholeRows } </Pagination.Item>
+          <Pagination.Prev disabled={currentPage <= 0} onClick={() => { handlePrevClick() }}/>
+          <Pagination.Next disabled={(currentPage + 1) >= wholeRows / 10} onClick={() => { handleNextClick() }}/>
+        </Pagination>
       </div>
     </div>
   );

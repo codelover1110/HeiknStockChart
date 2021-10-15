@@ -295,7 +295,6 @@ const FloatsComponent = () => {
 
 
   const loadFloatDetails = async (pageNum) => {
-    console.log("pageNum", pageNum)
     const floatDetails = await getFloatsDetails(pageNum, pageAmount)
 
     if (floatDetails) {
@@ -529,8 +528,8 @@ const FloatsComponent = () => {
           </MDBTableBody>
         </MDBTable>
         <Pagination>
-          <Pagination.Item>{currentPage*10}</Pagination.Item>
-          <Pagination.Item>{(currentPage) * 10 + 9}</Pagination.Item>
+          <Pagination.Item>{(currentPage-1)*10 + 1}</Pagination.Item>
+          <Pagination.Item>{(currentPage) * 10}</Pagination.Item>
           <Pagination.Item> of </Pagination.Item>
           <Pagination.Item> { wholeRows } </Pagination.Item>
           <Pagination.Prev disabled={currentPage <= 0} onClick={() => { handlePrevClick() }}/>

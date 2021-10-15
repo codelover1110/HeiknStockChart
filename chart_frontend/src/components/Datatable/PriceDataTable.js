@@ -13,6 +13,7 @@ import {
 } from "reactstrap";
 import { useHistory } from "react-router-dom";
 import { MDBDataTableV5 } from 'mdbreact';
+import Pagination from 'react-bootstrap/Pagination'
 import { useAuth } from 'contexts/authContext';
 import { getAllSymbols, filterPriceData } from 'api/Api'
 import { currentDateString } from 'utils/helper'
@@ -34,6 +35,9 @@ const PriceDataTable = () => {
     { value: "1h", label: "1h" },
     { value: "1d", label: "1d" }
   ])
+  const [pageAmount, setPageAmount] = useState(10)
+  const [currentPage, setCurrentPage] = useState(1);
+  const [wholeRows, setWholeRows] = useState(0);
 
   const hearder_columns = useMemo(() => {
     return [
@@ -88,11 +92,12 @@ const PriceDataTable = () => {
 
   useEffect(() => {
     const getPriceTrades = async (symbol, timeFrame, tradeStartDate, tradeEndDate) => {
-      const trades_data = await filterPriceData(symbol, timeFrame, tradeStartDate, tradeEndDate);
+      const trades_data = await filterPriceData(symbol, timeFrame, tradeStartDate, tradeEndDate, currentPage, pageAmount);
       wrapSetDatatable({
         columns: hearder_columns,
-        rows: trades_data
+        rows: trades_data.candles
       })
+      setWholeRows(trades_data.page_total)
     }
 
     getPriceTrades(symbol.value, timeFrame.value, tradeStartDate, tradeEndDate)
@@ -123,6 +128,25 @@ const PriceDataTable = () => {
   const selectDateRange = (startDate, endDate) => {
     setTradeStartDate(startDate)
     setTradeEndDate(endDate)
+  }
+
+  const loadPriceDetails = async () => {
+    const trades_data = await filterPriceData(symbol.value, timeFrame.value, tradeStartDate, tradeEndDate, currentPage, pageAmount);
+    wrapSetDatatable({
+      columns: hearder_columns,
+      rows: trades_data.candles
+    })
+    setWholeRows(trades_data.page_total)
+  }
+
+  const handlePrevClick = () => {
+    setCurrentPage(currentPage - 1)
+    loadPriceDetails(currentPage - 1)
+  }
+
+  const handleNextClick = () => {
+    setCurrentPage(currentPage + 1)
+    loadPriceDetails(currentPage + 1)
   }
 
   return (
@@ -156,12 +180,6 @@ const PriceDataTable = () => {
                   <p className="d-lg-none">Log out</p>
                 </DropdownToggle>
                 <DropdownMenu className="dropdown-navbar" right tag="ul">
-                  {/* <NavLink tag="li">
-                    <DropdownItem className="nav-item">Profile</DropdownItem>
-                  </NavLink>
-                  <NavLink tag="li">
-                    <DropdownItem className="nav-item">Settings</DropdownItem>
-                  </NavLink> */}
                   <DropdownItem divider tag="li" />
                   <NavLink tag="li">
                     <DropdownItem className="nav-item" onClick={() => {handleSignout()}}>Log out</DropdownItem>
@@ -177,14 +195,6 @@ const PriceDataTable = () => {
           Price Data Table
         </div>
         <div className="hunter-search-filter-area">
-          {/* <div className="select-option">
-            <Select
-              value={selectedSymbolType}
-              onChange={handleSymbolTypeChange}
-              options={optionsSymbolType}
-              placeholder="Select Symbol Type"
-            />
-          </div> */}
           <div className="select-option">
             <Select
               value={symbol}
@@ -223,6 +233,14 @@ const PriceDataTable = () => {
           striped={true}
           scrollY={true}
         />;
+        <Pagination>
+          <Pagination.Item>{(currentPage-1)*10 + 1}</Pagination.Item>
+          <Pagination.Item>{(currentPage) * 10}</Pagination.Item>
+          <Pagination.Item> of </Pagination.Item>
+          <Pagination.Item> { wholeRows } </Pagination.Item>
+          <Pagination.Prev disabled={currentPage <= 0} onClick={() => { handlePrevClick() }}/>
+          <Pagination.Next disabled={(currentPage + 1) >= wholeRows / 10} onClick={() => { handleNextClick() }}/>
+        </Pagination>
       </div>
     </div>
   );

@@ -101,7 +101,7 @@ export const getBacktestingResultReq = async (body) => {
   return await request(req);
 }
 
-export const filterPriceData = async (symbol, timeFrame, tradeStartDate, tradeEndDate) => {
+export const filterPriceData = async (symbol, timeFrame, tradeStartDate, tradeEndDate, currentPage, pageAmount) => {
   const requestOptions = {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
@@ -110,6 +110,8 @@ export const filterPriceData = async (symbol, timeFrame, tradeStartDate, tradeEn
       'time_frame': timeFrame,
       'start': tradeStartDate,
       'end': tradeEndDate,
+      'page_num': currentPage,
+      'page_mounts': pageAmount,
     })
   };
 
@@ -127,11 +129,14 @@ export const filterPriceData = async (symbol, timeFrame, tradeStartDate, tradeEn
           'date': x.date.replace('T', ' '),
         })
       })
-      return candles
+      return {
+        candles,
+        page_total: data.page_total
+      }
     })
 }
 
-export const filterTradesData = async (macroStrategy, microStrategy, tradeStartDate, tradeEndDate) => {
+export const filterTradesData = async (macroStrategy, microStrategy, tradeStartDate, tradeEndDate, currentPage, pageAmount) => {
   const requestOptions = {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
@@ -139,7 +144,9 @@ export const filterTradesData = async (macroStrategy, microStrategy, tradeStartD
       'macroStrategy': macroStrategy,
       'microStrategy': microStrategy,
       'tradeStartDate': tradeStartDate,
-      'tradeEndDate': tradeEndDate
+      'tradeEndDate': tradeEndDate,
+      'page_num': currentPage,
+      'page_mounts': pageAmount,
     })
   };
 
@@ -157,7 +164,10 @@ export const filterTradesData = async (macroStrategy, microStrategy, tradeStartD
           'price': x.price
         })
       })
-      return trades_data
+      return {
+        trades_data,
+        page_total: data.page_total
+      }
     })
 }
 
@@ -779,7 +789,7 @@ export const getScannerViewData = async (chart_number) => {
   }
 }
 
-export const getScannerDetails = async (exchange='', industry='', sector='') => {
+export const getScannerDetails = async (exchange='', industry='', sector='', currentPage, pageAmount) => {
 
   const requestOptions = {
     method: 'POST',
@@ -787,7 +797,9 @@ export const getScannerDetails = async (exchange='', industry='', sector='') => 
     body: JSON.stringify({
       'exchange': exchange,
       'industry': industry,
-      'sector': sector
+      'sector': sector,
+      'page_num': currentPage,
+      'page_mounts': pageAmount,
     })
   };
 
@@ -1113,6 +1125,30 @@ export const apiExportCollection = async(dbName, collectionName) => {
           a.download = `${dbName}_${collectionName}.csv`;
           a.click();
         })
+      })
+  } catch (e) {
+    return {
+      success: false,
+      message: e
+    }
+  }
+}
+
+export const getWatchListAll = async () => {
+  const requestOptions = {
+    method: 'GET',
+    headers: {'Content-Type': 'application/json'},
+  };
+
+  const apiURL = '/scanner/watchlists_all/'
+  try {
+    return await fetch(process.env.REACT_APP_BACKEND_URL + apiURL, requestOptions)
+    .then(response => response.json())
+    .then(data => {
+        return {
+          success: true,
+          result: data.result,
+        }
       })
   } catch (e) {
     return {
