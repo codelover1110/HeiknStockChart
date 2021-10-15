@@ -268,7 +268,7 @@ if __name__ == "__main__":
                 time.sleep(5)
                 proc_time += 5
 
-        time.sleep(10)
+        time.sleep(3600)
     for thrd in thread_list:
         thrd.stop()
 
