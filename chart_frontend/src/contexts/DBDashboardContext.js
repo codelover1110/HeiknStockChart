@@ -7,7 +7,12 @@ export const DBDashboardUpdateContext = React.createContext()
 export const DBDashboardLoadingContext = React.createContext()
 export const DBDatabaseExportContext = React.createContext()
 export const DBDatabaseDeleteContext = React.createContext()
+export const DBBackupContext = React.createContext()
 
+
+export function useBackupStatus() {
+  return useContext(DBBackupContext)
+}
 
 export function useDBDashboard() {
   return useContext(DBDashboardContext)
@@ -39,6 +44,7 @@ export const useDeleteDatabase = () => {
 export function DBDashboardProvider({children}) {
   const [isLoading, setLoading] = useState(false)
   const [databases, setDatabases] = useState([])
+  const [isBackupRunning, setBackupRunning] = useState(false)
 
   useEffect(() => {
     setLoading(true)
@@ -69,24 +75,27 @@ export function DBDashboardProvider({children}) {
   }
 
   const exportDatabase = (databaseName) => {
-
+    setBackupRunning(true)
     apiExportDatabase(databaseName).then((response) => {
       console.log('apiExportDatabase::response')
       console.log(response)
+      setBackupRunning(false)
     })
   }
 
   return (
     <DBDashboardLoadingContext.Provider value={isLoading}>
-      <DBDashboardContext.Provider value={databases}>
-        <DBDashboardUpdateContext.Provider value={updateDatabases}>
-          <DBDatabaseExportContext.Provider value={exportDatabase}>
-            <DBDatabaseDeleteContext.Provider value={deleteDatabase}>
-              {children}
-            </DBDatabaseDeleteContext.Provider>
-          </DBDatabaseExportContext.Provider>
-        </DBDashboardUpdateContext.Provider>
-      </DBDashboardContext.Provider>
+      <DBBackupContext.Provider value={isBackupRunning}>
+        <DBDashboardContext.Provider value={databases}>
+          <DBDashboardUpdateContext.Provider value={updateDatabases}>
+            <DBDatabaseExportContext.Provider value={exportDatabase}>
+              <DBDatabaseDeleteContext.Provider value={deleteDatabase}>
+                {children}
+              </DBDatabaseDeleteContext.Provider>
+            </DBDatabaseExportContext.Provider>
+          </DBDashboardUpdateContext.Provider>
+        </DBDashboardContext.Provider>
+      </DBBackupContext.Provider>
     </DBDashboardLoadingContext.Provider>
   )
 }
