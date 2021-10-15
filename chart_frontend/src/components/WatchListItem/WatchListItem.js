@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Button } from 'reactstrap'
 import Modal from 'react-bootstrap/Modal'
 import BarChart from 'components/FinancialDashboard/SmallBarChart';
@@ -7,11 +7,12 @@ import WatchListEditColumnWidget from 'components/WatchListEditColumnWidget/Watc
 import './WatchListItem.css'
 import Select from 'react-select'
 import {
-  getMultiFinancials, getScannerViewData, saveScannerView
+  getMultiFinancials, getScannerViewData, saveScannerView, getWatchListAll
 } from 'api/Api';
 
 const WatchListItem = (props) => {
   const { allViewData, setAllViewData } = props;
+  const [isLoadedWatchListOptions, setIsLoadedWatchListOptions] = useState(true)
   const [isConnected, setIsConnected] = useState(false)
   const [selectedColumns, setSelectedColumns] = useState(
     [
@@ -54,28 +55,8 @@ const WatchListItem = (props) => {
   const [isLoading, setIsLoading] = useState(false);
   const [ws, setWs] = useState(null);
   const [isOpenedEditColumnWidget, setIsOpenedEditColumnWidget] = useState(false)
-  const [selectedWatchList, setSelectedWatchList] = useState({
-    value: 'tech',
-    label: 'tech'
-  })
-  const [selectedWatchListOptions] = useState([
-    {
-      value: 'crypto',
-      label: 'crypto'
-    },
-    {
-      value: 'buffett',
-      label: 'buffett'
-    },
-    {
-      value: 'tech',
-      label: 'tech'
-    },
-    {
-      value: 'tech2',
-      label: 'tech2'
-    }
-  ])
+  const [selectedWatchList, setSelectedWatchList] = useState(null)
+  const [selectedWatchListOptions, setSelectedWatchListOptions] = useState([])
   const [selectedAggregationType, setSelectedAggregationType] = useState('QA');
   const [isUpdatedCols, setIsUpdatedCols] = useState(false)
   const [columnItems, setColumnItems] = useState([])
@@ -152,6 +133,24 @@ const WatchListItem = (props) => {
     setIsOpenedEditColumnWidget(false)
   }
 
+  const loadWatchListOptions = ( useCallback( async() => {
+    try {
+      const data = await getWatchListAll()
+      const result = data.result.map((o) => ({
+        value: o.name,
+        label: o.name
+      }))
+      setSelectedWatchListOptions(result)
+      setSelectedWatchList(result[0])
+    } catch (e) {
+      console.log(e)
+    }
+  }, []))
+  useEffect(() => {
+    loadWatchListOptions()
+    setIsLoadedWatchListOptions(true)
+  }, [])
+
   useEffect(() => {
     const getScannerAvailableFields = async () => {
       const result = await getScannerViewData(props.chart_number)
@@ -178,10 +177,12 @@ const WatchListItem = (props) => {
         }
       }
     }
-    
-    getScannerAvailableFields()
 
-  }, [])
+    if (isLoadedWatchListOptions) {
+      getScannerAvailableFields()
+    }
+  
+  }, [isLoadedWatchListOptions])
 
   useEffect(() => {
     const loadRows = async () => {
@@ -236,8 +237,10 @@ const WatchListItem = (props) => {
         console.log(error)
       }
     }
-    setIsLoading(1);
-    loadRows();
+    if (selectedWatchList) {
+      setIsLoading(1);
+      loadRows();
+    }
   }, [selectedWatchList])
 
   useEffect(() => {

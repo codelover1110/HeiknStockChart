@@ -13,6 +13,7 @@ import {
 } from "reactstrap";
 import { useHistory } from "react-router-dom";
 import { MDBDataTableV5 } from 'mdbreact';
+import Pagination from 'react-bootstrap/Pagination'
 import { useAuth } from 'contexts/authContext';
 import { getAllSymbols, filterTradesData } from 'api/Api'
 import { currentDateString } from 'utils/helper'
@@ -29,6 +30,10 @@ const TradeDataTable = () => {
   const [tradeStartDate, setTradeStartDate] = useState('2021-01-01')
   const [tradeEndDate, setTradeEndDate] = useState(currentDateString())
   const [strategyList, setStrategyList] = useState([]);
+
+  const [pageAmount, setPageAmount] = useState(10)
+  const [currentPage, setCurrentPage] = useState(1);
+  const [wholeRows, setWholeRows] = useState(0);
 
   const [optionsStrategy, setOptionsStrategy] = useState([])
   const [optionsMacroStrategy, setOptionsMacroStrategy] = useState([])
@@ -134,18 +139,19 @@ const TradeDataTable = () => {
   }, [getStrategyList])
 
   useEffect(() => {
-    const get_trades = async (macroStrat, microStrat, tradeStartDate, tradeEndDate) => {
-      const trades_data = await filterTradesData(macroStrat, microStrat, tradeStartDate, tradeEndDate);
+    const get_trades = async (macroStrat, microStrat, tradeStartDate, tradeEndDate, currentPage, pageAmount) => {
+      const result = await filterTradesData(macroStrat, microStrat, tradeStartDate, tradeEndDate, currentPage, pageAmount);
       wrapSetDatatable({
         columns: hearder_columns,
-        rows: trades_data
+        rows: result.trades_data
       })
+      setWholeRows(result.page_total)
     }
 
     get_trades(
       macroStrategy ? macroStrategy.value : '',
       microStrategy ? microStrategy.value : '',
-      tradeStartDate, tradeEndDate)
+      tradeStartDate, tradeEndDate, currentPage, pageAmount)
   }, [macroStrategy, microStrategy, hearder_columns, tradeStartDate, tradeEndDate])
 
   useEffect(() => {
@@ -204,6 +210,28 @@ const TradeDataTable = () => {
   const selectDateRange = (startDate, endDate) => {
     setTradeStartDate(startDate)
     setTradeEndDate(endDate)
+  }
+
+  const loadPriceDetails = async () => {
+    const result = await filterTradesData(macroStrategy ? macroStrategy.value : '',
+    microStrategy ? microStrategy.value : '',
+    tradeStartDate, tradeEndDate, currentPage, pageAmount);
+    wrapSetDatatable({
+      columns: hearder_columns,
+      rows: result.trades_data
+    })
+    
+    setWholeRows(result.page_total)
+  }
+
+  const handlePrevClick = () => {
+    setCurrentPage(currentPage - 1)
+    loadPriceDetails(currentPage - 1)
+  }
+
+  const handleNextClick = () => {
+    setCurrentPage(currentPage + 1)
+    loadPriceDetails(currentPage + 1)
   }
 
   return (
@@ -303,6 +331,14 @@ const TradeDataTable = () => {
           striped={true}
           scrollY={true}
         />;
+        <Pagination>
+          <Pagination.Item>{(currentPage-1)*10 + 1}</Pagination.Item>
+          <Pagination.Item>{(currentPage) * 10}</Pagination.Item>
+          <Pagination.Item> of </Pagination.Item>
+          <Pagination.Item> { wholeRows } </Pagination.Item>
+          <Pagination.Prev disabled={currentPage <= 0} onClick={() => { handlePrevClick() }}/>
+          <Pagination.Next disabled={(currentPage + 1) >= wholeRows / 10} onClick={() => { handleNextClick() }}/>
+        </Pagination>
       </div>
     </div>
   );

@@ -304,6 +304,7 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
 .hunter-search-filter-area {
   display: flex;
   width: 100%;
+  align-items: center;
 }
 
 .hunter-search-filter-area .select-option {
@@ -315,7 +316,7 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
   margin-right: 30px;
   color: #FFFFFF;
   display: flex;
-  align-items: center;
+  /* align-items: center; */
 }
 
 .hunter-date-time-picker .hunter-input {
@@ -758,4 +759,8 @@ pre {
 
 .hunter-csv-download-button {
   height: 38px
+}
+
+.mdb-dataTables_paginate, .mdb-datatable-entries, .datatable-select, .mdb-datatable-info {
+  display: none !important;
 }

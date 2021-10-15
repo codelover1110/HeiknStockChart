@@ -70,7 +70,7 @@ const PasswordResetConfirm = () => {
           />
         </div>
         <div className="form-group">
-          <label>ConfirmPassword</label>
+          <label>Confirm Password</label>
           <input
             type="password"
             className="form-control hunter-form-control"
@@ -79,20 +79,20 @@ const PasswordResetConfirm = () => {
             onChange={(e) => { handlePassword2Change(e)}}
           />
         </div>
-          <button
-            className="btn btn-dark btn-lg btn-block hunter-signin-button"
-            onClick={handlePasswordResetConfirm}
-          >
-            {isLoading && (
-                <span className="spinner-border spinner-border-sm hunter-spinner-button" role="status" aria-hidden="true"></span>
-            )}
-            Reset
-          </button>
-          <div className="form-group">
-            <p className="sign-up-area text-right">
-              <a href="/signin">Sign In?</a>
-            </p>
-          </div>
+        <button
+          className="btn btn-dark btn-lg btn-block hunter-signin-button"
+          onClick={handlePasswordResetConfirm}
+        >
+          {isLoading && (
+              <span className="spinner-border spinner-border-sm hunter-spinner-button" role="status" aria-hidden="true"></span>
+          )}
+          Reset
+        </button>
+        <div className="form-group">
+          <p className="sign-up-area text-right">
+            <a href="/signin">Sign In?</a>
+          </p>
+        </div>
       </div>
       {error !== -1 && 
         <div class="alert alert-primary" role="alert">
