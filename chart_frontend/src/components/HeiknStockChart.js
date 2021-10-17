@@ -5,6 +5,7 @@ import "react-datetime/css/react-datetime.css";
 import StockChart from "./stock-chart/StockChart"
 import { useHistory } from "react-router-dom";
 import {
+  Button,
   Collapse,
   DropdownToggle,
   DropdownMenu,
@@ -28,7 +29,6 @@ const HeiknStockChart = (props) => {
   const [collapseOpen,] = React.useState(false)
   const [chartColumn, setChartColumn] = useState({ value: 6, label: '6' })
   const [selectedViewType, setSelectedViewType] = useState({ value: 'charting', label: 'Charting' });
-  // const [microStrategy, setMicroStrategy] = useState({ value: '2m', label: '2m' });
   const [microStrategy, setMicroStrategy] = useState(null);
   const [strategy, setStrategy] = useState(null);//{ value: 'heikfilter', label: 'heikfilter' }
   const [strategyList, setStrategyList] = useState([]);
@@ -291,6 +291,7 @@ const HeiknStockChart = (props) => {
                 label: o,
               }
             })
+            
             setSymbolList(symbolOptions)
             setSymbol(symbolOptions[0])
             // setSymbol({value: 'MSFT', label: 'MSFT'})
@@ -483,6 +484,10 @@ const HeiknStockChart = (props) => {
     )
   }
 
+  const handleAssetClassClick = () => {
+    return
+  }
+
   return (
     <div className="hunter-chart-container">
       <nav className="navbar navbar-expand navbar-dark bg-dark hunter-nav-bar">
@@ -563,6 +568,17 @@ const HeiknStockChart = (props) => {
                 options={optionsColumn}
                 placeholder="Columns"
               />
+            </div>
+            <div className="select-option">
+              <Button
+                variant="secondary"
+                className="btn-md"
+                onClick = {() => {
+                  handleAssetClassClick()
+                }}
+              >
+                asset class
+              </Button>
             </div>
           </div>
         )}

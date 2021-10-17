@@ -520,6 +520,22 @@ export const getConfigFileList = async (collection) => {
     })
 }
 
+export const getBotConfigFileList = async (collection) => {
+  const requestOptions = {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      config_collection: collection,
+    })
+  };
+  
+  return await fetch(process.env.REACT_APP_BACKEND_URL + "/strategy/config_detail_names/", requestOptions)
+    .then(response => response.json())
+    .then(data => {
+      return data
+    })
+}
+
 export const getConfigFileDetail = async (collection, name) => {
   const requestOptions = {
     method: 'POST',
@@ -809,7 +825,7 @@ export const getScannerDetails = async (exchange='', industry='', sector='', cur
     return await fetch(process.env.REACT_APP_BACKEND_URL + apiURL, requestOptions)
     .then(response => response.json())
     .then(data => {
-      return data.result
+      return data
     })
   } catch (e) {
     return {
