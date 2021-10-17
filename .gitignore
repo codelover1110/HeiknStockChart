@@ -8,4 +8,5 @@ __pycache__/
 
 chart_frontend/.env
 chart_frontend/yarn.lock
+chart_frontend/package-lock.json
 chart_frontend/build/
