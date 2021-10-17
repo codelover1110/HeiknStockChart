@@ -13,6 +13,7 @@ import {
   saveScriptFile,
   getConfigFileList,
   getBotConfigList,
+  getBotConfigFileList,
   updateBotStatus
 } from "api/Api";
 import {
@@ -143,6 +144,15 @@ export default class TextEditor extends Component {
           }
         ],
       },
+      botConfigOptions: {
+        bot_name_config: '',
+        extended_hours_config: [
+          {value: true, label: 'true'},
+          {value: false, label: 'false'}
+        ],
+        macro_strategy_config: [],
+        start_date_config: ''
+      },
       processConfigSetting: {
         bot_name: '',
         timeframe: null,
@@ -159,7 +169,14 @@ export default class TextEditor extends Component {
         indicator_signalling: null,
         asset_class: null,
       },
+      botConfigSetting: {
+        bot_name_config: '',
+        extended_hours_config: null,
+        macro_strategy_config: null,
+        start_date_config: ''
+      },
       selectedConfigFile: null,
+      selectedBotConfigFile: null,
       selectedModuleContents: [],
       filename: '',
       file:[],
@@ -170,6 +187,7 @@ export default class TextEditor extends Component {
       isShowSaveModal: false,
       isCheckedStrategy: false,
       isShowConfigOpenModal: false,
+      isShowBotConfigOpenModal: false,
       strategyIndicators: [],
     headerColumnsBotStatus: [
       {
@@ -310,6 +328,7 @@ export default class TextEditor extends Component {
   async componentDidMount () {
     this.loadModuleTypes()  
     this.loadConfigFiles()
+    this.loadBotConfigFiles()
     this.loadBotStatusList()
     this.loadBotConfigList()
   }
@@ -327,6 +346,24 @@ export default class TextEditor extends Component {
       this.setState({
         configFileOptions: configFiles,
         selectedConfigFile: configFiles[0],
+        isUpdate: true,
+      })
+    }
+  }
+  
+  loadBotConfigFiles = async () => {
+    const res = await getBotConfigFileList('bot_configs');
+    if (res.success) {
+      const configFiles = res.result.map(value => {
+        return {
+          value: value,
+          label: value
+        }
+      })
+
+      this.setState({
+        botConfigFileOptions: configFiles,
+        selectedBotConfigFile: configFiles[0],
         isUpdate: true,
       })
     }
@@ -530,6 +567,13 @@ export default class TextEditor extends Component {
       isUpdate: true
     })
   }
+
+  handleBotConfigModal = async () => {
+    this.setState({
+      isShowBotConfigOpenModal: true,
+      isUpdate: true
+    })
+  }
   
   handleFileTypeChange = async (e) => {
     this.setState({
@@ -548,6 +592,13 @@ export default class TextEditor extends Component {
   handleConfigFileChange = async (e) => {
     this.setState({
       selectedConfigFile: e,
+      isUpdate: true,
+    })
+  }
+  
+  handleBotConfigFileChange = async (e) => {
+    this.setState({
+      selectedBotConfigFile: e,
       isUpdate: true,
     })
   }
@@ -605,8 +656,12 @@ export default class TextEditor extends Component {
     this.setState({isShowSaveModal: true})
   }
   
-  ProcessConfigModalClose = () => {
+  processConfigModalClose = () => {
     this.setState({isShowConfigOpenModal: false})
+  }
+  
+  botConfigModalClose = () => {
+    this.setState({isShowBotConfigOpenModal: false})
   }
 
   OpenScriptModalClose = () => {
@@ -639,11 +694,28 @@ export default class TextEditor extends Component {
 
   handleConfigFileOpen = async () => {
     const res = await getConfigFileDetail('bot_configs', this.state.selectedConfigFile.value)
+
     this.setState({
       processConfigSetting: res,
       isUpdate: true
     })
-    this.ProcessConfigModalClose()
+    this.processConfigModalClose()
+  }
+  
+  handleBotConfigFileOpen = async () => {
+    const res = await getConfigFileDetail('bot_configs', this.state.selectedConfigFile.value)
+
+    this.setState({
+      botConfigSetting: {
+        bot_name_config: res.bot_name,
+        macro_strategy_config: res.macro_strategy,
+        start_date_config: res.start_date_config,
+        extended_hours_config: res.extended_hours,
+      },
+      isUpdate: true
+    })
+
+    this.botConfigModalClose()
   }
 
   handleSave = (content) => {
@@ -661,6 +733,26 @@ export default class TextEditor extends Component {
     }
     const res = await saveConfigFile(
       this.state.processConfigSetting,
+      this.state.isUpdate,
+    )
+
+    if (res.success) {
+      alert(res.message)
+    } else {
+      alert('The config is not saved')
+    }
+
+    this.loadConfigFiles()
+    this.loadBotConfigList()
+  }
+  
+  handleBotConfigSettingSave = async () => {
+    if (!this.state.botConfigSetting.name.length) {
+      alert("name field is required!")
+      return
+    }
+    const res = await saveConfigFile(
+      this.state.botConfigSetting,
       this.state.isUpdate,
     )
 
@@ -708,9 +800,20 @@ export default class TextEditor extends Component {
     this.setState({processConfigSetting: this.state.processConfigSetting})
   }
   
+  
   handleProcessChange = (e, key) => {
     this.state.processConfigSetting[key] = e
     this.setState({processConfigSetting: this.state.processConfigSetting})
+  }
+  
+  handleBotConfigBotNameChange = (e, key) => {
+    this.state.botConfigSetting[key] = e.target.value
+    this.setState({botConfigSetting: this.state.botConfigSetting})
+  }
+
+  handleBotConfigInputChange = (e, key) => {
+    this.state.botConfigSetting[key] = e.target.value
+    this.setState({botConfigSetting: this.state.botConfigSetting})
   }
 
   displayProcessEditor = () => {
@@ -756,6 +859,50 @@ export default class TextEditor extends Component {
       )
     })
   }
+  
+  displayBotConfigEditor = () => {
+    let keys = Object.keys(this.state.botConfigOptions);
+    return keys.map((key, index) => {
+      return (
+        <li key={key} className="list-group-item strategy-indicator-edit-list">
+          <div className="strategy-indicator-edit-list-no display-flex-j-c">
+            <MDBBtn tag="a" size="sm">
+              {index}
+            </MDBBtn>
+          </div>
+          <div className="strategy-indicator-edit-list-content ml-30">
+            <MDBBtn tag="a" size="sm"  className="hunter-process-mdb-btn">
+              {key}
+            </MDBBtn>
+          </div>
+          <div className="strategy-indicator-edit-list-action">
+          { key === 'bot_name'|| key === 'start_date' || key === 'bot_name_config'|| key === 'start_date_config'
+            ? 
+            (
+              <input
+                  type="name"
+                  className="form-control hunter-bot-name-input"
+                  placeholder= {
+                    key === 'bot_name' ? "Enter bot name" : key === 'name' ? "Enter name": key === 'bot_name_config' ? "Enter bot name" : "Enter start date"
+                  }
+                  value={this.state.botConfigSetting[key]}
+                  onChange={(e) => { this.handleBotConfigBotNameChange(e, key)}}
+              />
+            )
+            :
+            (<Select
+              value={this.state.botConfigSetting[key]}
+              onChange={(e) => { this.handleBotConfigInputChange(e, key) }}
+              options={this.state.botConfigOptions[key]}
+              placeholder="select"
+              isMulti
+            />)
+          }
+          </div>
+        </li>
+      )
+    })
+  }
 
   handleIndicatorReset = () => {
     this.setState(
@@ -775,6 +922,19 @@ export default class TextEditor extends Component {
           macro_strategy: null,
           indicator_signalling: null,
           asset_class: null,
+        }
+      }
+    )
+  }
+  
+  handleBotConfigReset = () => {
+    this.setState(
+      { 
+        botConfigSetting: {
+          bot_name_config: '',
+          hours: null,
+          macro_strategy: null,
+          start_date: '',
         }
       }
     )
@@ -817,6 +977,18 @@ export default class TextEditor extends Component {
                   <button className="btn btn-md btn-secondary mr-10" onClick={()=>this.handleIndicatorReset()}>Reset</button>
                   <button className="btn btn-md btn-secondary mr-10" onClick={()=>this.handleOpenProcessConfigModal()}>Open</button>
                   <button className="btn btn-md btn-secondary mr-10" onClick={()=>this.handleProcessConfigSettingSave()}>Save</button>
+                </div>
+              </div>
+            </Tab>
+            <Tab eventKey="bot_config_editor" title="Bot Config Editor">
+              <div className={"strategy-indicator-edit-area"}>
+                <ul className="list-group">
+                  {this.displayBotConfigEditor()}
+                </ul>
+                <div className="strategy-edit-icon-area">
+                  <button className="btn btn-md btn-secondary mr-10" onClick={()=>this.handleBotConfigReset()}>Reset</button>
+                  <button className="btn btn-md btn-secondary mr-10" onClick={()=>this.handleBotConfigModal()}>Open</button>
+                  <button className="btn btn-md btn-secondary mr-10" onClick={()=>this.handleBotConfigSettingSave()}>Save</button>
                 </div>
               </div>
             </Tab>
@@ -892,7 +1064,7 @@ export default class TextEditor extends Component {
               </Button>
             </Modal.Footer>
           </Modal>
-          <Modal show={this.state.isShowConfigOpenModal} className="hunter-modal" onHide={this.ProcessConfigModalClose}>
+          <Modal show={this.state.isShowConfigOpenModal} className="hunter-modal" onHide={this.processConfigModalClose}>
             <Modal.Header closeButton>
               <Modal.Title>Open Script File</Modal.Title>
             </Modal.Header>
@@ -923,6 +1095,37 @@ export default class TextEditor extends Component {
               </Button>
             </Modal.Footer>
           </Modal>
+          <Modal show={this.state.isShowBotConfigOpenModal} className="hunter-modal" onHide={this.botConfigModalClose}>
+            <Modal.Header closeButton>
+              <Modal.Title>Open Bot Config File</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <div className="hunter-select-module-area">
+                <div className="select-multi-option">
+                  <label>Select Bot Config File</label>
+                  <Select
+                    className="hunter-module-type-select"
+                    name="select-config-file"
+                    placeholder="Config File"
+                    value={this.state.selectedBotConfigFile}
+                    onChange={this.handleBotConfigFileChange}
+                    options={this.state.botConfigFileOptions}
+                  />
+                </div>
+              </div>
+            </Modal.Body>
+            <Modal.Footer className="hunter-modal-footer">
+              <Button
+                variant="primary"
+                className="btn-md"
+                onClick = {() => {
+                  this.handleBotConfigFileOpen()
+                }}
+              >
+                Open
+              </Button>
+            </Modal.Footer>
+          </Modal>
           <Modal show={this.state.isShowSaveModal} className="hunter-modal" onHide={this.SaveScriptModalClose}>
             <Modal.Header closeButton>
               <Modal.Title>Save Script File</Modal.Title>
@@ -930,13 +1133,13 @@ export default class TextEditor extends Component {
             <Modal.Body>
               <div className="hunter-form-group">
                 <input
-                    type="text"
-                    className="form-control hunter-form-control"
-                    placeholder="script file name"
-                    value={
-                      this.state.filename
-                    }
-                    onChange={(e) => { this.handleScriptFileNameChange(e)}}
+                  type="text"
+                  className="form-control hunter-form-control"
+                  placeholder="script file name"
+                  value={
+                    this.state.filename
+                  }
+                  onChange={(e) => { this.handleScriptFileNameChange(e)}}
                 />
               </div>
             </Modal.Body>

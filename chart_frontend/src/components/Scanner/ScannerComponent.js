@@ -89,11 +89,12 @@ const ScannerComponent = () => {
     const loadWholeOptions = async () => {
       const scannerDetails = await getScannerDetails('', '', '', currentPage, pageAmount)
 
-      if (scannerDetails.length) {
+      if (scannerDetails.success) {
         wrapSetDatatable({
           columns: hearder_columns,
-          rows: scannerDetails,
+          rows: scannerDetails.result,
         })
+        setWholeRows(scannerDetails.page_total)
       }
 
       const scannerOptions = await getTickerScannerOptions()
@@ -158,26 +159,28 @@ const ScannerComponent = () => {
   const handleSectorChange = async (e) => {
     setSector(e)
 
-    const scannerDetails = await getScannerDetails(exchange ? exchange.value : '', industry ? industry.value : '', e.value)
-
-    if (scannerDetails.length) {
+    const scannerDetails = await getScannerDetails(exchange ? exchange.value : '', industry ? industry.value : '', e.value, currentPage, pageAmount)
+    
+    if (scannerDetails.success) {
       wrapSetDatatable({
         columns: hearder_columns,
-        rows: scannerDetails,
+        rows: scannerDetails.result,
       })
+      setWholeRows(scannerDetails.page_total)
     }
   }
 
   const handleExchangeChange = async (e) => {
     setExchange(e)
 
-    const scannerDetails = await getScannerDetails(e.value, industry ? industry.value : '', sector ? sector.value : '')
+    const scannerDetails = await getScannerDetails(exchange ? exchange.value : '', industry ? industry.value : '', e.value, currentPage, pageAmount)
 
-    if (scannerDetails.length) {
+    if (scannerDetails.success) {
       wrapSetDatatable({
         columns: hearder_columns,
-        rows: scannerDetails,
+        rows: scannerDetails.result,
       })
+      setWholeRows(scannerDetails.page_total)
     }
   }
 
@@ -188,18 +191,18 @@ const ScannerComponent = () => {
 
     wrapSetDatatable({
       columns: hearder_columns,
-      rows: scannerDetails,
+      rows: scannerDetails.result,
     })
   }
 
   const loadScannerDetails = async () => {
-    const result = await getScannerDetails(exchange ? exchange.value : '', industry ? industry.value : '', sector ? sector.value : '', currentPage, pageAmount)
+    const scannerDetails = await getScannerDetails(exchange ? exchange.value : '', industry ? industry.value : '', sector ? sector.value : '', currentPage, pageAmount)
 
     wrapSetDatatable({
       columns: hearder_columns,
-      rows: result.scannerDetails,
+      rows: scannerDetails.result,
     })
-    setWholeRows(result.page_total)
+    setWholeRows(scannerDetails.page_total)
   }
 
   const handlePrevClick = () => {

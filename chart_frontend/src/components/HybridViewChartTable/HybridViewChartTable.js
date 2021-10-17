@@ -16,13 +16,14 @@ import {
 import { useAuth } from 'contexts/authContext';
 import disableScroll from 'disable-scroll';
 import HybridViewTable from "./HybridViewTable";
-import { getSymbolsByMicroStrategy } from 'api/Api';
+import { getSymbolsByMicroStrategy, getStrategyListReq } from 'api/Api';
 
 const HybridViewChartTable = (props) => {
 
   const auth = useAuth();
   const { selectedInstance } = props
   const history = useHistory();
+  const [isLoaded, setIsLoaded] = useState(false)
   const [symbol, setSymbol] = useState(null);//{ value: 'MSFT', label: 'MSFT' }
   const [indicators, setIndicators] = useState([]);
   const [isShowMicro, setIsShowMicro] = useState(true);
@@ -80,46 +81,51 @@ const HybridViewChartTable = (props) => {
   ]);
 
   const getStrategyList = useCallback(
-    () => {
-      fetch(process.env.REACT_APP_BACKEND_URL + "/api/get_strategy_list")
-        .then(response => response.json())
-        .then(data => {
-          setStrategyList(data.result);
-          const strategyOptions = data.result.map((o => {
-            return {
-              value: o.macro,
-              label: o.macro,
-            }
-          }))
-          setOptionsStrategy(strategyOptions);
-          setStrategy(strategyOptions[0]);
-          if (data.result.length) {
-            data.result.forEach((item) => {
-              const microStrategyOptions = item.micro.map(o => {
+    async () => {
+      setIsLoaded(false)
+      const strategyListRes = await getStrategyListReq();
+      if (strategyListRes.success) {
+        const data = strategyListRes.data;
+        setStrategyList(data.result);
+        const strategyOptions = data.result.map((o => {
+          return {
+            value: o.macro,
+            label: o.macro,
+          }
+        }))
+        setOptionsStrategy(strategyOptions);
+        setStrategy(strategyOptions[0]);
+        if (data.result.length) {
+          let flag = true
+          let item = data.result[0]
+          if (flag) {
+            const microStrategyOptions = item.micro.map(o => {
+              return {
+                value: o,
+                label: o,
+              }
+            })
+            
+            setOptionsMicroStrategy( microStrategyOptions )
+            setMicroStrategy(microStrategyOptions[0])
+
+            const result = await getSymbolsByMicroStrategy(strategyOptions[0].value, microStrategyOptions[0].value)
+            if (result.success) {
+              const symbolOptions = result.data.map(o => {
                 return {
                   value: o,
                   label: o,
                 }
               })
-              setOptionsMicroStrategy( microStrategyOptions )
-              setMicroStrategy(microStrategyOptions[0])
-
-              const result = getSymbolsByMicroStrategy(strategyOptions[0].value, microStrategyOptions[0].value)
               
-              if (result.success) {
-                const symbolOptions = result.data.map(o => {
-                  return {
-                    value: o,
-                    label: o,
-                  }
-                })
-                
-                setSymbolList(symbolOptions)
-                setSymbol(symbolOptions[0])
-              }
-            })
+              setSymbolList(symbolOptions)
+              setSymbol(symbolOptions[0])
+              setIsLoaded(true)
+            }
           }
-        })   
+          flag = false
+        }
+      }
     },
     [],
   )
@@ -157,7 +163,7 @@ const HybridViewChartTable = (props) => {
     return () => {
       disableScroll.off();
     }
-  }, [getStrategyList, user])
+  }, [user])
   
   useEffect(() => {
     const handleInstanceChange = (value) => {
@@ -295,91 +301,6 @@ const HybridViewChartTable = (props) => {
             />
           )}
         </div>
-        <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          {microStrategy && symbol && (
-            < StockChart 
-            extendMarketTime={extendMarketTime.value}
-            selectedInstance={selectedInstance}
-            selectedTradeDB='heikfilter-12mins-trades'
-            chartPeriod='20D 12min'
-            symbol={symbol.value}
-            indicators={indicators}
-            strategy={strategy}
-            isHomePage={true}
-            chartColumn={1}
-            microStrategy={microStrategy.value}
-            startDate={null}
-            endDate={null}
-          />)}
-        </div>
-        <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          {microStrategy && symbol && (
-            < StockChart
-              extendMarketTime={extendMarketTime.value}
-              selectedInstance={selectedInstance}
-              selectedTradeDB='heikfilter-1hour-trades'
-              chartPeriod='30D 1hour'
-              symbol={symbol.value}
-              indicators={indicators}
-              strategy={strategy}
-              isHomePage={true}
-              chartColumn={1}
-              microStrategy={microStrategy.value}
-              startDate={null}
-              endDate={null}
-            />)}
-        </div>
-        <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          {microStrategy && symbol && (
-            < StockChart
-              extendMarketTime={extendMarketTime.value}
-              selectedInstance={selectedInstance}
-              selectedTradeDB='heikfilter-4hours-trades'
-              chartPeriod='90D 4hour'
-              symbol={symbol.value}
-              indicators={indicators}
-              strategy={strategy}
-              isHomePage={true}
-              chartColumn={1}
-              microStrategy={microStrategy.value}
-              startDate={null}
-              endDate={null}
-            />)}
-        </div>
-        <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          {microStrategy && symbol && (
-            < StockChart
-              extendMarketTime={extendMarketTime.value}
-              selectedInstance={selectedInstance}
-              selectedTradeDB='heikfilter-12hours-trades'
-              chartPeriod='90D 12hour'
-              symbol={symbol.value}
-              indicators={indicators}
-              strategy={strategy}
-              isHomePage={true}
-              chartColumn={1}
-              microStrategy={microStrategy.value}
-              startDate={null}
-              endDate={null}
-            />)}
-        </div>
-        <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          {microStrategy && symbol && (
-          < StockChart
-            extendMarketTime={extendMarketTime.value}
-            selectedInstance={selectedInstance}
-            selectedTradeDB='heikfilter-1day-trades'
-            chartPeriod='1Y 1day'
-            symbol={symbol.value}
-            indicators={indicators}
-            strategy={strategy}
-            isHomePage={true}
-            chartColumn={1}
-            microStrategy={microStrategy.value}
-            startDate={null}
-            endDate={null}
-          />)}
-        </div>
       </div>
     )
   }
@@ -480,7 +401,9 @@ const HybridViewChartTable = (props) => {
             symbol={symbol}
             macroStrategy={strategy}
             microStrategy={microStrategy}
+            isLoaded={isLoaded}
           />
+          
         </div>
       </div>
     </div>

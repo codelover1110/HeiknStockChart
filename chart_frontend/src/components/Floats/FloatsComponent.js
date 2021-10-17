@@ -30,7 +30,7 @@ const FloatsComponent = () => {
   const [industry, setIndustry] = useState(null);
   const [scannerData, setScannerData] = useState([])
   const [pageAmount, setPageAmount] = useState(10)
-  const [currentPage, setCurrentPage] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
   const [wholeRows, setWholeRows] = useState(0);
   const [optionsExchange, setOptionsExchanges] = useState([])
   const [optionsSector, setOptionsSector] = useState([])

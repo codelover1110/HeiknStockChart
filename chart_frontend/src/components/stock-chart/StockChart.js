@@ -160,7 +160,7 @@ const StockChart = (props) => {
   return (
   <>
     {
-      chartData == null ? <div>Loading...</div> :
+      chartData == null ? <div className="hunter-loadding-status-text">Loading...</div> :
       <>
         <div className="select-wrape">
           <div>
