@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { MDBTable, MDBTableBody, MDBTableHead } from 'mdbreact';
 import { useCsvDownloadUpdate } from 'contexts/CsvDownloadContext';
+import { useDatatableLoading, useDatatable } from "contexts/DatatableContext";
+import Spinner from "components/Spinner"
 
 const FinancialDataTable = (props) => {
   const { data, selectedStockType, selectedAggregationType } = props;
@@ -8,6 +10,7 @@ const FinancialDataTable = (props) => {
   const [datatable, setDatatable] = useState();
   const [sorted, setSorted] = useState(0);
 
+  const [isLoadingData, setLoadingData] = useDatatableLoading()
   const updateCsvDownload = useCsvDownloadUpdate();
 
   const wrapSetDatatable = (data) => {
@@ -155,7 +158,8 @@ const FinancialDataTable = (props) => {
   return (
     <div className="hunter-chart-container">
       <div className="col-sm-12 hunter-data-table-container financial-data-table">
-        {datatable && (
+        {isLoadingData && <Spinner>Loading</Spinner>}
+        {!isLoadingData && datatable && (
           <MDBTable
             hover
             dark={true}

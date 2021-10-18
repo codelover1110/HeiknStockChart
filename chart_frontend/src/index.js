@@ -35,6 +35,7 @@ import MarketWatch from 'layouts/User/MarketWatch'
 import Scanner from 'layouts/User/Scanner'
 import Optimization from 'layouts/User/Optimization'
 import DBManagementDashboardWrapper from './components/DBManagement/DashboardWrapper'
+import { DatatableProvider } from "contexts/DatatableContext";
 
 ReactDOM.render(
   <ThemeContextWrapper>
@@ -60,7 +61,9 @@ ReactDOM.render(
               <FileManager/>
             </PrivateRoute>
             <PrivateRoute path="/floats">
-              <Floats />
+              <DatatableProvider>
+                <Floats />
+              </DatatableProvider>
             </PrivateRoute>
             <PrivateRoute path="/market_watch">
               <MarketWatch />
@@ -72,16 +75,22 @@ ReactDOM.render(
               <PriceData />
             </PrivateRoute>
             <PrivateRoute path="/tradedatatable">
-              <TradeData />
+              <DatatableProvider>
+                <TradeData />
+              </DatatableProvider>
             </PrivateRoute>
             <PrivateRoute path="/hybrid_view">
               <HybridView />
             </PrivateRoute>
             <PrivateRoute path="/financial_data">
-              <FinancialDashboard />
+              <DatatableProvider>
+                <FinancialDashboard />
+              </DatatableProvider>
             </PrivateRoute>
             <PrivateRoute path="/scanner">
-              <Scanner />
+              <DatatableProvider>
+                <Scanner />
+              </DatatableProvider>
             </PrivateRoute>
             <PrivateRoute path="/db_management">
               <DBManagementDashboardWrapper />

@@ -15,7 +15,6 @@ const Header = (props) => {
   };
 
   const csvData = useCsvDownload()
-  console.log('csvData', csvData)
 
   return (
     <div className="container custom-container">
