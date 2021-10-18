@@ -45,7 +45,7 @@ export function DBDashboardProvider({children}) {
   const [isLoading, setLoading] = useState(false)
   const [databases, setDatabases] = useState([])
   const [isBackupRunning, setBackupRunning] = useState(false)
-  const [isClickedStopBackup, setClickedStopBackup] = useState(false)
+  const [currentBackupId, setCurrentBackupId] = useState(false)
 
   useEffect(() => {
     setLoading(true)
@@ -79,23 +79,24 @@ export function DBDashboardProvider({children}) {
     setBackupRunning(true)
     apiCreateBackup(databaseName)
       .then(data => {
+        setCurrentBackupId(data.id)
+
         // execute backup
         apiExecuteBackup(data).then(data => {
           setBackupRunning(false)
         })
 
-        // handle stop backup
-        if (isClickedStopBackup) {
-          apiStopBackup(data).then(data => {
-            setBackupRunning(false)
-            setClickedStopBackup(false)
-          })
-        }
       })
   }
 
   const stopExportDatabase = () => {
-    alert('stop me')
+    setBackupRunning(false)
+    if (currentBackupId) {
+      apiStopBackup({'id':currentBackupId}).then(data => {
+        setBackupRunning(false)
+        setCurrentBackupId(false)
+      })
+    }
   }
 
   return (
@@ -103,7 +104,7 @@ export function DBDashboardProvider({children}) {
       <DBBackupContext.Provider value={isBackupRunning}>
         <DBDashboardContext.Provider value={databases}>
           <DBDashboardUpdateContext.Provider value={updateDatabases}>
-            <DBDatabaseExportContext.Provider value={{'exportDatabase':exportDatabase,'stopExportDatabase':stopExportDatabase}}>
+            <DBDatabaseExportContext.Provider value={[exportDatabase, stopExportDatabase]}>
               <DBDatabaseDeleteContext.Provider value={deleteDatabase}>
                 {children}
               </DBDatabaseDeleteContext.Provider>

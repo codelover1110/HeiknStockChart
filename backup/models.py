@@ -1,8 +1,8 @@
 from django.db import models
 
 class BackupProgress(models.Model):
-    target = models.CharField(max_length=256, default='')
-    target_type = models.CharField(max_length=256, default='collection')
+    database = models.CharField(max_length=256, default='')
+    collection = models.CharField(max_length=256, default='')
     status = models.CharField(max_length=256, default='')
     current = models.IntegerField(default=0)
     total = models.IntegerField(default=0)
@@ -10,6 +10,13 @@ class BackupProgress(models.Model):
 
     def json(self):
       return {
-        'id': self.id,
-        'target': self.target
+        'id': str(self.id),
+        'database': self.database,
+        'collection': self.collection,
       }
+
+    def is_database(self):
+      return not self.collection
+
+    def is_collection(self):
+      return self.collection

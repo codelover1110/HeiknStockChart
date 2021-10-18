@@ -9,13 +9,15 @@ export default function DBDatabaseActions() {
   const colors = useThemeColors()
 
   const handleDelete = useDeleteDatabase()
-  const {handleBackup, stopBackup} = useExportDatabase()
+  const [handleBackup, stopBackup] = useExportDatabase()
   const isBackupRunning = useBackupStatus()
 
   return (
     <>
       {dbName &&
       <div class="d-flex">
+        <MDBBtn color="white" onClick={(e) => {e.preventDefault(); stopBackup(); }}>Stop Backup</MDBBtn>
+
         <MDBBtn color="white" onClick={(e) => {e.preventDefault(); handleDelete(dbName); }}><MDBIcon icon="trash" style={{color: colors.white}} /></MDBBtn>
         <MDBBtn disabled={isBackupRunning} className="d-flex flex-nowrap align-items-center" color="primary" onClick={(e) => {e.preventDefault(); handleBackup(dbName); }}>
           <MDBIcon icon="file-export" style={{color: colors.white}} /> <span class="ml-1">Backup</span>

@@ -7,8 +7,8 @@ urlpatterns = [
     url(r'^api/get_databases$', views.get_databases),
     url(r'^api/get_collections$', views.get_collections),
     url(r'^api/delete_collection$', views.delete_collection),
-    url(r'^api/export_database$', views.export_database),
-    url(r'^api/export_collection$', views.export_collection),
+    # url(r'^api/export_database$', views.export_database),
+    # url(r'^api/export_collection$', views.export_collection),
 
 
     url(r'^api/create_backup$', views.create_backup),
