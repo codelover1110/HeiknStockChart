@@ -26,8 +26,11 @@ SECRET_KEY = 'django-insecure-ucgiq635)vr6lch3k3m=_@$c_0ymj_+j4f59yfz6*nbf7b_2h4
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# SECURE_SSL_REDIRECT = True
+# SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+
 CORS_ORIGIN_WHITELIST = (
     'http://localhost:3000',
     'http://localhost:8081',
@@ -53,7 +56,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
-    'backup.apps.BackupConfig',
     'chartApis.apps.ChartapisConfig',
     'corsheaders',
     'codes',
@@ -64,7 +66,8 @@ INSTALLED_APPS = [
     'financials',
     'scanner',
     'floats',
-    'crispy_forms',
+    'crispy_forms', 
+    'sslserver',
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -75,7 +78,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',    
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -116,7 +119,7 @@ WSGI_APPLICATION = 'backtestingApp.wsgi.application'
 # }
 
 DATABASES = {
-#   'default': {
+#   'default': {  
 #     'ENGINE':   'djongo',
 #     'NAME':     'test',
 #     'CLIENT': {
@@ -124,7 +127,7 @@ DATABASES = {
 #       'port': 27017,
 #       'username': 'hunter',
 #       'password': 'STOCKdb123',
-#     }
+#     } 
 #   },
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
