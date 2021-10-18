@@ -2,14 +2,13 @@ import { MDBBtn, MDBIcon } from 'mdbreact'
 import React from 'react'
 import {useThemeColors} from 'contexts/ThemeContext'
 import { useActiveDatabase, useBackupStatus, useDeleteDatabase, useExportDatabase } from 'contexts/DBDashboardContext'
-import Spinner from 'components/Spinner'
 
 export default function DBDatabaseActions() {
   const dbName = useActiveDatabase()
   const colors = useThemeColors()
 
   const handleDelete = useDeleteDatabase()
-  const handleBackup = useExportDatabase()
+  const [handleBackup, ] = useExportDatabase()
   const isBackupRunning = useBackupStatus()
 
   return (

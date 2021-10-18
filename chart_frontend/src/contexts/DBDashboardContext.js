@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useContext} from 'react'
 import { useLocation, useHistory } from "react-router-dom";
-import { apiGetDatabases, apiDeleteDatabase, apiExportDatabase } from "api/Api"
+import { apiGetDatabases, apiDeleteDatabase, apiCreateBackup, apiExecuteBackup, apiStopBackup } from "api/Api"
 
 export const DBDashboardContext = React.createContext()
 export const DBDashboardUpdateContext = React.createContext()
@@ -45,6 +45,7 @@ export function DBDashboardProvider({children}) {
   const [isLoading, setLoading] = useState(false)
   const [databases, setDatabases] = useState([])
   const [isBackupRunning, setBackupRunning] = useState(false)
+  const [currentBackupId, setCurrentBackupId] = useState(false)
 
   useEffect(() => {
     setLoading(true)
@@ -74,13 +75,28 @@ export function DBDashboardProvider({children}) {
     }
   }
 
-  const exportDatabase = (databaseName) => {
+  const exportDatabase = (databaseName, collectionName='') => {
     setBackupRunning(true)
-    apiExportDatabase(databaseName).then((response) => {
-      console.log('apiExportDatabase::response')
-      console.log(response)
-      setBackupRunning(false)
-    })
+    apiCreateBackup(databaseName, collectionName)
+      .then(data => {
+        setCurrentBackupId(data.id)
+
+        // execute backup
+        apiExecuteBackup(data).then(data => {
+          setBackupRunning(false)
+        })
+
+      })
+  }
+
+  const stopExportDatabase = () => {
+    setBackupRunning(false)
+    if (currentBackupId) {
+      apiStopBackup({'id':currentBackupId}).then(data => {
+        setBackupRunning(false)
+        setCurrentBackupId(false)
+      })
+    }
   }
 
   return (
@@ -88,7 +104,7 @@ export function DBDashboardProvider({children}) {
       <DBBackupContext.Provider value={isBackupRunning}>
         <DBDashboardContext.Provider value={databases}>
           <DBDashboardUpdateContext.Provider value={updateDatabases}>
-            <DBDatabaseExportContext.Provider value={exportDatabase}>
+            <DBDatabaseExportContext.Provider value={[exportDatabase, stopExportDatabase]}>
               <DBDatabaseDeleteContext.Provider value={deleteDatabase}>
                 {children}
               </DBDatabaseDeleteContext.Provider>

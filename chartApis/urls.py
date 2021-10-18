@@ -7,8 +7,13 @@ urlpatterns = [
     url(r'^api/get_databases$', views.get_databases),
     url(r'^api/get_collections$', views.get_collections),
     url(r'^api/delete_collection$', views.delete_collection),
-    url(r'^api/export_database$', views.export_database),
-    url(r'^api/export_collection$', views.export_collection),
+    # url(r'^api/export_database$', views.export_database),
+    # url(r'^api/export_collection$', views.export_collection),
+
+
+    url(r'^api/create_backup$', views.create_backup),
+    url(r'^api/execute_backup$', views.execute_backup),
+    url(r'^api/stop_backup$', views.stop_backup),
 
 
     url(r'^api/tables$', views.get_table_list),

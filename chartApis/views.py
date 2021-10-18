@@ -10,6 +10,10 @@ from wsgiref.util import FileWrapper
 from rest_framework.parsers import JSONParser
 from rest_framework import status
 
+from backup.models import BackupProgress
+from django.core import serializers
+
+
 from ib_insync import *
 import numpy as np
 import pandas as pd
@@ -37,8 +41,10 @@ from .models import (
             api_get_collections,
             api_delete_database,
             api_delete_collection,
-            api_export_database,
-            api_export_collection,
+            # api_export_database,
+            # api_export_collection,
+            api_create_backup,
+            api_execute_backup,
             )
 
 from .common import (
@@ -132,7 +138,7 @@ def get_table_candles(request):
         try:
             page_num = request_data['page_num']
             page_mounts = request_data['page_mounts']
-            candles, page_total = get_symbol_candles(symbol, start_date, end_date, time_frame, page_num, page_mounts)    
+            candles, page_total = get_symbol_candles(symbol, start_date, end_date, time_frame, page_num, page_mounts)
         except:
             candles, page_total = get_symbol_candles(symbol, start_date, end_date, time_frame)
         return JsonResponse({"candles": candles, "page_total": page_total}, status=status.HTTP_201_CREATED)
@@ -312,34 +318,91 @@ def delete_collection(request):
     return JsonResponse({'success': True, 'data': result}, status=status.HTTP_201_CREATED)
 
 
+# @csrf_exempt
+# def export_database(request):
+#     print(" ++++++ API: api_export_database ++++++")
+#     db_name = request.GET['db_name']
+#     result = api_export_database(db_name)
+
+
+#     # filelike = StringIO("This is an example file-like object"*10)
+#     response = HttpResponse(result, content_type='application/csv')
+#     response['Content-Disposition'] = 'attachment; filename="%s"' % 'hoangxuanhao.csv'
+
+#     return response
+
+#     # return JsonResponse({'success': True, 'data': result}, status=status.HTTP_201_CREATED)
+
+
+# @csrf_exempt
+# def export_collection(request):
+#     print(" ++++++ API: api_export_collection ++++++")
+#     db_name = request.GET['db_name']
+#     collection_name = request.GET['collection_name']
+#     result = api_export_collection(db_name, collection_name)
+
+#     # filelike = StringIO("This is an example file-like object"*10)
+#     response = HttpResponse(result, content_type='application/csv')
+#     response['Content-Disposition'] = 'attachment; filename="%s"' % 'hoangxuanhao.csv'
+
+#     return response
+
+
 @csrf_exempt
-def export_database(request):
-    print(" ++++++ API: api_export_database ++++++")
+def create_backup(request):
+    print(" ++++++ API: api_create_backup ++++++")
     db_name = request.GET['db_name']
-    result = api_export_database(db_name)
+    collection_name = ''
+    if 'collection_name' in request.GET:
+        collection_name = request.GET['collection_name']
+
+    print(db_name, collection_name)
+    backup = api_create_backup(db_name, collection_name)
+    result = backup.json()
+
+    return JsonResponse({'success': True, 'data': result}, status=status.HTTP_201_CREATED)
 
 
-    # filelike = StringIO("This is an example file-like object"*10)
-    response = HttpResponse(result, content_type='application/csv')
+@csrf_exempt
+def execute_backup(request):
+    print(" ++++++ API: api_execute_backup ++++++")
+    backup_id = request.GET['backup_id']
+
+    backup = BackupProgress.objects.get(pk=backup_id)
+    print(backup.json())
+
+    counter = 0
+    def check_stopping(collection, document):
+        nonlocal counter, backup
+        counter = counter + 1
+        if counter % 100 == 0:
+            refresh_backup = BackupProgress.objects.get(pk=backup_id)
+            if refresh_backup.status == 'stop':
+                return True
+        return False
+
+    fileData = api_execute_backup(backup, check_stopping)
+    if not fileData:
+        backup.delete()
+        return JsonResponse({'success': False, 'data': {}}, status=status.HTTP_201_CREATED)
+
+    response = HttpResponse(fileData, content_type='application/csv')
     response['Content-Disposition'] = 'attachment; filename="%s"' % 'hoangxuanhao.csv'
+
+    backup.delete()
 
     return response
 
-    # return JsonResponse({'success': True, 'data': result}, status=status.HTTP_201_CREATED)
-
-
 @csrf_exempt
-def export_collection(request):
-    print(" ++++++ API: api_export_collection ++++++")
-    db_name = request.GET['db_name']
-    collection_name = request.GET['collection_name']
-    result = api_export_collection(db_name, collection_name)
+def stop_backup(request):
+    print(" ++++++ API: api_execute_backup ++++++")
+    backup_id = request.GET['backup_id']
 
-    # filelike = StringIO("This is an example file-like object"*10)
-    response = HttpResponse(result, content_type='application/csv')
-    response['Content-Disposition'] = 'attachment; filename="%s"' % 'hoangxuanhao.csv'
+    backup = BackupProgress.objects.get(pk=backup_id)
+    backup.status = 'stop'
+    backup.save()
 
-    return response
+    return JsonResponse({'success': True, 'data': backup.json()}, status=status.HTTP_201_CREATED)
 
 
 def index(request):
