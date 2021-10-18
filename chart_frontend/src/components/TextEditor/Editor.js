@@ -4,7 +4,7 @@ import Select from 'react-select'
 import { Editor } from "react-draft-wysiwyg";
 import { EditorState, convertToRaw ,convertFromHTML,ContentState} from "draft-js";
 import draftToHtml from "draftjs-to-html";
-import { 
+import {
   getBotStatusList,
   getConfigFileDetail,
   getModuleTypeNames,
@@ -306,13 +306,50 @@ export default class TextEditor extends Component {
         with: 100,
       }
     ],
+    headerColumnsBotConfig1: [
+      {
+        label: 'ID',
+        field: 'id',
+        wdith: 100,
+        attributes: {
+          'aria-controls': 'DataTable',
+          'aria-label': 'ID',
+        },
+      },
+      {
+        label: 'BOT NAME',
+        field: 'name',
+        width: 150,
+      },
+      {
+        label: 'Macro Strategy',
+        field: 'macro_strategy',
+        sort: false,
+        with: 50,
+      },
+      {
+        label: 'Extended Hours',
+        field: 'extended_hours',
+        with: 50,
+      },
+      {
+        label: 'Start Date',
+        field: 'update_date',
+        sort: false,
+        with: 300,
+      },
+    ],
       botStatusDatatable: {
         columns: [],
-        rows: [],    
+        rows: [],
       },
       botConfigDatatable: {
         columns: [],
-        rows: [],    
+        rows: [],
+      },
+      botConfigDatatable1: {
+        columns: [],
+        rows: [],
       }
     };
   }
@@ -326,13 +363,13 @@ export default class TextEditor extends Component {
   }
 
   async componentDidMount () {
-    this.loadModuleTypes()  
+    this.loadModuleTypes()
     this.loadConfigFiles()
     this.loadBotConfigFiles()
     this.loadBotStatusList()
     this.loadBotConfigList()
   }
-  
+
   loadConfigFiles = async () => {
     const res = await getConfigFileList('bot_configs');
     if (res.success) {
@@ -350,7 +387,7 @@ export default class TextEditor extends Component {
       })
     }
   }
-  
+
   loadBotConfigFiles = async () => {
     const res = await getBotConfigFileList('bot_configs');
     if (res.success) {
@@ -373,7 +410,7 @@ export default class TextEditor extends Component {
     const res = await updateBotStatus(bot.name, action)
     alert(res.message)
     await this.loadBotStatusList()
-  } 
+  }
 
   loadBotStatusList = async () => {
     const res = await getBotStatusList();
@@ -417,7 +454,7 @@ export default class TextEditor extends Component {
       })
     }
   }
-  
+
   loadBotConfigList = async () => {
     const res = await getBotConfigList();
     if (res.result) {
@@ -439,7 +476,7 @@ export default class TextEditor extends Component {
         asset_class: bot.asset_class,
       }))
       const data = {
-        columns: this.state.headerColumnsBotConfig.map((col, index) => { 
+        columns: this.state.headerColumnsBotConfig.map((col, index) => {
           if (index === 0) {
             col.width = 50;
           } else if (index === 1) {
@@ -455,11 +492,43 @@ export default class TextEditor extends Component {
         }),
         rows: botConfigList
       }
+
+      const botConfigList1 = res.result.map((bot, index) => ({
+        id: index + 1,
+        name: bot.name,
+        bot_name: bot.bot_name,
+        macro_strategy: bot.macro_strategy,
+        extended_hours: bot.extended_hours,
+        update_date: bot.update_date,
+        asset_class: bot.asset_class,
+      }))
+      const data1= {
+        columns: this.state.headerColumnsBotConfig1.map((col, index) => {
+          if (index === 0) {
+            col.width = 50;
+          } else if (index === 1) {
+            col.width = 150;
+          } else if (index === 2) {
+            col.width = 100;
+          } else if (index === 3) {
+            col.width = 100;
+          } else if ((index === 4) || (index === 5) || (index === 6) || (index === 7) || (index === 8) || (index === 9)) {
+            col.width = 250;
+          } else if ((index === 10) || (index === 11) || (index === 12) || (index === 13)) {
+            col.width = 200;
+          }
+          return col;
+        }),
+        rows: botConfigList1
+      }
+
       this.setState({
-        botConfigDatatable: data
+        botConfigDatatable: data,
+        botConfigDatatable1: data1,
       })
     }
   }
+
 
   loadModuleTypes = async () => {
     const res = await getModuleTypeNames();
@@ -553,12 +622,12 @@ export default class TextEditor extends Component {
       editorState: EditorState.createEmpty(),
     })
   }
-  
+
   handleOpenScriptFile = async () => {
     this.setState({
       isShowOpenModal: true,
       isUpdate: true,
-    })    
+    })
   }
 
   handleOpenProcessConfigModal = async () => {
@@ -574,14 +643,14 @@ export default class TextEditor extends Component {
       isUpdate: true
     })
   }
-  
+
   handleFileTypeChange = async (e) => {
     this.setState({
       selectedFileType: e,
       isUpdate: true,
     })
   }
-  
+
   handleFile1TypeChange = async (e) => {
     this.setState({
       selectedFile1Type: e,
@@ -595,7 +664,7 @@ export default class TextEditor extends Component {
       isUpdate: true,
     })
   }
-  
+
   handleBotConfigFileChange = async (e) => {
     this.setState({
       selectedBotConfigFile: e,
@@ -626,7 +695,7 @@ export default class TextEditor extends Component {
       })
     }
   }
-  
+
   handleModule1TypeChange = async (e) => {
     this.setState({
       selectedModule1Type: e,
@@ -655,11 +724,11 @@ export default class TextEditor extends Component {
   handleSaveModalShow = async () => {
     this.setState({isShowSaveModal: true})
   }
-  
+
   processConfigModalClose = () => {
     this.setState({isShowConfigOpenModal: false})
   }
-  
+
   botConfigModalClose = () => {
     this.setState({isShowBotConfigOpenModal: false})
   }
@@ -667,11 +736,11 @@ export default class TextEditor extends Component {
   OpenScriptModalClose = () => {
     this.setState({isShowOpenModal: false})
   }
-  
+
   AddIndicatorModalClose = () => {
     this.setState({ isShowAddIndicatorModal: false })
   }
-  
+
   SaveScriptModalClose = () => {
     this.setState({isShowSaveModal: false})
   }
@@ -701,7 +770,7 @@ export default class TextEditor extends Component {
     })
     this.processConfigModalClose()
   }
-  
+
   handleBotConfigFileOpen = async () => {
     const res = await getConfigFileDetail('bot_configs', this.state.selectedConfigFile.value)
 
@@ -725,7 +794,7 @@ export default class TextEditor extends Component {
     })
     this.handleSaveModalShow()
   }
-  
+
   handleProcessConfigSettingSave = async () => {
     if (!this.state.processConfigSetting.name.length) {
       alert("name field is required!")
@@ -745,7 +814,7 @@ export default class TextEditor extends Component {
     this.loadConfigFiles()
     this.loadBotConfigList()
   }
-  
+
   handleBotConfigSettingSave = async () => {
     if (!this.state.botConfigSetting.name.length) {
       alert("name field is required!")
@@ -771,7 +840,7 @@ export default class TextEditor extends Component {
     e.preventDefault()
     let currFile=e.target.files[0]
     const reader = new FileReader()
-    reader.onload = async (e) => { 
+    reader.onload = async (e) => {
       const text = (e.target.result)
       const blocksFromHTML = convertFromHTML(text);
       const state= ContentState.createFromBlockArray(
@@ -799,13 +868,13 @@ export default class TextEditor extends Component {
     this.state.processConfigSetting[key] = e.target.value
     this.setState({processConfigSetting: this.state.processConfigSetting})
   }
-  
-  
+
+
   handleProcessChange = (e, key) => {
     this.state.processConfigSetting[key] = e
     this.setState({processConfigSetting: this.state.processConfigSetting})
   }
-  
+
   handleBotConfigBotNameChange = (e, key) => {
     this.state.botConfigSetting[key] = e.target.value
     this.setState({botConfigSetting: this.state.botConfigSetting})
@@ -833,7 +902,7 @@ export default class TextEditor extends Component {
           </div>
           <div className="strategy-indicator-edit-list-action">
           { key === 'bot_name' || key === 'name' || key === 'starting_cash'
-            ? 
+            ?
             (
               <input
                   type="name"
@@ -859,7 +928,7 @@ export default class TextEditor extends Component {
       )
     })
   }
-  
+
   displayBotConfigEditor = () => {
     let keys = Object.keys(this.state.botConfigOptions);
     return keys.map((key, index) => {
@@ -877,7 +946,7 @@ export default class TextEditor extends Component {
           </div>
           <div className="strategy-indicator-edit-list-action">
           { key === 'bot_name'|| key === 'start_date' || key === 'bot_name_config'|| key === 'start_date_config'
-            ? 
+            ?
             (
               <input
                   type="name"
@@ -906,7 +975,7 @@ export default class TextEditor extends Component {
 
   handleIndicatorReset = () => {
     this.setState(
-      { 
+      {
         processConfigSetting: {
           bot_name: '',
           timeframe: null,
@@ -926,10 +995,10 @@ export default class TextEditor extends Component {
       }
     )
   }
-  
+
   handleBotConfigReset = () => {
     this.setState(
-      { 
+      {
         botConfigSetting: {
           bot_name_config: '',
           hours: null,
@@ -944,7 +1013,7 @@ export default class TextEditor extends Component {
     const { editorState } = this.state;
     return (
       <React.Fragment>
-        <div className="hunter-textedit-container" > 
+        <div className="hunter-textedit-container" >
           <Tabs
             id="controlled-tab-example"
             activeKey={this.state.key}
@@ -993,7 +1062,7 @@ export default class TextEditor extends Component {
               </div>
             </Tab>
             <Tab eventKey="bot-status-manager" title="Bot Status Manager">
-            <MDBDataTableV5 
+            <MDBDataTableV5
               hover
               maxHeight="500px"
               entriesOptions={[10, 25, 50, 100]}
@@ -1008,13 +1077,28 @@ export default class TextEditor extends Component {
             />;
             </Tab>
             <Tab eventKey="bot-config-manager" title="Bot Config Manager">
-              <MDBDataTableV5 
+              <MDBDataTableV5
                 hover
                 maxHeight="500px"
                 entriesOptions={[10, 25, 50, 100]}
                 entries={10}
                 pagesAmount={4}
                 data={this.state.botConfigDatatable}
+                noBottomColumns={true}
+                small={true}
+                sortable={false}
+                striped={true}
+                scrollX
+              />;
+            </Tab>
+            <Tab eventKey="bot-config-manager1" title="Bot Config Manager1">
+              <MDBDataTableV5
+                hover
+                maxHeight="500px"
+                entriesOptions={[10, 25, 50, 100]}
+                entries={10}
+                pagesAmount={4}
+                data={this.state.botConfigDatatable1}
                 noBottomColumns={true}
                 small={true}
                 sortable={false}
