@@ -11,6 +11,7 @@ function DBCollectionList() {
 
   const [isLoading, setLoading] = useState(true)
 
+
   useEffect(() => {
     setLoading(true)
     setCollections([])
@@ -32,6 +33,7 @@ function DBCollectionList() {
       })
     }
   }
+
 
   let index = 1
 

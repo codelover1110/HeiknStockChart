@@ -5,7 +5,7 @@ import tempfile
 import pandas
 from wsgiref.util import FileWrapper
 from zipfile import ZipFile
-
+from backup.models import BackupProgress
 
 from Having_system.Update_candles.define import INDICATORS_COL_NAME, PARAMETERS_DB
 from .utils import define_start_date, check_candle_in_maket_time
@@ -303,7 +303,7 @@ def get_table_list_db(strategy_name):
     return tables_name
 
 #######################################
-### get candles for specific symbol ### 
+### get candles for specific symbol ###
 #######################################
 def get_symbol_candles(symbol, start_date, end_date, time_frame, page_num=0, page_mounts=0):
     masterdb = azuremongo[STOCK_MARKET_DATA_ALL]
@@ -313,7 +313,7 @@ def get_symbol_candles(symbol, start_date, end_date, time_frame, page_num=0, pag
         db_collection = masterdb['backtest_1_hour']
     elif time_frame == '1d':
         db_collection = masterdb['backtest_1_day']
-    else: 
+    else:
         return []
 
     cur_date = datetime.now().date()
@@ -401,54 +401,130 @@ def api_delete_database(db_name):
     db.drop()
     return True
 
-def api_export_database(db_name):
-    print('api_export_database', db_name)
+# def api_export_database(db_name):
+#     print('api_export_database', db_name)
 
-    collections = api_get_collections(db_name)
-    tempdir = tempfile.mkdtemp()
+#     collections = api_get_collections(db_name)
+#     tempdir = tempfile.mkdtemp()
 
-    target_zipfile = tempdir + '/' + db_name + '.zip'
-    print('Target Zip file: ', target_zipfile)
-    zipObj = ZipFile(target_zipfile, 'w')
+#     target_zipfile = tempdir + '/' + db_name + '.zip'
+#     print('Target Zip file: ', target_zipfile)
+#     zipObj = ZipFile(target_zipfile, 'w')
 
 
-    for collection_name in collections:
-        csv_file_path = tempdir + '/' + collection_name + '.csv'
-        print(csv_file_path)
-        dataframe = get_csv_collection(db_name, collection_name)
-        dataframe.to_csv(csv_file_path)
+#     for collection_name in collections:
+#         csv_file_path = tempdir + '/' + collection_name + '.csv'
+#         print(csv_file_path)
+#         dataframe = get_csv_collection(db_name, collection_name)
+#         dataframe.to_csv(csv_file_path)
 
-        zipObj.write(csv_file_path)
+#         zipObj.write(csv_file_path)
 
-    zipObj.close()
+#     zipObj.close()
 
-    zipfile = open(target_zipfile, 'rb')
+#     zipfile = open(target_zipfile, 'rb')
 
-    return FileWrapper(zipfile)
+#     return FileWrapper(zipfile)
 
-def api_export_collection(db_name, collection_name):
-    print('++++ api_export_collection +++ ', db_name, collection_name)
-    docs = get_csv_collection(db_name, collection_name)
-    csv_export = docs.to_csv(sep=",")
-    return csv_export
+# def api_export_collection(db_name, collection_name):
+#     print('++++ api_export_collection +++ ', db_name, collection_name)
+#     docs = get_csv_collection(db_name, collection_name)
+#     csv_export = docs.to_csv(sep=",")
+#     return csv_export
 
-def get_csv_collection(db_name, collection_name):
-    db = azuremongo[db_name]
+def get_csv_collection(backup, collection_name, check_stopping):
+    print ("Generating CSV.. from ", backup.database, collection_name)
+    db = azuremongo[backup.database]
     collection = db[collection_name]
 
     cursor = collection.find()
     mongo_docs = list(cursor)
 
-    series_obj = pandas.Series({"a key":"a value"})
-    print ("series_obj:", type(series_obj))
+    series_obj = pandas.Series([])
 
     docs = pandas.DataFrame(columns=[])
     for num, doc in enumerate( mongo_docs ):
         doc["_id"] = str(doc["_id"])
         doc_id = doc["_id"]
 
-        print('Process csv data', db_name, collection_name, doc_id)
+        if check_stopping(collection_name, doc_id):
+            return False
+
+        # print('Process csv data', backup.database, collection_name, doc_id)
         series_obj = pandas.Series( doc, name=doc_id )
         docs = docs.append( series_obj )
 
     return docs
+
+
+def count_total_collection(db_name, collection_name):
+    if not collection_name:
+        total = count_total_database_record(db_name)
+    else:
+        total = count_total_collection_record(db_name, collection_name)
+    return total
+
+
+def count_total_database_record(db_name):
+    total = 0
+    collections = api_get_collections(db_name)
+    for collection_name in collections:
+        total = total + count_total_collection_record(db_name, collection_name)
+
+    return total
+
+def count_total_collection_record(db_name, collection_name):
+    db = azuremongo[db_name]
+    collection = db[collection_name]
+    return collection.find().count()
+
+def api_create_backup(db_name, collection_name):
+    backup = BackupProgress()
+
+
+    backup.database = db_name
+    backup.collection = collection_name
+    backup.status = 'generated'
+    backup.current = 0
+    backup.total = count_total_collection(db_name, collection_name)
+    backup.save()
+
+    return backup
+
+
+def api_execute_backup(backup, check_stopping = None):
+    db_name = backup.database
+
+    if backup.is_database():
+        print('++++ api_execute_backup: database +++ ', db_name)
+        collections = api_get_collections(db_name)
+        tempdir = tempfile.mkdtemp()
+
+        target_zipfile = tempdir + '/' + db_name + '.zip'
+        print('Target Zip file: ', target_zipfile)
+        zipObj = ZipFile(target_zipfile, 'w')
+
+
+        for collection_name in collections:
+            csv_file_path = tempdir + '/' + collection_name + '.csv'
+            print(csv_file_path)
+            dataframe = get_csv_collection(backup, collection_name, check_stopping)
+            if isinstance(dataframe, bool):
+                zipObj.close()
+                return False
+            dataframe.to_csv(csv_file_path)
+            zipObj.write(csv_file_path)
+
+
+        zipObj.close()
+
+        zipfile = open(target_zipfile, 'rb')
+
+        return FileWrapper(zipfile)
+    else:
+        print('++++ api_execute_backup +++ ', backup.database, backup.collection)
+        docs = get_csv_collection(backup, backup.collection, check_stopping)
+        if isinstance(docs, bool):
+            return False
+        csv_export = docs.to_csv(sep=",")
+        return csv_export

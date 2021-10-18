@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { MDBLink, MDBIcon } from 'mdbreact';
 import { useThemeColors } from 'contexts/ThemeContext'
-import { apiExportCollection } from "api/Api"
+import { useBackupStatus, useExportDatabase } from 'contexts/DBDashboardContext'
 
 function DBCollection(props) {
   const colors = useThemeColors()
@@ -21,16 +21,8 @@ function DBCollection(props) {
     backgroundColor: colors.white,
   }
 
-  const [isBackupRunning, setBackupRunning] = useState(false)
-
-  const exportCollection = () => {
-    setBackupRunning(true)
-    apiExportCollection(dbName, collectionName).then((response) => {
-      console.log('apiExportCollection::response')
-      console.log(response)
-      setBackupRunning(false)
-    })
-  }
+  const isBackupRunning = useBackupStatus()
+  const [handleBackup, ] = useExportDatabase()
 
 
   return (
@@ -41,7 +33,7 @@ function DBCollection(props) {
         <td>
           <div class="d-flex align-items-center">
             <MDBLink disabled={isBackupRunning} onClick={(e) => {e.preventDefault(); props.onDeleteClick(); }} style={{...buttonStyle, color: colors.red}}><MDBIcon icon="trash" /></MDBLink>
-            <MDBLink disabled={isBackupRunning} onClick={(e) => {e.preventDefault(); exportCollection(); }} style={buttonStyle}><MDBIcon icon="file-export" /></MDBLink>
+            <MDBLink disabled={isBackupRunning} onClick={(e) => {e.preventDefault(); handleBackup(dbName, collectionName); }} style={buttonStyle}><MDBIcon icon="file-export" /></MDBLink>
             {isBackupRunning && <span class="ml-1 spinner-border spinner-border-sm text-primary" role="status" aria-hidden="true"></span>}
           </div>
         </td>
