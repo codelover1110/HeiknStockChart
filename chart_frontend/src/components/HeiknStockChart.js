@@ -28,6 +28,7 @@ const HeiknStockChart = (props) => {
   const [symbolList, setSymbolList] = useState([])
   const [collapseOpen,] = React.useState(false)
   const [chartColumn, setChartColumn] = useState({ value: 6, label: '6' })
+  const [assetClass, setAssetClass] = useState({ value: 'stock', label: 'stock' })
   const [selectedViewType, setSelectedViewType] = useState({ value: 'charting', label: 'Charting' });
   const [microStrategy, setMicroStrategy] = useState(null);
   const [strategy, setStrategy] = useState(null);//{ value: 'heikfilter', label: 'heikfilter' }
@@ -44,14 +45,14 @@ const HeiknStockChart = (props) => {
     label: 'stock'
   })
 
-  const optionsSymbolType = [
+  const [optionsAssetClass] = useState([
     {
       value: 'stock', label: 'stock',
     },
     {
       value: 'crypto', label: 'crypto',
     }
-  ]
+  ])
   
   const [optionsViewTypes, setOptionsViewTypes] = useState([
     { value: 'charting', label: 'Charting' },
@@ -373,6 +374,10 @@ const HeiknStockChart = (props) => {
     history.push('/login')
   }
 
+  const handleAssetClass = () => {
+
+  }
+
   const displayChart = () => {
     return (
       <div className={`row ${calculateHeightStyle()}`}>
@@ -484,7 +489,8 @@ const HeiknStockChart = (props) => {
     )
   }
 
-  const handleAssetClassClick = () => {
+  const handleAssetClassChange = (e) => {
+    setAssetClass(e)
     return
   }
 
@@ -570,15 +576,12 @@ const HeiknStockChart = (props) => {
               />
             </div>
             <div className="select-option">
-              <Button
-                variant="secondary"
-                className="btn-md"
-                onClick = {() => {
-                  handleAssetClassClick()
-                }}
-              >
-                asset class
-              </Button>
+              <Select
+                value={assetClass}
+                onChange={handleAssetClassChange}
+                options={optionsAssetClass}
+                placeholder="Asset Class"
+              />
             </div>
           </div>
         )}
