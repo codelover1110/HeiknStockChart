@@ -75,9 +75,9 @@ export function DBDashboardProvider({children}) {
     }
   }
 
-  const exportDatabase = (databaseName) => {
+  const exportDatabase = (databaseName, collectionName='') => {
     setBackupRunning(true)
-    apiCreateBackup(databaseName)
+    apiCreateBackup(databaseName, collectionName)
       .then(data => {
         setCurrentBackupId(data.id)
 

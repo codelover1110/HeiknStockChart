@@ -37,8 +37,8 @@ const DBDashboard = () => {
             background: 'rgba(0,0,0,0.9)',
             zIndex: 9999,
           }}>
-            <div class="d-flex flex-column align-items-center justify-content-center">
-              <div className="mb-5"><Spinner>Loading</Spinner><span class="ml-2" style={{color: colors.white}}>Processing...</span></div>
+            <div class="d-flex flex-column align-items-center justify-content-center px-5 py-3 pt-5 rounded rounded-5" style={{background: colors.white}}>
+              <div className="mb-5"><Spinner>Loading</Spinner><span class="ml-2" style={{color: colors.darkBlue}}>Processing...</span></div>
               <MDBBtn color="red" onClick={(e) => {e.preventDefault(); stopBackup(); }}>Stop</MDBBtn>
             </div>
         </div>)

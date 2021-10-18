@@ -433,14 +433,14 @@ def api_delete_database(db_name):
 #     return csv_export
 
 def get_csv_collection(backup, collection_name, check_stopping):
+    print ("Generating CSV.. from ", backup.database, collection_name)
     db = azuremongo[backup.database]
     collection = db[collection_name]
 
     cursor = collection.find()
     mongo_docs = list(cursor)
 
-    series_obj = pandas.Series({"a key":"a value"})
-    print ("series_obj:", type(series_obj))
+    series_obj = pandas.Series([])
 
     docs = pandas.DataFrame(columns=[])
     for num, doc in enumerate( mongo_docs ):
@@ -496,7 +496,7 @@ def api_execute_backup(backup, check_stopping = None):
     db_name = backup.database
 
     if backup.is_database():
-        print('++++ api_execute_backup: dataabse +++ ', db_name)
+        print('++++ api_execute_backup: database +++ ', db_name)
         collections = api_get_collections(db_name)
         tempdir = tempfile.mkdtemp()
 
@@ -504,15 +504,17 @@ def api_execute_backup(backup, check_stopping = None):
         print('Target Zip file: ', target_zipfile)
         zipObj = ZipFile(target_zipfile, 'w')
 
+
         for collection_name in collections:
             csv_file_path = tempdir + '/' + collection_name + '.csv'
             print(csv_file_path)
             dataframe = get_csv_collection(backup, collection_name, check_stopping)
-            if not dataframe:
+            if isinstance(dataframe, bool):
                 zipObj.close()
                 return False
             dataframe.to_csv(csv_file_path)
             zipObj.write(csv_file_path)
+
 
         zipObj.close()
 
@@ -522,7 +524,7 @@ def api_execute_backup(backup, check_stopping = None):
     else:
         print('++++ api_execute_backup +++ ', backup.database, backup.collection)
         docs = get_csv_collection(backup, backup.collection, check_stopping)
-        if not docs:
+        if isinstance(docs, bool):
             return False
         csv_export = docs.to_csv(sep=",")
         return csv_export

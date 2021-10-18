@@ -379,19 +379,19 @@ def execute_backup(request):
             refresh_backup = BackupProgress.objects.get(pk=backup_id)
             if refresh_backup.status == 'stop':
                 return True
-
         return False
 
     fileData = api_execute_backup(backup, check_stopping)
-    if fileData:
+    if not fileData:
+        backup.delete()
         return JsonResponse({'success': False, 'data': {}}, status=status.HTTP_201_CREATED)
 
     response = HttpResponse(fileData, content_type='application/csv')
     response['Content-Disposition'] = 'attachment; filename="%s"' % 'hoangxuanhao.csv'
-    backupJson = backup.json()
+
     backup.delete()
 
-    return JsonResponse({'success': True, 'data': backupJson}, status=status.HTTP_201_CREATED)
+    return response
 
 @csrf_exempt
 def stop_backup(request):

@@ -1176,14 +1176,14 @@ export const getWatchListAll = async () => {
 
 
 
-export const apiCreateBackup = async(dbName) => {
+export const apiCreateBackup = async(dbName, collectionName = '') => {
   const requestOptions = {
     method: 'GET',
     header: {'Content-Type': 'application/json'},
   }
 
   let apiURL = new URL(process.env.REACT_APP_BACKEND_URL + '/api/create_backup')
-  apiURL.search = new URLSearchParams({db_name: dbName}).toString()
+  apiURL.search = new URLSearchParams({db_name: dbName, collection_name: collectionName}).toString()
 
   try {
     return await fetch(apiURL, requestOptions)
@@ -1208,9 +1208,30 @@ export const apiExecuteBackup = async(data) => {
   apiURL.search = new URLSearchParams({backup_id: data['id']}).toString()
 
   try {
+    let filename = `${data['database']}.zip`
+    if (data['collection']) {
+      filename = `${data['database']}_${data['collection']}.csv`
+    }
     return await fetch(apiURL, requestOptions)
-      .then(response => response.json())
-      .then(result => result['data'])
+      .then(response => {
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.indexOf("application/json") !== -1) {
+          console.log('Json object response')
+        } else {
+          response.blob().then(blob => {
+            let url = window.URL.createObjectURL(blob);
+            let a = document.createElement("a");
+            a.href = url;
+            a.download = filename;
+            a.click();
+          })
+        }
+
+        // console.log('response')
+        // console.log(response)
+
+
+      })
   } catch (e) {
     return {
       success: false,
