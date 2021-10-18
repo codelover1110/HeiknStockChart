@@ -20,6 +20,8 @@ import "./FloatsComponent.css"
 
 import { useCsvDownloadUpdate } from "contexts/CsvDownloadContext";
 import ButtonCsvDownload from 'components/ButtonCsvDownload'
+import { useDatatableLoading } from "contexts/DatatableContext";
+import Spinner from "components/Spinner";
 
 const FloatsComponent = () => {
   const auth = useAuth();
@@ -35,6 +37,7 @@ const FloatsComponent = () => {
   const [optionsExchange, setOptionsExchanges] = useState([])
   const [optionsSector, setOptionsSector] = useState([])
   const [optionsIndustry, setOptionsIndustry] = useState([])
+  const [isLoadingData, setLoadingData] = useDatatableLoading()
 
   const hearder_columns = useMemo(() => {
     return [
@@ -295,6 +298,7 @@ const FloatsComponent = () => {
 
 
   const loadFloatDetails = async (pageNum) => {
+    setLoadingData(true)
     const floatDetails = await getFloatsDetails(pageNum, pageAmount)
 
     if (floatDetails) {
@@ -304,9 +308,12 @@ const FloatsComponent = () => {
         rows: floatDetails.floats,
       })
     }
+
+    setLoadingData(false)
   }
 
   const loadFloatsFilterOption = async () => {
+    setLoadingData(true)
     const scannerOptions = await getFloatsFilterOptions()
     if (scannerOptions.success) {
       const exchanges = [{
@@ -354,11 +361,14 @@ const FloatsComponent = () => {
       setOptionsIndustry(industries)
       setOptionsSector(sectors)
     }
+    setLoadingData(false)
   }
 
   useEffect(() => {
+    setLoadingData(true)
     loadFloatDetails(currentPage)
     loadFloatsFilterOption()
+    setLoadingData(false)
   }, [])
 
   const handleSignout = () => {
@@ -377,6 +387,7 @@ const FloatsComponent = () => {
   }
 
   const handleSectorChange = async (e) => {
+    setLoadingData(true)
     setSector(e)
 
     const floatDetails = await getFloatsDetails(currentPage, pageAmount, exchange ? exchange.value : '', industry ? industry.value : '', e.value)
@@ -388,9 +399,11 @@ const FloatsComponent = () => {
         rows: floatDetails.floats,
       })
     }
+    setLoadingData(false)
   }
 
   const handleExchangeChange = async (e) => {
+    setLoadingData(true)
     setExchange(e)
 
     const floatDetails = await getFloatsDetails(currentPage, pageAmount, e.value, industry ? industry.value : '', sector ? sector.value : '')
@@ -402,9 +415,11 @@ const FloatsComponent = () => {
         rows: floatDetails.floats,
       })
     }
+    setLoadingData(false)
   }
 
   const handleIndustryChange = async (e) => {
+    setLoadingData(true)
     setIndustry(e)
 
     const floatDetails = await getFloatsDetails(currentPage, pageAmount, exchange ? exchange.value : '', e.value, sector ? sector.value : '')
@@ -413,6 +428,7 @@ const FloatsComponent = () => {
       columns: hearder_columns,
       rows: floatDetails.floats,
     })
+    setLoadingData(false)
   }
 
   return (
@@ -487,54 +503,60 @@ const FloatsComponent = () => {
           </div>
           <ButtonCsvDownload filename={"floats.csv"}>Csv Download</ButtonCsvDownload>
         </div>
-        <MDBTable
-          hover
-          small={true}
-          maxHeight="500px"
-          entriesOptions={[10, 25, 50, 100]}
-          entries={10}
-          pagesAmount={50}
-          data={datatable}
-          dark={true}
-          noBottomColumns={true}
-          small={true}
-          scrollX={true}
-          scrollY={true}
-        >
-          <MDBTableHead  className="watch-list-data-table-header">
-            <tr>
-              {hearder_columns.map((item) => (
-                <th key={item.label} className={`hunter-custom-table-floats-chart-th`}>{item.label}</th>
-              ))}
-            </tr>
-          </MDBTableHead>
-          <MDBTableBody
-              className={"financial-table-body-1"}
-            >
-            {datatable.rows.map((item) => (
-              <tr key={`row-${item.Symbol}`}>
-                {hearder_columns.map((column) =>
-                  (
-                    <td
-                      key={`${item.symbol}-${column.field}`}
-                      className={`${column.field === 'Description' ? 'hunter-custom-table-description-td' : ''} hunter-custom-table-td`}
-                    >
-                      {item[column.field]}
-                    </td>
-                  )
-                )}
+        {console.log(isLoadingData)}
+        {isLoadingData && <Spinner />}
+        {!isLoadingData &&
+        <>
+          <MDBTable
+            hover
+            small={true}
+            maxHeight="500px"
+            entriesOptions={[10, 25, 50, 100]}
+            entries={10}
+            pagesAmount={50}
+            data={datatable}
+            dark={true}
+            noBottomColumns={true}
+            small={true}
+            scrollX={true}
+            scrollY={true}
+          >
+            <MDBTableHead  className="watch-list-data-table-header">
+              <tr>
+                {hearder_columns.map((item) => (
+                  <th key={item.label} className={`hunter-custom-table-floats-chart-th`}>{item.label}</th>
+                ))}
               </tr>
-            ))}
-          </MDBTableBody>
-        </MDBTable>
-        <Pagination>
-          <Pagination.Item>{(currentPage-1)*10 + 1}</Pagination.Item>
-          <Pagination.Item>{(currentPage) * 10}</Pagination.Item>
-          <Pagination.Item> of </Pagination.Item>
-          <Pagination.Item> { wholeRows } </Pagination.Item>
-          <Pagination.Prev disabled={currentPage <= 0} onClick={() => { handlePrevClick() }}/>
-          <Pagination.Next disabled={(currentPage + 1) >= wholeRows / 10} onClick={() => { handleNextClick() }}/>
-        </Pagination>
+            </MDBTableHead>
+            <MDBTableBody
+                className={"financial-table-body-1"}
+              >
+              {datatable.rows.map((item) => (
+                <tr key={`row-${item.Symbol}`}>
+                  {hearder_columns.map((column) =>
+                    (
+                      <td
+                        key={`${item.symbol}-${column.field}`}
+                        className={`${column.field === 'Description' ? 'hunter-custom-table-description-td' : ''} hunter-custom-table-td`}
+                      >
+                        {item[column.field]}
+                      </td>
+                    )
+                  )}
+                </tr>
+              ))}
+            </MDBTableBody>
+          </MDBTable>
+          <Pagination>
+            <Pagination.Item>{(currentPage-1)*10 + 1}</Pagination.Item>
+            <Pagination.Item>{(currentPage) * 10}</Pagination.Item>
+            <Pagination.Item> of </Pagination.Item>
+            <Pagination.Item> { wholeRows } </Pagination.Item>
+            <Pagination.Prev disabled={currentPage <= 0} onClick={() => { handlePrevClick() }}/>
+            <Pagination.Next disabled={(currentPage + 1) >= wholeRows / 10} onClick={() => { handleNextClick() }}/>
+          </Pagination>
+        </>
+        }
       </div>
     </div>
   );

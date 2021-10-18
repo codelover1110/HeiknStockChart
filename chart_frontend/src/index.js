@@ -61,7 +61,9 @@ ReactDOM.render(
               <FileManager/>
             </PrivateRoute>
             <PrivateRoute path="/floats">
-              <Floats />
+              <DatatableProvider>
+                <Floats />
+              </DatatableProvider>
             </PrivateRoute>
             <PrivateRoute path="/market_watch">
               <MarketWatch />
@@ -73,7 +75,9 @@ ReactDOM.render(
               <PriceData />
             </PrivateRoute>
             <PrivateRoute path="/tradedatatable">
-              <TradeData />
+              <DatatableProvider>
+                <TradeData />
+              </DatatableProvider>
             </PrivateRoute>
             <PrivateRoute path="/hybrid_view">
               <HybridView />
@@ -84,7 +88,9 @@ ReactDOM.render(
               </DatatableProvider>
             </PrivateRoute>
             <PrivateRoute path="/scanner">
-              <Scanner />
+              <DatatableProvider>
+                <Scanner />
+              </DatatableProvider>
             </PrivateRoute>
             <PrivateRoute path="/db_management">
               <DBManagementDashboardWrapper />
