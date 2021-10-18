@@ -9,7 +9,7 @@ export default function DBDatabaseActions() {
   const colors = useThemeColors()
 
   const handleDelete = useDeleteDatabase()
-  const handleBackup = useExportDatabase()
+  const {handleBackup, stopBackup} = useExportDatabase()
   const isBackupRunning = useBackupStatus()
 
   return (

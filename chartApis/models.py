@@ -5,7 +5,7 @@ import tempfile
 import pandas
 from wsgiref.util import FileWrapper
 from zipfile import ZipFile
-
+from backup.models import BackupProgress
 
 from Having_system.Update_candles.define import INDICATORS_COL_NAME, PARAMETERS_DB
 from .utils import define_start_date, check_candle_in_maket_time
@@ -432,7 +432,7 @@ def api_export_collection(db_name, collection_name):
     csv_export = docs.to_csv(sep=",")
     return csv_export
 
-def get_csv_collection(db_name, collection_name):
+def get_csv_collection(db_name, collection_name, loop_callback):
     db = azuremongo[db_name]
     collection = db[collection_name]
 
@@ -447,9 +447,69 @@ def get_csv_collection(db_name, collection_name):
         doc["_id"] = str(doc["_id"])
         doc_id = doc["_id"]
 
+        loop_callback(doc_id)
+
         print('Process csv data', db_name, collection_name, doc_id)
         series_obj = pandas.Series( doc, name=doc_id )
         docs = docs.append( series_obj )
 
     return docs
 
+
+def count_total_collection(target, target_type):
+    if target_type == 'database':
+        dbname = target
+        total = count_total_database_record(db_name)
+    else:
+        [dbname, collection_name] = target.split('/')
+        total = count_total_collection_record(db_name, collection_name)
+    return total
+
+
+def count_total_database_record(db_name):
+    total = 0
+    collections = api_get_collections(db_name)
+    for collection_name in collections:
+        total = total + count_total_collection_record(db_name, collection_name)
+
+    return total
+
+def count_total_collection_record(db_name, collection_name):
+    db = azuremongo[db_name]
+    collection = db[collection_name]
+    return collection.find().count()
+
+def api_create_backup(target, target_type):
+    backup = BackupProgress()
+    backup.target = target
+    backup.target_type = target_type
+    backup.status = 'generated'
+    backup.current = 0
+    backup.total = count_total_collection(target, target_type)
+    backup.save()
+
+    return backup
+
+
+def api_execute_backup(backup, loop_callback):
+    db_name = backup.target
+    collections = api_get_collections(db_name)
+    tempdir = tempfile.mkdtemp()
+
+    target_zipfile = tempdir + '/' + db_name + '.zip'
+    print('Target Zip file: ', target_zipfile)
+    zipObj = ZipFile(target_zipfile, 'w')
+
+    for collection_name in collections:
+        csv_file_path = tempdir + '/' + collection_name + '.csv'
+        print(csv_file_path)
+        dataframe = get_csv_collection(db_name, collection_name, loop_callback)
+        dataframe.to_csv(csv_file_path)
+
+        zipObj.write(csv_file_path)
+
+    zipObj.close()
+
+    zipfile = open(target_zipfile, 'rb')
+
+    return FileWrapper(zipfile)

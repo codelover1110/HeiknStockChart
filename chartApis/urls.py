@@ -11,6 +11,11 @@ urlpatterns = [
     url(r'^api/export_collection$', views.export_collection),
 
 
+    url(r'^api/create_backup$', views.create_backup),
+    url(r'^api/execute_backup$', views.execute_backup),
+    url(r'^api/stop_backup$', views.stop_backup),
+
+
     url(r'^api/tables$', views.get_table_list),
     url(r'^api/get_data$', views.get_live_data),
     url(r'^api/get_data_extended$', views.get_live_data_extended),

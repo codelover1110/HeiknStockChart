@@ -528,7 +528,7 @@ export const getBotConfigFileList = async (collection) => {
       config_collection: collection,
     })
   };
-  
+
   return await fetch(process.env.REACT_APP_BACKEND_URL + "/strategy/config_detail_names/", requestOptions)
     .then(response => response.json())
     .then(data => {
@@ -1173,3 +1173,73 @@ export const getWatchListAll = async () => {
     }
   }
 }
+
+
+
+export const apiCreateBackup = async(dbName) => {
+  const requestOptions = {
+    method: 'GET',
+    header: {'Content-Type': 'application/json'},
+  }
+
+  let apiURL = new URL(process.env.REACT_APP_BACKEND_URL + '/api/create_backup')
+  apiURL.search = new URLSearchParams({db_name: dbName}).toString()
+
+  try {
+    return await fetch(apiURL, requestOptions)
+      .then(response => response.json())
+      .then(result => result['data'])
+  } catch (e) {
+    return {
+      success: false,
+      message: e
+    }
+  }
+}
+
+
+export const apiExecuteBackup = async(data) => {
+  const requestOptions = {
+    method: 'GET',
+    header: {'Content-Type': 'application/json'},
+  }
+
+  let apiURL = new URL(process.env.REACT_APP_BACKEND_URL + '/api/execute_backup')
+  apiURL.search = new URLSearchParams({backup_id: data['id']}).toString()
+
+  try {
+    return await fetch(apiURL, requestOptions)
+      .then(response => response.json())
+      .then(result => result['data'])
+  } catch (e) {
+    return {
+      success: false,
+      message: e
+    }
+  }
+}
+
+
+export const apiStopBackup = async(data) => {
+  const requestOptions = {
+    method: 'GET',
+    header: {'Content-Type': 'application/json'},
+  }
+
+  let apiURL = new URL(process.env.REACT_APP_BACKEND_URL + '/api/stop_backup')
+  apiURL.search = new URLSearchParams({backup_id: data['id']}).toString()
+
+  try {
+    return await fetch(apiURL, requestOptions)
+      .then(response => response.json())
+      .then(result => result['data'])
+  } catch (e) {
+    return {
+      success: false,
+      message: e
+    }
+  }
+}
+
+
+
