@@ -18,7 +18,8 @@ import { useAuth } from 'contexts/authContext';
 import { getAllSymbols, filterTradesData } from 'api/Api'
 import { currentDateString } from 'utils/helper'
 import MultiRangeSlider from 'components/MultiRangeSlider/MultiRangeSlider'
-
+import { useDatatable, useDatatableLoading } from "contexts/DatatableContext";
+import Spinner from 'components/Spinner'
 
 const TradeDataTable = () => {
   const auth = useAuth();
@@ -83,11 +84,13 @@ const TradeDataTable = () => {
     },
   ]}, [])
 
-  const [datatable, setDatatable] = React.useState({
+  const [datatable, setDatatable] = useDatatable({
     columns: hearder_columns,
     rows: [
     ],
   });
+
+  const [isLoadingData, setLoadingData] = useDatatableLoading()
 
   const wrapSetDatatable = (data) => {
     setDatatable(data)
@@ -139,6 +142,7 @@ const TradeDataTable = () => {
   }, [getStrategyList])
 
   useEffect(() => {
+    setLoadingData(true)
     const get_trades = async (macroStrat, microStrat, tradeStartDate, tradeEndDate, currentPage, pageAmount) => {
       const result = await filterTradesData(macroStrat, microStrat, tradeStartDate, tradeEndDate, currentPage, pageAmount);
       wrapSetDatatable({
@@ -146,6 +150,7 @@ const TradeDataTable = () => {
         rows: result.trades_data
       })
       setWholeRows(result.page_total)
+      setLoadingData(false)
     }
 
     get_trades(
@@ -155,9 +160,11 @@ const TradeDataTable = () => {
   }, [macroStrategy, microStrategy, hearder_columns, tradeStartDate, tradeEndDate])
 
   useEffect(() => {
+      setLoadingData(true)
       const getSymbols = async () => {
       const res = await getAllSymbols()
       setOptionsSymbol(res)
+      setLoadingData(false)
     }
     getSymbols()
   }, [setOptionsSymbol])
@@ -213,6 +220,7 @@ const TradeDataTable = () => {
   }
 
   const loadPriceDetails = async () => {
+    setLoadingData(true)
     const result = await filterTradesData(macroStrategy ? macroStrategy.value : '',
     microStrategy ? microStrategy.value : '',
     tradeStartDate, tradeEndDate, currentPage, pageAmount);
@@ -220,8 +228,9 @@ const TradeDataTable = () => {
       columns: hearder_columns,
       rows: result.trades_data
     })
-    
+
     setWholeRows(result.page_total)
+    setLoadingData(false)
   }
 
   const handlePrevClick = () => {
@@ -316,29 +325,33 @@ const TradeDataTable = () => {
             />
           </div>
         </div>
-        <MDBDataTableV5
-          hover
-          maxHeight="500px"
-          entriesOptions={[10, 25, 50, 100]}
-          entries={10}
-          pagesAmount={4}
-          data={datatable}
-          // searchTop searchBottom={false}
-          // bordered={true}
-          dark={true}
-          noBottomColumns={true}
-          small={true}
-          striped={true}
-          scrollY={true}
-        />;
-        <Pagination>
-          <Pagination.Item>{(currentPage-1)*10 + 1}</Pagination.Item>
-          <Pagination.Item>{(currentPage) * 10}</Pagination.Item>
-          <Pagination.Item> of </Pagination.Item>
-          <Pagination.Item> { wholeRows } </Pagination.Item>
-          <Pagination.Prev disabled={currentPage <= 0} onClick={() => { handlePrevClick() }}/>
-          <Pagination.Next disabled={(currentPage + 1) >= wholeRows / 10} onClick={() => { handleNextClick() }}/>
-        </Pagination>
+
+        {isLoadingData && <Spinner />}
+        {!isLoadingData && <>
+          <MDBDataTableV5
+            hover
+            maxHeight="500px"
+            entriesOptions={[10, 25, 50, 100]}
+            entries={10}
+            pagesAmount={4}
+            data={datatable}
+            // searchTop searchBottom={false}
+            // bordered={true}
+            dark={true}
+            noBottomColumns={true}
+            small={true}
+            striped={true}
+            scrollY={true}
+          />;
+          <Pagination>
+            <Pagination.Item>{(currentPage-1)*10 + 1}</Pagination.Item>
+            <Pagination.Item>{(currentPage) * 10}</Pagination.Item>
+            <Pagination.Item> of </Pagination.Item>
+            <Pagination.Item> { wholeRows } </Pagination.Item>
+            <Pagination.Prev disabled={currentPage <= 0} onClick={() => { handlePrevClick() }}/>
+            <Pagination.Next disabled={(currentPage + 1) >= wholeRows / 10} onClick={() => { handleNextClick() }}/>
+          </Pagination>
+        </>}
       </div>
     </div>
   );

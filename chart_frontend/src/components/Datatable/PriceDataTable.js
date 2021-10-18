@@ -20,6 +20,8 @@ import { currentDateString } from 'utils/helper'
 import MultiRangeSlider from 'components/MultiRangeSlider/MultiRangeSlider'
 import { useCsvDownloadUpdate } from "contexts/CsvDownloadContext"
 import ButtonCsvDownload from 'components/ButtonCsvDownload'
+import {useDatatableLoading, useDatatable} from "contexts/DatatableContext"
+import Spinner from 'components/Spinner'
 
 const PriceDataTable = () => {
   const auth = useAuth();
@@ -77,7 +79,9 @@ const PriceDataTable = () => {
     },
   ]}, [])
 
-  const [datatable, setDatatable] = React.useState({
+  const [isLoadingData, setLoadingData] = useDatatableLoading()
+
+  const [datatable, setDatatable] = useDatatable({
     columns: hearder_columns,
     rows: [
     ],
@@ -92,12 +96,15 @@ const PriceDataTable = () => {
 
   useEffect(() => {
     const getPriceTrades = async (symbol, timeFrame, tradeStartDate, tradeEndDate) => {
+      setLoadingData(true)
       const trades_data = await filterPriceData(symbol, timeFrame, tradeStartDate, tradeEndDate, currentPage, pageAmount);
       wrapSetDatatable({
         columns: hearder_columns,
         rows: trades_data.candles
       })
       setWholeRows(trades_data.page_total)
+
+      setLoadingData(false)
     }
 
     getPriceTrades(symbol.value, timeFrame.value, tradeStartDate, tradeEndDate)
@@ -131,12 +138,15 @@ const PriceDataTable = () => {
   }
 
   const loadPriceDetails = async () => {
+
+    setLoadingData(true)
     const trades_data = await filterPriceData(symbol.value, timeFrame.value, tradeStartDate, tradeEndDate, currentPage, pageAmount);
     wrapSetDatatable({
       columns: hearder_columns,
       rows: trades_data.candles
     })
     setWholeRows(trades_data.page_total)
+    setLoadingData(false)
   }
 
   const handlePrevClick = () => {
@@ -218,29 +228,35 @@ const PriceDataTable = () => {
             <ButtonCsvDownload filename={"price.csv"}>Csv Download</ButtonCsvDownload>
           </div>
         </div>
-        <MDBDataTableV5
-          hover
-          maxHeight="500px"
-          entriesOptions={[10, 25, 50, 100]}
-          entries={10}
-          pagesAmount={4}
-          data={datatable}
-          // searchTop searchBottom={false}
-          // bordered={true}
-          dark={true}
-          noBottomColumns={true}
-          small={true}
-          striped={true}
-          scrollY={true}
-        />;
-        <Pagination>
-          <Pagination.Item>{(currentPage-1)*10 + 1}</Pagination.Item>
-          <Pagination.Item>{(currentPage) * 10}</Pagination.Item>
-          <Pagination.Item> of </Pagination.Item>
-          <Pagination.Item> { wholeRows } </Pagination.Item>
-          <Pagination.Prev disabled={currentPage <= 0} onClick={() => { handlePrevClick() }}/>
-          <Pagination.Next disabled={(currentPage + 1) >= wholeRows / 10} onClick={() => { handleNextClick() }}/>
-        </Pagination>
+        {isLoadingData && <Spinner>Loading</Spinner>}
+        {!isLoadingData &&
+        (
+          <>
+            <MDBDataTableV5
+              hover
+              maxHeight="500px"
+              entriesOptions={[10, 25, 50, 100]}
+              entries={10}
+              pagesAmount={4}
+              data={datatable}
+              // searchTop searchBottom={false}
+              // bordered={true}
+              dark={true}
+              noBottomColumns={true}
+              small={true}
+              striped={true}
+              scrollY={true}
+            />
+            <Pagination>
+              <Pagination.Item>{(currentPage-1)*10 + 1}</Pagination.Item>
+              <Pagination.Item>{(currentPage) * 10}</Pagination.Item>
+              <Pagination.Item> of </Pagination.Item>
+              <Pagination.Item> { wholeRows } </Pagination.Item>
+              <Pagination.Prev disabled={currentPage <= 0} onClick={() => { handlePrevClick() }}/>
+              <Pagination.Next disabled={(currentPage + 1) >= wholeRows / 10} onClick={() => { handleNextClick() }}/>
+            </Pagination>
+          </>
+        )}
       </div>
     </div>
   );

@@ -10,6 +10,7 @@ import { routes } from "routes.js";
 
 import { BackgroundColorContext } from "contexts/BackgroundColorContext";
 import { CsvDownloadProvider } from 'contexts/CsvDownloadContext';
+import { DatatableProvider } from "contexts/DatatableContext";
 
 function PriceData() {
   const [isShowSidebar, setShowSidebar] = React.useState(false);
@@ -47,9 +48,11 @@ function PriceData() {
               />
             )}
             <div className="col-sm-12">
-              <CsvDownloadProvider>
-                <PriceDataTable />
-              </CsvDownloadProvider>
+              <DatatableProvider>
+                <CsvDownloadProvider>
+                  <PriceDataTable />
+                </CsvDownloadProvider>
+              </DatatableProvider>
             </div>
           </div>
         </React.Fragment>

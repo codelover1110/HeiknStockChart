@@ -19,6 +19,8 @@ import { CsvDownloadProvider } from 'contexts/CsvDownloadContext';
 import ButtonCsvDownload from 'components/ButtonCsvDownload'
 
 import { getNewsFinancialData } from 'api/Api';
+import { useDatatableLoading, useDatatable } from "contexts/DatatableContext";
+import Spinner from 'components/Spinner'
 
 import {
   getAllSymbols,
@@ -37,6 +39,8 @@ const FinancialDashboard = () => {
   const [selectedAggregationType, setSelectedAggregationType] = useState('QA');
   const [selectedStockType, setSelectedStockType] =
     useState('Income Statement');
+
+  const [isLoadingData, setLoadingData] = useDatatableLoading()
 
   const [chartData, setChartData] = useState(null);
   const [datatable, setDataTable] = useState();
@@ -74,12 +78,14 @@ const FinancialDashboard = () => {
   };
 
   useEffect(() => {
+    setLoadingData(true)
     disableScroll.on();
     const getSymbols = async () => {
       const res = await getAllSymbols();
       setOptionsSymbol(res);
     };
     getSymbols();
+    setLoadingData(false)
 
     return () => {
       disableScroll.off();
@@ -89,39 +95,51 @@ const FinancialDashboard = () => {
   useEffect(() => {
     setIsLoading(1);
     setChartData();
+    setLoadingData(true)
     const getNewsFinancials = async () => {
+      setLoadingData(true)
       const res = await getNewsFinancialData(symbol.value);
       setFinancialStatements({
         columns: ['id', 'time', 'title'],
         rows: res.results,
       });
+      setLoadingData(false)
     };
 
     const getTotalData = async () => {
+      setLoadingData(true)
       const res = await getFinancialTotalData(symbol.value);
       setDataTable(res.results);
       setIsLoading(2);
+      setLoadingData(false)
     };
 
     const getIncomeForDataTable = async () => {
+      setLoadingData(true)
       const res = await getFinancialTotalData(symbol.value);
       setDataTable(res.results);
       setIsLoading(2);
+      setLoadingData(false)
     };
 
     const getBalanceForDataTable = async () => {
+      setLoadingData(true)
       const res = await getFinancialTotalData(symbol.value);
       setDataTable(res.results);
       setIsLoading(2);
+      setLoadingData(false)
     };
 
     const getCashForDataTable = async () => {
+      setLoadingData(true)
       const res = await getFinancialTotalData(symbol.value);
       setDataTable(res.results);
       setIsLoading(2);
+      setLoadingData(false)
     };
 
     const getIncome = async () => {
+      setLoadingData(true)
       const res = await getIncomeStatement(symbol.value);
       let revenus = {
         label: 'Revenue',
@@ -202,9 +220,11 @@ const FinancialDashboard = () => {
         sortDataPointsByDate(earningsPerBasicShare),
       ]);
       setIsLoading(2);
+      setLoadingData(false)
     };
 
     const getBalance = async () => {
+      setLoadingData(true)
       const res = await getBalanceSheet(symbol.value);
       let assets = {
         label: 'Total Assets',
@@ -286,9 +306,11 @@ const FinancialDashboard = () => {
         sortDataPointsByDate(cashAndEquivalents),
       ]);
       setIsLoading(2);
+      setLoadingData(false)
     };
 
     const getCash = async () => {
+      setLoadingData(true)
       const res = await getCashStatement(symbol.value);
       let netCashFlowFromOperations = {
         label: 'Net Cash Flow from Operations',
@@ -370,11 +392,14 @@ const FinancialDashboard = () => {
         sortDataPointsByDate(paymentDividendsOtherCashDistributions),
       ]);
       setIsLoading(2);
+      setLoadingData(false)
     };
 
     if (selectedHeaderNav === 'News') {
+      setLoadingData(true)
       getNewsFinancials();
     } else if (selectedHeaderNav === 'Data Table') {
+      setLoadingData(true)
       if (selectedStockType === '') {
         getTotalData();
       } else if (selectedStockType === 'Income Statement') {
@@ -386,6 +411,7 @@ const FinancialDashboard = () => {
       }
 
       // update database for csv download
+      // setLoadingData(false)
 
     } else if (selectedHeaderNav === 'Chart') {
       if (selectedStockType === 'Income Statement') {
@@ -395,87 +421,99 @@ const FinancialDashboard = () => {
       } else if (selectedStockType === 'Cash Flow Statement') {
         getCash();
       }
+
     }
+    // setLoadingData(false)
   }, [selectedHeaderNav, selectedStockType, symbol]);
 
   return (
-    <CsvDownloadProvider>
-      <div className="financial-dashboard-container">
-        {!isShowSidebar && (
-          <Button
-            className={'show-sidebar-toggle-area show-sidebar-icon'}
-            onClick={handleSidebarChange}
-          >
-            <i className="tim-icons icon-align-left-2" />
-          </Button>
-        )}
-        {isShowSidebar && (
-          <Sidebar
-            isAdminPage={false}
-            routes={routes}
-            subInstance={'tradedatatable'}
-            selectedInstance={selectedInstance}
-            handleSidebarChange={handleSidebarChange}
-            handleInstanceChange={handleInstanceChange}
-          />
-        )}
-        <Header
-          selectedHeaderNav={selectedHeaderNav}
-          setSelectedHeaderNav={setSelectedHeaderNav}
-          symbol={symbol}
-          setSymbol={setSymbol}
-          optionsSymbol={optionsSymbol}
-        />
-        {selectedHeaderNav !== 'News' && (
-          <div className="filter-types-section">
-            <GraphTypes
-              selectedAggregationType={selectedAggregationType}
-              setSelectedAggregationType={setSelectedAggregationType}
+      <CsvDownloadProvider>
+        <div className="financial-dashboard-container">
+          {!isShowSidebar && (
+            <Button
+              className={'show-sidebar-toggle-area show-sidebar-icon'}
+              onClick={handleSidebarChange}
+            >
+              <i className="tim-icons icon-align-left-2" />
+            </Button>
+          )}
+          {isShowSidebar && (
+            <Sidebar
+              isAdminPage={false}
+              routes={routes}
+              subInstance={'tradedatatable'}
+              selectedInstance={selectedInstance}
+              handleSidebarChange={handleSidebarChange}
+              handleInstanceChange={handleInstanceChange}
             />
-            <StockTypes
-              selectedStockType={selectedStockType}
-              setSelectedStockType={setSelectedStockType}
-              selectedHeaderNav={selectedHeaderNav}
-            />
-            {selectedHeaderNav == 'Data Table' && (<ButtonCsvDownload filename={"financial.csv"}>Csv Download</ButtonCsvDownload>)}
-          </div>
-        )}
-        {selectedHeaderNav === 'Data Table' ? (
-          <FinancialDataTable
-            data={datatable}
-            selectedStockType={selectedStockType}
-            selectedAggregationType={selectedAggregationType}
+          )}
+          <Header
+            selectedHeaderNav={selectedHeaderNav}
+            setSelectedHeaderNav={setSelectedHeaderNav}
+            symbol={symbol}
+            setSymbol={setSymbol}
+            optionsSymbol={optionsSymbol}
           />
-        ) : selectedHeaderNav === 'News' ? (
-          <FinancialStatementsDataTable
-            data={financialStatements}
-          />
-        ) : (
-          <div className="container custom-container chart-area">
-            <div className="row justify-content-center">
-              {chartData ? (
-                chartData.map((data) => (
-                  <div
-                    key={data.label}
-                    className="col-lg-4 col-md-4 col-sm-6 col-xs-12 group-bar-chart"
-                  >
-                    <BarChart
-                      data={data}
-                      chartData={chartData}
-                      globalAggregationType={selectedAggregationType}
-                    />
-                  </div>
-                ))
-              ) : isLoading === 2 ? (
-                <div className="no-data">No data</div>
-              ) : (
-                <div className="no-data">Fetching...</div>
-              )}
+          {selectedHeaderNav !== 'News' && (
+            <div className="filter-types-section">
+              <GraphTypes
+                selectedAggregationType={selectedAggregationType}
+                setSelectedAggregationType={setSelectedAggregationType}
+              />
+              <StockTypes
+                selectedStockType={selectedStockType}
+                setSelectedStockType={setSelectedStockType}
+                selectedHeaderNav={selectedHeaderNav}
+              />
+              {selectedHeaderNav == 'Data Table' && (<ButtonCsvDownload filename={"financial.csv"}>Csv Download</ButtonCsvDownload>)}
             </div>
-          </div>
-        )}
-      </div>
-    </CsvDownloadProvider>
+          )}
+          {selectedHeaderNav === 'Data Table' ? (
+            <>
+              { console.log('isLoadingData') }
+              { console.log(isLoadingData) }
+              {isLoadingData && <Spinner />}
+              {!isLoadingData &&
+              <FinancialDataTable
+                data={datatable}
+                selectedStockType={selectedStockType}
+                selectedAggregationType={selectedAggregationType}
+              />}
+            </>
+          ) : selectedHeaderNav === 'News' ? (
+            <>
+              {isLoadingData && <Spinner />}
+              {!isLoadingData &&
+              <FinancialStatementsDataTable
+                data={financialStatements}
+              />}
+            </>
+          ) : (
+            <div className="container custom-container chart-area">
+              <div className="row justify-content-center">
+                {chartData ? (
+                  chartData.map((data) => (
+                    <div
+                      key={data.label}
+                      className="col-lg-4 col-md-4 col-sm-6 col-xs-12 group-bar-chart"
+                    >
+                      <BarChart
+                        data={data}
+                        chartData={chartData}
+                        globalAggregationType={selectedAggregationType}
+                      />
+                    </div>
+                  ))
+                ) : isLoading === 2 ? (
+                  <div className="no-data">No data</div>
+                ) : (
+                  <div className="no-data">Fetching...</div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </CsvDownloadProvider>
   );
 };
 
