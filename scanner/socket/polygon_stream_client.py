@@ -187,7 +187,6 @@ async def handler(websocket, path):
         if not stream_candles.empty():
             while not stream_candles.empty():
                 candle = stream_candles.get()
-                print ("web-socket => ", candle)
                 candles.append(candle)
             await websocket.send(json.dumps(candles))
         await asyncio.sleep(1)

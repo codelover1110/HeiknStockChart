@@ -76,7 +76,6 @@ class StockStreamServer(object):
 
 	def receive_message(self, client, server, message):
 		scanner_info = json.loads(message)
-		print ("scanner_info:", scanner_info)
 		action = scanner_info['action']
 		symbol_type = scanner_info['symbol_type'] 
 		cc_mgr = self.get_cc_mgr_by_symbol_type(symbol_type)

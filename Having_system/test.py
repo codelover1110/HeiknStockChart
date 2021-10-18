@@ -1,10 +1,12 @@
-from datetime import datetime, timedelta
-from numpy.core.records import get_remaining_size
 import pymongo
-import time
-import requests
 
-mongoclient = pymongo.MongoClient('mongodb://mluser:mlUser1000@20.84.64.243:27019')
+from update_market_data import *
+from ticker_meta_data import *
+from discord_bot import *
+
+API_KEY = 'tuQt2ur25Y7hTdGYdqI2VrE4dueVA8Xk'
+MONGO_URL = 'mongodb://mluser:mlUser1000@20.84.64.243:27018'
+mongoclient = pymongo.MongoClient(MONGO_URL)
 
 MARKET_DATA_DB = 'stock_market_data'
 BACKTESTING_CANDLES = 'backtest_1_minute'  # 1 minute market data

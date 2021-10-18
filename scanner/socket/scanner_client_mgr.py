@@ -38,7 +38,6 @@ class ScannerClientManager(object):
         self._removeing = True
         client_id = client_info['id']
         client_idx = self.find_client_idx(client_id)
-        print ("____________________________________:", client_id)
         if client_idx != -1:
             scanner_obj = self.scanner_obj_list[client_idx]
             scanner_info = scanner_obj.get_scanner_info()

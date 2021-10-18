@@ -140,7 +140,6 @@ def watchlists_all(request):
     print (" ++++++ API: /scanner/watchlists_all ++++++")
     try:
         watch_list_all = scanner.get_watchlist_all()
-        print (watch_list_all)
         return JsonResponse({"success": True, "result": watch_list_all}, safe=True)
     except:
         return JsonResponse({"success": False, "message": "Failed to get all watchlists!"}, safe=True)
