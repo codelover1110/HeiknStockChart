@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
+    'backup.apps.BackupConfig',
     'chartApis.apps.ChartapisConfig',
     'corsheaders',
     'codes',
@@ -63,7 +64,7 @@ INSTALLED_APPS = [
     'financials',
     'scanner',
     'floats',
-    'crispy_forms', 
+    'crispy_forms',
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -74,7 +75,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',    
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -115,7 +116,7 @@ WSGI_APPLICATION = 'backtestingApp.wsgi.application'
 # }
 
 DATABASES = {
-#   'default': {  
+#   'default': {
 #     'ENGINE':   'djongo',
 #     'NAME':     'test',
 #     'CLIENT': {
@@ -123,7 +124,7 @@ DATABASES = {
 #       'port': 27017,
 #       'username': 'hunter',
 #       'password': 'STOCKdb123',
-#     } 
+#     }
 #   },
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',

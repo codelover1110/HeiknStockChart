@@ -303,7 +303,7 @@ def get_table_list_db(strategy_name):
     return tables_name
 
 #######################################
-### get candles for specific symbol ### 
+### get candles for specific symbol ###
 #######################################
 def get_symbol_candles(symbol, start_date, end_date, time_frame, page_num=0, page_mounts=0):
     masterdb = azuremongo[STOCK_MARKET_DATA_ALL]
@@ -313,7 +313,7 @@ def get_symbol_candles(symbol, start_date, end_date, time_frame, page_num=0, pag
         db_collection = masterdb['backtest_1_hour']
     elif time_frame == '1d':
         db_collection = masterdb['backtest_1_day']
-    else: 
+    else:
         return []
 
     cur_date = datetime.now().date()
@@ -452,3 +452,4 @@ def get_csv_collection(db_name, collection_name):
         docs = docs.append( series_obj )
 
     return docs
+
