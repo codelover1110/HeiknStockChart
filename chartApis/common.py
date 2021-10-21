@@ -442,9 +442,7 @@ def fill_missing_candles__(chat_candles, candle_name, macro, micro):
     #     if macro_name in strtg:
     #         macro_strategies.append(strtg)
 
-    print ('---------- candle_name: {}, macro: {}, micro: {}'.format(candle_name, macro, micro))
     micros = get_micro_strategies(macro)
-    print ('--------- micros: {}'.format(micros))
     available_strategies = get_chat_available_stratgies_no_interval(candle_name, micros)
     if micro in available_strategies:
         insert_candles = []

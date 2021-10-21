@@ -119,10 +119,12 @@ def get_data_trades(request):
             symbol = ''
         else:
             symbol = request_data['symbol']
+        page_num = request_data['page_num']
+        page_mounts = request_data['page_mounts']
         macroStrategy = request_data['macroStrategy']
         microStrategy = request_data['microStrategy']
-        trades_data = get_data_trades_db(request_data['tradeStartDate'], request_data['tradeEndDate'], macroStrategy, microStrategy, symbol)
-        return JsonResponse({'trades_data': trades_data}, status=status.HTTP_201_CREATED)
+        trades_data, page_total = get_data_trades_db(request_data['tradeStartDate'], request_data['tradeEndDate'], macroStrategy, microStrategy, symbol, page_num, page_mounts)
+        return JsonResponse({'trades_data': trades_data, "page_total": page_total}, status=status.HTTP_201_CREATED)
 
 
 @csrf_exempt

@@ -1,70 +1,22 @@
+import sys
+sys.path.insert(0, '..')
 import pymongo
 from datetime import datetime, timedelta
-import pandas as pd 
 import requests
 import time
-import io
 import threading
-import json
+
 try:
    import queue
 except ImportError:
    import Queue as queue
 
-from define import *
-from db_models import get_watch_list_symbols
+from v_define import MONGO_URL, API_KEY, STOCK_CHART_DB_NAME, STOCK_LAST_UPDATE_DATE_COL, SYMBOL_TYPE_STOCK
+from v_define import INTERVALS as intervals
+from v_db_models import get_watch_list_symbols
+from common import get_symbols
 
-API_KEY = "tuQt2ur25Y7hTdGYdqI2VrE4dueVA8Xk"
-mongoclient = pymongo.MongoClient('mongodb://root:rootUser2021@20.84.64.243:27017')
-
-
-def monitoring_cryto_history():
-    all_count = 0
-    url = "https://api.polygon.io/v1/historic/crypto/BTC/USD/2020-10-14?limit=100&apiKey=" + API_KEY
-    # url = "https://api.polygon.io/v2/aggs/ticker/X:BTCUSD/range/1/day/2020-10-14/2020-10-14?adjusted=true&sort=asc&limit=120&apiKey=" + API_KEY
-    contents = json.loads(requests.get(url).content)
-    print (contents.keys())
-    # for key in contents.keys():
-    #     print ("===============> ", key)
-    #     print (contents[key])
-    print('symbol: ', contents['symbol'])
-    print ('map: ', contents['map'])
-    if contents["status"] == "success" and len(contents["ticks"]) > 0:
-        ticks = contents['ticks']
-        for tick in ticks:
-            tick['date'] = datetime.fromtimestamp(tick['t']/1e3)
-            print (tick)
-            break
-        print ('all count: {}'.format(len(ticks)))
-
-def monitoring_cryto_aggregates():
-    all_count = 0
-    url = "https://api.polygon.io/v2/aggs/ticker/X:BTCUSD/range/1/minute/2020-10-14/2020-10-14?adjusted=true&sort=asc&limit=50000&apiKey=" + API_KEY
-    contents = json.loads(requests.get(url).content)
-    print (contents.keys())
-
-    print('queryCount: ', contents['queryCount'])
-    print ('resultsCount: ', contents['resultsCount'])
-    if contents["status"] == "OK" and contents["resultsCount"] > 0:
-        results = contents['results']
-        for candle in results:
-            candle['date'] = datetime.fromtimestamp(candle['t']/1000)
-            print (candle)
-            # break
-
-DB_NAME = 'chart_market_data'
-LAST_UPDATE_DATE_COL = "crypto_symbol_last_date"
-
-intervals = [
-    [['1', 'minute'], 1, False, 31],    # use 30 when get a year candles
-    [['2', 'minute'], 2, False, 31],    # use 60 when get a year candles
-    [['12', 'minute'], 12, False, 60],  # use 200 when get a year candles
-    [['1', 'hour'], 1*60, False, 60],
-    [['4', 'hour'], 4*60, False, 200],
-    [['12', 'hour'], 12*60, False, 500],
-    [['1', 'day'], 24*60, False, 500],
-]
-
+mongoclient = pymongo.MongoClient(MONGO_URL)
 class DailyPutThread(object):
     def __init__(self, symbols,
                     interval,
@@ -79,7 +31,7 @@ class DailyPutThread(object):
         self.market_start_time = market_start_time
         self.market_end_time = market_end_time
         self.get_only_market_time = get_only_market_time
-        self.time_delta = 30                # fetch 30 days market data at a once
+        self.time_delta = 30           
         self.working = False
         self._stop = False
 
@@ -111,8 +63,8 @@ class DailyPutThread(object):
         print ("deleted")
 
     def update_last_put_date(self, symbol, interval, last_candle_date):
-        masterdb = mongoclient[DB_NAME]
-        ob_table = masterdb[LAST_UPDATE_DATE_COL]
+        masterdb = mongoclient[STOCK_CHART_DB_NAME]
+        ob_table = masterdb[STOCK_LAST_UPDATE_DATE_COL]
         symbol_last_update_date = ob_table.find_one({"symbol": symbol})
 
         if symbol_last_update_date is not None:
@@ -121,10 +73,10 @@ class DailyPutThread(object):
             ob_table.update_one({'_id': object_id},  {'$set': {key: last_candle_date}}) 
 
     def get_last_put_date(self, symbol, interval): 
-        default_date = datetime.strptime("2020-10-04 00:00:00", '%Y-%m-%d %H:%M:%S')
+        default_date = datetime.strptime("2020-09-01 00:00:00", '%Y-%m-%d %H:%M:%S')
         
-        masterdb = mongoclient[DB_NAME]
-        ob_table = masterdb[LAST_UPDATE_DATE_COL]
+        masterdb = mongoclient[STOCK_CHART_DB_NAME]
+        ob_table = masterdb[STOCK_LAST_UPDATE_DATE_COL]
         last_date_doc = ob_table.find_one({"symbol": symbol})
         if last_date_doc is not None:
             key = interval[0] + "_" + interval[1]
@@ -162,14 +114,14 @@ class DailyPutThread(object):
     def get_new_candles(self, symbol, interval, interval_unit, last_put_date):
         last_put_date_str = str(last_put_date.date())
         new_candles = []
-        sym_x = f"X:{symbol}USD"
         try:
             end_date = last_put_date+timedelta(days=self.time_delta)
             cur_date_str = str(end_date.date())
 
-            polygon_url = f"https://api.polygon.io/v2/aggs/ticker/{sym_x}/range/{interval}/{interval_unit}/{last_put_date_str}/{cur_date_str}?adjusted=true&sort=asc&limit=50000&apiKey=" + API_KEY
+            polygon_url = f"https://api.polygon.io/v2/aggs/ticker/{symbol}/range/{interval}/{interval_unit}/{last_put_date_str}/{cur_date_str}?adjusted=true&sort=asc&limit=50000&apiKey=" + API_KEY
             datasets = requests.get(polygon_url).json()
             api_candles = datasets['results'] if 'results' in datasets else []
+
             for candle in api_candles:
                 candle_date = datetime.fromtimestamp((candle['t']/1000))
                 if last_put_date < candle_date:
@@ -179,7 +131,7 @@ class DailyPutThread(object):
         except:
             print ("......error in get_new_candles......")
 
-        return new_candles, sym_x
+        return new_candles
 
     def check_candle_in_maket_time(self, candle):
         year = int(candle['date'].strftime("%Y"))
@@ -202,13 +154,13 @@ class DailyPutThread(object):
             for sym_idx, symbol in enumerate(self.symbols):
                 last_put_date = self.get_last_put_date(symbol, self.interval)
 
-                masterdb = mongoclient[DB_NAME]
+                masterdb = mongoclient[STOCK_CHART_DB_NAME]
                 collection_name = 'backtest_'+self.interval[0]+"_"+self.interval[1]
                 ob_table = masterdb[collection_name]
                 
                 put_candle_count = 0
                 while True:
-                    new_candles, ticker = self.get_new_candles(symbol, self.interval[0], self.interval[1], last_put_date)
+                    new_candles = self.get_new_candles(symbol, self.interval[0], self.interval[1], last_put_date)
                     put_candles = []
                     for idx, candle in enumerate(new_candles):
                         if self.get_only_market_time:
@@ -218,7 +170,6 @@ class DailyPutThread(object):
                         candle['interval'] = self.int_value
                         candle['stock'] = symbol
                         candle['time_frame'] = self.interval[0] + "_" + self.interval[1]
-                        candle['ticker'] = ticker
                         put_candles.append(candle)  
 
                     if len(put_candles) > 0:
@@ -245,12 +196,10 @@ if __name__ == "__main__":
     market_start_time = [9, 30]
     market_end_time = [16, 30]
     get_only_market_time = True
-    thread_count = 7
+    thread_count = 2
     thread_list = []
 
-    # symbols = get_symbols()
-    # symbols = ["BTC","ETH","DOGE","BCH","LTC", ""]
-    symbols = get_watch_list_symbols(SYMBOL_TYPE_CRYPTO)
+    symbols = get_watch_list_symbols(SYMBOL_TYPE_STOCK)
     symbols.append("")
     symbol_count = len(symbols)
     print (symbols, "symbols: ", symbol_count)
@@ -297,11 +246,11 @@ if __name__ == "__main__":
                 time.sleep(5)
                 proc_time += 5
 
-        time.sleep(1800)
+        time.sleep(3600)
     for thrd in thread_list:
         thrd.stop()
 
-    time.sleep(2)
+    time.sleep(20)
     end_time = datetime.now()
     print ('start at: {}, end_at: {}'.format(start_time, end_time))
         

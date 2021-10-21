@@ -36,7 +36,6 @@ class SignupLinkRoleView(views.APIView):
 def send_link_to_email(request) :
     if request.method == "POST":
         request_data = JSONParser().parse(request)
-        print(request_data)
         email = request_data['email']
         link = request_data['link']
         send_email(link, email)

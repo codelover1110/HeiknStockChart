@@ -1,11 +1,10 @@
+import sys
+sys.path.insert(0, '..')
 import pymongo
 from datetime import datetime, timedelta
 import pandas as pd 
-import os
 import requests
 import time
-import io
-import csv
 import threading
 
 try:
@@ -13,27 +12,10 @@ try:
 except ImportError:
    import Queue as queue
 
-API_KEY = 'tuQt2ur25Y7hTdGYdqI2VrE4dueVA8Xk'
-mongoclient = pymongo.MongoClient('mongodb://root:rootUser2021@20.84.64.243:27017')
+from v_define import MONGO_URL, API_KEY, NASDAQ_100_DB_NAME, NASDAQ_100_LAST_UPDATE_DATE_COL, SYMBOL_TYPE_STOCK
+from v_define import INTERVALS as intervals
 
-def get_symbols():
-    url="https://pkgstore.datahub.io/core/nasdaq-listings/nasdaq-listed_csv/data/7665719fb51081ba0bd834fde71ce822/nasdaq-listed_csv.csv"
-    s = requests.get(url).content
-    companies = pd.read_csv(io.StringIO(s.decode('utf-8')))
-    symbols = companies['Symbol'].tolist()
-    return symbols
-
-DB_NAME = 'nasdaq100'
-
-intervals = [
-    # [['1', 'minute'], 1, False, 30],    # use 30 when get a year candles
-    # [['1', 'hour'], 1*60, False, 500],
-    # [['2', 'minute'], 2, False, 60],    # use 60 when get a year candles
-    # [['12', 'minute'], 12, False, 200],  # use 200 when get a year candles
-    # [['4', 'hour'], 4*60, False, 500],
-    # [['12', 'hour'], 12*60, False, 500],
-    [['1', 'day'], 24*60, False, 1000],
-]
+mongoclient = pymongo.MongoClient(MONGO_URL)
 
 class DailyPutThread(object):
     def __init__(self, symbols,
@@ -81,20 +63,20 @@ class DailyPutThread(object):
         print ("deleted")
 
     def update_last_put_date(self, symbol, interval, last_candle_date):
-        masterdb = mongoclient[DB_NAME]
-        ob_table = masterdb['symbol_last_date']
+        masterdb = mongoclient[NASDAQ_100_DB_NAME]
+        ob_table = masterdb[NASDAQ_100_LAST_UPDATE_DATE_COL]
         symbol_last_update_date = ob_table.find_one({"symbol": symbol})
 
         if symbol_last_update_date is not None:
             object_id = symbol_last_update_date['_id']
             key = interval[0] + "_" + interval[1]
-            ob_table.update_one({'_id': object_id},  {'$set': {key: last_candle_date}}) 
+            # ob_table.update_one({'_id': object_id},  {'$set': {key: last_candle_date}}) 
 
     def get_last_put_date(self, symbol, interval): 
         default_date = datetime.strptime("2015-01-21 00:00:00", '%Y-%m-%d %H:%M:%S')
         
-        masterdb = mongoclient[DB_NAME]
-        ob_table = masterdb['symbol_last_date']
+        masterdb = mongoclient[NASDAQ_100_DB_NAME]
+        ob_table = masterdb[NASDAQ_100_LAST_UPDATE_DATE_COL]
         last_date_doc = ob_table.find_one({"symbol": symbol})
         if last_date_doc is not None:
             key = interval[0] + "_" + interval[1]
@@ -102,7 +84,7 @@ class DailyPutThread(object):
                 return last_date_doc[key]
             else:
                 object_id = last_date_doc['_id']
-                ob_table.update({'_id': object_id},  {'$set': {key: default_date}}) 
+                # ob_table.update({'_id': object_id},  {'$set': {key: default_date}}) 
                 return default_date
         else:
             symbol_last_date = dict()
@@ -126,7 +108,7 @@ class DailyPutThread(object):
                 symbol_last_date['1_day'] = datetime.now() - timedelta(days=365)
 
 
-            ob_table.insert_one(symbol_last_date)
+            # ob_table.insert_one(symbol_last_date)
             return symbol_last_date[interval[0] + "_" + interval[1]]
 
     def get_new_candles(self, symbol, interval, interval_unit, last_put_date):
@@ -136,7 +118,7 @@ class DailyPutThread(object):
             end_date = last_put_date+timedelta(days=self.time_delta)
             cur_date_str = str(end_date.date())
 
-            polygon_url = f"https://api.polygon.io/v2/aggs/ticker/{symbol}/range/{interval}/{interval_unit}/{last_put_date_str}/{cur_date_str}?adjusted=true&sort=asc&limit=50000&apiKey=tuQt2ur25Y7hTdGYdqI2VrE4dueVA8Xk"
+            polygon_url = f"https://api.polygon.io/v2/aggs/ticker/{symbol}/range/{interval}/{interval_unit}/{last_put_date_str}/{cur_date_str}?adjusted=true&sort=asc&limit=50000&apiKey=" + API_KEY
             datasets = requests.get(polygon_url).json()
             api_candles = datasets['results'] if 'results' in datasets else []
 
@@ -171,9 +153,8 @@ class DailyPutThread(object):
                 continue
             for sym_idx, symbol in enumerate(self.symbols):
                 last_put_date = self.get_last_put_date(symbol, self.interval)
-                # last_put_date = datetime.strptime("2021-09-06 00:00:00", '%Y-%m-%d %H:%M:%S')
 
-                masterdb = mongoclient[DB_NAME]
+                masterdb = mongoclient[NASDAQ_100_DB_NAME]
                 collection_name = 'nasdaq100_'+self.interval[0]+"_"+self.interval[1]
                 ob_table = masterdb[collection_name]
                 
@@ -192,7 +173,7 @@ class DailyPutThread(object):
                         put_candles.append(candle)  
 
                     if len(put_candles) > 0:
-                        ob_table.insert_many(put_candles)
+                        # ob_table.insert_many(put_candles)
                         last_candle_date = put_candles[-1]['date']
                         self.update_last_put_date(symbol, self.interval, last_candle_date)
                         put_candle_count += len(put_candles)
@@ -207,7 +188,7 @@ class DailyPutThread(object):
             time.sleep(1)
 
 def read_symbols():
-    file_name = 'qqq_tickers.csv'
+    file_name = 'csv_files/qqq_tickers.csv'
     df = pd.read_csv(file_name)
     return df['Ticker'].tolist()
 
@@ -219,13 +200,11 @@ if __name__ == "__main__":
     market_start_time = [9, 30]
     market_end_time = [16, 30]
     get_only_market_time = True
-    thread_count = 10
+    thread_count = 2
     thread_list = []
 
     symbols = read_symbols()
     symbols.append("")
-    # symbols = get_symbols()
-    # symbols = ["GOOG", "ATVI", "AMD", "MSFT", "AMZN", "NVDA", "TSLA", "AAPL", ""]
     symbol_count = len(symbols)
     print ("symbols: ", symbol_count)
 
@@ -271,11 +250,10 @@ if __name__ == "__main__":
             time.sleep(5)
             proc_time += 5
 
-    time.sleep(10)
+        # time.sleep(3600)
     for thrd in thread_list:
         thrd.stop()
 
-    time.sleep(2)
+    time.sleep(20)
     end_time = datetime.now()
     print ('start at: {}, end_at: {}'.format(start_time, end_time))
-        

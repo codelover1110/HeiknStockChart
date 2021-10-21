@@ -1,9 +1,10 @@
 import websocket
 import threading
 import time
+import ssl
 
-server_url = "ws://127.0.0.1:11111/"
-
+server_url = "wss://20.84.64.243:11111/"
+#server_url = "ws://137.220.61.158:9999/"
 class Client(object):
 	def __init__(self, socket_url):
 		self.ws = websocket.WebSocketApp(
@@ -12,6 +13,7 @@ class Client(object):
 			on_message=self.on_message,
 			on_close=self.on_close
 		)
+		self.ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
 
 		self.ws_thread = threading.Thread(target=self.ws.run_forever)
 	

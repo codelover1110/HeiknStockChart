@@ -68,6 +68,7 @@ INSTALLED_APPS = [
     'floats',
     'crispy_forms', 
     'sslserver',
+    'backup.apps.BackupConfig'
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'

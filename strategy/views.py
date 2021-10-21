@@ -136,9 +136,9 @@ def config_item_detail(request):
 
         try:
             config_detail = params.get_config_item_detail(config_collection, name)
-            save_config(name, config_detail)
-            file_path = 'chartApis/lib/download/test.py'
-            run_command('python {} --bot={}'.format(file_path, name))
+            # save_config(name, config_detail)
+            # file_path = 'chartApis/lib/download/test.py'
+            # run_command('python {} --bot={}'.format(file_path, name))
             return JsonResponse({"success": True, "result": config_detail}, safe=True)
         except:
             return JsonResponse({"success": False, "message": 'Failed to get {}-{} config details!'.format(config_collection, name)}, safe=True)

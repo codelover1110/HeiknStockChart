@@ -131,10 +131,10 @@ class WebSocketHandler(StreamRequestHandler):
     def __init__(self, socket, addr, server):
         self.server = server
         if server.key and server.cert:
-            try:
+            # try:
                 socket = ssl.wrap_socket(socket, server_side=True, certfile=server.cert, keyfile=server.key)
-            except: # Not sure which exception it throws if the key/cert isn't found
-                logger.warn("SSL not available (are the paths {} and {} correct for the key and cert?)".format(server.key, server.cert))
+            # except: # Not sure which exception it throws if the key/cert isn't found
+            #     logger.warn("SSL not available (are the paths {} and {} correct for the key and cert?)".format(server.key, server.cert))
         StreamRequestHandler.__init__(self, socket, addr, server)
 
     def setup(self):
