@@ -296,9 +296,10 @@ def get_all_scanner_symbols():
     result = json.loads(wl['contents'])
     return result['tickers']
 
-def get_ticker_details_list(exchange, industry, sector):
+def get_ticker_details_list(exchange, industry, sector, page_num=0, page_mounts=0):
     news_db = mongoclient[DETAILS]
     db_collection = news_db[DETAILS_COL_NAME]
+    fields = {'_id': 0, 'tags':0, 'similar':0, 'address':0}
     
 
     query_obj = dict()
@@ -309,9 +310,12 @@ def get_ticker_details_list(exchange, industry, sector):
     if sector != '':
         query_obj['sector'] = sector
     
-    details = list(db_collection.find(query_obj, {'_id': False}).sort('updated', pymongo.ASCENDING))
-    details_data = list(details)
-    return details_data
+    page_total = db_collection.find(query_obj, fields).count()
+    if page_num != 0 and page_mounts != 0:
+        details = list(db_collection.find(query_obj, fields).skip(page_num).limit(page_mounts))
+    else:
+        details = list(db_collection.find(query_obj, fields))
+    return details, page_total
 
 def get_ticker_details_filter_options():
     news_db = mongoclient[DETAILS]

@@ -124,7 +124,7 @@ class DailyPutThread(object):
             api_candles = datasets['results'] if 'results' in datasets else []
 
             for candle in api_candles:
-                candle_date = datetime.fromtimestamp((candle['t']/1000))
+                candle_date = datetime.fromtimestamp(candle['t']/1000) - timedelta(hours=2)
                 if last_put_date < candle_date:
                     candle['date'] = candle_date
                     new_candles.append(candle)

@@ -38,7 +38,7 @@ def monitoring_cryto_aggregates():
     if contents["status"] == "OK" and contents["resultsCount"] > 0:
         results = contents['results']
         for candle in results:
-            candle['date'] = datetime.fromtimestamp(candle['t']/1000)
+            candle['date'] = datetime.fromtimestamp(candle['t']/1000) - timedelta(hours=2)
 
 class DailyPutThread(object):
     def __init__(self, symbols,
@@ -146,7 +146,7 @@ class DailyPutThread(object):
             datasets = requests.get(polygon_url).json()
             api_candles = datasets['results'] if 'results' in datasets else []
             for candle in api_candles:
-                candle_date = datetime.fromtimestamp((candle['t']/1000))
+                candle_date = datetime.fromtimestamp(candle['t']/1000) - timedelta(hours=2)
                 if last_put_date < candle_date:
                     candle['date'] = candle_date
                     new_candles.append(candle)

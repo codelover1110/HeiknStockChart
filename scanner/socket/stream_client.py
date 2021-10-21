@@ -17,15 +17,16 @@ except ImportError:
    import Queue as queue
 
 
-socket = "ws://127.0.0.1:9999/"
-# socket = "wss://52.191.3.0:9999"
+# socket = "ws://127.0.0.1:9999/"
+# socket = "ws://52.191.3.0:9999"
 # socket = "ws://20.84.64.243:9999"
+socket = "wss://www.testvioletteam.com"
 # ["BTC", "ETH", "LTC"],   ["AMD", "AMZN", "GOOG"]
 test_info = {
         "action": "create_fields",
         "chart_number": 4,
-        "symbol_type": "crypto",
-        "symbols": ["BTC", "ETH", "LTC"],
+        "symbol_type": "stock",
+        "symbols": ["AMD", "AMZN", "GOOG"],
         "fields": [
             { "Stock Financials":   [ "period","calendarDate" ] },
             { "Ticker News":        [ "id", "title" ] },
@@ -33,6 +34,16 @@ test_info = {
             { "Indicators": [ "rsi", "rsi2", "rsi3", "heik", "heik2" ] }
         ]
     }
+
+# test_info = {
+#         "action": "create_fields",
+#         "chart_number": 3,
+#         "symbols": ["BTC", "ETH", "DOGE", "BCH", "LTC"],
+#         "symbol_type": "stock",
+#         "fields": [
+#             { "Indicators": [ "rsi", "rsi2", "rsi3", "heik", "heik2" ] }
+#         ]
+#     }
 
 class StreamClient(object):
     def __init__(self, socket_url):
@@ -43,7 +54,7 @@ class StreamClient(object):
             on_close=self.on_close
         )
 
-        self.ws_thread = threading.Thread(target=self.ws.run_forever)
+        self.ws_thread = threading.Thread(target=self.ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE}))
     
     def start(self):
         self.ws_thread.deamon = True
