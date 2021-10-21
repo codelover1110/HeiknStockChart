@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
 import Pagination from 'react-bootstrap/Pagination'
-import { MDBDataTableV5, MDBTable, MDBTableBody, MDBTableHead } from 'mdbreact';
-import { Collapse, Button, CardBody, Card } from 'reactstrap';
+import { MDBTable, MDBTableBody, MDBTableHead } from 'mdbreact';
+import { Collapse, CardBody, Card } from 'reactstrap';
 import moment from 'moment'
 
 const FinancialStatementsDataTable = (props) => {

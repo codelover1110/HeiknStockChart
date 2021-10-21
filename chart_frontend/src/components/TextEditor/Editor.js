@@ -1,4 +1,3 @@
-
 import React, { Component } from "react";
 import Select from 'react-select'
 import { Editor } from "react-draft-wysiwyg";
@@ -189,128 +188,166 @@ export default class TextEditor extends Component {
       isShowConfigOpenModal: false,
       isShowBotConfigOpenModal: false,
       strategyIndicators: [],
-    headerColumnsBotStatus: [
-      {
-        label: 'ID',
-        field: 'id',
-        width: 100,
-        attributes: {
-          'aria-controls': 'DataTable',
-          'aria-label': 'symbol',
+      headerColumnsBotStatus: [
+        {
+          label: 'ID',
+          field: 'id',
+          width: 100,
+          attributes: {
+            'aria-controls': 'DataTable',
+            'aria-label': 'symbol',
+          },
         },
-      },
-      {
-        label: 'BOT NAME',
-        field: 'name',
-        width: 200,
-      },
-      {
-        label: 'STATUS',
-        field: 'status',
-        width: 150,
-      },
-      {
-        label: 'UPDATED',
-        field: 'updated',
-        width: 150,
-      },
-      {
-        label: 'Action',
-        field: 'action',
-        sort: false,
-        width: 100,
-      }
-    ],
-    headerColumnsBotConfig: [
-      {
-        label: 'ID',
-        field: 'id',
-        wdith: 100,
-        attributes: {
-          'aria-controls': 'DataTable',
-          'aria-label': 'ID',
+        {
+          label: 'BOT NAME',
+          field: 'name',
+          width: 200,
         },
-      },
-      {
-        label: 'BOT NAME',
-        field: 'name',
-        width: 200,
-      },
-      {
-        label: 'Time Frame',
-        field: 'timeframe',
-        with: 200,
-      },
-      {
-        label: 'Indicator',
-        field: 'indicator',
-        with: 500,
-      },
-      {
-        label: 'Watch List',
-        field: 'watchlist',
-        with: 100,
-      },
-      {
-        label: 'Position Sizing',
-        field: 'position_sizing',
-        sort: false,
-        with: 100,
-      },
-      {
-        label: 'Order Routing',
-        field: 'order_routing',
-        sort: false,
-        with: 100,
-      },
-      {
-        label: 'Data Source',
-        field: 'data_source',
-        sort: false,
-        with: 100,
-      },
-      {
-        label: 'Live Trading',
-        field: 'live_trading',
-        sort: false,
-        with: 100,
-      },
-      {
-        label: 'Starting Cash',
-        field: 'starting_cash',
-        sort: false,
-        with: 100,
-      },
-      {
-        label: 'Hours',
-        field: 'hours',
-        sort: false,
-        with: 100,
-      },
-      {
-        label: 'Macro Strategy',
-        field: 'macro_strategy',
-        sort: false,
-        with: 100,
-      },
-      {
-        label: 'Indicator Signalling',
-        field: 'indicator_signalling',
-        sort: false,
-        with: 100,
-      },
-      {
-        label: 'Asset Class',
-        field: 'asset_class',
-        sort: false,
-        with: 100,
-      }
-    ],
+        {
+          label: 'STATUS',
+          field: 'status',
+          width: 150,
+        },
+        {
+          label: 'UPDATED',
+          field: 'updated',
+          width: 150,
+        },
+        {
+          label: 'Action',
+          field: 'action',
+          sort: false,
+          width: 100,
+        }
+      ],
+      headerColumnsBotConfig: [
+        {
+          label: 'ID',
+          field: 'id',
+          wdith: 100,
+          attributes: {
+            'aria-controls': 'DataTable',
+            'aria-label': 'ID',
+          },
+        },
+        {
+          label: 'BOT NAME',
+          field: 'name',
+          width: 200,
+        },
+        {
+          label: 'Time Frame',
+          field: 'timeframe',
+          with: 200,
+        },
+        {
+          label: 'Indicator',
+          field: 'indicator',
+          with: 500,
+        },
+        {
+          label: 'Watch List',
+          field: 'watchlist',
+          with: 100,
+        },
+        {
+          label: 'Position Sizing',
+          field: 'position_sizing',
+          sort: false,
+          with: 100,
+        },
+        {
+          label: 'Order Routing',
+          field: 'order_routing',
+          sort: false,
+          with: 100,
+        },
+        {
+          label: 'Data Source',
+          field: 'data_source',
+          sort: false,
+          with: 100,
+        },
+        {
+          label: 'Live Trading',
+          field: 'live_trading',
+          sort: false,
+          with: 100,
+        },
+        {
+          label: 'Starting Cash',
+          field: 'starting_cash',
+          sort: false,
+          with: 100,
+        },
+        {
+          label: 'Hours',
+          field: 'hours',
+          sort: false,
+          with: 100,
+        },
+        {
+          label: 'Macro Strategy',
+          field: 'macro_strategy',
+          sort: false,
+          with: 100,
+        },
+        {
+          label: 'Indicator Signalling',
+          field: 'indicator_signalling',
+          sort: false,
+          with: 100,
+        },
+        {
+          label: 'Asset Class',
+          field: 'asset_class',
+          sort: false,
+          with: 100,
+        }
+      ],
+      headerColumnsSmallBotConfig: [
+        {
+          label: 'ID',
+          field: 'id',
+          wdith: 100,
+          attributes: {
+            'aria-controls': 'DataTable',
+            'aria-label': 'ID',
+          },
+        },
+        {
+          label: 'BOT NAME',
+          field: 'name',
+          width: 200,
+        },
+        {
+          label: 'Macro Strategy',
+          field: 'macro_strategy',
+          sort: false,
+          with: 100,
+        },
+        {
+          label: 'Extended Hours',
+          field: 'hours',
+          sort: false,
+          with: 100,
+        },
+        {
+          label: 'Start Date',
+          field: 'start_date',
+          sort: false,
+          with: 100,
+        }
+      ],
       botStatusDatatable: {
         columns: [],
         rows: [],    
       },
       botConfigDatatable: {
+        columns: [],
+        rows: [],    
+      },
+      botConfigSmallDatatable: {
         columns: [],
         rows: [],    
       }
@@ -455,8 +492,26 @@ export default class TextEditor extends Component {
         }),
         rows: botConfigList
       }
+      const data1 = {
+        columns: this.state.headerColumnsSmallBotConfig.map((col, index) => { 
+          if (index === 0) {
+            col.width = 50;
+          } else if (index === 1) {
+            col.width = 150;
+          } else if (index === 3) {
+            col.width = 300;
+          } else if ((index === 4) || (index === 5) || (index === 6) || (index === 7) || (index === 8) || (index === 9)) {
+            col.width = 150;
+          } else if ((index === 10) || (index === 11) || (index === 12) || (index === 13)) {
+            col.width = 200;
+          }
+          return col;
+        }),
+        rows: botConfigList
+      }
       this.setState({
-        botConfigDatatable: data
+        botConfigDatatable: data,
+        botConfigSmallDatatable: data1
       })
     }
   }
@@ -497,20 +552,23 @@ export default class TextEditor extends Component {
       return;
     }
 
-    if (this.state.isSelectedStrategyFile) {
-      if (!this.state.strategyIndicators.length) {
-        console.log("content is empty!")
-        return;
-      }
-    } else {
+    
+    
+    if (!this.state.isSelectedStrategyFile) {
       if (this.state.isCheckedStrategy) {
         console.log("content is empty!")
         return;
       }
     }
-
+    
     let res;
     if (this.state.isSelectedStrategyFile) {
+      if (this.state.isUpdate) {
+        if (!this.state.selectedFileType) {
+          alert("content is empty!")
+          return
+        }
+      }
       res = await saveScriptFile(
         this.state.isUpdate ? this.state.selectedFileType.value : this.state.filename,
         this.state.content,
@@ -568,13 +626,6 @@ export default class TextEditor extends Component {
     })
   }
 
-  handleBotConfigModal = async () => {
-    this.setState({
-      isShowBotConfigOpenModal: true,
-      isUpdate: true
-    })
-  }
-  
   handleFileTypeChange = async (e) => {
     this.setState({
       selectedFileType: e,
@@ -718,9 +769,10 @@ export default class TextEditor extends Component {
     this.botConfigModalClose()
   }
 
-  handleSave = (content) => {
+  handleSave = (editorState) => {
+    let content = convertToRaw(editorState.getCurrentContent())
     this.setState({
-      content,
+      content: content.blocks[0].text,
       isSelectedStrategyFile: true
     })
     this.handleSaveModalShow()
@@ -746,27 +798,6 @@ export default class TextEditor extends Component {
     this.loadBotConfigList()
   }
   
-  handleBotConfigSettingSave = async () => {
-    if (!this.state.botConfigSetting.name.length) {
-      alert("name field is required!")
-      return
-    }
-    const res = await saveConfigFile(
-      this.state.botConfigSetting,
-      this.state.isUpdate,
-    )
-
-    if (res.success) {
-      alert(res.message)
-    } else {
-      alert('The config is not saved')
-    }
-
-    this.loadConfigFiles()
-    this.loadBotConfigList()
-
-  }
-
   showFile = async (e) => {
     e.preventDefault()
     let currFile=e.target.files[0]
@@ -860,50 +891,6 @@ export default class TextEditor extends Component {
     })
   }
   
-  displayBotConfigEditor = () => {
-    let keys = Object.keys(this.state.botConfigOptions);
-    return keys.map((key, index) => {
-      return (
-        <li key={key} className="list-group-item strategy-indicator-edit-list">
-          <div className="strategy-indicator-edit-list-no display-flex-j-c">
-            <MDBBtn tag="a" size="sm">
-              {index}
-            </MDBBtn>
-          </div>
-          <div className="strategy-indicator-edit-list-content ml-30">
-            <MDBBtn tag="a" size="sm"  className="hunter-process-mdb-btn">
-              {key}
-            </MDBBtn>
-          </div>
-          <div className="strategy-indicator-edit-list-action">
-          { key === 'bot_name'|| key === 'start_date' || key === 'bot_name_config'|| key === 'start_date_config'
-            ? 
-            (
-              <input
-                  type="name"
-                  className="form-control hunter-bot-name-input"
-                  placeholder= {
-                    key === 'bot_name' ? "Enter bot name" : key === 'name' ? "Enter name": key === 'bot_name_config' ? "Enter bot name" : "Enter start date"
-                  }
-                  value={this.state.botConfigSetting[key]}
-                  onChange={(e) => { this.handleBotConfigBotNameChange(e, key)}}
-              />
-            )
-            :
-            (<Select
-              value={this.state.botConfigSetting[key]}
-              onChange={(e) => { this.handleBotConfigInputChange(e, key) }}
-              options={this.state.botConfigOptions[key]}
-              placeholder="select"
-              isMulti
-            />)
-          }
-          </div>
-        </li>
-      )
-    })
-  }
-
   handleIndicatorReset = () => {
     this.setState(
       { 
@@ -927,19 +914,6 @@ export default class TextEditor extends Component {
     )
   }
   
-  handleBotConfigReset = () => {
-    this.setState(
-      { 
-        botConfigSetting: {
-          bot_name_config: '',
-          hours: null,
-          macro_strategy: null,
-          start_date: '',
-        }
-      }
-    )
-  }
-
   render() {
     const { editorState } = this.state;
     return (
@@ -964,7 +938,8 @@ export default class TextEditor extends Component {
                 <div className="display-flex-left">
                   <button className="btn btn-md btn-secondary" onClick={()=>this.handleScriptFileCreate()}>New</button>
                   <button className="btn btn-md btn-secondary" onClick={()=>this.handleOpenScriptFile()}>Open</button>
-                  <button className="btn btn-md btn-secondary" onClick={()=>this.handleSave(draftToHtml(convertToRaw(editorState.getCurrentContent())))}>Save</button>
+                  {/* <button className="btn btn-md btn-secondary" onClick={()=>this.handleSave(draftToHtml(convertToRaw(editorState.getCurrentContent())))}>Save</button> */}
+                  <button className="btn btn-md btn-secondary" onClick={()=>this.handleSave(editorState)}>Save</button>
                 </div>
               </div>
             </Tab>
@@ -977,18 +952,6 @@ export default class TextEditor extends Component {
                   <button className="btn btn-md btn-secondary mr-10" onClick={()=>this.handleIndicatorReset()}>Reset</button>
                   <button className="btn btn-md btn-secondary mr-10" onClick={()=>this.handleOpenProcessConfigModal()}>Open</button>
                   <button className="btn btn-md btn-secondary mr-10" onClick={()=>this.handleProcessConfigSettingSave()}>Save</button>
-                </div>
-              </div>
-            </Tab>
-            <Tab eventKey="bot_config_editor" title="Bot Config Editor">
-              <div className={"strategy-indicator-edit-area"}>
-                <ul className="list-group">
-                  {this.displayBotConfigEditor()}
-                </ul>
-                <div className="strategy-edit-icon-area">
-                  <button className="btn btn-md btn-secondary mr-10" onClick={()=>this.handleBotConfigReset()}>Reset</button>
-                  <button className="btn btn-md btn-secondary mr-10" onClick={()=>this.handleBotConfigModal()}>Open</button>
-                  <button className="btn btn-md btn-secondary mr-10" onClick={()=>this.handleBotConfigSettingSave()}>Save</button>
                 </div>
               </div>
             </Tab>
@@ -1006,6 +969,21 @@ export default class TextEditor extends Component {
               striped={true}
               scrollY={true}
             />;
+            </Tab>
+            <Tab eventKey="bot-config-manager-small" title="Bot Config Manager1">
+              <MDBDataTableV5 
+                hover
+                maxHeight="500px"
+                entriesOptions={[10, 25, 50, 100]}
+                entries={10}
+                pagesAmount={4}
+                data={this.state.botConfigSmallDatatable}
+                noBottomColumns={true}
+                small={true}
+                sortable={false}
+                striped={true}
+                scrollX
+              />;
             </Tab>
             <Tab eventKey="bot-config-manager" title="Bot Config Manager">
               <MDBDataTableV5 

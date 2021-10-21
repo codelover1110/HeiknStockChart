@@ -207,7 +207,6 @@ const TradeDataTable = () => {
       }
       setMacroStrategy(e)
     }
-
   }
 
   const handleMicroStrategy = (e) => {
@@ -274,12 +273,6 @@ const TradeDataTable = () => {
                   <p className="d-lg-none">Log out</p>
                 </DropdownToggle>
                 <DropdownMenu className="dropdown-navbar" right tag="ul">
-                  {/* <NavLink tag="li">
-                    <DropdownItem className="nav-item">Profile</DropdownItem>
-                  </NavLink>
-                  <NavLink tag="li">
-                    <DropdownItem className="nav-item">Settings</DropdownItem>
-                  </NavLink> */}
                   <DropdownItem divider tag="li" />
                   <NavLink tag="li">
                     <DropdownItem className="nav-item" onClick={() => {handleSignout()}}>Log out</DropdownItem>
@@ -326,7 +319,7 @@ const TradeDataTable = () => {
           </div>
         </div>
 
-        {isLoadingData && <Spinner />}
+        {isLoadingData && <div className="hunter-spinner-area"><span className="mr-30">Loading ...</span>    <Spinner>Loading</Spinner></div>}
         {!isLoadingData && <>
           <MDBDataTableV5
             hover

@@ -158,7 +158,7 @@ const FinancialDataTable = (props) => {
   return (
     <div className="hunter-chart-container">
       <div className="col-sm-12 hunter-data-table-container financial-data-table">
-        {isLoadingData && <Spinner>Loading</Spinner>}
+        {isLoadingData && <div className="hunter-spinner-area"><span className="mr-30">Loading ...</span>    <Spinner>Loading</Spinner></div>}
         {!isLoadingData && datatable && (
           <MDBTable
             hover
