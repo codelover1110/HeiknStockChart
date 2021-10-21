@@ -120,7 +120,6 @@ def get_ticker_details_fields():
     news_db = mongoclient[DETAILS]
     db_collection = news_db[DETAILS_COL_NAME]
     details = db_collection.find_one({}, fields)
-    print (details)
     total = list(details.keys())
     results = {
         "total": total,
@@ -188,8 +187,6 @@ def update_symbol_candle(symbol, candle):
                 tmp_candle['rsi3'] = new_candle['rsi3']
                 tmp_candle['heik'] = new_candle['heik']
                 tmp_candle['heik2'] = new_candle['heik2']
-                if symbol == "AMZN":
-                    print (tmp_candle)
                 symbol_scanner['rsi_candle'] = tmp_candle
                 symbol_scanner['lastest_candles'] = latest_candles[-24:]
             else:
@@ -263,7 +260,6 @@ def get_watchlist(name):
     scanner_db = mongoclient[PARAMETERS_DB]
     db_collection = scanner_db[WATCHLIST_COL_NAME]
     wl = db_collection.find_one({'name': name}, {"_id": 0})
-    print (wl)
     tickers = wl['contents'].split('\n')
     tickers.remove('')
 
@@ -282,10 +278,7 @@ def get_watchlist_all():
         wl_item = dict()
         wl_item['name'] = wl_name
         wl_item['tickers'] = tickers
-        print (wl_item)
         result.append(wl_item)
-
-    print ("---------", result)
 
     return result
 

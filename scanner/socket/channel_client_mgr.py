@@ -6,6 +6,7 @@ import threading
 from ib_insync import util
 
 from polygon_stream_client import PolygonStream
+from polygon_api_mgr import PolygonApiClientManager
 from utils import Filter as rsi_heik_v1_fitler_1
 from db_models import DBManager, get_watch_list_symbols, get_all_scanner_fields
 from utils import get_candle_fields, combine_dict, get_fields_data
@@ -14,6 +15,7 @@ from channel_client import ChannelClient
 
 stock_websocket = "wss://delayed.polygon.io/stocks"
 crypto_websocket = "wss://socket.polygon.io/crypto"
+api_key = 'tuQt2ur25Y7hTdGYdqI2VrE4dueVA8Xk'
 output_stream_queue = queue.Queue()
 
 class ChannelClientManager(object):
@@ -40,6 +42,7 @@ class ChannelClientManager(object):
 
     def init(self):
         self.symbols = get_watch_list_symbols(self.symbol_type)
+        # self.symbols = self.symbols[:4]
         print ("symbols: ", self.symbols)
         
         print ("pre-loading database fields for ", self.symbol_type, " ...")
@@ -52,7 +55,8 @@ class ChannelClientManager(object):
             sym_last_candles['last_rsi_candle'] = None
             self.symbol_last_candles.append(sym_last_candles)
 
-        self.polygon_stream_client = PolygonStream(self.socket_url, self.input_all_stream_queue, self.symbols, self.symbol_type)
+        # self.polygon_stream_client = PolygonStream(self.socket_url, self.input_all_stream_queue, self.symbols, self.symbol_type)
+        self.polygon_stream_client = PolygonApiClientManager(self.symbols, self.input_all_stream_queue, api_key, self.symbol_type)
         self.db_scanner = DBManager(self.symbols, default_fields)
         print ("------- done")
     

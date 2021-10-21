@@ -123,7 +123,7 @@ class PolygonStream(object):
         result.append(fake_candle)
         return result
 
-    def file_date_field(self, candles):
+    def fill_date_field(self, candles):
         result = []
         for candle in candles:
             candle['date'] = str(datetime.fromtimestamp(int(candle['s']/1000)))
@@ -169,7 +169,7 @@ class PolygonStream(object):
 
     def on_message(self, ws, message):
         candles = list(eval(message))
-        candles = self.file_date_field(candles)
+        candles = self.fill_date_field(candles)
         self.put_queue(candles)
         
 
@@ -187,7 +187,6 @@ async def handler(websocket, path):
         if not stream_candles.empty():
             while not stream_candles.empty():
                 candle = stream_candles.get()
-                print ("web-socket => ", candle)
                 candles.append(candle)
             await websocket.send(json.dumps(candles))
         await asyncio.sleep(1)

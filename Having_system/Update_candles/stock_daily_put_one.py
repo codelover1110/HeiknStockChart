@@ -1,11 +1,10 @@
+import sys
+sys.path.insert(0, '..')
 import pymongo
 from datetime import datetime, timedelta
 import pandas as pd 
-import os
 import requests
 import time
-import io
-import csv
 import threading
 
 try:
@@ -13,33 +12,11 @@ try:
 except ImportError:
    import Queue as queue
 
-from define import *
-from db_models import get_watch_list_symbols
+from v_define import MONGO_URL, API_KEY, STOCK_MARKET_DATA_ALL_DB, STOCK_LAST_UPDATE_DATE_ALL_COL
+from v_define import INTERVALS as intervals
+from common import get_symbols
 
-API_KEY = 'tuQt2ur25Y7hTdGYdqI2VrE4dueVA8Xk'
-# mongoclient = pymongo.MongoClient('mongodb://aliaksandr:BD20fc854X0LIfSv@cluster0-shard-00-00.35i8i.mongodb.net:27017,cluster0-shard-00-01.35i8i.mongodb.net:27017,cluster0-shard-00-02.35i8i.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-aoj781-shard-0&authSource=admin&retryWrites=true&w=majority')
-# mongoclient = pymongo.MongoClient('mongodb://user:-Hz2f$!YBXbDcKG@cluster0-shard-00-00.vcom7.mongodb.net:27017,cluster0-shard-00-01.vcom7.mongodb.net:27017,cluster0-shard-00-02.vcom7.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-7w6acj-shard-0&authSource=admin&retryWrites=true&w=majority')
-mongoclient = pymongo.MongoClient('mongodb://root:rootUser2021@20.84.64.243:27017')
-
-def get_symbols():
-    url="https://pkgstore.datahub.io/core/nasdaq-listings/nasdaq-listed_csv/data/7665719fb51081ba0bd834fde71ce822/nasdaq-listed_csv.csv"
-    s = requests.get(url).content
-    companies = pd.read_csv(io.StringIO(s.decode('utf-8')))
-    symbols = companies['Symbol'].tolist()
-    return symbols
-
-DB_NAME = 'chart_market_data'
-LAST_UPDATE_DATE_COL = "stock_symbol_last_date"
-
-intervals = [
-    [['1', 'minute'], 1, False, 500],    # use 30 when get a year candles
-    [['2', 'minute'], 2, False, 500],    # use 60 when get a year candles
-    [['12', 'minute'], 12, False, 500],  # use 200 when get a year candles
-    [['1', 'hour'], 1*60, False, 500],
-    [['4', 'hour'], 4*60, False, 500],
-    [['12', 'hour'], 12*60, False, 500],
-    [['1', 'day'], 24*60, False, 500],
-]
+mongoclient = pymongo.MongoClient(MONGO_URL)
 
 class DailyPutThread(object):
     def __init__(self, symbols,
@@ -55,7 +32,7 @@ class DailyPutThread(object):
         self.market_start_time = market_start_time
         self.market_end_time = market_end_time
         self.get_only_market_time = get_only_market_time
-        self.time_delta = 30                # fetch 30 days market data at a once
+        self.time_delta = 30           
         self.working = False
         self._stop = False
 
@@ -87,8 +64,8 @@ class DailyPutThread(object):
         print ("deleted")
 
     def update_last_put_date(self, symbol, interval, last_candle_date):
-        masterdb = mongoclient[DB_NAME]
-        ob_table = masterdb[LAST_UPDATE_DATE_COL]
+        masterdb = mongoclient[STOCK_MARKET_DATA_ALL_DB]
+        ob_table = masterdb[STOCK_LAST_UPDATE_DATE_ALL_COL]
         symbol_last_update_date = ob_table.find_one({"symbol": symbol})
 
         if symbol_last_update_date is not None:
@@ -97,10 +74,10 @@ class DailyPutThread(object):
             ob_table.update_one({'_id': object_id},  {'$set': {key: last_candle_date}}) 
 
     def get_last_put_date(self, symbol, interval): 
-        default_date = datetime.strptime("2020-09-01 00:00:00", '%Y-%m-%d %H:%M:%S')
+        default_date = datetime.strptime("2020-09-27 00:00:00", '%Y-%m-%d %H:%M:%S')
         
-        masterdb = mongoclient[DB_NAME]
-        ob_table = masterdb[LAST_UPDATE_DATE_COL]
+        masterdb = mongoclient[STOCK_MARKET_DATA_ALL_DB]
+        ob_table = masterdb[STOCK_LAST_UPDATE_DATE_ALL_COL]
         last_date_doc = ob_table.find_one({"symbol": symbol})
         if last_date_doc is not None:
             key = interval[0] + "_" + interval[1]
@@ -112,7 +89,7 @@ class DailyPutThread(object):
                 return default_date
         else:
             symbol_last_date = dict()
-            if False:
+            if True:
                 symbol_last_date['symbol'] = symbol
                 symbol_last_date['1_minute'] = default_date
                 symbol_last_date['2_minute'] = default_date
@@ -142,7 +119,7 @@ class DailyPutThread(object):
             end_date = last_put_date+timedelta(days=self.time_delta)
             cur_date_str = str(end_date.date())
 
-            polygon_url = f"https://api.polygon.io/v2/aggs/ticker/{symbol}/range/{interval}/{interval_unit}/{last_put_date_str}/{cur_date_str}?adjusted=true&sort=asc&limit=50000&apiKey=tuQt2ur25Y7hTdGYdqI2VrE4dueVA8Xk"
+            polygon_url = f"https://api.polygon.io/v2/aggs/ticker/{symbol}/range/{interval}/{interval_unit}/{last_put_date_str}/{cur_date_str}?adjusted=true&sort=asc&limit=50000&apiKey=" + API_KEY
             datasets = requests.get(polygon_url).json()
             api_candles = datasets['results'] if 'results' in datasets else []
 
@@ -177,9 +154,8 @@ class DailyPutThread(object):
                 continue
             for sym_idx, symbol in enumerate(self.symbols):
                 last_put_date = self.get_last_put_date(symbol, self.interval)
-                # last_put_date = datetime.strptime("2021-09-06 00:00:00", '%Y-%m-%d %H:%M:%S')
 
-                masterdb = mongoclient[DB_NAME]
+                masterdb = mongoclient[STOCK_MARKET_DATA_ALL_DB]
                 collection_name = 'backtest_'+self.interval[0]+"_"+self.interval[1]
                 ob_table = masterdb[collection_name]
                 
@@ -221,15 +197,12 @@ if __name__ == "__main__":
     market_start_time = [9, 30]
     market_end_time = [16, 30]
     get_only_market_time = True
-    thread_count = 10
+    thread_count = 2
     thread_list = []
 
-    # symbols = get_symbols()
-    # symbols = ["GOOG", "ATVI", "AMD", "MSFT", "AMZN", "NVDA", "TSLA", "AAPL", "ADBE", ""]
-    symbols = get_watch_list_symbols(SYMBOL_TYPE_STOCK)
-    symbols.append("")
+    symbols = get_symbols()
+    symbols.extend(["AXP", "KO", "COST", "V", "BAC", ""])
     symbol_count = len(symbols)
-    print (symbols, "symbols: ", symbol_count)
 
     thread_symbol_count = int(symbol_count / thread_count) + 1
     for idx in range(thread_count):
@@ -277,7 +250,7 @@ if __name__ == "__main__":
     for thrd in thread_list:
         thrd.stop()
 
-    time.sleep(2)
+    time.sleep(20)
     end_time = datetime.now()
     print ('start at: {}, end_at: {}'.format(start_time, end_time))
         

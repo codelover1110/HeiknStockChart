@@ -272,7 +272,7 @@ def get_backtesting_result(symbols, macro, micro, start_date, end_date):
     list_data_db = list(ob_table.find(query, {'_id': False}).sort('date', pymongo.ASCENDING))
     return list_data_db
 
-def get_data_trades_db(start_date, end_date, macro, micro, symbol):
+def get_data_trades_db(start_date, end_date, macro, micro, symbol, page_num=0, page_mounts=0):
     masterdb = azuremongo[BACKTESTING_TRADES]
     db_collection = masterdb[ALL_TRADES_HISTORY]
     query_obj = {}
@@ -283,12 +283,27 @@ def get_data_trades_db(start_date, end_date, macro, micro, symbol):
     if micro != '':
         query_obj['micro_strategy'] = micro
 
-    startDate = datetime.strptime(start_date, '%Y-%m-%d')
-    endDate = datetime.strptime(end_date, '%Y-%m-%d')
-    query_obj['date'] = {"$gte": startDate, "$lt": endDate}
+    cur_date = datetime.now().date()
 
-    trades_data = list(db_collection.find(query_obj, {'_id': False}).sort('date', pymongo.ASCENDING))
-    return trades_data
+    if start_date == '' and end_date == '':
+        end_date = str(cur_date)
+        start_date = '2020-01-01'
+    elif start_date == '':
+        start_date = '2020-01-01'
+    elif end_date == '':
+        end_date = str(cur_date)
+
+    start_date_obj = datetime.strptime(start_date, '%Y-%m-%d')
+    end_date_obj = datetime.strptime(end_date, '%Y-%m-%d')
+
+    query_obj['date'] = {"$gte": start_date_obj, "$lt": end_date_obj}
+    page_total = db_collection.find(query_obj, {'_id': False}).count()
+    if page_num != 0 and page_mounts != 0:
+        list_db_data = list(db_collection.find(query_obj, {'_id': False}).sort('date', pymongo.DESCENDING).skip(page_num).limit(page_mounts))
+    else:
+        list_db_data = list(db_collection.find(query_obj, {'_id': False}).sort('date', pymongo.DESCENDING))
+
+    return list_db_data, page_total
 
 def get_table_list_db(strategy_name):
     masterdb = azuremongo["backtest_tables"]

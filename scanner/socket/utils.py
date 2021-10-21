@@ -62,7 +62,6 @@ def Filter(df, barSize=1, stock="AMZN"):
     df['absdiff'] = df['absdiff'].replace(np.nan, 0)
 
     df["NetChgAvg"] = Wilders(df,"diff",14)
-    # print (df)
     df["TotChgAvg"] = Wilders(df,"absdiff",14)
     df["ChgRatio"] = df["NetChgAvg"]/df["TotChgAvg"]
     df["RSI"] = (50 * (df["ChgRatio"] + 1) - 50)
