@@ -24,7 +24,7 @@ def check_candle_in_maket_time(candle):
     market_start_time = [9, 30]
     market_end_time = [16, 30]
 
-    candle['date'] = datetime.fromtimestamp((candle['t']/1000))
+    candle['date'] = datetime.fromtimestamp(candle['t']/1000) - timedelta(hours=2)
     year = int(candle['date'].strftime("%Y"))
     month = int(candle['date'].strftime("%m"))
     day = int(candle['date'].strftime("%d"))

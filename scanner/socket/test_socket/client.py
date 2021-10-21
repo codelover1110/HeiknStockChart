@@ -3,8 +3,9 @@ import threading
 import time
 import ssl
 
-server_url = "wss://20.84.64.243:11111/"
-#server_url = "ws://137.220.61.158:9999/"
+# server_url = "wss://20.84.64.243:11111/"
+# server_url = "wss://23.202.231.167:9999/"
+server_url = "wss://www.testvioletteam.com"
 class Client(object):
 	def __init__(self, socket_url):
 		self.ws = websocket.WebSocketApp(

@@ -54,7 +54,7 @@ class PolygonApiClient(object):
             api_candles = datasets['results'] if 'results' in datasets else []
             buffering_candles = api_candles[-25:]
             for candle in buffering_candles:
-                candle['date'] = str(datetime.fromtimestamp((candle['t']/1000)))
+                candle['date'] = str(datetime.fromtimestamp(candle['t']/1000) - timedelta(hours=2))
                 print ("buffering ", symbol)
                 self.put_queue(candle, symbol)
             time.sleep(0.01)
@@ -85,12 +85,12 @@ class PolygonApiClient(object):
             api_candles = datasets['results'] if 'results' in datasets else []
             if len(api_candles) > 0:
                 last_candle = api_candles[0]
-                last_candle_date = datetime.fromtimestamp((last_candle['t']/1000))
+                last_candle_date = datetime.fromtimestamp(last_candle['t']/1000) - timedelta(hours=2)
                 last_candle['date'] = str(last_candle_date)
                 if self.latest_time == None:
                     self.latest_time = last_candle_date
 
-                if self.latest_time <= last_candle_date:
+                if self.latest_time < last_candle_date:
                     self.put_queue(last_candle, symbol)
                     self.latest_time = last_candle_date
             

@@ -9,7 +9,7 @@ import websockets
 import pandas as pd
 import io
 import random
-from datetime import datetime
+from datetime import datetime, timedelta
 
 try:
    import queue
@@ -119,14 +119,14 @@ class PolygonStream(object):
             "s": random.randint(1610044640000, 1610544640000),
             "e": random.randint(1610044700000, 1610544700000),
         }
-        fake_candle['date'] = str(datetime.fromtimestamp(int(fake_candle['s']/1000)))
+        fake_candle['date'] = str(datetime.fromtimestamp(fake_candle['t']/1000) - timedelta(hours=2))
         result.append(fake_candle)
         return result
 
     def fill_date_field(self, candles):
         result = []
         for candle in candles:
-            candle['date'] = str(datetime.fromtimestamp(int(candle['s']/1000)))
+            candle['date'] = str(datetime.fromtimestamp(candle['t']/1000) - timedelta(hours=2))
             result.append(candle)
         return result
 

@@ -86,7 +86,7 @@ class PolygonCrawller(object):
                 # last_idx = random.randint(0, len(api_candles)-1)
                 # last_candle = api_candles[last_idx]
                 last_candle = api_candles[-1]
-                last_candle['date'] = str(datetime.fromtimestamp((last_candle['t']/1000)))
+                last_candle['date'] = str(datetime.fromtimestamp(last_candle['t']/1000) - timedelta(hours=2))
                 del last_candle['t']
                 if 'op' in last_candle.keys():
                     del last_candle['op']
