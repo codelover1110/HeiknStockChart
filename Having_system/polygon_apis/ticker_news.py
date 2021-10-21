@@ -1,9 +1,9 @@
+import sys
+sys.path.insert(0, '..')
 import pymongo
-from datetime import datetime, timedelta
-import pandas as pd 
+from datetime import datetime
 import requests
 import time
-import io
 import threading
 import json
 try:
@@ -11,11 +11,12 @@ try:
 except ImportError:
    import Queue as queue
 
-API_KEY = "tuQt2ur25Y7hTdGYdqI2VrE4dueVA8Xk"
-
+from v_define import MONGO_URL, API_KEY, TICKER_NEWS_DB, TICKER_NEWS_LAST_UPDATE_COL, TICKER_NEWS_META_DATA_COL
+from v_define import INTERVALS as intervals
+from v_db_models import get_watch_list_symbols
+from common import get_symbols
 
 def monitoring():
-    # symbol = 'AMZN'
     all_count = 0
     url = "https://api.polygon.io/v2/reference/news?limit=10&order=descending&sort=published_utc&apiKey=" + API_KEY
     contents = json.loads(requests.get(url).content)
@@ -30,13 +31,9 @@ def monitoring():
 
     print ("all count: ", all_count)
 
-# mongoclient = pymongo.MongoClient('mongodb://aliaksandr:BD20fc854X0LIfSv@cluster0-shard-00-00.35i8i.mongodb.net:27017,cluster0-shard-00-01.35i8i.mongodb.net:27017,cluster0-shard-00-02.35i8i.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-aoj781-shard-0&authSource=admin&retryWrites=true&w=majority')
-# mongoclient = pymongo.MongoClient('mongodb://user:-Hz2f$!YBXbDcKG@cluster0-shard-00-00.vcom7.mongodb.net:27017,cluster0-shard-00-01.vcom7.mongodb.net:27017,cluster0-shard-00-02.vcom7.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-7w6acj-shard-0&authSource=admin&retryWrites=true&w=majority')
-mongoclient = pymongo.MongoClient('mongodb://root:!23QweAsd@20.84.64.243:27017')
+mongoclient = pymongo.MongoClient(MONGO_URL)
 
-DB_NAME = 'sticker_news'
-
-class DailyPutThread(object):
+class TickerNewsThread(object):
     def __init__(self):
 
         self.working = False
@@ -63,8 +60,8 @@ class DailyPutThread(object):
         print ("deleted")
 
     def update_last_put_date(self, last_news_date):
-        masterdb = mongoclient[DB_NAME]
-        ob_table = masterdb['last_update_date']
+        masterdb = mongoclient[TICKER_NEWS_DB]
+        ob_table = masterdb[TICKER_NEWS_LAST_UPDATE_COL]
         news_last_update_date = ob_table.find_one()
 
         if news_last_update_date is not None:
@@ -74,8 +71,8 @@ class DailyPutThread(object):
     def get_last_put_date(self): 
         default_date = datetime.strptime("2010-09-01 00:00:00Z", '%Y-%m-%d %H:%M:%SZ')
         
-        masterdb = mongoclient[DB_NAME]
-        ob_table = masterdb['last_update_date']
+        masterdb = mongoclient[TICKER_NEWS_DB]
+        ob_table = masterdb[TICKER_NEWS_LAST_UPDATE_COL]
         key = 'last_date'
         last_date_doc = ob_table.find_one()
         if last_date_doc is not None:
@@ -119,9 +116,8 @@ class DailyPutThread(object):
                 continue
             db_last_news_date = self.get_last_put_date()
 
-            masterdb = mongoclient[DB_NAME]
-            collection_name = 'news_meta_data'
-            ob_table = masterdb[collection_name]
+            masterdb = mongoclient[TICKER_NEWS_DB]
+            ob_table = masterdb[TICKER_NEWS_META_DATA_COL]
             
             put_news_count = 0
             news = self.get_news(db_last_news_date)
@@ -134,9 +130,7 @@ class DailyPutThread(object):
 
                 print('news count:{}, last news date: {}'.format(put_news_count, last_news_date))
             else:
-                # print ('No news!')
                 pass
-            # self.working = False
 
             time.sleep(5)
 
@@ -148,7 +142,7 @@ if __name__ == "__main__":
 
     for idx in range(thread_count):
 
-        news_thread = DailyPutThread()
+        news_thread = TickerNewsThread()
         
         thread_list.append(news_thread)
         print ('created thread for news')
@@ -167,7 +161,7 @@ if __name__ == "__main__":
     for thrd in thread_list:
         thrd.stop()
 
-    time.sleep(2)
+    time.sleep(20)
     end_time = datetime.now()
     print ('start at: {}, end_at: {}'.format(start_time, end_time))
 

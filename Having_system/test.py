@@ -1,55 +1,81 @@
+import sys
+sys.path.insert(0, '..')
 import pymongo
+from datetime import datetime, timedelta
+import requests
+import time
+import threading
 
-from update_market_data import *
-from ticker_meta_data import *
-from discord_bot import *
+try:
+   import queue
+except ImportError:
+   import Queue as queue
 
-API_KEY = 'tuQt2ur25Y7hTdGYdqI2VrE4dueVA8Xk'
-MONGO_URL = 'mongodb://mluser:mlUser1000@20.84.64.243:27018'
+from v_define import MONGO_URL, API_KEY, STOCK_CHART_DB_NAME, STOCK_LAST_UPDATE_DATE_COL, SYMBOL_TYPE_STOCK
+from v_define import INTERVALS as intervals
+from v_db_models import get_watch_list_symbols
+from common import get_symbols
+
 mongoclient = pymongo.MongoClient(MONGO_URL)
 
-MARKET_DATA_DB = 'stock_market_data'
-BACKTESTING_CANDLES = 'backtest_1_minute'  # 1 minute market data
+market_start_time = [9, 30]
+market_end_time = [16, 30]
+get_only_market_time = True
+thread_count = 2
+thread_list = []
 
-# masterdb = mongoclient[MARKET_DATA_DB]
-# db_collection = masterdb[BACKTESTING_CANDLES]
+class DailyPutThreadManager(object):
+    def __init__(self, symbols,
+                    interval,
+                    int_value,
+                    market_start_time, 
+                    market_end_time, 
+                    get_only_market_time=False):
 
-# def print_(label, value):
-#     print ('------------{} => {}'.format(label, value))
+        self.symbols = symbols
+        self.interval = interval
+        self.int_value = int_value
+        self.market_start_time = market_start_time
+        self.market_end_time = market_end_time
+        self.get_only_market_time = get_only_market_time
+        self.time_delta = 30           
+        self.working = False
+        self._stop = False
 
-# def define_start_date():
-#     cur_date = datetime.now().date()
-#     start_time = cur_date - timedelta(days=20)
 
-#     return datetime.strptime(str(start_time), '%Y-%m-%d'), datetime.strptime(str(cur_date), '%Y-%m-%d')
+        self.thread_start_time = None         
+        self.min_1_thread = threading.Thread(target=self.thread_func)
 
-# start_time = datetime.now()
-# start_at, end_at = define_start_date()
-# query = {'date':{'$gte': start_at, '$lt': end_at},'stock': 'GOOG'}
-# candles = list(db_collection.find(query).sort('date', pymongo.ASCENDING))
-# end_time = datetime.now()
+    def start(self):
+        self.thread_start_time = time.time()
+        if not self.min_1_thread.is_alive():
+            self.min_1_thread.start()
 
-# print ('{} -> {} : {}'.format(start_time, end_time, len(candles)))
+    def stop(self):
+        self._stop = True
+        time.sleep(3)
+ 
+    def __del__(self):
+        self.min_1_thread.join()
+        print ("deleted")
 
-# https://docs.whale-alert.io/#transactions
-# start_at = int(time.time() - 1000)
-# polygon_url = "https://api.whale-alert.io/v1/transactions?api_key=o1ip6p4clqCamFA4b43AxppY5J498UBf&min_value=600000&start="+str(start_at)
-# datasets = requests.get(polygon_url).json()
-# # print (datasets)
-# for d in datasets['transactions']:
-#     print (d)
-# print (datasets['count'])
-# print (datasets['cursor'])
-# print (len(datasets))
+    def thread_func(self):
+        while True:
+            if self._stop == True:
+                break
+            time.slee(1)
+if __name__ == "__main__":
+    start_time = datetime.now()
+    interval = ['1', 'minute']
+    int_value = 1
+    
+    market_start_time = [9, 30]
+    market_end_time = [16, 30]
+    get_only_market_time = True
+    thread_count = 2
+    thread_list = []
 
-NEWS = 'sticker_news'
-COL_NAME = 'news_meta_data'
-
-def get_recent_news():
-    news_db = mongoclient[NEWS]
-    db_collection = news_db[COL_NAME]
-    result = list(db_collection.find({}, {'_id': False}).sort('date', pymongo.DESCENDING))
-    return result
-
-news  = get_recent_news()
-print (len(news))
+    symbols = get_watch_list_symbols(SYMBOL_TYPE_STOCK)
+    symbols.append("")
+    symbol_count = len(symbols)
+    print (symbols, "symbols: ", symbol_count)

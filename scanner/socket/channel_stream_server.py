@@ -101,17 +101,17 @@ class StockStreamServer(object):
 			if not self.update_queue.empty():
 				while not self.update_queue.empty():
 					candle_update = self.update_queue.get()
-					try:
-						client = candle_update['client']
-						if client in self.closed_client:
-							continue
-						cc_mgr = self.get_cc_mgr_by_client(client)
-						if cc_mgr is not None:
-							del candle_update['client']
-							message = json.dumps([candle_update])
-							self.server.send_message(client, message)
-					except:
-						print ("can't send message.", 'client: {}, message: {}'.format(client['id'], candle_update))
+					# try:
+					client = candle_update['client']
+					if client in self.closed_client:
+						continue
+					cc_mgr = self.get_cc_mgr_by_client(client)
+					if cc_mgr is not None:
+						del candle_update['client']
+						message = json.dumps([candle_update])
+						self.server.send_message(client, message)
+					# except:
+					# 	print ("can't send message.", 'client: {}, message: {}'.format(client['id'], candle_update))
 
 	def look_client_action(self):
 		while True:

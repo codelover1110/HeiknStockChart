@@ -1,11 +1,14 @@
 import threading
 from base_server import WebsocketServer
-
-server_url = "ws://127.0.0.1:9999/"
+import pathlib
+import ssl
 
 class Server(object):
 	def __init__(self):
-		self.server = WebsocketServer(11111, host='127.0.0.1')
+		# self.server = WebsocketServer(9999, host='127.0.0.1')
+		# path_cert = pathlib.Path(__file__).with_name("cert.pem")
+		# path_key = pathlib.Path(__file__).with_name("key.pem")
+		self.server = WebsocketServer(9999, '0.0.0.0', key="key.pem", cert="cert.pem")
 		self.server.event_new_client_join(self.new_client_joined)
 		self.server.event_client_left(self.client_left)
 		self.server.event_message_received(self.receive_message)
