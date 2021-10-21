@@ -470,9 +470,7 @@ const FinancialDashboard = () => {
           )}
           {selectedHeaderNav === 'Data Table' ? (
             <>
-              { console.log('isLoadingData') }
-              { console.log(isLoadingData) }
-              {isLoadingData && <Spinner />}
+              {isLoadingData && <div className="hunter-spinner-area"><span className="mr-30">Loading ...</span>    <Spinner>Loading</Spinner></div>}
               {!isLoadingData &&
               <FinancialDataTable
                 data={datatable}
@@ -482,7 +480,7 @@ const FinancialDashboard = () => {
             </>
           ) : selectedHeaderNav === 'News' ? (
             <>
-              {isLoadingData && <Spinner />}
+              {isLoadingData && <div className="hunter-spinner-area"><span className="mr-30">Loading ...</span>    <Spinner>Loading</Spinner></div>}
               {!isLoadingData &&
               <FinancialStatementsDataTable
                 data={financialStatements}

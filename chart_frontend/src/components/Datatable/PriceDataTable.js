@@ -228,7 +228,7 @@ const PriceDataTable = () => {
             <ButtonCsvDownload filename={"price.csv"}>Csv Download</ButtonCsvDownload>
           </div>
         </div>
-        {isLoadingData && <Spinner>Loading</Spinner>}
+        {isLoadingData && <div className="hunter-spinner-area"><span className="mr-30">Loading ...</span>    <Spinner>Loading</Spinner></div>}
         {!isLoadingData &&
         (
           <>

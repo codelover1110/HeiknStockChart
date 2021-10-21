@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallBack } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Select from 'react-select'
 import { Link } from "react-router-dom";
 import "react-datetime/css/react-datetime.css";
@@ -20,7 +20,7 @@ import "./FloatsComponent.css"
 
 import { useCsvDownloadUpdate } from "contexts/CsvDownloadContext";
 import ButtonCsvDownload from 'components/ButtonCsvDownload'
-import { useDatatableLoading } from "contexts/DatatableContext";
+import { useDatatable, useDatatableLoading } from "contexts/DatatableContext";
 import Spinner from "components/Spinner";
 
 const FloatsComponent = () => {
@@ -30,7 +30,6 @@ const FloatsComponent = () => {
   const [exchange, setExchange] = React.useState(null)
   const [sector, setSector] = useState(null);
   const [industry, setIndustry] = useState(null);
-  const [scannerData, setScannerData] = useState([])
   const [pageAmount, setPageAmount] = useState(10)
   const [currentPage, setCurrentPage] = useState(1);
   const [wholeRows, setWholeRows] = useState(0);
@@ -92,10 +91,6 @@ const FloatsComponent = () => {
     {
       label: 'Sector',
       field: 'Sector',
-    },
-    {
-      label: 'Industry',
-      field: 'Industry',
     },
     {
       label: 'Address',
@@ -274,18 +269,14 @@ const FloatsComponent = () => {
       field: 'LastSplitFactor',
     },
     {
-      label: 'ShortPercentOutstanding',
-      field: 'ShortPercentOutstanding',
-    },
-    {
       label: 'LastSplitDate',
       field: 'LastSplitDate',
     },
   ]}, [])
 
-  const [datatable, setDatatable] = React.useState({
+  const [datatable, setDatatable] = useDatatable({
     columns: hearder_columns,
-    rows: scannerData,
+    rows: [],
   });
 
   const updateCsvDownload = useCsvDownloadUpdate();
@@ -313,7 +304,6 @@ const FloatsComponent = () => {
   }
 
   const loadFloatsFilterOption = async () => {
-    setLoadingData(true)
     const scannerOptions = await getFloatsFilterOptions()
     if (scannerOptions.success) {
       const exchanges = [{
@@ -361,14 +351,11 @@ const FloatsComponent = () => {
       setOptionsIndustry(industries)
       setOptionsSector(sectors)
     }
-    setLoadingData(false)
   }
 
   useEffect(() => {
-    setLoadingData(true)
     loadFloatDetails(currentPage)
     loadFloatsFilterOption()
-    setLoadingData(false)
   }, [])
 
   const handleSignout = () => {
@@ -503,22 +490,17 @@ const FloatsComponent = () => {
           </div>
           <ButtonCsvDownload filename={"floats.csv"}>Csv Download</ButtonCsvDownload>
         </div>
-        {console.log(isLoadingData)}
-        {isLoadingData && <Spinner />}
+        {isLoadingData && <div className="hunter-spinner-area"><span className="mr-30">Loading ...</span>    <Spinner>Loading</Spinner></div>}
         {!isLoadingData &&
         <>
           <MDBTable
             hover
             small={true}
             maxHeight="500px"
-            entriesOptions={[10, 25, 50, 100]}
             entries={10}
-            pagesAmount={50}
             data={datatable}
             dark={true}
-            noBottomColumns={true}
             small={true}
-            scrollX={true}
             scrollY={true}
           >
             <MDBTableHead  className="watch-list-data-table-header">
@@ -532,7 +514,7 @@ const FloatsComponent = () => {
                 className={"financial-table-body-1"}
               >
               {datatable.rows.map((item) => (
-                <tr key={`row-${item.Symbol}`}>
+                <tr key={`row-${item.symbol}`}>
                   {hearder_columns.map((column) =>
                     (
                       <td

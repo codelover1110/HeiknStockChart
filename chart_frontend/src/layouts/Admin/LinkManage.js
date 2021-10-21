@@ -39,16 +39,16 @@ function LinkManage() {
   const [isLoading, setIsLoading] = useState(false)
 
   const optionsRole = [
-    { value: 'admin_tab', label: 'Admin Bot Management' },
     { value: 'forward_test', label: 'Forward Test' },
-    { value: 'stress_test', label: 'Stress Test' },
-    { value: 'optimization', label: 'Optimization' },
+    // { value: 'stress_test', label: 'Stress Test' },
+    // { value: 'optimization', label: 'Optimization' },
     { value: 'live_trading', label: 'Live Trade' },
     { value: 'market_watch', label: 'Market' },
     { value: 'scanner', label: 'Scanner' },
     { value: 'trade_data', label: 'Trade Data' },
     { value: 'hybrid_view', label: 'Hybrid View' },
     { value: 'financial_data', label: 'Financial Data' },
+    { value: 'floats', label: 'Floats' },
   ]
 
   const [user] = useState(JSON.parse(localStorage.getItem('user-info')));
@@ -84,7 +84,8 @@ function LinkManage() {
   React.useEffect(() => {
     const fetchActiveLinks = async () => {
       let links = await getActiveLinks();
-      const linklist = links.map(link => {
+      const filteredLinks = links.filter(link => !link.expired)
+      const linklist = filteredLinks.map(link => {
         return {
           id: link.id,
           link: link.link,

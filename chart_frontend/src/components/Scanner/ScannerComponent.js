@@ -19,6 +19,8 @@ import { useAuth } from 'contexts/authContext';
 import { getScannerDetails, getTickerScannerOptions } from 'api/Api'
 import { useCsvDownloadUpdate } from "contexts/CsvDownloadContext";
 import ButtonCsvDownload from 'components/ButtonCsvDownload'
+import { useDatatable, useDatatableLoading } from "contexts/DatatableContext";
+import Spinner from 'components/Spinner'
 
 const ScannerComponent = () => {
   const auth = useAuth();
@@ -30,11 +32,11 @@ const ScannerComponent = () => {
   const [optionsExchange, setOptionsExchanges] = useState([])
   const [optionsSector, setOptionsSector] = useState([])
   const [optionsIndustry, setOptionsIndustry] = useState([])
-  const [scannerData, setScannerData] = useState([])
-
+  
   const [pageAmount, setPageAmount] = useState(10)
   const [currentPage, setCurrentPage] = useState(1);
   const [wholeRows, setWholeRows] = useState(0);
+  const [isLoadingData, setLoadingData] = useDatatableLoading()
 
   const hearder_columns = useMemo(() => {
     return [
@@ -73,9 +75,9 @@ const ScannerComponent = () => {
     },
   ]}, [])
 
-  const [datatable, setDatatable] = React.useState({
+  const [datatable, setDatatable] = useDatatable({
     columns: hearder_columns,
-    rows: scannerData,
+    rows: [],
   });
 
   const updateCsvDownload = useCsvDownloadUpdate();
@@ -87,6 +89,7 @@ const ScannerComponent = () => {
 
   useEffect(() => {
     const loadWholeOptions = async () => {
+      setLoadingData(true)
       const scannerDetails = await getScannerDetails('', '', '', currentPage, pageAmount)
 
       if (scannerDetails.success) {
@@ -146,6 +149,7 @@ const ScannerComponent = () => {
         setOptionsIndustry(industries)
         setOptionsSector(sectors)
       }
+      setLoadingData(false)
     }
 
     loadWholeOptions()
@@ -159,6 +163,7 @@ const ScannerComponent = () => {
   const handleSectorChange = async (e) => {
     setSector(e)
 
+    setLoadingData(true)
     const scannerDetails = await getScannerDetails(exchange ? exchange.value : '', industry ? industry.value : '', e.value, currentPage, pageAmount)
     
     if (scannerDetails.success) {
@@ -168,11 +173,13 @@ const ScannerComponent = () => {
       })
       setWholeRows(scannerDetails.page_total)
     }
+    setLoadingData(false)
   }
 
   const handleExchangeChange = async (e) => {
     setExchange(e)
 
+    setLoadingData(true)
     const scannerDetails = await getScannerDetails(exchange ? exchange.value : '', industry ? industry.value : '', e.value, currentPage, pageAmount)
 
     if (scannerDetails.success) {
@@ -182,20 +189,24 @@ const ScannerComponent = () => {
       })
       setWholeRows(scannerDetails.page_total)
     }
+    setLoadingData(false)
   }
 
   const handleIndustryChange = async (e) => {
     setIndustry(e)
 
+    setLoadingData(true)
     const scannerDetails = await getScannerDetails(exchange ? exchange.value : '', e.value, sector ? sector.value : '')
 
     wrapSetDatatable({
       columns: hearder_columns,
       rows: scannerDetails.result,
     })
+    setLoadingData(false)
   }
 
   const loadScannerDetails = async () => {
+    setLoadingData(true)
     const scannerDetails = await getScannerDetails(exchange ? exchange.value : '', industry ? industry.value : '', sector ? sector.value : '', currentPage, pageAmount)
 
     wrapSetDatatable({
@@ -203,6 +214,7 @@ const ScannerComponent = () => {
       rows: scannerDetails.result,
     })
     setWholeRows(scannerDetails.page_total)
+    setLoadingData(false)
   }
 
   const handlePrevClick = () => {
@@ -289,27 +301,30 @@ const ScannerComponent = () => {
             <ButtonCsvDownload filename={"scanner.csv"}>Csv Download</ButtonCsvDownload>
           </div>
         </div>
-        <MDBDataTableV5
-          hover
-          maxHeight="500px"
-          entriesOptions={[10, 25, 50, 100]}
-          entries={10}
-          pagesAmount={4}
-          data={datatable}
-          dark={true}
-          noBottomColumns={true}
-          small={true}
-          striped={true}
-          scrollY={true}
-        />;
-        <Pagination>
-          <Pagination.Item>{(currentPage-1)*10 + 1}</Pagination.Item>
-          <Pagination.Item>{(currentPage) * 10}</Pagination.Item>
-          <Pagination.Item> of </Pagination.Item>
-          <Pagination.Item> { wholeRows } </Pagination.Item>
-          <Pagination.Prev disabled={currentPage <= 0} onClick={() => { handlePrevClick() }}/>
-          <Pagination.Next disabled={(currentPage + 1) >= wholeRows / 10} onClick={() => { handleNextClick() }}/>
-        </Pagination>
+        {isLoadingData && <div className="hunter-spinner-area"><span className="mr-30">Loading ...</span>    <Spinner>Loading</Spinner></div>}
+        {!isLoadingData && <>
+          <MDBDataTableV5
+            hover
+            maxHeight="500px"
+            entriesOptions={[10, 25, 50, 100]}
+            entries={10}
+            pagesAmount={4}
+            data={datatable}
+            dark={true}
+            noBottomColumns={true}
+            small={true}
+            striped={true}
+            scrollY={true}
+          />;
+          <Pagination>
+            <Pagination.Item>{(currentPage-1)*10 + 1}</Pagination.Item>
+            <Pagination.Item>{(currentPage) * 10}</Pagination.Item>
+            <Pagination.Item> of </Pagination.Item>
+            <Pagination.Item> { wholeRows } </Pagination.Item>
+            <Pagination.Prev disabled={currentPage <= 0} onClick={() => { handlePrevClick() }}/>
+            <Pagination.Next disabled={(currentPage + 1) >= wholeRows / 10} onClick={() => { handleNextClick() }}/>
+          </Pagination>
+        </>}
       </div>
     </div>
   );

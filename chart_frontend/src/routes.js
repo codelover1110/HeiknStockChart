@@ -6,7 +6,7 @@ export var routes = [
     items: [
       {
         id: 0,
-        label: 'Bot Management',
+        label: 'Paper Bot Management',
         instance: "systemfilemanager",
         pathname: '/botmanagement'
       },
@@ -19,7 +19,7 @@ export var routes = [
     ],
   },
   {
-    name: "Forward test",
+    name: "Paper Trading",
     icon: "tim-icons icon-chart-pie-36",
     instance: "forward_test",
     items: [
@@ -31,32 +31,32 @@ export var routes = [
       }
     ],
   },
-  {
-    name: "Stress test",
-    icon: "tim-icons icon-attach-87",
-    instance: "stress_test",
-    items: [
-      {
-        id: 0,
-        label: 'View',
-        instance: "view",
-        pathname: '/'
-      }
-    ],
-  },
-  {
-    name: "Optimization",
-    icon: "tim-icons icon-atom",
-    instance: "optimization",
-    items: [
-      {
-        id: 0,
-        label: 'View',
-        instance: "view",
-        pathname: '/optimization'
-      }
-    ],
-  },
+  // {
+  //   name: "Stress test",
+  //   icon: "tim-icons icon-attach-87",
+  //   instance: "stress_test",
+  //   items: [
+  //     {
+  //       id: 0,
+  //       label: 'View',
+  //       instance: "view",
+  //       pathname: '/'
+  //     }
+  //   ],
+  // },
+  // {
+  //   name: "Optimization",
+  //   icon: "tim-icons icon-atom",
+  //   instance: "optimization",
+  //   items: [
+  //     {
+  //       id: 0,
+  //       label: 'View',
+  //       instance: "view",
+  //       pathname: '/optimization'
+  //     }
+  //   ],
+  // },
   {
     name: "Live trading",
     icon: "tim-icons icon-badge",

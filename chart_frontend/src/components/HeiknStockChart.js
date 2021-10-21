@@ -575,14 +575,14 @@ const HeiknStockChart = (props) => {
                 placeholder="Columns"
               />
             </div>
-            <div className="select-option">
+            {/* <div className="select-option">
               <Select
                 value={assetClass}
                 onChange={handleAssetClassChange}
                 options={optionsAssetClass}
                 placeholder="Asset Class"
               />
-            </div>
+            </div> */}
           </div>
         )}
         <Collapse navbar isOpen={collapseOpen}>

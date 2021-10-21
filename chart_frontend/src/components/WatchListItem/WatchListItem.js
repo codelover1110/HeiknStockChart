@@ -377,7 +377,7 @@ const WatchListItem = (props) => {
         action: 'create_fields',
         chart_number: props.chart_number,
         symbols,
-        symbol_type: 'stock', // or 'crypto'
+        symbol_type: (selectedWatchList.value === 'crypto' || selectedWatchList.value === 'bigCryptos') ? 'crypto' : 'stock',
         fields: colObjects,
       }
 
@@ -413,7 +413,7 @@ const WatchListItem = (props) => {
         action: selectedWatchList.value === 'crypto' ? 'create_fields' : 'change_fields',
         chart_number: props.chart_number,
         symbols,
-        symbol_type: selectedWatchList.value === 'crypto' ? 'crypto' : 'stock',
+        symbol_type: (selectedWatchList.value === 'crypto' || selectedWatchList.value === 'bigCryptos') ? 'crypto' : 'stock',
         fields: colObjects,
       }
       
@@ -479,7 +479,7 @@ const WatchListItem = (props) => {
         action: 'change_fields',
         chart_number: props.chart_number,
         symbols,
-        symbol_type: selectedWatchList.value === 'crypto' ? 'crypto' : 'stock',
+        symbol_type: (selectedWatchList.value === 'crypto' || selectedWatchList.value === 'bigCryptos') ? 'crypto' : 'stock',
         fields: colObjects,
       }
 
@@ -656,6 +656,7 @@ const WatchListItem = (props) => {
     socket.onmessage = (event) => {
       try {
         const msg = JSON.parse(event.data)
+        console.log('msg??????????????????????', msg)
         setWatchListData(msg)
         setIsUpdatedWatchList(true)
       } catch (error) {
