@@ -261,7 +261,7 @@ def get_backtesting_result(symbols, macro, micro, start_date, end_date):
         end_date = str(cur_date)
 
     start_date_obj = datetime.strptime(start_date, '%Y-%m-%d')
-    end_date_obj = datetime.strptime(end_date, '%Y-%m-%d')
+    end_date_obj = datetime.strptime(end_date, '%Y-%m-%d') + timedelta(days=1)
     query = {
             'date': {'$gte': start_date_obj, '$lt': end_date_obj},
             'macro_strategy': macro,
