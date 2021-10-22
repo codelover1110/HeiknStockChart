@@ -1,8 +1,7 @@
 import React, { Component } from "react";
 import Select from 'react-select'
-import { Editor } from "react-draft-wysiwyg";
+// import { Editor } from "react-draft-wysiwyg";
 import { EditorState, convertToRaw ,convertFromHTML,ContentState} from "draft-js";
-import draftToHtml from "draftjs-to-html";
 import { 
   getBotStatusList,
   getConfigFileDetail,
@@ -20,16 +19,23 @@ import {
 } from "reactstrap";
 import { MDBBtn } from "mdbreact";
 
+import Editor from 'react-simple-code-editor';
+import { highlight, languages } from 'prismjs/components/prism-core';
+import 'prismjs/components/prism-clike';
+import 'prismjs/components/prism-javascript';  
+
 import Modal from 'react-bootstrap/Modal'
 import Tabs from 'react-bootstrap/Tabs'
 import Tab from 'react-bootstrap/Tab'
 import { MDBDataTableV5 } from 'mdbreact';
 import moment from 'moment'
+import "./Editor.css"
 
 export default class TextEditor extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      code: '',
       key: 'parameter',
       editorState: EditorState.createEmpty(),
       textdata:["hello"],
@@ -547,7 +553,7 @@ export default class TextEditor extends Component {
       return;
     }
 
-    if (!this.state.content.length) {
+    if (!this.state.code.length) {
       alert("File content is empty!")
       return;
     }
@@ -563,18 +569,13 @@ export default class TextEditor extends Component {
     
     let res;
     if (this.state.isSelectedStrategyFile) {
-      if (this.state.isUpdate) {
-        if (!this.state.selectedFileType) {
-          alert("content is empty!")
-          return
-        }
-      }
       res = await saveScriptFile(
-        this.state.isUpdate ? this.state.selectedFileType.value : this.state.filename,
-        this.state.content,
+        this.state.filename,
+        this.state.code,
         this.state.isUpdate,
         this.state.isCheckedStrategy
       )
+      console.log("res?????????????????????????????????????", res)
     } else {
       res = await saveConfigFile(
         this.state.isUpdate ? this.state.selectedFileType.value : this.state.filename,
@@ -736,11 +737,13 @@ export default class TextEditor extends Component {
     );
 
     this.setState({
+      code: selectedFile[0].contents,
       editorState: EditorState.createWithContent(blockContent),
       scriptfile: selectedFile,
     })
 
     this.OpenScriptModalClose();
+
   }
 
   handleConfigFileOpen = async () => {
@@ -783,6 +786,7 @@ export default class TextEditor extends Component {
       alert("name field is required!")
       return
     }
+    
     const res = await saveConfigFile(
       this.state.processConfigSetting,
       this.state.isUpdate,
@@ -926,14 +930,20 @@ export default class TextEditor extends Component {
             className="mb-3"
           >
             <Tab eventKey="parameter" title="Parameter Editor">
-              <Editor
-                editorState={editorState}
-                toolbarClassName="toolbarClassName"
-                wrapperClassName="wrapperClassName"
-                editorClassName="editorClassName"
-                editorStyle={{backgroundColor:"whitesmoke"}}
-                onEditorStateChange={this.onEditorStateChange}
-              />
+              <div className="hunter-code-editor-area">
+                <Editor
+                  value={this.state.code}
+                  onValueChange={code => this.setState({ code })}
+                  highlight={code => highlight(code, languages.plaintext)}
+                  padding={10}
+                  style={{
+                    fontFamily: '"Fira code", "Fira Mono", monospace',
+                    fontSize: 12,
+                    minHeight: "500px",
+                    backgroundColor: "#FFFFFF",
+                  }}
+                />
+              </div>
               <div className="hunter-editor-button-area">
                 <div className="display-flex-left">
                   <button className="btn btn-md btn-secondary" onClick={()=>this.handleScriptFileCreate()}>New</button>
@@ -959,9 +969,6 @@ export default class TextEditor extends Component {
             <MDBDataTableV5 
               hover
               maxHeight="500px"
-              entriesOptions={[10, 25, 50, 100]}
-              entries={10}
-              pagesAmount={4}
               data={this.state.botStatusDatatable}
               dark={true}
               noBottomColumns={true}
@@ -974,9 +981,6 @@ export default class TextEditor extends Component {
               <MDBDataTableV5 
                 hover
                 maxHeight="500px"
-                entriesOptions={[10, 25, 50, 100]}
-                entries={10}
-                pagesAmount={4}
                 data={this.state.botConfigSmallDatatable}
                 noBottomColumns={true}
                 small={true}
@@ -989,9 +993,6 @@ export default class TextEditor extends Component {
               <MDBDataTableV5 
                 hover
                 maxHeight="500px"
-                entriesOptions={[10, 25, 50, 100]}
-                entries={10}
-                pagesAmount={4}
                 data={this.state.botConfigDatatable}
                 noBottomColumns={true}
                 small={true}

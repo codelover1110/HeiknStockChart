@@ -344,6 +344,7 @@ const convertArraytoString = (src) => {
 
   let dest = ''
   let comma = ''
+
   src.forEach(o => {
     dest = dest + comma + o.value
     comma = ','
@@ -365,8 +366,8 @@ const convertStringtoArray = (src) => {
 
 const convertStringtoHourObject = (src) => {
   return {
-    value: src === 'true' ? true : false,
-    label: src
+    value: src === true || src === 'true' ? true : false,
+    label: src === true || src === 'true' ? 'true' : 'false',
   }
 }
 
@@ -381,7 +382,7 @@ const transformingProcessConfigToQuery = (settings) => {
     data_source: convertArraytoString(settings.data_source),
     live_trading: convertArraytoString(settings.live_trading),
     starting_cash: settings.starting_cash,
-    extended_hours: convertArraytoString(settings.extended_hours),
+    extended_hours: settings.extended_hours.value,
     name: settings.name,
     macro_strategy: convertArraytoString(settings.macro_strategy),
     indicator_signalling: convertArraytoString(settings.indicator_signalling),
@@ -400,7 +401,7 @@ const transformingProcessConfigFromParam = (settings) => {
     data_source: convertStringtoArray(settings.data_source),
     live_trading: convertStringtoArray(settings.live_trading),
     starting_cash: settings.starting_cash,
-    extended_hours: convertStringtoHourObject(settings.extended_hours.toLowerCase()),
+    extended_hours: convertStringtoHourObject(settings.extended_hours),
     name: settings.name,
     macro_strategy: convertStringtoArray(settings.macro_strategy),
     indicator_signalling: convertStringtoArray(settings.indicator_signalling),
@@ -409,8 +410,9 @@ const transformingProcessConfigFromParam = (settings) => {
 }
 
 export const saveConfigFile = async(settings) => {
-  const data = transformingProcessConfigToQuery(settings)
 
+  
+  const data = transformingProcessConfigToQuery(settings)
   const requestOptions = {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
@@ -429,18 +431,17 @@ export const saveConfigFile = async(settings) => {
     })
 }
 
-export const saveScriptFile = async(filename, content, isUpdate, isCheckedStrategy) => {
+export const saveScriptFile = async(filename, contents, isUpdate) => {
   const requestOptions = {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
-      filename,
-      content,
-      isStrategyScript: isCheckedStrategy
+      name: filename,
+      contents,
     })
   };
 
-  const api = isUpdate ? '/strategy/save_script_file' : '/api/create_script_file';
+  const api = '/strategy/save_other_parameters/';
 
   return await fetch(process.env.REACT_APP_BACKEND_URL + api, requestOptions)
     .then(response => response.json())
