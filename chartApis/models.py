@@ -1,5 +1,5 @@
 from io import StringIO
-from datetime import datetime
+from datetime import datetime, timedelta
 import pymongo
 import tempfile
 import pandas
@@ -249,7 +249,8 @@ def get_backtesting_symbols(macro, micro, start_date, end_date):
     return  []
 
 def get_backtesting_result(symbols, macro, micro, start_date, end_date):
-    cur_date = datetime.now().date()
+    cur_date = datetime.now() + timedelta(days=1)
+    cur_date = cur_date.date()
 
     if start_date == '' and end_date == '':
         end_date = str(cur_date)

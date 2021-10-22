@@ -79,7 +79,6 @@ def backtesting_result(request):
         end_date = request_data['end_date']
         symbols = request_data['symbols']
         list_db_data = get_backtesting_result(symbols, macro, micro, start_date, end_date)
-
         wL = calc_winningLosing(symbols, list_db_data)
         pE_wLA_lS = calc_percentEfficiency(symbols, list_db_data)
         if len(symbols) > 0:
