@@ -22,14 +22,15 @@ export var routes = [
     name: "Paper Trading",
     icon: "tim-icons icon-chart-pie-36",
     instance: "forward_test",
-    items: [
-      {
-        id: 0,
-        label: 'View',
-        instance: "view",
-        pathname: '/'
-      }
-    ],
+    pathname: '/'
+    // items: [
+    //   {
+    //     id: 0,
+    //     label: 'View',
+    //     instance: "view",
+    //     pathname: '/'
+    //   }
+    // ],
   },
   // {
   //   name: "Stress test",
@@ -61,14 +62,15 @@ export var routes = [
     name: "Live trading",
     icon: "tim-icons icon-badge",
     instance: "live_trading",
-    items: [
-      {
-        id: 0,
-        label: 'View',
-        instance: "view",
-        pathname: '/'
-      }
-    ],
+    pathname: '/'
+    // items: [
+    //   {
+    //     id: 0,
+    //     label: 'View',
+    //     instance: "view",
+    //     pathname: '/'
+    //   }
+    // ],
   },
   {
     name: "Market",

@@ -55,7 +55,7 @@ const HybridViewChartTable = (props) => {
       value: 'volume', label: 'VOLUME',
     },
     {
-      value: 'rsi', label: 'RSI',
+      value: 'rsi1', label: 'RSI',
     },
     {
       value: 'rsi2', label: 'RSI2',

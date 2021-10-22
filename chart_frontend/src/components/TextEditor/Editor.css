@@ -1,0 +1,8 @@
+.tab-content .mdb-dataTables_paginate, .mdb-datatable-entries, .datatable-select, .mdb-datatable-info {
+  display: block !important;
+}
+
+.hunter-code-editor-area {
+  height: 500px;
+  overflow-y: auto;
+}
