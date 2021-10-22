@@ -103,8 +103,9 @@ const StockChart = (props) => {
           return;
         }
         
+        const filteredSymbols = symbols.filter(symbol => symbol !== '*')
         const requestBody = {
-          'symbols': symbols,
+          'symbols': filteredSymbols,
           "macro": strategy.value,
           "micro": microStrategy,
           'start_date': startDate,
