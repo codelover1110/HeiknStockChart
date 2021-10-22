@@ -65,8 +65,11 @@ def multi_financials(request):
     print (" ++++++ API: scanner/multi_financials ++++++")
     if request.method == 'POST':
         req = JSONParser().parse(request)
-        symbols = req['symbols']
-        financial_part = req['financial_part']
+        try:
+            symbols = req['symbols']
+            financial_part = req['financial_part']
+        except:
+            print ("request: ", req)
 
         try:
             multi_symbol_fynancials = scanner.get_multi_financials(symbols, financial_part)

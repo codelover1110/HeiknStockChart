@@ -1,6 +1,3 @@
-# Author: Johan Hanssen Seferidis
-# License: MIT
-
 import sys
 import struct
 import ssl
