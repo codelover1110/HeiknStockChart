@@ -785,3 +785,7 @@ pre {
 .hunter-spiner-icon {
   margin-left: 30px;
 }
+
+pre {
+  color: #212529 !important;
+}
