@@ -977,7 +977,7 @@ export default class TextEditor extends Component {
               scrollY={true}
             />;
             </Tab>
-            <Tab eventKey="bot-config-manager-small" title="Bot Config Manager1">
+            {/* <Tab eventKey="bot-config-manager-small" title="Bot Config Manager1">
               <MDBDataTableV5 
                 hover
                 maxHeight="500px"
@@ -988,7 +988,7 @@ export default class TextEditor extends Component {
                 striped={true}
                 scrollX
               />;
-            </Tab>
+            </Tab> */}
             <Tab eventKey="bot-config-manager" title="Bot Config Manager">
               <MDBDataTableV5 
                 hover
