@@ -29,6 +29,26 @@ def get_parameter_content(param_type, param_item_name):
     content = db_collection.find_one({"name": param_item_name})
     return content['contents']
 
+def save_parameter_item(param_name, item_name, contents):
+    db_collection = param_db[param_name]
+    query = {'name': item_name}
+    b_param = db_collection.find_one(query)
+    if b_param is not None:
+        db_collection.update_one({'_id': b_param['_id']}, {'$set': {'contents': contents}})
+    else:
+        db_collection.insert_one({'name': item_name, 'contents': contents})
+
+def save_other_parameter_item(item_name, contents):
+    param_other = "others"
+    db_collection = param_db[param_other]
+    query = {'name': item_name}
+    b_param = db_collection.find_one(query)
+    if b_param is not None:
+        db_collection.update_one({'_id': b_param['_id']}, {'$set': {'contents': contents}})
+    else:
+        db_collection.insert_one({'name': item_name, 'contents': contents})
+
+
 #################### config operations ####################
 
 def create_bot_configs_one(bot_config):

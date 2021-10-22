@@ -71,6 +71,54 @@ def parameter_content(request):
     return BAD_REQUEST()
 
 @csrf_exempt
+def parameter_update_content(request):
+    print (" ++++++ API: /strategy/parameter_update_content ++++++")
+    if request.method == 'POST':
+        req = JSONParser().parse(request)
+        param_name = req['parameter_name']
+        item_name = req['item_name']
+        contents = req['contents']
+
+        try:
+            params.save_parameter_item(param_name, item_name, contents)
+            return JsonResponse({"success": True, "message": "Updated successfully!"}, safe=True)
+        except:
+            return JsonResponse({"success": False, "message": "Failed to update!"}, safe=True)
+    return BAD_REQUEST()
+
+@csrf_exempt
+def parameter_create_content(request):
+    print (" ++++++ API: /strategy/parameter_create_content ++++++")
+    if request.method == 'POST':
+        req = JSONParser().parse(request)
+        param_name = req['parameter_name']
+        item_name = req['item_name']
+        contents = req['contents']
+
+        try:
+            params.save_parameter_item(param_name, item_name, contents)
+            return JsonResponse({"success": True, "message": "Created successfully!"}, safe=True)
+        except:
+            return JsonResponse({"success": False, "message": "Failed to created!"}, safe=True)
+    return BAD_REQUEST()
+
+@csrf_exempt
+def save_other_parameters(request):
+    print (" ++++++ API: /strategy/save_other_parameters ++++++")
+    if request.method == 'POST':
+        req = JSONParser().parse(request)
+        item_name = req['name']
+        contents = req['contents']
+
+        try:
+            params.save_other_parameter_item(item_name, contents)
+            return JsonResponse({"success": True, "message": "Created successfully!"}, safe=True)
+        except:
+            return JsonResponse({"success": False, "message": "Failed to created!"}, safe=True)
+    return BAD_REQUEST()
+
+
+@csrf_exempt
 def save_script_file(request):
     print (" ++++++ API: save_script_file ++++++")
     if request.method == 'POST':
@@ -173,7 +221,6 @@ def delete_configs(request):
         except:
             return JsonResponse({"success": False, "message": "Failed to delete configs!"}, safe=True)
     return BAD_REQUEST()
-
 
 @csrf_exempt
 def delete_config_details(request):

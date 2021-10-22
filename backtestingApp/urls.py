@@ -22,6 +22,9 @@ urlpatterns = [
     path('strategy/parameter_item_names/', strategy_view.parameter_item_names, name='parameter-item-names'),
     path('strategy/parameter_content/', strategy_view.parameter_content, name='parameter-content'),
     path('strategy/parameter_detail_list/', strategy_view.parameter_detail_list, name='parameter-detail-list'),
+    path('strategy/parameter_create_content/', strategy_view.parameter_create_content, name='parameter-create-content'),
+    path('strategy/parameter_update_content/', strategy_view.parameter_update_content, name='parameter-update-content'),
+    path('strategy/save_other_parameters/', strategy_view.save_other_parameters, name='save-other-parameters'),
     path('strategy/save_script_file/', strategy_view.save_script_file, name='save-script-file'),
    
     # config management
