@@ -32,7 +32,7 @@ const ScannerComponent = () => {
   const [optionsExchange, setOptionsExchanges] = useState([])
   const [optionsSector, setOptionsSector] = useState([])
   const [optionsIndustry, setOptionsIndustry] = useState([])
-  
+
   const [pageAmount, setPageAmount] = useState(10)
   const [currentPage, setCurrentPage] = useState(1);
   const [wholeRows, setWholeRows] = useState(0);
@@ -67,6 +67,11 @@ const ScannerComponent = () => {
     {
       label: 'Market Cap',
       field: 'marketcap',
+      width: 200,
+    },
+    {
+      label: 'Symbol',
+      field: 'symbol',
       width: 200,
     },
     {
@@ -165,7 +170,7 @@ const ScannerComponent = () => {
 
     setLoadingData(true)
     const scannerDetails = await getScannerDetails(exchange ? exchange.value : '', industry ? industry.value : '', e.value, currentPage, pageAmount)
-    
+
     if (scannerDetails.success) {
       wrapSetDatatable({
         columns: hearder_columns,
