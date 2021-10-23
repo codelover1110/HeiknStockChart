@@ -42,14 +42,14 @@ def get_chat_data_from_candles(candles):
         sub_candles = candles[idx:idx+24]
         df = util.df(sub_candles)
         result_data.append(rsi_heik_v1_fitler_1(df))
-    return result_data 
+    return result_data
 
 def get_chat_data_rsi_heik_v1(candles):
     df = util.df(candles)
     hadf = rsi_heik_v1_fitler(df)
     heik = (hadf["HA_close"] - hadf["HA_open"]).rolling(window=3).mean()
     heik_tmp = heik.copy()
-    lastdf = df.iloc[-1] 
+    lastdf = df.iloc[-1]
 
     heik_diff = heik_tmp.diff()
     heik_last = heik.iloc[-1]
@@ -58,7 +58,7 @@ def get_chat_data_rsi_heik_v1(candles):
 
     df.replace(np.nan, 0)
     result_data = []
-        
+
     for data in df.iloc:
         # if( data.rsi2 >= 0 and data.rsi3 >= 0 and heik.iloc[-1] >=0 and heik_diff.iloc[-1] >= 0):
         # if( data.rsi2 >= 0 and data.rsi3 >= 0 and heik_last >=0 and heik_diff.iat[-1] >= 0):
@@ -77,7 +77,7 @@ def get_chat_data_rsi_heik_v1(candles):
         heik2 = dataConverter(np.nan_to_num(data.rsi3))
         # heik = dataConverter(np.nan_to_num(heik_diff.iat[-1]))
         # heik2 = dataConverter(np.nan_to_num(heik_diff.iat[-2]))
-        
+
         log_str = ' {}    {}    {}    {}    {}'.format(rsi, rsi2, rsi3, heik, heik2)
         result_data.append({
             'close': float(data.c),
@@ -103,14 +103,14 @@ def get_chat_data_rsi_heik_v11(candles):
     hadf = rsi_heik_v1_fitler(df)
     heik = (hadf["HA_close"] - hadf["HA_open"]).rolling(window=3).mean()
     heik_tmp = heik.copy()
-    lastdf = df.iloc[-1] 
+    lastdf = df.iloc[-1]
 
     heik_diff = heik_tmp.diff()
     heik_last = heik.iloc[-1]
 
     df.replace(np.nan, 0)
     result_data = []
-    idx = 0        
+    idx = 0
     for data in df.iloc:
         if idx == 0:
             prev_data = df.iloc[idx]
@@ -139,7 +139,7 @@ def get_chat_data_rsi_heik_v11(candles):
         percent_down = 100*((data.o - data.l)/data.o)
         percent_up = 100*((data.h - data.o)/data.o)
         percent_net = percent_up - percent_down
-        
+
         result_data.append({
             'close': float(data.c),
             'date': data.date,
@@ -169,7 +169,7 @@ def get_chat_data_rsi_heik_v1_non(candles):
 
     df.replace(np.nan, 0)
     result_data = []
-        
+
     for data in df.iloc:
         result_data.append({
             'close': float(data.c),
@@ -257,7 +257,7 @@ def join_append(candles, strategy_trades, strategy_name):
     return candles
 
 def get_chat_available_stratgies_no_interval(candle_name, micros):
-    # get candle interval 
+    # get candle interval
     interval_unit = candle_name.split('_')[-1]
     candle_interval = 0        # minute
     interval_num = candle_name.split('_')[1]
@@ -279,15 +279,15 @@ def get_chat_available_stratgies_no_interval(candle_name, micros):
             base_interval = int(base_interval_str.split('h')[0]) * 60
         elif 'd' in base_interval_str:
             base_interval = int(base_interval_str.split('d')[0]) * 24 * 60
-        
+
         if base_interval >= candle_interval:
             result.append(micro)
-    
+
     return result
 
 
 def get_chat_available_stratgies(candle_name, micros):
-    # get candle interval 
+    # get candle interval
     interval_unit = candle_name.split('_')[-1]
     candle_interval = 0        # minute
     interval_num = candle_name.split('_')[1]
@@ -308,14 +308,14 @@ def get_chat_available_stratgies(candle_name, micros):
             base_interval = int(base_interval_str.split('h')[0]) * 60
         elif 'd' in base_interval_str:
             base_interval = int(base_interval_str.split('d')[0]) * 24 * 60
-        
+
         if base_interval >= candle_interval:
             result.append(micro)
-    
+
     return result
 
 def calc_winningLosing(symbols, db_data):
-    wL = []   
+    wL = []
     for symbol in symbols:
         winningLosing_temp = {
             'symbol': symbol,
@@ -334,6 +334,8 @@ def calc_winningLosing(symbols, db_data):
                     else:
                         winningLosing_temp['losing'] =  winningLosing_temp['losing'] + 1
                     pair_wL = {}
+        if winningLosing_temp['winning'] == 0 and winningLosing_temp['losing'] == 0:
+            continue
         wL.append(winningLosing_temp)
     return wL
 
@@ -381,7 +383,7 @@ def calc_percentEfficiency(symbols, db_data):
                         winningT.append(percent)
                     else:
                         losingT.append(percent)
-              
+
 
         avgWinning = 0
         avgLosing = 0
@@ -389,6 +391,13 @@ def calc_percentEfficiency(symbols, db_data):
         avgWinning = round(avgWinning, 3)
         avgLosing = sum(losingT) / len(losingT) if len(losingT) > 0 else 0
         avgLosing = round(avgLosing, 3)
+
+        print('symbol', symbol)
+        print('avgLosing', avgLosing)
+        print('avgWinning', avgWinning)
+        if avgLosing == 0 or avgWinning == 0:
+            continue
+
         wLA.append({
             "symbol": symbol,
             "avgWinning": avgWinning,
@@ -426,7 +435,7 @@ def calc_percentEfficiency(symbols, db_data):
         pE.append({
             symbol: sym_pE
         })
-    
+
     return {
         "pE": pE,
         "wLA": wLA,
