@@ -14,6 +14,21 @@ const getSymbols = (chartData) => {
 }
 
 const optionCreator = (chartData, isAverage, isTotal) => {
+  const formatAvg = (value) => {
+    let text = value.toFixed(10)
+    let newText = ''
+    let beginChecking = false
+    for (let i=0; i<text.length; i++) {
+      newText += text[i]
+      if (beginChecking && '0' != text[i]) {
+        break
+      }
+
+      if ('.' == text[i] )
+        beginChecking = true
+    }
+    return newText + ' %'
+  }
   return {
     chart: {
       type: "bar",
@@ -42,7 +57,7 @@ const optionCreator = (chartData, isAverage, isTotal) => {
     },
     colors: ["#00ff00", `rgba(255,0,0, ${1 ? 0.5 : 1})`],
     title: {
-      text: isAverage ? "Winning & Losing Avg Percent" : !isTotal ? "Winning & Losing Trades" : "Winning & Losing Total",
+      text: isAverage ? "Average return per trade" : !isTotal ? "Number of trades" : "Total return",
       align: "left",
       offsetX: 8,
       offsetY: -2,
@@ -69,7 +84,7 @@ const optionCreator = (chartData, isAverage, isTotal) => {
         colors: ["#FFFFFF", "#FFFFFF"]
       },
       formatter: (value, opts) => {
-        return isAverage ? value.toFixed(5) : value | 0 
+        return isAverage ? formatAvg(value) : value | 0
       },
     },
     stroke: {
