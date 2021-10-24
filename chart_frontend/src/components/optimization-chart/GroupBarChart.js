@@ -69,7 +69,8 @@ const optionCreator = (chartData, isAverage) => {
         colors: ["#FFFFFF", "#FFFFFF"]
       },
       formatter: (value, opts) => {
-        return isAverage ? value.toFixed(5) : value | 0 
+        return 'ssssssssss'
+        return isAverage ? value.toFixed(5) : value
       },
     },
     stroke: {
@@ -95,7 +96,7 @@ const optionCreator = (chartData, isAverage) => {
         style: {
             colors: '#FFFFFF',
         },
-        formatter: (value) => { return isAverage ? value.toFixed(5) : value | 0 },
+        formatter: (value) => { return isAverage ? value.toFixed(5) : value },
       },
       axisBorder: {
         show: true,

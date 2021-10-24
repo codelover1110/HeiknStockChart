@@ -16,6 +16,12 @@ const getSymbols = (chartData) => {
 const optionCreator = (chartData, isAverage, isTotal) => {
   const formatAvg = (value) => {
     let text = value.toFixed(10)
+
+    let parts = text.split('.');
+    if (parts && parts.length > 0 && 0 == parseInt(parts[1])) {
+      return parts[0]
+    }
+
     let newText = ''
     let beginChecking = false
     for (let i=0; i<text.length; i++) {
@@ -84,7 +90,7 @@ const optionCreator = (chartData, isAverage, isTotal) => {
         colors: ["#FFFFFF", "#FFFFFF"]
       },
       formatter: (value, opts) => {
-        return isAverage ? formatAvg(value) : value | 0
+        return formatAvg(value)
       },
     },
     stroke: {
@@ -167,10 +173,26 @@ export default function GroupApexBar(props) {
         data: getLosingData(chartData, isAverage, isTotal)
       }
     ])
+    console.log('Xinchao')
+    console.log(isTotal)
+    console.log([
+      {
+        name: isAverage ? 'Winning Average' : !isTotal ? 'Winning' : 'Total Winning',
+        data: getWiningData(chartData, isAverage, isTotal)
+      },
+      {
+        name: isAverage ? 'Losing Average' : !isTotal ? 'Losing' : 'Total Losing',
+        data: getLosingData(chartData, isAverage, isTotal)
+      }
+    ])
   }, [chartData, isAverage])
 
   return (
     <div id="chart">
+      {console.log('options')}
+      {console.log(options)}
+      {console.log('series')}
+      {console.log(series)}
       <ReactApexChart
         options={options}
         series={series}
