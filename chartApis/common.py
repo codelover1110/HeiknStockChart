@@ -405,8 +405,8 @@ def calc_percentEfficiency(symbols, db_data):
         })
         totWL.append({
             "symbol": symbol,
-            "totWinning": round( sum(winningT), 3),
-            "totLosing": round(abs(sum(losingT)), 3)
+            "totWinning": round( sum(winningT), 5),
+            "totLosing": round(abs(sum(losingT)), 5)
         })
 
         # Calculation Long and Short
