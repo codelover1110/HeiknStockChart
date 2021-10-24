@@ -17,6 +17,9 @@ from django.core import serializers
 from ib_insync import *
 import numpy as np
 import pandas as pd
+
+import datetime
+
 pd.options.mode.chained_assignment = None  # default='warn'
 
 from .utils import get_symbol_exchange
@@ -79,6 +82,9 @@ def backtesting_result(request):
         end_date = request_data['end_date']
         symbols = request_data['symbols']
         list_db_data = get_backtesting_result(symbols, macro, micro, start_date, end_date)
+
+        # print('HaoHHHHHH')
+        # print(list_db_data)
         wL = calc_winningLosing(symbols, list_db_data)
         pE_wLA_lS = calc_percentEfficiency(symbols, list_db_data)
         if len(symbols) > 0:
@@ -86,10 +92,71 @@ def backtesting_result(request):
         else:
             exchange = ""
 
+        pE = pE_wLA_lS['pE']
+        # newPE = [
+        #     {'BTC': [
+        #         {'date': '2021-10-20', 'percent': 88.114, 'entry': 'buy', 'exit': 'sell', 'efficiency': 0.07},
+        #         {'date': '2021-10-21', 'percent': 8.114, 'entry': 'buy', 'exit': 'sell', 'efficiency': 0.07},
+        #     ]},
+        #     {'HAO': [
+        #         {'date': '2021-10-21', 'percent': 31.114, 'entry': 'buy', 'exit': 'sell', 'efficiency': 0.07},
+        #     ]},
+        # ]
+        newPE = []
+        for pE_record in pE:
+            newPE_record = {}
+            for symbol in pE_record:
+                symbol_data = pE_record[symbol]
+                print(symbol,'-------------------------------------------')
 
+                group_counters = {}
+                group_dates = {}
+                group_percents = {}
+                group_entries = {}
+                group_exits = {}
+                group_efficiencies = {}
+                for symbol_record in symbol_data:
+                    transaction_date = symbol_record['date'].strftime("%Y_%m_%d")
+                    group_key = symbol + transaction_date
+
+                    if not group_key in group_counters:
+                        group_counters[group_key] = 0
+                        group_percents[group_key] = 0
+                        group_efficiencies[group_key] = 0
+
+                    group_counters[group_key] += 1
+                    group_dates[group_key] = symbol_record['date'].strftime("%Y-%m-%d")
+                    group_percents[group_key] += symbol_record['percent']
+                    group_entries[group_key] = symbol_record['entry']
+                    group_exits[group_key] = symbol_record['exit']
+                    group_efficiencies[group_key] += symbol_record['efficiency']
+
+
+                # group all times in a day
+                newPE_symbol_data = []
+                for group_key in group_counters:
+                    newPE_symbol_record = {}
+                    newPE_symbol_record['date'] = group_dates[group_key]
+                    newPE_symbol_record['percent'] = round(group_percents[group_key] / group_counters[group_key], 5)
+                    newPE_symbol_record['entry'] = group_entries[group_key]
+                    newPE_symbol_record['exit'] = group_exits[group_key]
+                    newPE_symbol_record['efficiency'] = round(group_efficiencies[group_key] / group_counters[group_key], 5)
+                    newPE_symbol_data.append(newPE_symbol_record)
+
+                newPE_record[symbol] = newPE_symbol_data
+
+            newPE.append(newPE_record)
+
+
+        # for record in pE:
+        #     print('record')
+        #     print(record)
+        #
+        #     print('transaction_date: ', transaction_date)
+            # key = f'{record['side']}_{record['symbol']}'
 
         bastestData = {
-            'percentEfficiency': pE_wLA_lS['pE'],
+            'percentEfficiency': newPE,
             'winningLosing': wL,
             "winningLosingAvg": pE_wLA_lS['wLA'],
             "longShort": pE_wLA_lS['lS'],
