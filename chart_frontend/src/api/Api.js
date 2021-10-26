@@ -411,7 +411,7 @@ const transformingProcessConfigFromParam = (settings) => {
 
 export const saveConfigFile = async(settings) => {
 
-  
+
   const data = transformingProcessConfigToQuery(settings)
   const requestOptions = {
     method: 'POST',
@@ -985,6 +985,30 @@ export const getIndicators = async () => {
   };
 
   const apiURL = '/api/indicator_list'
+  try {
+    return await fetch(process.env.REACT_APP_BACKEND_URL + apiURL, requestOptions)
+    .then(response => response.json())
+    .then(data => {
+        return {
+          success: true,
+          data: data.result,
+        }
+      })
+  } catch (e) {
+    return {
+      success: false,
+      message: e
+    }
+  }
+}
+
+export const getIndicatorSignallingList = async () => {
+  const requestOptions = {
+    method: 'GET',
+    headers: {'Content-Type': 'application/json'},
+  };
+
+  const apiURL = '/api/get_indicator_signalling_list'
   try {
     return await fetch(process.env.REACT_APP_BACKEND_URL + apiURL, requestOptions)
     .then(response => response.json())

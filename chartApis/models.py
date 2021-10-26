@@ -7,7 +7,7 @@ from wsgiref.util import FileWrapper
 from zipfile import ZipFile
 from backup.models import BackupProgress
 
-from Having_system.Update_candles.define import INDICATORS_COL_NAME, PARAMETERS_DB
+from Having_system.Update_candles.define import INDICATORS_COL_NAME, PARAMETERS_DB, INDICATOR_SIGNALLING_COL_NAME
 from .utils import define_start_date, check_candle_in_maket_time
 
 azuremongo = pymongo.MongoClient('mongodb://root:rootUser2021@20.84.64.243:27017')
@@ -105,6 +105,7 @@ def get_indicator_list():
         if indicator['name'] != 'int_percent_net':
             result.append(indicator['name'])
     return  result
+
 
 ##################################
 ### get macro strategy symbols ###
@@ -544,3 +545,13 @@ def api_execute_backup(backup, check_stopping = None):
             return False
         csv_export = docs.to_csv(sep=",")
         return csv_export
+
+
+def api_get_indicator_signalling_list():
+    masterdb = azuremongo[PARAMETERS_DB]
+    ob_table = masterdb[INDICATOR_SIGNALLING_COL_NAME]
+    indicator_names = list(ob_table.find({}, {'name': 1, '_id': 0}))
+    result = []
+    for indicator in indicator_names:
+        result.append({'label':indicator['name'], 'value':indicator['name']})
+    return  result

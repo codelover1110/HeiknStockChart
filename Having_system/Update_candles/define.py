@@ -22,6 +22,7 @@ SCANNER_VIEWS = 'scanner_views'
 
 PARAMETERS_DB = 'parameters'
 INDICATORS_COL_NAME = 'indicators'
+INDICATOR_SIGNALLING_COL_NAME = 'indicator_signalling'
 WATCHLIST_COL_NAME = 'watchlists'
 
 SCANNER_FINANCIAL_DETAIL_FIELDS = {
@@ -31,9 +32,9 @@ SCANNER_FINANCIAL_DETAIL_FIELDS = {
         "debt": 1,
         "period": 1,
         "updated": 1,
-        "assetsCurrent": 1, 
-        "assets": 1, 
-        "profitMargin": 1, 
+        "assetsCurrent": 1,
+        "assets": 1,
+        "profitMargin": 1,
         "shares": 1,
         "taxAssets": 1
     }
@@ -41,13 +42,13 @@ SCANNER_FINANCIAL_DETAIL_FIELDS = {
 
 SCANNER_TICKER_DETAIL_FIELDS = {
         "_id": 0,
-        "country": 1, 
+        "country": 1,
         "phone": 1,
         "url": 1,
         "hq_state": 1,
-        "type": 1, 
-        "updated": 1, 
-        "active": 1, 
+        "type": 1,
+        "updated": 1,
+        "active": 1,
         "ceo": 1,
         "exchangeSymbol": 1,
         "name": 1

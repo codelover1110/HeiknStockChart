@@ -48,6 +48,7 @@ from .models import (
             # api_export_collection,
             api_create_backup,
             api_execute_backup,
+            api_get_indicator_signalling_list,
             )
 
 from .common import (
@@ -241,6 +242,12 @@ def micro_strategy_symbols(request):
 def indicator_list(request):
     print (" ++++++ API: indicator_list ++++++")
     indicator_list = get_indicator_list()
+    return JsonResponse({"result": indicator_list}, status=status.HTTP_201_CREATED)
+
+@csrf_exempt
+def get_indicator_signalling_list(request):
+    print (" ++++++ API: get_indicator_signalling_list ++++++")
+    indicator_list = api_get_indicator_signalling_list()
     return JsonResponse({"result": indicator_list}, status=status.HTTP_201_CREATED)
 
 

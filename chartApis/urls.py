@@ -28,6 +28,7 @@ urlpatterns = [
     url(r'^api/get_data_extended_slice$', views.get_live_data_extended_slice),
     url(r'^api/micro_strategy_symbols$', views.micro_strategy_symbols),
     url(r'^api/indicator_list$', views.indicator_list),
+    url(r'^api/get_indicator_signalling_list$', views.get_indicator_signalling_list),
 
     # strategy management api
     url(r'^api/get_script_file$', views.get_script_file),
