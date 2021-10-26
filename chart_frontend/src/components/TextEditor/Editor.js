@@ -858,8 +858,7 @@ export default class TextEditor extends Component {
 
   displayProcessEditor = () => {
     let keys = Object.keys(this.state.processConfigOptions);
-    console.log('keys')
-    console.log(keys)
+
     return keys.map((key, index) => {
       return (
         <li key={key} className="list-group-item strategy-indicator-edit-list">
