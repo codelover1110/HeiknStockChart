@@ -147,7 +147,6 @@ export default class TextEditor extends Component {
       },
       processConfigSetting: {
         bot_name: '',
-        timeframe: null,
         indicator: null,
         watchlist: null,
         position_sizing: null,
@@ -156,7 +155,6 @@ export default class TextEditor extends Component {
         live_trading: null,
         starting_cash: 10000,
         extended_hours: null,
-        name: '',
         macro_strategy: null,
         indicator_signalling: null,
         asset_class: null,
@@ -786,11 +784,6 @@ export default class TextEditor extends Component {
   }
 
   handleProcessConfigSettingSave = async () => {
-    if (!this.state.processConfigSetting.name.length) {
-      alert("name field is required!")
-      return
-    }
-
     const res = await saveConfigFile(
       this.state.processConfigSetting,
       this.state.isUpdate,
