@@ -562,7 +562,7 @@ export default class TextEditor extends Component {
     
     if (!this.state.isSelectedStrategyFile) {
       if (this.state.isCheckedStrategy) {
-        console.log("content is empty!")
+        alert("content is empty!")
         return;
       }
     }
@@ -575,7 +575,6 @@ export default class TextEditor extends Component {
         this.state.isUpdate,
         this.state.isCheckedStrategy
       )
-      console.log("res?????????????????????????????????????", res)
     } else {
       res = await saveConfigFile(
         this.state.isUpdate ? this.state.selectedFileType.value : this.state.filename,

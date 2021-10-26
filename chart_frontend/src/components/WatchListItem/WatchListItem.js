@@ -20,31 +20,31 @@ const WatchListItem = (props) => {
         label: "Indicators",
         value: "parent_value_2",
         children: [
-            {
-                label: "rsi",
-                value: "child_value_2_1",
-                default: true
-            },
-            {
-                label: "rsi2",
-                value: "child_value_2_2",
-                default: true
-            },
-            {
-                label: "rsi3",
-                value: "child_value_2_3",
-                default: false
-            },
-            {
-                label: "heik",
-                value: "child_value_2_4",
-                default: false
-            },
-            {
-                label: "heik2",
-                value: "child_value_2_5",
-                default: false
-            }
+            // {
+            //     label: "rsi",
+            //     value: "child_value_2_1",
+            //     default: true
+            // },
+            // {
+            //     label: "rsi2",
+            //     value: "child_value_2_2",
+            //     default: true
+            // },
+            // {
+            //     label: "rsi3",
+            //     value: "child_value_2_3",
+            //     default: false
+            // },
+            // {
+            //     label: "heik",
+            //     value: "child_value_2_4",
+            //     default: false
+            // },
+            // {
+            //     label: "heik2",
+            //     value: "child_value_2_5",
+            //     default: false
+            // }
         ],
         "default": true
       }
@@ -67,10 +67,8 @@ const WatchListItem = (props) => {
       width: 100,
     },
   ])
-  const [isInited, setIsInited] = useState(false)
   const [isUpdatedWatchList, setIsUpdatedWatchList] = useState(false);
   const [selectedSymbols, setSelectedSymbols] = useState([])
-  const [symbolOptions, setSymbolOptions] = useState([])
   
   const [columns, setColumns] = useState([
     {
@@ -78,31 +76,31 @@ const WatchListItem = (props) => {
       label: 'symbol',
       width: 100,
     },
-    {
-      value: 'rsi',
-      label: 'rsi',
-      width: 100,
-    },
-    {
-      value: 'rsi2',
-      label: 'rsi2',
-      width: 100,
-    },
-    {
-      value: 'rsi3',
-      label: 'rsi3',
-      width: 100,
-    },
-    {
-      value: 'heik',
-      label: 'heik',
-      width: 100,
-    },
-    {
-      value: 'heik2',
-      label: 'heik2',
-      width: 100,
-    },
+    // {
+    //   value: 'rsi',
+    //   label: 'rsi',
+    //   width: 100,
+    // },
+    // {
+    //   value: 'rsi2',
+    //   label: 'rsi2',
+    //   width: 100,
+    // },
+    // {
+    //   value: 'rsi3',
+    //   label: 'rsi3',
+    //   width: 100,
+    // },
+    // {
+    //   value: 'heik',
+    //   label: 'heik',
+    //   width: 100,
+    // },
+    // {
+    //   value: 'heik2',
+    //   label: 'heik2',
+    //   width: 100,
+    // },
     {
       value: 'chart',
       label: 'chart',
@@ -228,10 +226,8 @@ const WatchListItem = (props) => {
           })
 
           updateChangeSymbol(symbols)
-          setSymbolOptions(symbols)
           setSelectedSymbols(symbols)
           setWatchListInitData(realData)
-          setIsInited(true);  
         })  
       } catch (error) {
         console.log(error)
@@ -262,6 +258,19 @@ const WatchListItem = (props) => {
         width: 100,
       })
       setColumns(columns)
+    } else {
+      setColumns([
+        {
+          value: 'symbol',
+          label: 'symbol',
+          width: 100,
+        },
+        {
+          value: 'chart',
+          label: 'chart',
+          width: 100,
+        }
+      ])
     }
 
   }, [isUpdatedCols])
@@ -471,7 +480,6 @@ const WatchListItem = (props) => {
     setIsUpdatedCols(!isUpdatedCols)
     setColumnItems(cols)
     setSelectedColumns(columns)
-    
     if (isConnected) {
       const symbols = selectedSymbols.map( (o) => o.value )
       
@@ -656,7 +664,6 @@ const WatchListItem = (props) => {
     socket.onmessage = (event) => {
       try {
         const msg = JSON.parse(event.data)
-        console.log('msg??????????????????????', msg)
         setWatchListData(msg)
         setIsUpdatedWatchList(true)
       } catch (error) {

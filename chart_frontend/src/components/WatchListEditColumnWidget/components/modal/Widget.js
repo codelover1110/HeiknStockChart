@@ -198,7 +198,8 @@ class Widget extends React.Component {
           }
         })
       });
-  
+
+      
       // merge the new current nodes into original current nodes
       const originCurrentNodes = cloneDeep(this.state.currentNodes);
       let totalNewCurrentNodes = [];
@@ -210,11 +211,12 @@ class Widget extends React.Component {
             newCurrentNode.children.map((newChildItem) => {
               currentChildItems.push(newChildItem);
             });
-            totalNewCurrentNodes.push({ ...currentNode, children: currentChildItems });
+            // totalNewCurrentNodes.push({...currentNode})
+            // totalNewCurrentNodes.push({ ...currentNode, children: currentChildItems });
             exist = true;
           }
         })
-  
+        
         if (!exist) {
           let parentExist = false;
           totalNewCurrentNodes.map((node, index) => {
@@ -228,7 +230,7 @@ class Widget extends React.Component {
           }
         }
       })
-  
+      
       let totalCurrentNodes = totalNewCurrentNodes;
       originCurrentNodes.map((originNode) => {
         let exist = false;
@@ -241,6 +243,7 @@ class Widget extends React.Component {
           totalCurrentNodes.push(originNode);
         }
       });
+
   
       totalNodes.map((totalNode) => {
         let parentFlag = false;
@@ -281,6 +284,7 @@ class Widget extends React.Component {
         nodesAvailableItem: availableNodes,
         nodesFilteredAvailableItem: availableNodes,
       });
+      
     }
   }
 
