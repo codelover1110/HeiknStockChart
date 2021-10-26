@@ -5,21 +5,16 @@
   border-color: lighten($black,5%);
   border-radius: $border-radius-lg;
   font-size: $font-size-sm;
-  @include transition-input-focus-color();
-
 
   &:focus{
     border-color: $primary;
-    background-color: $input-bg;
     @include box-shadow(none);
-
     & + .input-group-append .input-group-text,
     & ~ .input-group-append .input-group-text,
     & + .input-group-prepend .input-group-text,
     & ~ .input-group-prepend .input-group-text{
         border: 1px solid $primary;
         border-left: none;
-        background-color: $transparent-bg;
     }
   }
 
