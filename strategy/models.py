@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 import pymongo
 
-# mongoclient = pymongo.MongoClient("mongodb://aliaksandr:BD20fc854X0LIfSv@cluster0-shard-00-00.35i8i.mongodb.net:27017,cluster0-shard-00-01.35i8i.mongodb.net:27017,cluster0-shard-00-02.35i8i.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-aoj781-shard-0&authSource=admin&retryWrites=true&w=majority") 
+# mongoclient = pymongo.MongoClient("mongodb://aliaksandr:BD20fc854X0LIfSv@cluster0-shard-00-00.35i8i.mongodb.net:27017,cluster0-shard-00-01.35i8i.mongodb.net:27017,cluster0-shard-00-02.35i8i.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-aoj781-shard-0&authSource=admin&retryWrites=true&w=majority")
 mongoclient = pymongo.MongoClient('mongodb://root:rootUser2021@20.84.64.243:27017')
 
 STRATEGY_PARAMETERS = 'parameters'
@@ -25,7 +25,7 @@ def get_parameter_item_names(param_type):
 
 def get_parameter_content(param_type, param_item_name):
     db_collection = param_db[param_type]
-    
+
     content = db_collection.find_one({"name": param_item_name})
     return content['contents']
 
@@ -54,7 +54,7 @@ def save_other_parameter_item(item_name, contents):
 def create_bot_configs_one(bot_config):
     db_collection = proc_db['bot_configs']
     bot_config['update_date'] = datetime.now()
-    query = {"name": bot_config['name']}
+    query = {"name": bot_config['bot_name']}
     b_config = db_collection.find_one(query)
     if b_config is not None:
         db_collection.update_one({"_id": b_config['_id']}, {"$set": bot_config}, upsert=False)
