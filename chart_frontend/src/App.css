@@ -185,7 +185,7 @@
   background: #3b61ff
 }
 .active-instance .nav-link p{
-  font-weight: bold;    
+  font-weight: bold;
 }
 
 .hunter-nav-bar {
@@ -195,7 +195,7 @@
 }
 
 .logo-title {
-  z-index: 9999;    
+  z-index: 9999;
 }
 
 .hunter-chart-container {
@@ -265,7 +265,7 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
 }
 
 .hunter-form-signup-area {
-  display: flex;  
+  display: flex;
   justify-content: space-between;
   align-items: baseline;
 }
@@ -788,4 +788,8 @@ pre {
 
 pre {
   color: #212529 !important;
+}
+
+.form-control:focus {
+  color: #212529!important;
 }
