@@ -12,7 +12,8 @@ import {
   getConfigFileList,
   getBotConfigList,
   getBotConfigFileList,
-  updateBotStatus
+  updateBotStatus,
+  getIndicatorSignallingList,
 } from "api/Api";
 import {
   Button
@@ -134,21 +135,6 @@ export default class TextEditor extends Component {
             value: "equities"
           }
         ],
-        // timeframe: [
-        //   {
-        //     value: '2m',
-        //     label: '2m'
-        //   },
-        //   {
-        //     value: '4m',
-        //     label: '4m'
-        //   },
-        //   {
-        //     value: '12m',
-        //     label: '12m'
-        //   }
-        // ],
-        // name: '',
       },
       botConfigOptions: {
         bot_name_config: '',
@@ -359,6 +345,8 @@ export default class TextEditor extends Component {
         rows: [],
       }
     };
+
+
   }
 
   openAddIndicatorModal = () => {
@@ -369,12 +357,28 @@ export default class TextEditor extends Component {
     this.setState({ isCheckedStrategy: checked });
   }
 
+
   async componentDidMount () {
+    // loading indicator signalling options
+    await this.loadIndicatorSignallingOptions()
+
     this.loadModuleTypes()
     this.loadConfigFiles()
     this.loadBotConfigFiles()
     this.loadBotStatusList()
     this.loadBotConfigList()
+  }
+
+  async loadIndicatorSignallingOptions() {
+    const res = await getIndicatorSignallingList();
+
+    if (res.success) {
+      //this.state.processConfigOptions.
+      let updatedState = this.state
+      updatedState.processConfigOptions.indicator_signalling = res.data
+
+      this.setState((state, props) => (updatedState));
+    }
   }
 
   loadConfigFiles = async () => {
@@ -870,6 +874,8 @@ export default class TextEditor extends Component {
             </MDBBtn>
           </div>
           <div className="strategy-indicator-edit-list-action">
+            {console.log('key:', key)}
+          {console.log(this.state.processConfigOptions[key])}
           { key === 'bot_name' || key === 'name' || key === 'starting_cash'
             ?
             (
