@@ -383,7 +383,7 @@ const transformingProcessConfigToQuery = (settings) => {
     live_trading: convertArraytoString(settings.live_trading),
     starting_cash: settings.starting_cash,
     extended_hours: settings.extended_hours.value,
-    name: settings.name,
+    name: settings.bot_name,
     macro_strategy: convertArraytoString(settings.macro_strategy),
     indicator_signalling: convertArraytoString(settings.indicator_signalling),
     asset_class: convertArraytoString(settings.asset_class),
