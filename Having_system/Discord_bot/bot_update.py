@@ -36,8 +36,8 @@ async def get_all_text_channels(guild):
     text_channel_list = []
     # for guild in client.guilds:
     for channel in guild.channels:
-        if str(channel.type) == 'text':
-            text_channel_list.append(channel.name)
+        # if str(channel.type) == 'text':
+        text_channel_list.append(channel.name)
     return text_channel_list
 
 async def delete_text_channels(guild):
@@ -56,7 +56,8 @@ async def on_ready():
         print ("Server:", guild.id)
         # await delete_text_channels(guild)
 
-    calculate_profit.start()
+    # calculate_profit.start()
+    send_message()
     update_channels.start()
 
     print(f'{client.user.name} has connected to Discord!')
@@ -109,6 +110,7 @@ async def send_message():
                 await guild.create_text_channel(name=channel_name)
                 time.sleep(0.5)
             channel = discord.utils.get(guild.channels, name=channel_name)
+            print("333333333333333:", guild.channels)
 
             try:
                 if channel is not None:
@@ -124,7 +126,8 @@ async def send_message():
 @tasks.loop(seconds=1)
 async def calculate_profit():
     if trigger_queue.empty():
-        print ("no trigger")
+        # print ("no trigger")
+        pass
     else:
         while not trigger_queue.empty():
             trigger_item = trigger_queue.get()
@@ -141,38 +144,41 @@ async def calculate_profit():
                                 text_channels = await get_all_text_channels(guild)
                                 if channel_name not in text_channels:
                                     await guild.create_text_channel(name=channel_name)
+                                    print ("---------------------", channel_name)
                                     time.sleep(0.5)
+
                                 channel = discord.utils.get(guild.channels, name=channel_name)
+                                # try:
+                                if channel is not None:
+                                    sell_trade_doc = trigger_item['trade_doc']
+                                    buy_msg = '    {}   {} - {} - {} - {}'.format(str(buy_trade_doc['date']),
+                                                                            buy_trade_doc['symbol'], 
+                                                                            buy_trade_doc['side'], 
+                                                                            int(float(buy_trade_doc['quantity'])), 
+                                                                            buy_trade_doc['price'])
+                                    
+                                    sell_msg = '    {}   {} - {} - {} - {}'.format(str(sell_trade_doc['date']), 
+                                                                            sell_trade_doc['symbol'], 
+                                                                            sell_trade_doc['side'], 
+                                                                            int(float(sell_trade_doc['quantity'])), 
+                                                                            sell_trade_doc['price'])
+                                    
+                                    profit_msg = '@@@@@@@@@@@@@@@@@@@@@@@=>  {} %       $ {}'.format(
+                                            round(float(sell_trade_doc['price'])*100/float(buy_trade_doc['price']) - 100 + 0.0000001, 4),
+                                            round(float(sell_trade_doc['price']) - float(buy_trade_doc['price']) + 0.0000001, 4)
+                                        )
 
-                                try:
-                                    if channel is not None:
-                                        sell_trade_doc = trigger_item['trade_doc']
-                                        buy_msg = '    {}   {} - {} - {} - {}'.format(str(buy_trade_doc['date']),
-                                                                                buy_trade_doc['symbol'], 
-                                                                                buy_trade_doc['side'], 
-                                                                                int(float(buy_trade_doc['quantity'])), 
-                                                                                buy_trade_doc['price'])
-                                        
-                                        sell_msg = '    {}   {} - {} - {} - {}'.format(str(sell_trade_doc['date']), 
-                                                                                sell_trade_doc['symbol'], 
-                                                                                sell_trade_doc['side'], 
-                                                                                int(float(sell_trade_doc['quantity'])), 
-                                                                                sell_trade_doc['price'])
-                                        
-                                        profit_msg = '@@@@@@@@@@@@@@@@@@@@@@@=>  {} %       $ {}'.format(
-                                                round(float(sell_trade_doc['price'])*100/float(buy_trade_doc['price']) - 100 + 0.0000001, 4),
-                                                round(float(sell_trade_doc['price']) - float(buy_trade_doc['price']) + 0.0000001, 4)
-                                            )
-
-                                        await channel.send(buy_msg)
-                                        await channel.send(sell_msg)
-                                        await channel.send(profit_msg)
-                                        del buy_list[idx]
-                                except:
-                                    print ('not available to send message to deleted channel')
+                                    await channel.send(buy_msg)
+                                    await channel.send(sell_msg)
+                                    await channel.send(profit_msg)
+                                    del buy_list[idx]
+                                else:
+                                    print ("*************:", channel.name)
+                                # except:
+                                #     print ('not available to send message to deleted channel')
 
 
-@tasks.loop(seconds=10)
+@tasks.loop(seconds=3600)
 async def update_channels():
     guild = client.get_guild(882549263534542868)
     for channel in guild.channels:

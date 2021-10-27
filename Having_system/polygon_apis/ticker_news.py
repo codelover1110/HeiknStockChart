@@ -132,7 +132,7 @@ class TickerNewsThread(object):
             else:
                 pass
 
-            time.sleep(5)
+            time.sleep(1800)
 
 
 if __name__ == "__main__":
@@ -165,8 +165,6 @@ if __name__ == "__main__":
     end_time = datetime.now()
     print ('start at: {}, end_at: {}'.format(start_time, end_time))
 
-    # monitoring()
-    # get_published_dates()
     
 
 
