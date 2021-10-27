@@ -270,6 +270,9 @@ class WebSocketHandler(StreamRequestHandler):
     def handshake(self):
         headers = self.read_http_headers()
 
+        if 'upgrade' not in headers.keys():
+            self.keep_alive = False
+            return
         try:
             assert headers['upgrade'].lower() == 'websocket'
         except AssertionError:

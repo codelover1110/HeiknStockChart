@@ -55,7 +55,7 @@ class PolygonApiClient(object):
             buffering_candles = api_candles[-25:]
             for candle in buffering_candles:
                 candle['date'] = str(datetime.fromtimestamp(candle['t']/1000) - timedelta(hours=2))
-                print ("buffering ", symbol)
+                # print ("buffering ", symbol)
                 self.put_queue(candle, symbol)
             time.sleep(0.01)
 
