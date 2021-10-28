@@ -55,7 +55,7 @@ export default class TextEditor extends Component {
         { value: 'core', label: 'core' },
       ],
       processConfigOptions: {
-        bot_name: '',
+        name: '',
 
         indicator: [
           {
@@ -147,7 +147,7 @@ export default class TextEditor extends Component {
         start_date_config: ''
       },
       processConfigSetting: {
-        bot_name: '',
+        name: '',
         indicator: null,
         watchlist: null,
         position_sizing: null,
@@ -344,7 +344,7 @@ export default class TextEditor extends Component {
         rows: [],
       },
       selectValidations: {
-        bot_name: true,
+        name: true,
         indicator: true,
         watchlist: true,
         position_sizing: true,
@@ -485,8 +485,7 @@ export default class TextEditor extends Component {
     if (res.result) {
       const botConfigList = res.result.map((bot, index) => ({
         id: index + 1,
-        bot_name: bot.bot_name,
-        timeframe: bot.timeframe,
+        name: bot.name,
         indicator: bot.indicator,
         watchlist: bot.watchlist,
         position_sizing: bot.position_sizing,
@@ -495,7 +494,6 @@ export default class TextEditor extends Component {
         live_trading: bot.live_trading,
         starting_cash: bot.starting_cash,
         hours: bot.extended_hours,
-        name: bot.name,
         macro_strategy: bot.macro_strategy,
         indicator_signalling: bot.indicator_signalling,
         asset_class: bot.asset_class,
@@ -779,7 +777,7 @@ export default class TextEditor extends Component {
 
     this.setState({
       botConfigSetting: {
-        bot_name_config: res.bot_name,
+        bot_name_config: res.name,
         macro_strategy_config: res.macro_strategy,
         start_date_config: res.start_date_config,
         extended_hours_config: res.extended_hours,
@@ -905,14 +903,14 @@ export default class TextEditor extends Component {
             </MDBBtn>
           </div>
           <div className="strategy-indicator-edit-list-action">
-          { key === 'bot_name' || key === 'name' || key === 'starting_cash'
+          { key === 'name' || key === 'starting_cash'
             ?
             (
               <input
                   type="name"
                   className="form-control hunter-bot-name-input"
                   placeholder= {
-                    key === 'bot_name' ? "Enter bot name" : key === 'name' ? "Enter name" : "Enter starting cash"
+                    key === 'name' ? "Enter name" : "Enter starting cash"
                   }
                   value={this.state.processConfigSetting[key]}
                   onChange={(e) => { this.handleBotNameChange(e, key)}}
@@ -940,8 +938,7 @@ export default class TextEditor extends Component {
     this.setState(
       {
         processConfigSetting: {
-          bot_name: '',
-          timeframe: null,
+          name: '',
           indicator: null,
           watchlist: null,
           position_sizing: null,
@@ -950,7 +947,6 @@ export default class TextEditor extends Component {
           live_trading: null,
           starting_cash: 10000,
           hours: null,
-          name: '',
           macro_strategy: null,
           indicator_signalling: null,
           asset_class: null,
