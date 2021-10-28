@@ -109,6 +109,7 @@ def backtesting_result(request):
             for symbol in pE_record:
                 symbol_data = pE_record[symbol]
                 print(symbol,'-------------------------------------------')
+                print(symbol_data)
 
                 group_counters = {}
                 group_dates = {}
@@ -143,6 +144,17 @@ def backtesting_result(request):
                     newPE_symbol_record['exit'] = group_exits[group_key]
                     newPE_symbol_record['efficiency'] = round(group_efficiencies[group_key] / group_counters[group_key], 5)
                     newPE_symbol_data.append(newPE_symbol_record)
+
+                print('newPE_symbol_data-----')
+                print(newPE_symbol_data)
+
+                if len(newPE_symbol_data) < 2:
+                    newPE_symbol_data = []
+                    for symbol_record in symbol_data:
+                        symbol_record['date'] = symbol_record['date'].strftime("%Y-%m-%d %H:%M:%S")
+                        newPE_symbol_data.append(symbol_record)
+
+                    # newPE_symbol_data = symbol_data
 
                 newPE_record[symbol] = newPE_symbol_data
 
