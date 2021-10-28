@@ -54,7 +54,7 @@ def save_other_parameter_item(item_name, contents):
 def create_bot_configs_one(bot_config):
     db_collection = proc_db['bot_configs']
     bot_config['update_date'] = datetime.now()
-    query = {"name": bot_config['bot_name']}
+    query = {"name": bot_config['name']}
     b_config = db_collection.find_one(query)
     if b_config is not None:
         db_collection.update_one({"_id": b_config['_id']}, {"$set": bot_config}, upsert=False)
