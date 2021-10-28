@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import Select from 'react-select'
+import BaseSelect from 'react-select'
 // import { Editor } from "react-draft-wysiwyg";
 import { EditorState, convertToRaw ,convertFromHTML,ContentState} from "draft-js";
 import {
@@ -31,6 +31,7 @@ import Tab from 'react-bootstrap/Tab'
 import { MDBDataTableV5 } from 'mdbreact';
 import moment from 'moment'
 import "./Editor.css"
+import Select from "components/CustomSelect"
 
 export default class TextEditor extends Component {
   constructor(props) {
@@ -341,7 +342,21 @@ export default class TextEditor extends Component {
       botConfigSmallDatatable: {
         columns: [],
         rows: [],
-      }
+      },
+      selectValidations: {
+        bot_name: true,
+        indicator: true,
+        watchlist: true,
+        position_sizing: true,
+        order_routing: true,
+        data_source: true,
+        live_trading: true,
+        starting_cash: true,
+        extended_hours: true,
+        macro_strategy: true,
+        indicator_signalling: true,
+        asset_class: true,
+      },
     };
 
 
@@ -366,6 +381,7 @@ export default class TextEditor extends Component {
     this.loadBotStatusList()
     this.loadBotConfigList()
   }
+
 
   async loadIndicatorSignallingOptions() {
     const res = await getIndicatorSignallingList();
@@ -784,6 +800,29 @@ export default class TextEditor extends Component {
   }
 
   handleProcessConfigSettingSave = async () => {
+    const form = document.querySelector('#controlled-tab-example-tabpane-process form')
+    if (!form.checkValidity()) {
+      form.classList.add('was-validated');
+    }
+
+    let isFormValid = true
+
+    let validations = {}
+    for (const config in this.state.processConfigSetting) {
+      validations[config] = true
+      if (!this.state.processConfigSetting[config] || this.state.processConfigSetting[config]=='' || this.state.processConfigSetting[config].length == 0) {
+
+        validations[config] = false
+        isFormValid = false
+      }
+    }
+    this.setState({selectValidations: validations})
+
+    if (!isFormValid) {
+      return
+    }
+
+
     const res = await saveConfigFile(
       this.state.processConfigSetting,
       this.state.isUpdate,
@@ -834,6 +873,7 @@ export default class TextEditor extends Component {
 
 
   handleProcessChange = (e, key) => {
+    this.state.selectValidations[key] = (e.length > 0)
     this.state.processConfigSetting[key] = e
     this.setState({processConfigSetting: this.state.processConfigSetting})
   }
@@ -865,8 +905,6 @@ export default class TextEditor extends Component {
             </MDBBtn>
           </div>
           <div className="strategy-indicator-edit-list-action">
-            {console.log('key:', key)}
-          {console.log(this.state.processConfigOptions[key])}
           { key === 'bot_name' || key === 'name' || key === 'starting_cash'
             ?
             (
@@ -878,6 +916,7 @@ export default class TextEditor extends Component {
                   }
                   value={this.state.processConfigSetting[key]}
                   onChange={(e) => { this.handleBotNameChange(e, key)}}
+                  required
               />
             )
             :
@@ -887,6 +926,8 @@ export default class TextEditor extends Component {
               options={this.state.processConfigOptions[key]}
               placeholder="select"
               isMulti
+              required="true"
+              isValid={this.state.selectValidations[key]}
             />)
           }
           </div>
@@ -955,9 +996,12 @@ export default class TextEditor extends Component {
             </Tab>
             <Tab eventKey="process" title="Process Config Editor">
               <div className={"strategy-indicator-edit-area"}>
-                <ul className="list-group">
-                  {this.displayProcessEditor()}
-                </ul>
+                <form class="needs-validation" noValidate>
+                  <ul className="list-group">
+                    {this.displayProcessEditor()}
+                  </ul>
+                </form>
+
                 <div className="strategy-edit-icon-area">
                   <button className="btn btn-md btn-secondary mr-10" onClick={()=>this.handleIndicatorReset()}>Reset</button>
                   <button className="btn btn-md btn-secondary mr-10" onClick={()=>this.handleOpenProcessConfigModal()}>Open</button>
