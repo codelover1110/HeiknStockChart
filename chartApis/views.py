@@ -111,48 +111,50 @@ def backtesting_result(request):
                 print(symbol,'-------------------------------------------')
                 print(symbol_data)
 
-                group_counters = {}
-                group_dates = {}
-                group_percents = {}
-                group_entries = {}
-                group_exits = {}
-                group_efficiencies = {}
-                for symbol_record in symbol_data:
-                    transaction_date = symbol_record['date'].strftime("%Y_%m_%d")
-                    group_key = symbol + transaction_date
-
-                    if not group_key in group_counters:
-                        group_counters[group_key] = 0
-                        group_percents[group_key] = 0
-                        group_efficiencies[group_key] = 0
-
-                    group_counters[group_key] += 1
-                    group_dates[group_key] = symbol_record['date'].strftime("%Y-%m-%d")
-                    group_percents[group_key] += symbol_record['percent']
-                    group_entries[group_key] = symbol_record['entry']
-                    group_exits[group_key] = symbol_record['exit']
-                    group_efficiencies[group_key] += symbol_record['efficiency']
-
-
-                # group all times in a day
-                newPE_symbol_data = []
-                for group_key in group_counters:
-                    newPE_symbol_record = {}
-                    newPE_symbol_record['date'] = group_dates[group_key]
-                    newPE_symbol_record['percent'] = round(group_percents[group_key] / group_counters[group_key], 5)
-                    newPE_symbol_record['entry'] = group_entries[group_key]
-                    newPE_symbol_record['exit'] = group_exits[group_key]
-                    newPE_symbol_record['efficiency'] = round(group_efficiencies[group_key] / group_counters[group_key], 5)
-                    newPE_symbol_data.append(newPE_symbol_record)
-
-                print('newPE_symbol_data-----')
-                print(newPE_symbol_data)
-
-                if len(newPE_symbol_data) < 2:
+                if detect_individual_trade(symbol_data):
                     newPE_symbol_data = []
                     for symbol_record in symbol_data:
                         symbol_record['date'] = symbol_record['date'].strftime("%Y-%m-%d %H:%M:%S")
                         newPE_symbol_data.append(symbol_record)
+                else:
+                    group_counters = {}
+                    group_dates = {}
+                    group_percents = {}
+                    group_entries = {}
+                    group_exits = {}
+                    group_efficiencies = {}
+                    for symbol_record in symbol_data:
+                        transaction_date = symbol_record['date'].strftime("%Y_%m_%d")
+                        group_key = symbol + transaction_date
+
+                        if not group_key in group_counters:
+                            group_counters[group_key] = 0
+                            group_percents[group_key] = 0
+                            group_efficiencies[group_key] = 0
+
+                        group_counters[group_key] += 1
+                        group_dates[group_key] = symbol_record['date'].strftime("%Y-%m-%d")
+                        group_percents[group_key] += symbol_record['percent']
+                        group_entries[group_key] = symbol_record['entry']
+                        group_exits[group_key] = symbol_record['exit']
+                        group_efficiencies[group_key] += symbol_record['efficiency']
+
+
+                    # group all times in a day
+                    newPE_symbol_data = []
+                    for group_key in group_counters:
+                        newPE_symbol_record = {}
+                        newPE_symbol_record['date'] = group_dates[group_key]
+                        newPE_symbol_record['percent'] = round(group_percents[group_key] / group_counters[group_key], 5)
+                        newPE_symbol_record['entry'] = group_entries[group_key]
+                        newPE_symbol_record['exit'] = group_exits[group_key]
+                        newPE_symbol_record['efficiency'] = round(group_efficiencies[group_key] / group_counters[group_key], 5)
+                        newPE_symbol_data.append(newPE_symbol_record)
+
+                print('newPE_symbol_data-----')
+                print(newPE_symbol_data)
+
+
 
                     # newPE_symbol_data = symbol_data
 
@@ -179,6 +181,14 @@ def backtesting_result(request):
 
         return JsonResponse({'chart_data': bastestData}, status=status.HTTP_201_CREATED)
 
+
+def detect_individual_trade(symbol_data):
+    transaction_date_list = {}
+    for symbol_record in symbol_data:
+        transaction_date = symbol_record['date'].strftime("%Y_%m_%d")
+        transaction_date_list[transaction_date] = transaction_date
+
+    return len(transaction_date_list) < 2
 
 @csrf_exempt
 def get_table_list(request):
