@@ -46,8 +46,13 @@ export class MultiLineChart extends React.Component {
             style: {
                 colors: '#FFFFFF',
             },
-            formatter: (val, opt) =>
-              moment.utc(val).format("MM/DD")
+            formatter: (val, opt) => {
+                if (val && val.length>10) {
+                  return moment.utc(val).format("MM/DD hh:mm")
+                } else {
+                  return moment.utc(val).format("MM/DD")
+                }
+              }
           },
           datetimeUTC: true,
         },
@@ -102,8 +107,13 @@ export class MultiLineChart extends React.Component {
               style: {
                   colors: '#FFFFFF',
               },
-              formatter: (val) =>
-                moment.utc(val).format("MM/DD")
+              formatter: (val) => {
+                if (val && val.length>10) {
+                  return moment.utc(val).format("MM/DD hh:mm")
+                } else {
+                  return moment.utc(val).format("MM/DD")
+                }
+              }
             },
             datetimeUTC: true,
           },
