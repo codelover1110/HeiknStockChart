@@ -412,8 +412,8 @@ def calc_percentEfficiency(symbols, db_data):
         })
         totWL.append({
             "symbol": symbol,
-            "totWinning": round( sum(winningT), 5),
-            "totLosing": round(abs(sum(losingT)), 5)
+            "totWinning": totalWinning,
+            "totLosing": totalLosing
         })
 
         # Calculation Long and Short
@@ -480,4 +480,3 @@ def fill_missing_candles__(chat_candles, candle_name, macro, micro):
         chat_candles.sort(key = lambda x: x['date'])
 
     return chat_candles
-
