@@ -116,7 +116,16 @@ const optionCreator = (chartData, isAverage, isTotal) => {
         style: {
             colors: '#FFFFFF',
         },
-        formatter: (value) => { return isAverage ? value.toFixed(5) : value | 0 },
+        // formatter: (value) => { return isAverage ? value.toFixed(5) : value | 0 },
+        formatter: (value) => {
+          if (isTotal) {
+            return formatAvg(value)
+          } else if (isAverage) {
+            return formatAvg(value)
+          } else {
+            return formatAvg(value)
+          }
+        },
       },
       axisBorder: {
         show: true,
@@ -173,7 +182,7 @@ export default function GroupApexBar(props) {
         data: getLosingData(chartData, isAverage, isTotal)
       }
     ])
-    console.log('Xinchao')
+    console.log('isTotal')
     console.log(isTotal)
     console.log([
       {

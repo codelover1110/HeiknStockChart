@@ -11,17 +11,20 @@ import MultiRangeSlider from 'components/MultiRangeSlider/MultiRangeSlider'
 import { getSymbolsByMicroStrategy, getIndicators } from 'api/Api'
 
 const HeiknStockChartItem = (props) => {
-    
+
   const { selectedInstance, handleChartRedirect } = props
   const history = useHistory();
   const { viewType, initStrategy, initMicroStrategy, initIndicators, initSymbol } = history.location.state
-  
+
   const [selectedViewType, setSelectedViewType] = useState(
     viewType
     ? viewType
     : { value: 'charting', label: 'Charting' }
   );
-    
+
+  console.log('initSymbol')
+  console.log(initSymbol)
+
   const [symbol, setSymbol] = useState(initSymbol)
   const [multiSymbol, setMultiSymbol] = useState([initSymbol])
   const [strategy, setStrategy] = useState(initStrategy ? initStrategy : {})
@@ -32,15 +35,15 @@ const HeiknStockChartItem = (props) => {
   const [tradeStartDate, setTradeStartDate] = useState('')
   const [tradeEndDate, setTradeEndDate] = useState('')
   const [strategyList, setStrategyList] = useState([]);
-    
+
   const [optionsViewTypes, setOptionsViewTypes] = useState([
     { value: 'charting', label: 'Charting' },
     { value: 'performance', label: 'Performance' },
     { value: 'sliced_charting', label: 'Sliced Chatting'}
-  ])    
+  ])
 
   const [optionsMicroStrategy, setOptionsMicroStrategy] = useState([])
-    
+
   const [optionsStratgy, setOptionsStrategy] = useState([])
 
   const optionsSymbolType = [
@@ -51,7 +54,7 @@ const HeiknStockChartItem = (props) => {
       value: 'crypto', label: 'crypto',
     }
   ]
-    
+
   const [optionsIndicator, setOptionsIndicator] = useState([
     {
       value: 'volume', label: 'VOLUME',
@@ -88,7 +91,7 @@ const HeiknStockChartItem = (props) => {
                     label: o,
                   }
                 })
-                setOptionsMicroStrategy( microStrategyOptions )                
+                setOptionsMicroStrategy( microStrategyOptions )
 
                 const symbolOptions = item.symbols.map(o => {
                   return {
@@ -99,7 +102,7 @@ const HeiknStockChartItem = (props) => {
                 setSymbolList([{ label: "All", value: "*" }, ...symbolOptions]);
                 // setSymbol(symbolOptions[0])
           }
-        })   
+        })
     },
     [],
   )
@@ -115,7 +118,7 @@ const HeiknStockChartItem = (props) => {
       ))
       setOptionsIndicator(indicatorList)
     }
-  }, [])  
+  }, [])
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user-info'))
@@ -127,7 +130,7 @@ const HeiknStockChartItem = (props) => {
       disableScroll.off();
     }
   }, [getStrategyList])
-    
+
   useEffect(() => {
     if (selectedInstance.value === 'optimization') {
       setOptionsViewTypes([
@@ -166,10 +169,10 @@ const HeiknStockChartItem = (props) => {
             setSymbolList([{ label: "All", value: "*" }, ...temp_data]);
           })
       } catch (error) {
-        console.log(error)  
+        console.log(error)
       }
     }
-    
+
     if (!apiFlag) {
       setMicroStrategy(microStrategy)
       get_tables();
@@ -191,10 +194,10 @@ const HeiknStockChartItem = (props) => {
         setSymbol(e)
     }
   }
-    
+
   const handlMultiSymbolChange = (e, event) => {
     if (event.action === 'select-option' && event.option.value === '*') {
-      setMultiSymbol(symbolList)  
+      setMultiSymbol(symbolList)
     } else if (event.action === 'deselect-option' && event.option.value === '*') {
       setMultiSymbol([])
     } else if (event.action === 'deselect-option') {
@@ -259,7 +262,7 @@ const HeiknStockChartItem = (props) => {
             label: o,
           }
         })
-        
+
         if (selectedViewType.value !== 'performance') {
           setSymbolList(symbolOptions)
           setSymbol(symbolOptions[0])
@@ -284,7 +287,7 @@ const HeiknStockChartItem = (props) => {
       <nav className="navbar navbar-expand navbar-dark bg-dark hunter-nav-bar">
         <div className="logo-title">
           <a href="/chart" className="hunter-navbar-brand">
-            Violette AM - Client Portal 
+            Violette AM - Client Portal
           </a>
         </div>
         <div className="navbar-nav ma-auto hunter-nav-bar-nav">
@@ -333,7 +336,7 @@ const HeiknStockChartItem = (props) => {
                 />
             </div>)
           }
-          {selectedInstance.value !== 'live_trading' && 
+          {selectedInstance.value !== 'live_trading' &&
             (<div className="select-option">
               <Select
                 name="filters"
@@ -344,7 +347,7 @@ const HeiknStockChartItem = (props) => {
               />
             </div>)
           }
-          {selectedViewType.value !== 'performance' && 
+          {selectedViewType.value !== 'performance' &&
             (<div className="select-multi-option">
               <Select
                 name="filters"
