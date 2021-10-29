@@ -62,7 +62,7 @@ export class MultiLineChart extends React.Component {
             style: {
                 colors: '#FFFFFF',
             },
-            formatter: (value) => { return (value)?value.toFixed(2):'' },
+            formatter: (value) => { return (value)?value.toFixed(3):'' },
           },
           axisBorder: {
             show: true,
