@@ -334,7 +334,7 @@ def calc_winningLosing(symbols, db_data):
                     else:
                         winningLosing_temp['losing'] =  winningLosing_temp['losing'] + 1
                     pair_wL = {}
-        if winningLosing_temp['winning'] == 0 and winningLosing_temp['losing'] == 0:
+        if winningLosing_temp['winning'] == 0 or winningLosing_temp['losing'] == 0:
             continue
         wL.append(winningLosing_temp)
     return wL
@@ -395,13 +395,20 @@ def calc_percentEfficiency(symbols, db_data):
         print('symbol', symbol)
         print('avgLosing', avgLosing)
         print('avgWinning', avgWinning)
-        if avgLosing == 0 or avgWinning == 0:
+
+        totalWinning = round( sum(winningT), 5)
+        totalLosing = round( sum(winningT), 5)
+
+        print("totWinning", totalWinning)
+        print("totLosing", totalLosing)
+
+        if avgLosing == 0 or avgWinning == 0 or totalWinning == 0 or totalLosing == 0:
             continue
 
         wLA.append({
             "symbol": symbol,
-            "avgWinning": avgWinning,
-            "avgLosing": abs(avgLosing)
+            "avgWinning": abs(avgWinning)*100,
+            "avgLosing": abs(avgLosing)*100
         })
         totWL.append({
             "symbol": symbol,
