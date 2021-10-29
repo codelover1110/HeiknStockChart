@@ -109,7 +109,7 @@ const PriceDataTable = () => {
 
     getPriceTrades(symbol.value, timeFrame.value, tradeStartDate, tradeEndDate)
 
-  }, [symbol, timeFrame, hearder_columns, tradeStartDate, tradeEndDate])
+  }, [symbol, timeFrame, hearder_columns, tradeStartDate, tradeEndDate, pageAmount])
 
   useEffect(() => {
       const getSymbols = async () => {
@@ -118,6 +118,23 @@ const PriceDataTable = () => {
     }
     getSymbols()
   }, [setOptionsSymbol])
+
+
+  useEffect(() => {
+    setTimeout(() => {
+      const selectEl = document.querySelector('.mdb-datatable select')
+      if (selectEl)  {
+        selectEl.outerHTML = selectEl.outerHTML;
+        selectEl.addEventListener('change', (e) => {
+
+          //this.setState(state => ({...state, pageAmount: 50}))
+          //setPageAmount(50)
+          console.log('page amount changed')
+          // setLoadingData(true)
+        })
+      }
+    }, 1000)
+  }, [])
 
   const handleSignout = () => {
     auth.signout()
@@ -236,7 +253,7 @@ const PriceDataTable = () => {
               hover
               maxHeight="500px"
               entriesOptions={[10, 25, 50, 100]}
-              entries={10}
+              entries={pageAmount}
               pagesAmount={4}
               data={datatable}
               // searchTop searchBottom={false}
@@ -246,6 +263,7 @@ const PriceDataTable = () => {
               small={true}
               striped={true}
               scrollY={true}
+              onPageChange={(activePage, pagesAmount) => {alert('xxx')} }
             />
             <Pagination>
               <Pagination.Item>{(currentPage-1)*10 + 1}</Pagination.Item>

@@ -15,7 +15,7 @@ const getSymbols = (chartData) => {
 
 const optionCreator = (chartData, isAverage, isTotal) => {
   const formatAvg = (value) => {
-    let text = value.toFixed(10)
+    let text = value.toFixed(3)
 
     let parts = text.split('.');
     if (parts && parts.length > 0 && 0 == parseInt(parts[1])) {
