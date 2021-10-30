@@ -87,7 +87,7 @@ export class MultiLineChart extends React.Component {
       for (const property in data) {
         series.push({
           name: property,
-          data: data[property].map((o) => this.props.isPercent ? o.percent : o.efficiency)
+          data: data[property].map((o) => this.props.isPercent ? o.percent.toFixed(3) : o.efficiency.toFixed(3))
         })
       }
       return null
@@ -123,7 +123,7 @@ export class MultiLineChart extends React.Component {
               style: {
                   colors: '#FFFFFF',
               },
-              formatter: (value) => value,
+              formatter: (value) => value.toFixed(3),
               min: this.getMinValue(),
               max: this.getMaxValue(),
             },
@@ -147,7 +147,7 @@ export class MultiLineChart extends React.Component {
       return null
     })
     const min = Math.min(...series)
-    return min;
+    return min.toFixed(3);
   }
 
   getMaxValue() {
@@ -160,7 +160,7 @@ export class MultiLineChart extends React.Component {
       return null
     })
     const max = Math.max(...series)
-    return max;
+    return max.toFixed(3);
   }
 
   getCategories() {
