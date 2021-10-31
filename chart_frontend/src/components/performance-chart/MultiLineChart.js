@@ -28,7 +28,7 @@ export class MultiLineChart extends React.Component {
           dashArray: 0,
         },
         title: {
-          text: props.isPercent ? 'Percent Gain/Lost' : 'Efficiency',
+          text: props.isPercent ? 'Percent Gain/Lost' : 'Total Percent Gain/Lost',
           align: 'left',
           style: {
             fontSize:  '18px',
@@ -123,7 +123,7 @@ export class MultiLineChart extends React.Component {
               style: {
                   colors: '#FFFFFF',
               },
-              formatter: (value) => value.toFixed(3),
+              formatter: (value) => { return (value)?value.toFixed(3):0 },
               min: this.getMinValue(),
               max: this.getMaxValue(),
             },
