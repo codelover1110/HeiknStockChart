@@ -28,7 +28,7 @@ const HeiknDatatable = (props) => {
 
   return (
     <>
-      {isLoadingData && <Spinner />}
+      {isLoadingData && <div className="hunter-spinner-area"><span className="mr-30">Loading ...</span><Spinner>Loading</Spinner></div>}
       {!isLoadingData && (
       <MDBDataTableV5
         hover

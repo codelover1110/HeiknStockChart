@@ -12,14 +12,12 @@ import {
   Nav,
 } from "reactstrap";
 import { useHistory } from "react-router-dom";
-import { MDBDataTableV5 } from 'mdbreact';
-import Pagination from 'react-bootstrap/Pagination'
 import { useAuth } from 'contexts/authContext';
 import { getAllSymbols, filterTradesData } from 'api/Api'
 import { currentDateString } from 'utils/helper'
 import MultiRangeSlider from 'components/MultiRangeSlider/MultiRangeSlider'
-import { useDatatable, useDatatableLoading } from "contexts/DatatableContext";
-import Spinner from 'components/Spinner'
+import {useDatatableLoading, useDatatable, usePagination, usePaginationUpdate} from "contexts/DatatableContext"
+import HeiknDatatable from 'components/HeiknDatatable'
 
 const TradeDataTable = () => {
   const auth = useAuth();
@@ -32,9 +30,9 @@ const TradeDataTable = () => {
   const [tradeEndDate, setTradeEndDate] = useState(currentDateString())
   const [strategyList, setStrategyList] = useState([]);
 
-  const [pageAmount, setPageAmount] = useState(10)
-  const [currentPage, setCurrentPage] = useState(1);
-  const [wholeRows, setWholeRows] = useState(0);
+  // handle pagination state
+  const [currentPage, itemsPerPage,] = usePagination()
+  const [, , setTotalItems] = usePaginationUpdate()
 
   const [optionsStrategy, setOptionsStrategy] = useState([])
   const [optionsMacroStrategy, setOptionsMacroStrategy] = useState([])
@@ -84,17 +82,14 @@ const TradeDataTable = () => {
     },
   ]}, [])
 
-  const [datatable, setDatatable] = useDatatable({
+  const [,setDatatable] = useDatatable({
     columns: hearder_columns,
     rows: [
     ],
   });
 
-  const [isLoadingData, setLoadingData] = useDatatableLoading()
+  const [,setLoadingData] = useDatatableLoading()
 
-  const wrapSetDatatable = (data) => {
-    setDatatable(data)
-  }
 
   const getStrategyList = useCallback(
     () => {
@@ -137,34 +132,32 @@ const TradeDataTable = () => {
     [],
   )
 
+  const getTrades = async (macroStrat, microStrat, tradeStartDate, tradeEndDate, currentPage, pageAmount) => {
+    setLoadingData(true)
+    const result = await filterTradesData(macroStrat, microStrat, tradeStartDate, tradeEndDate, currentPage, pageAmount);
+    setDatatable({
+      columns: hearder_columns,
+      rows: result.trades_data
+    })
+    setTotalItems(result.page_total)
+    setLoadingData(false)
+  }
+
   useEffect(() => {
     getStrategyList()
   }, [getStrategyList])
 
   useEffect(() => {
-    setLoadingData(true)
-    const get_trades = async (macroStrat, microStrat, tradeStartDate, tradeEndDate, currentPage, pageAmount) => {
-      const result = await filterTradesData(macroStrat, microStrat, tradeStartDate, tradeEndDate, currentPage, pageAmount);
-      wrapSetDatatable({
-        columns: hearder_columns,
-        rows: result.trades_data
-      })
-      setWholeRows(result.page_total)
-      setLoadingData(false)
-    }
-
-    get_trades(
+    getTrades(
       macroStrategy ? macroStrategy.value : '',
       microStrategy ? microStrategy.value : '',
-      tradeStartDate, tradeEndDate, currentPage, pageAmount)
-  }, [macroStrategy, microStrategy, hearder_columns, tradeStartDate, tradeEndDate])
+      tradeStartDate, tradeEndDate, currentPage, itemsPerPage)
+  }, [macroStrategy, microStrategy, hearder_columns, tradeStartDate, tradeEndDate, currentPage, itemsPerPage])
 
   useEffect(() => {
-      setLoadingData(true)
       const getSymbols = async () => {
       const res = await getAllSymbols()
       setOptionsSymbol(res)
-      setLoadingData(false)
     }
     getSymbols()
   }, [setOptionsSymbol])
@@ -218,29 +211,6 @@ const TradeDataTable = () => {
     setTradeEndDate(endDate)
   }
 
-  const loadPriceDetails = async () => {
-    setLoadingData(true)
-    const result = await filterTradesData(macroStrategy ? macroStrategy.value : '',
-    microStrategy ? microStrategy.value : '',
-    tradeStartDate, tradeEndDate, currentPage, pageAmount);
-    wrapSetDatatable({
-      columns: hearder_columns,
-      rows: result.trades_data
-    })
-
-    setWholeRows(result.page_total)
-    setLoadingData(false)
-  }
-
-  const handlePrevClick = () => {
-    setCurrentPage(currentPage - 1)
-    loadPriceDetails(currentPage - 1)
-  }
-
-  const handleNextClick = () => {
-    setCurrentPage(currentPage + 1)
-    loadPriceDetails(currentPage + 1)
-  }
 
   return (
     <div className="hunter-chart-container">
@@ -319,32 +289,7 @@ const TradeDataTable = () => {
           </div>
         </div>
 
-        {isLoadingData && <div className="hunter-spinner-area"><span className="mr-30">Loading ...</span>    <Spinner>Loading</Spinner></div>}
-        {!isLoadingData && <>
-          <MDBDataTableV5
-            hover
-            maxHeight="500px"
-            entriesOptions={[10, 25, 50, 100]}
-            entries={10}
-            pagesAmount={4}
-            data={datatable}
-            // searchTop searchBottom={false}
-            // bordered={true}
-            dark={true}
-            noBottomColumns={true}
-            small={true}
-            striped={true}
-            scrollY={true}
-          />;
-          <Pagination>
-            <Pagination.Item>{(currentPage-1)*10 + 1}</Pagination.Item>
-            <Pagination.Item>{(currentPage) * 10}</Pagination.Item>
-            <Pagination.Item> of </Pagination.Item>
-            <Pagination.Item> { wholeRows } </Pagination.Item>
-            <Pagination.Prev disabled={currentPage <= 0} onClick={() => { handlePrevClick() }}/>
-            <Pagination.Next disabled={(currentPage + 1) >= wholeRows / 10} onClick={() => { handleNextClick() }}/>
-          </Pagination>
-        </>}
+        <HeiknDatatable />
       </div>
     </div>
   );
