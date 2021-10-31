@@ -152,6 +152,8 @@ export class MultiLineChart extends React.Component {
 
   getMaxValue() {
     let series = [];
+    console.log('this.props.chartData')
+    console.log(this.props.chartData)
     this.props.chartData.map((data) => {
       for (const property in data) {
         const rows = data[property].map(o => this.props.isPercent ? o.percent : o.efficiency)
