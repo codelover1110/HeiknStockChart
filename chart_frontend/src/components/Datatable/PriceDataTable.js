@@ -12,16 +12,15 @@ import {
   Nav,
 } from "reactstrap";
 import { useHistory } from "react-router-dom";
-import { MDBDataTableV5 } from 'mdbreact';
-import Pagination from 'react-bootstrap/Pagination'
+
 import { useAuth } from 'contexts/authContext';
 import { getAllSymbols, filterPriceData } from 'api/Api'
 import { currentDateString } from 'utils/helper'
 import MultiRangeSlider from 'components/MultiRangeSlider/MultiRangeSlider'
 import { useCsvDownloadUpdate } from "contexts/CsvDownloadContext"
 import ButtonCsvDownload from 'components/ButtonCsvDownload'
-import {useDatatableLoading, useDatatable} from "contexts/DatatableContext"
-import Spinner from 'components/Spinner'
+import {useDatatableLoading, useDatatable, usePagination, usePaginationUpdate} from "contexts/DatatableContext"
+import HeiknDatatable from 'components/HeiknDatatable'
 
 const PriceDataTable = () => {
   const auth = useAuth();
@@ -37,9 +36,10 @@ const PriceDataTable = () => {
     { value: "1h", label: "1h" },
     { value: "1d", label: "1d" }
   ])
-  const [pageAmount, setPageAmount] = useState(10)
-  const [currentPage, setCurrentPage] = useState(1);
-  const [wholeRows, setWholeRows] = useState(0);
+
+  // handle pagination state
+  const [currentPage, itemsPerPage,] = usePagination()
+  const [, , setTotalItems] = usePaginationUpdate()
 
   const hearder_columns = useMemo(() => {
     return [
@@ -79,9 +79,9 @@ const PriceDataTable = () => {
     },
   ]}, [])
 
-  const [isLoadingData, setLoadingData] = useDatatableLoading()
+  const [, setLoadingData] = useDatatableLoading()
 
-  const [datatable, setDatatable] = useDatatable({
+  const [, setDatatable] = useDatatable({
     columns: hearder_columns,
     rows: [
     ],
@@ -89,52 +89,36 @@ const PriceDataTable = () => {
 
   const updateCsvDownload = useCsvDownloadUpdate();
 
-  const wrapSetDatatable = (data) => {
-    setDatatable(data)
-    updateCsvDownload([...data.rows])
+
+  // updating datatable of price
+  const getPriceTrades = async (symbol, timeFrame, tradeStartDate, tradeEndDate) => {
+    setLoadingData(true)
+
+    const trades_data = await filterPriceData(symbol, timeFrame, tradeStartDate, tradeEndDate, currentPage, itemsPerPage);
+
+    setDatatable({
+      columns: hearder_columns,
+      rows: trades_data.candles
+    })
+    updateCsvDownload([...trades_data.candles])
+    setTotalItems(trades_data.page_total)
+
+    setLoadingData(false)
   }
 
   useEffect(() => {
-    const getPriceTrades = async (symbol, timeFrame, tradeStartDate, tradeEndDate) => {
-      setLoadingData(true)
-      const trades_data = await filterPriceData(symbol, timeFrame, tradeStartDate, tradeEndDate, currentPage, pageAmount);
-      wrapSetDatatable({
-        columns: hearder_columns,
-        rows: trades_data.candles
-      })
-      setWholeRows(trades_data.page_total)
-
-      setLoadingData(false)
-    }
-
     getPriceTrades(symbol.value, timeFrame.value, tradeStartDate, tradeEndDate)
+  }, [symbol, timeFrame, hearder_columns, tradeStartDate, tradeEndDate, itemsPerPage, currentPage])
 
-  }, [symbol, timeFrame, hearder_columns, tradeStartDate, tradeEndDate, pageAmount])
 
   useEffect(() => {
-      const getSymbols = async () => {
+    const getSymbols = async () => {
       const res = await getAllSymbols()
       setOptionsSymbol(res)
     }
     getSymbols()
   }, [setOptionsSymbol])
 
-
-  useEffect(() => {
-    setTimeout(() => {
-      const selectEl = document.querySelector('.mdb-datatable select')
-      if (selectEl)  {
-        selectEl.outerHTML = selectEl.outerHTML;
-        selectEl.addEventListener('change', (e) => {
-
-          //this.setState(state => ({...state, pageAmount: 50}))
-          //setPageAmount(50)
-          console.log('page amount changed')
-          // setLoadingData(true)
-        })
-      }
-    }, 1000)
-  }, [])
 
   const handleSignout = () => {
     auth.signout()
@@ -152,28 +136,6 @@ const PriceDataTable = () => {
   const selectDateRange = (startDate, endDate) => {
     setTradeStartDate(startDate)
     setTradeEndDate(endDate)
-  }
-
-  const loadPriceDetails = async () => {
-
-    setLoadingData(true)
-    const trades_data = await filterPriceData(symbol.value, timeFrame.value, tradeStartDate, tradeEndDate, currentPage, pageAmount);
-    wrapSetDatatable({
-      columns: hearder_columns,
-      rows: trades_data.candles
-    })
-    setWholeRows(trades_data.page_total)
-    setLoadingData(false)
-  }
-
-  const handlePrevClick = () => {
-    setCurrentPage(currentPage - 1)
-    loadPriceDetails(currentPage - 1)
-  }
-
-  const handleNextClick = () => {
-    setCurrentPage(currentPage + 1)
-    loadPriceDetails(currentPage + 1)
   }
 
   return (
@@ -245,36 +207,7 @@ const PriceDataTable = () => {
             <ButtonCsvDownload filename={"price.csv"}>Csv Download</ButtonCsvDownload>
           </div>
         </div>
-        {isLoadingData && <div className="hunter-spinner-area"><span className="mr-30">Loading ...</span>    <Spinner>Loading</Spinner></div>}
-        {!isLoadingData &&
-        (
-          <>
-            <MDBDataTableV5
-              hover
-              maxHeight="500px"
-              entriesOptions={[10, 25, 50, 100]}
-              entries={pageAmount}
-              pagesAmount={4}
-              data={datatable}
-              // searchTop searchBottom={false}
-              // bordered={true}
-              dark={true}
-              noBottomColumns={true}
-              small={true}
-              striped={true}
-              scrollY={true}
-              onPageChange={(activePage, pagesAmount) => {alert('xxx')} }
-            />
-            <Pagination>
-              <Pagination.Item>{(currentPage-1)*10 + 1}</Pagination.Item>
-              <Pagination.Item>{(currentPage) * 10}</Pagination.Item>
-              <Pagination.Item> of </Pagination.Item>
-              <Pagination.Item> { wholeRows } </Pagination.Item>
-              <Pagination.Prev disabled={currentPage <= 0} onClick={() => { handlePrevClick() }}/>
-              <Pagination.Next disabled={(currentPage + 1) >= wholeRows / 10} onClick={() => { handleNextClick() }}/>
-            </Pagination>
-          </>
-        )}
+        <HeiknDatatable />
       </div>
     </div>
   );
