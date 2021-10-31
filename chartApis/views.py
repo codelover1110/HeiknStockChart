@@ -171,6 +171,7 @@ def backtesting_result(request):
             # key = f'{record['side']}_{record['symbol']}'
 
         bastestData = {
+            'totalPercentGainLost': calculate_total_gain_lost(newPE),
             'percentEfficiency': newPE,
             'winningLosing': wL,
             "winningLosingAvg": pE_wLA_lS['wLA'],
@@ -181,6 +182,26 @@ def backtesting_result(request):
 
         return JsonResponse({'chart_data': bastestData}, status=status.HTTP_201_CREATED)
 
+def calculate_total_gain_lost(data_array):
+    new_data_array = []
+    group_total_by_date = {}
+    for record in data_array:
+        symbol_records = list(record.values())[0]
+        for symbol_record in symbol_records:
+            # symbol_record = {'date': '2021-10-22', 'percent': -0.656, 'entry': 'buy', 'exit': 'sell', 'efficiency': -0.656}
+            transaction_date = symbol_record['date']
+
+            if transaction_date in group_total_by_date:
+                group_total_by_date[transaction_date]['efficiency'] += symbol_record['efficiency']
+                group_total_by_date[transaction_date]['percent'] += symbol_record['percent']
+            else:
+                group_total_by_date[transaction_date] = {'date': transaction_date, 'percent': 0, 'entry': 'buy', 'exit': 'sell', 'efficiency': 0}
+
+
+    new_data_array = [
+        {'Total Percent Gain/Lost': list(group_total_by_date.values())}
+    ]
+    return new_data_array
 
 def detect_individual_trade(symbol_data):
     transaction_date_list = {}
