@@ -84,8 +84,6 @@ def backtesting_result(request):
         symbols = request_data['symbols']
         list_db_data = get_backtesting_result(symbols, macro, micro, start_date, end_date)
 
-        # print('HaoHHHHHH')
-        # print(list_db_data)
         wL = calc_winningLosing(symbols, list_db_data)
         pE_wLA_lS = calc_percentEfficiency(symbols, list_db_data)
         if len(symbols) > 0:
@@ -94,22 +92,12 @@ def backtesting_result(request):
             exchange = ""
 
         pE = pE_wLA_lS['pE']
-        # newPE = [
-        #     {'BTC': [
-        #         {'date': '2021-10-20', 'percent': 88.114, 'entry': 'buy', 'exit': 'sell', 'efficiency': 0.07},
-        #         {'date': '2021-10-21', 'percent': 8.114, 'entry': 'buy', 'exit': 'sell', 'efficiency': 0.07},
-        #     ]},
-        #     {'HAO': [
-        #         {'date': '2021-10-21', 'percent': 31.114, 'entry': 'buy', 'exit': 'sell', 'efficiency': 0.07},
-        #     ]},
-        # ]
         newPE = []
+
         for pE_record in pE:
             newPE_record = {}
             for symbol in pE_record:
                 symbol_data = pE_record[symbol]
-                print(symbol,'-------------------------------------------')
-                print(symbol_data)
 
                 if detect_individual_trade(symbol_data):
                     newPE_symbol_data = []
@@ -151,24 +139,10 @@ def backtesting_result(request):
                         newPE_symbol_record['efficiency'] = round(group_efficiencies[group_key] / group_counters[group_key], 5)
                         newPE_symbol_data.append(newPE_symbol_record)
 
-                print('newPE_symbol_data-----')
-                print(newPE_symbol_data)
-
-
-
-                    # newPE_symbol_data = symbol_data
 
                 newPE_record[symbol] = newPE_symbol_data
 
             newPE.append(newPE_record)
-
-
-        # for record in pE:
-        #     print('record')
-        #     print(record)
-        #
-        #     print('transaction_date: ', transaction_date)
-            # key = f'{record['side']}_{record['symbol']}'
 
         bastestData = {
             'totalPercentGainLost': calculate_total_gain_lost(newPE),
@@ -186,27 +160,36 @@ def calculate_total_gain_lost(data_array):
     new_data_array = []
     group_total_by_date = {}
     for record in data_array:
-        symbol_records = list(record.values())[0]
-        for symbol_record in symbol_records:
+        symbol_data = list(record.values())[0]
+
+        for symbol_record in symbol_data:
             # symbol_record = {'date': '2021-10-22', 'percent': -0.656, 'entry': 'buy', 'exit': 'sell', 'efficiency': -0.656}
             transaction_date = symbol_record['date']
 
-            if transaction_date in group_total_by_date:
-                group_total_by_date[transaction_date]['efficiency'] += symbol_record['efficiency']
-                group_total_by_date[transaction_date]['percent'] += symbol_record['percent']
-            else:
+            if not transaction_date in group_total_by_date:
                 group_total_by_date[transaction_date] = {'date': transaction_date, 'percent': 0, 'entry': 'buy', 'exit': 'sell', 'efficiency': 0}
 
+            group_total_by_date[transaction_date]['efficiency'] += symbol_record['efficiency']
+            group_total_by_date[transaction_date]['percent'] += symbol_record['percent']
+
+    sorted_group_total_by_date = []
+    sorted_keys = sorted(group_total_by_date)
+    for key in sorted_keys:
+        sorted_group_total_by_date.append(group_total_by_date[key])
 
     new_data_array = [
-        {'Total Percent Gain/Lost': list(group_total_by_date.values())}
+        # {'Total Percent Gain/Lost': list(group_total_by_date.values())}
+        {'Total Percent Gain/Lost': sorted_group_total_by_date}
     ]
     return new_data_array
 
 def detect_individual_trade(symbol_data):
     transaction_date_list = {}
     for symbol_record in symbol_data:
-        transaction_date = symbol_record['date'].strftime("%Y_%m_%d")
+        if type(symbol_record['date']) == str:
+            transaction_date = symbol_record['date'][9].replace('-', '_')
+        else:
+            transaction_date = symbol_record['date'].strftime("%Y_%m_%d")
         transaction_date_list[transaction_date] = transaction_date
 
     return len(transaction_date_list) < 2

@@ -378,7 +378,6 @@ def calc_percentEfficiency(symbols, db_data):
                         'efficiency': percent
                     })
                     pair_pE = {}
-                    # print("percent", percent)
                     if percent > 0:
                         winningT.append(percent)
                     else:
@@ -392,15 +391,10 @@ def calc_percentEfficiency(symbols, db_data):
         avgLosing = sum(losingT) / len(losingT) if len(losingT) > 0 else 0
         avgLosing = round(avgLosing, 3)
 
-        print('symbol', symbol)
-        print('avgLosing', avgLosing)
-        print('avgWinning', avgWinning)
 
         totalWinning = round( sum(winningT), 5)
         totalLosing = round( sum(winningT), 5)
 
-        print("totWinning", totalWinning)
-        print("totLosing", totalLosing)
 
         if avgLosing == 0 or avgWinning == 0 or totalWinning == 0 or totalLosing == 0:
             continue
@@ -431,13 +425,6 @@ def calc_percentEfficiency(symbols, db_data):
                 'short': short,
             }
         })
-        # Calculation efficiency
-        # for sym_item in sym_pE:
-        #     sym_item['efficiency'] = 0
-        #     if long > 0:
-        #         sym_item['efficiency'] = sym_item['percent'] * 100/long
-        #     elif short > 0:
-        #         sym_item['efficiency'] = sym_item['percent'] * 100/short
 
         pE.append({
             symbol: sym_pE

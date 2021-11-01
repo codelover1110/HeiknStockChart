@@ -418,37 +418,6 @@ def api_delete_database(db_name):
     db.drop()
     return True
 
-# def api_export_database(db_name):
-#     print('api_export_database', db_name)
-
-#     collections = api_get_collections(db_name)
-#     tempdir = tempfile.mkdtemp()
-
-#     target_zipfile = tempdir + '/' + db_name + '.zip'
-#     print('Target Zip file: ', target_zipfile)
-#     zipObj = ZipFile(target_zipfile, 'w')
-
-
-#     for collection_name in collections:
-#         csv_file_path = tempdir + '/' + collection_name + '.csv'
-#         print(csv_file_path)
-#         dataframe = get_csv_collection(db_name, collection_name)
-#         dataframe.to_csv(csv_file_path)
-
-#         zipObj.write(csv_file_path)
-
-#     zipObj.close()
-
-#     zipfile = open(target_zipfile, 'rb')
-
-#     return FileWrapper(zipfile)
-
-# def api_export_collection(db_name, collection_name):
-#     print('++++ api_export_collection +++ ', db_name, collection_name)
-#     docs = get_csv_collection(db_name, collection_name)
-#     csv_export = docs.to_csv(sep=",")
-#     return csv_export
-
 def get_csv_collection(backup, collection_name, check_stopping):
     print ("Generating CSV.. from ", backup.database, collection_name)
     db = azuremongo[backup.database]
