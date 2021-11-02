@@ -357,10 +357,6 @@ def calc_percentEfficiency(symbols, db_data):
                     "date": db_collection['date']
                     }
                 if 'buy' in pair_pE and 'sell' in pair_pE:
-                    percent = float(pair_pE['sell']['price']) * 100  / float(pair_pE['buy']['price'])
-                    # percent = round(percent, 2)
-                    percent = percent - 100
-                    percent = round(percent, 3)
                     if pair_pE['sell']['date'].timestamp() - pair_pE['buy']['date'].timestamp() > 0:
                         entry = 'buy'
                         exit = 'sell'
@@ -370,6 +366,16 @@ def calc_percentEfficiency(symbols, db_data):
                         exit = 'buy'
                         exit_date = pair_pE['buy']['date']
 
+                    buy_price =  float(pair_pE['buy']['price'])
+                    sell_price = float(pair_pE['sell']['price'])
+                    initial_cash_value = float(pair_pE[entry]['price'])
+                    final_cash_value = abs(sell_price - buy_price)
+                    percent = round(final_cash_value * 100 / initial_cash_value, 3)
+                    if sell_price > buy_price: # winning
+                        winningT.append(percent)
+                    else: #losing
+                        losingT.append(percent)
+
                     sym_pE.append({
                         'date': exit_date,
                         'percent': percent,
@@ -378,14 +384,11 @@ def calc_percentEfficiency(symbols, db_data):
                         'efficiency': percent
                     })
                     pair_pE = {}
-                    if percent > 0:
-                        winningT.append(percent)
-                    else:
-                        losingT.append(percent)
 
 
         avgWinning = 0
         avgLosing = 0
+
         avgWinning = sum(winningT) / len(winningT) if len(winningT) > 0 else 0
         avgWinning = round(avgWinning, 3)
         avgLosing = sum(losingT) / len(losingT) if len(losingT) > 0 else 0
@@ -401,8 +404,8 @@ def calc_percentEfficiency(symbols, db_data):
 
         wLA.append({
             "symbol": symbol,
-            "avgWinning": abs(avgWinning)*100,
-            "avgLosing": abs(avgLosing)*100
+            "avgWinning": abs(avgWinning),
+            "avgLosing": abs(avgLosing)
         })
         totWL.append({
             "symbol": symbol,
