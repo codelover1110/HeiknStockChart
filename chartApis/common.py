@@ -392,8 +392,8 @@ def calc_percentEfficiency(symbols, db_data):
         avgLosing = round(avgLosing, 3)
 
 
-        totalWinning = round( sum(winningT), 5)
-        totalLosing = round( sum(winningT), 5)
+        totalWinning = abs(round( sum(winningT), 5))
+        totalLosing = abs(round( sum(losingT), 5))
 
 
         if avgLosing == 0 or avgWinning == 0 or totalWinning == 0 or totalLosing == 0:
