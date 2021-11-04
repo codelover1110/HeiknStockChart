@@ -14,21 +14,18 @@ class PerformanceChart extends React.Component {
 			return <div>Loading...</div>
 		}
 
-		console.log('mainData')
-		console.log(mainData)
-
 		return (
 			<div>
 				<MultiLineChart chartData={mainData.totalPercentGainLost} isPercent={false}/>
 				<MultiLineChart chartData={mainData.percentEfficiency} isPercent={true}/>
 				<TypeChooser>
-					{type => <GroupApexBar type={type} data={mainData.winningLosing} isAverage={false}/>}
+					{type => <GroupApexBar type={type} data={mainData.winningLosing} isAverage={false} isPercent={false} />}
 				</TypeChooser>
 				<TypeChooser>
-					{type => <GroupApexBar type={type} data={mainData.winningLosingAvg} isAverage={true}/>}
+					{type => <GroupApexBar type={type} data={mainData.winningLosingAvg} isAverage={true} isPercent={true}/>}
 				</TypeChooser>
 				<TypeChooser>
-					{type => <GroupApexBar type={type} data={mainData.totWinLose} isTotal={true} isAverage={false}/>}
+					{type => <GroupApexBar type={type} data={mainData.totWinLose} isTotal={true} isAverage={false} isPercent={true}/>}
 				</TypeChooser>
 				{/* <MultiLineChart chartData={mainData.percentEfficiency} isPercent={false}/> */}
 			</div>
