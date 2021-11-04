@@ -22,9 +22,6 @@ const HeiknStockChartItem = (props) => {
     : { value: 'charting', label: 'Charting' }
   );
 
-  console.log('initSymbol')
-  console.log(initSymbol)
-
   const [symbol, setSymbol] = useState(initSymbol)
   const [multiSymbol, setMultiSymbol] = useState([initSymbol])
   const [strategy, setStrategy] = useState(initStrategy ? initStrategy : {})

@@ -13,27 +13,10 @@ const getSymbols = (chartData) => {
   return chartData.map((d) => d.symbol)
 }
 
-const optionCreator = (chartData, isAverage, isTotal) => {
+const optionCreator = (chartData, isAverage, isTotal, isPercent) => {
   const formatAvg = (value) => {
-    let text = value.toFixed(3)
-
-    let parts = text.split('.');
-    if (parts && parts.length > 0 && 0 == parseInt(parts[1])) {
-      return parts[0]
-    }
-
-    let newText = ''
-    let beginChecking = false
-    for (let i=0; i<text.length; i++) {
-      newText += text[i]
-      if (beginChecking && '0' != text[i]) {
-        break
-      }
-
-      if ('.' == text[i] )
-        beginChecking = true
-    }
-    return newText + ' %'
+    const formatValue = parseFloat(value.toFixed(2))
+    return formatValue + ((isPercent)?' %':'')
   }
   return {
     chart: {
@@ -118,13 +101,7 @@ const optionCreator = (chartData, isAverage, isTotal) => {
         },
         // formatter: (value) => { return isAverage ? value.toFixed(5) : value | 0 },
         formatter: (value) => {
-          if (isTotal) {
-            return formatAvg(value)
-          } else if (isAverage) {
-            return formatAvg(value)
-          } else {
-            return formatAvg(value)
-          }
+          return formatAvg(value)
         },
       },
       axisBorder: {
@@ -159,8 +136,8 @@ const optionCreator = (chartData, isAverage, isTotal) => {
 };
 
 export default function GroupApexBar(props) {
-  const { data: chartData, isAverage, isTotal } = props;
-  const [options, setOptions] = useState(optionCreator(chartData, isAverage, isTotal));
+  const { data: chartData, isAverage, isTotal, isPercent } = props;
+  const [options, setOptions] = useState(optionCreator(chartData, isAverage, isTotal, isPercent));
   const [series, setSeries] = useState([
     {
       data: getWiningData(chartData, isAverage, isTotal)
@@ -171,7 +148,7 @@ export default function GroupApexBar(props) {
   ]);
 
   useEffect(() => {
-    setOptions(optionCreator(chartData, isAverage, isTotal))
+    setOptions(optionCreator(chartData, isAverage, isTotal, isPercent))
     setSeries([
       {
         name: isAverage ? 'Winning Average' : !isTotal ? 'Winning' : 'Total Winning',
@@ -182,26 +159,11 @@ export default function GroupApexBar(props) {
         data: getLosingData(chartData, isAverage, isTotal)
       }
     ])
-    console.log('isTotal')
-    console.log(isTotal)
-    console.log([
-      {
-        name: isAverage ? 'Winning Average' : !isTotal ? 'Winning' : 'Total Winning',
-        data: getWiningData(chartData, isAverage, isTotal)
-      },
-      {
-        name: isAverage ? 'Losing Average' : !isTotal ? 'Losing' : 'Total Losing',
-        data: getLosingData(chartData, isAverage, isTotal)
-      }
-    ])
+
   }, [chartData, isAverage])
 
   return (
     <div id="chart">
-      {console.log('options')}
-      {console.log(options)}
-      {console.log('series')}
-      {console.log(series)}
       <ReactApexChart
         options={options}
         series={series}
