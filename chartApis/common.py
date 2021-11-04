@@ -1,5 +1,5 @@
 import numpy as np
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 from ib_insync import util
 from pymongo.common import MIN_SUPPORTED_SERVER_VERSION
@@ -47,6 +47,23 @@ def get_chat_data_from_candles(candles):
 def get_chat_data_rsi_heik_v1(candles):
     df = util.df(candles)
     hadf = rsi_heik_v1_fitler(df)
+    if hadf is None:
+        return [{
+            'close': 0,
+            'date': date.today(),
+            'high': 0,
+            'low': 0,
+            'open': 0,
+            'percentChange': "",
+            'volume': 0,
+            'RSI': 0,
+            'side': 'side',
+            'rsi': {'bearPower': 0, 'bullPower': 0, 'side': 'side'},
+            'rsi2': {'bearPower': 0, 'bullPower': 0, 'color': 'l_r'},
+            'rsi3': {'bearPower': 0, 'bullPower': 0, 'color': 'l_r'},
+            'heik': {'bearPower': 0, 'bullPower': 0, 'color': 'l_r'},
+            'heik2': {'bearPower': 0, 'bullPower': 0, 'color': 'l_r'},
+        }]
     heik = (hadf["HA_close"] - hadf["HA_open"]).rolling(window=3).mean()
     heik_tmp = heik.copy()
     lastdf = df.iloc[-1]
@@ -101,6 +118,8 @@ def get_chat_data_rsi_heik_v1(candles):
 def get_chat_data_rsi_heik_v11(candles):
     df = util.df(candles)
     hadf = rsi_heik_v1_fitler(df)
+    if hadf is None:
+        return []
     heik = (hadf["HA_close"] - hadf["HA_open"]).rolling(window=3).mean()
     heik_tmp = heik.copy()
     lastdf = df.iloc[-1]
