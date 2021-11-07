@@ -6,7 +6,7 @@ import { TypeChooser } from "react-stockcharts/lib/helper";
 import { getDataReq, getDataExtendedReq, getBacktestingResultReq, getDataSliceReq, getDataExtendedSliceReq } from 'api/Api';
 
 const StockChart = (props) => {
-  const { 
+  const {
     chartColumn,
     viewType,
     symbol,
@@ -28,10 +28,10 @@ const StockChart = (props) => {
   const [dbname, setDbname] = useState('')
 	const [chartData, setChartData] = useState(null)
   const [exchange, setExchange] = useState('')
-	
+
   useEffect(() => {
     if (selectedInstance === 'live_trading') {
-      setChartData(null)    
+      setChartData(null)
     }
   }, [selectedInstance])
 
@@ -55,7 +55,7 @@ const StockChart = (props) => {
   }, [selectedTradeDB])
 
   useEffect(() => {
-    setChartData(null)      
+    setChartData(null)
   }, [viewType])
 
   useEffect(() => {
@@ -86,13 +86,15 @@ const StockChart = (props) => {
           }
           if (dataRes.success) {
             let data = dataRes.data;
-            data['chart_data']['columns'] = ["date", "open", "high", "low", "close", "volume", "split", "dividend", "absoluteChange", "percentChange"]
-            data['chart_data'].map((x) => {
-              let converDate = new Date(x.date)
-              x.date = converDate
-              return null
-            })
-            setChartData(data['chart_data'])
+            if (data['chart_data'].length > 0) {
+              data['chart_data']['columns'] = ["date", "open", "high", "low", "close", "volume", "split", "dividend", "absoluteChange", "percentChange"]
+              data['chart_data'].map((x) => {
+                let converDate = new Date(x.date)
+                x.date = converDate
+                return null
+              })
+              setChartData(data['chart_data'])
+            }
           }
         } catch (e) {
           console.error(e)
@@ -102,7 +104,7 @@ const StockChart = (props) => {
         if (!symbols.length | !microStrategy) {
           return;
         }
-        
+
         const filteredSymbols = symbols.filter(symbol => symbol !== '*')
         const requestBody = {
           'symbols': filteredSymbols,
@@ -122,12 +124,12 @@ const StockChart = (props) => {
         }
       }
     }
-      
+
     if (symbol || multiSymbol.length) {
       get_data(symbol)
     }
   }, [extendMarketTime, selectedInstance, dbname, viewType, symbol, multiSymbol, startDate, endDate, strategy.value])
-    
+
   const displayPerformanceChart = (type) => {
     return (
       <PerformanceChart type={type} data={chartData} multiSymbol={multiSymbol.map((symbol) => symbol.value)}/>

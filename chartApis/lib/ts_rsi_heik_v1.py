@@ -28,8 +28,13 @@ def Filter(df, barSize=1, stock="AMZN"):
 
     # df["diff"] = df["close"].diff()
     # df["absdiff"] = abs(df["close"].diff())
+
+    if df is None:
+        return None
+
     df["diff"] = df["c"].diff()
     df["absdiff"] = abs(df["c"].diff())
+
 
     df["NetChgAvg"] = Wilders(df,"diff",14)
     df["TotChgAvg"] = Wilders(df,"absdiff",14)
@@ -46,6 +51,5 @@ def Filter(df, barSize=1, stock="AMZN"):
 
     df = df.reset_index()
 
-    hadf = ta.ha(df["o"], df["h"], df["l"], df["c"]) 
+    hadf = ta.ha(df["o"], df["h"], df["l"], df["c"])
     return hadf
-   

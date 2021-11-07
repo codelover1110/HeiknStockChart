@@ -289,7 +289,8 @@ def get_live_data(request):
     # candles, strategy_trades = get_stock_candles_for_strategy(db_name, symbol, macro, micro)
     candles, strategy_trades = get_stock_candles_for_strategy_all(db_name, symbol, macro, micro)
     chat_candles = get_chat_data_rsi_heik_v11(candles)
-    verdict = join_append(chat_candles, strategy_trades, strategy)
+    if not chat_candles is None:
+        verdict = join_append(chat_candles, strategy_trades, strategy)
     verdict = fill_missing_candles__(verdict, db_name, macro, micro)
     exchange = get_symbol_exchange(symbol)
 
