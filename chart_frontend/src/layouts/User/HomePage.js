@@ -14,6 +14,7 @@ import { BackgroundColorContext } from "contexts/BackgroundColorContext";
 import HeiknStockChart from "components/HeiknStockChart"
 import HeiknStockChartItem from "components/ItemChart"
 import HeiknStockSlicedChart from "components/HeiknStockSlicedChart"
+import ChartWithNewApi from "components/api-chart/ChartWithNewApi";
 
 var ps;
 
@@ -27,7 +28,7 @@ function HomePage() {
   );
   const location = useLocation();
   const mainPanelRef = React.useRef(null);
-  
+
   React.useEffect(() => {
     if (navigator.platform.indexOf("Win") > -1) {
       document.documentElement.className += " perfect-scrollbar-on";
@@ -64,7 +65,7 @@ function HomePage() {
       mainPanelRef.current.scrollTop = 0;
     }
   }, [location]);
-  
+
   const handleSidebarChange = () => {
     setShowSidebar(!isShowSidebar);
   };
@@ -76,21 +77,48 @@ function HomePage() {
   const handleChartRedirect = (flag) => {
     setViewType(flag)
   }
-  
+
+  const renderChart = (isShowSidebar, color) => {
+    let result = ''
+    switch (viewType) {
+      case 0:
+        result = <div className={`main-panel ${!isShowSidebar ? 'full-width' : ''}`} ref={mainPanelRef} data={color}>
+          <HeiknStockChart selectedInstance={selectedInstance} handleChartRedirect={handleChartRedirect}/>
+        </div>
+        break;
+      case 1:
+        result = <div className={`main-panel ${!isShowSidebar ? 'full-width' : ''}`} ref={mainPanelRef} data={color}>
+        <HeiknStockChartItem selectedInstance={selectedInstance} handleChartRedirect={handleChartRedirect}/>
+       </div>
+        break;
+      case 2:
+        result = <div className={`main-panel ${!isShowSidebar ? 'full-width' : ''}`} ref={mainPanelRef} data={color}>
+          <HeiknStockSlicedChart selectedInstance={selectedInstance} handleChartRedirect={handleChartRedirect}/>
+        </div>
+        break;
+      case 3:
+        result = <div className={`main-panel ${!isShowSidebar ? 'full-width' : ''}`} ref={mainPanelRef} data={color}>
+         <ChartWithNewApi selectedInstance={selectedInstance} handleChartRedirect={handleChartRedirect}></ChartWithNewApi>
+        </div>
+        break;
+    }
+    return result
+  }
+
   return (
     <BackgroundColorContext.Consumer>
       {({ color }) => (
         <React.Fragment>
           <div className="wrapper hunter-wrapper">
-          {!isShowSidebar && (
-            <Button
-              className ={"show-sidebar-toggle-area show-sidebar-icon"}
-              onClick={handleSidebarChange}
-            >
-              <i className="tim-icons icon-align-left-2"/>
-            </Button>
-          )}
-          {isShowSidebar && (
+            {!isShowSidebar && (
+              <Button
+                className ={"show-sidebar-toggle-area show-sidebar-icon"}
+                onClick={handleSidebarChange}
+              >
+                <i className="tim-icons icon-align-left-2"/>
+              </Button>
+            )}
+            {isShowSidebar && (
               <Sidebar
                 subInstance={'view'}
                 isAdminPage={false}
@@ -100,22 +128,8 @@ function HomePage() {
                 handleInstanceChange={handleInstanceChange}
               />
             )}
-            {viewType === 0 
-             ? (
-              <div className={`main-panel ${!isShowSidebar ? 'full-width' : ''}`} ref={mainPanelRef} data={color}>
-                <HeiknStockChart selectedInstance={selectedInstance} handleChartRedirect={handleChartRedirect}/>
-              </div>
-              )
-              : viewType === 1 ? (
-                <div className={`main-panel ${!isShowSidebar ? 'full-width' : ''}`} ref={mainPanelRef} data={color}>
-                 <HeiknStockChartItem selectedInstance={selectedInstance} handleChartRedirect={handleChartRedirect}/>
-                </div>
-              ) : (
-                <div className={`main-panel ${!isShowSidebar ? 'full-width' : ''}`} ref={mainPanelRef} data={color}>
-                 <HeiknStockSlicedChart selectedInstance={selectedInstance} handleChartRedirect={handleChartRedirect}/>
-                </div>
-              )
-            }
+            {renderChart(isShowSidebar, color)}
+
           </div>
         </React.Fragment>
       )}

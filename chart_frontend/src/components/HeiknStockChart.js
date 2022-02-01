@@ -53,15 +53,16 @@ const HeiknStockChart = (props) => {
       value: 'crypto', label: 'crypto',
     }
   ])
-  
+
   const [optionsViewTypes, setOptionsViewTypes] = useState([
     { value: 'charting', label: 'Charting' },
     { value: 'performance', label: 'Performance' },
-    { value: 'sliced_charting', label: 'Sliced Chatting'}
+    { value: 'sliced_charting', label: 'Sliced Chatting'},
+    { value: 'chart_with_new_api', label: 'Chart With New API6' },
   ])
 
   const [optionsMicroStrategy, setOptionsMicroStrategy] = useState([])
-  
+
   const [optionsStratgy, setOptionsStrategy] = useState([])
 
   const [optionsIndicator, setOptionsIndicator] = useState([
@@ -78,9 +79,9 @@ const HeiknStockChart = (props) => {
       value: 'heik_diff', label: 'HEIK2',
     }
   ]);
-  
+
   const [optionsIndicatorExtend, setOptionsIndicatorExtend] = useState([]);
-  
+
   const [optionsMarketTime] = useState([
     {
       value: 'markettime', label: 'market time',
@@ -129,7 +130,7 @@ const HeiknStockChart = (props) => {
                 label: o,
               }
             })
-            
+
             setOptionsMicroStrategy( microStrategyOptions )
             setMicroStrategy(microStrategyOptions[0])
 
@@ -141,7 +142,7 @@ const HeiknStockChart = (props) => {
                   label: o,
                 }
               })
-              
+
               setSymbolList(symbolOptions)
               setSymbol(symbolOptions[0])
             }
@@ -183,7 +184,7 @@ const HeiknStockChart = (props) => {
       ))
       setOptionsIndicatorExtend(indicatorList)
     }
-  }, [])  
+  }, [])
 
   useEffect(() => {
     disableScroll.on();
@@ -191,7 +192,7 @@ const HeiknStockChart = (props) => {
       disableScroll.off();
     }
   }, [getStrategyList, user])
-  
+
   useEffect(() => {
     const handleInstanceChange = (value) => {
       if (value === 'live_trading') {
@@ -207,13 +208,13 @@ const HeiknStockChart = (props) => {
       }
       getStrategyList()
       setIsShowMicro(true);
-    } 
+    }
     if (!user.is_admin && !user?.role.length) {
       return;
     }
     handleInstanceChange(selectedInstance)
     if(selectedInstance === 'live_trading') {
-      get_tables('no_strategy');    
+      get_tables('no_strategy');
     }
     if (selectedInstance === 'optimization') {
       setOptionsViewTypes([
@@ -223,7 +224,8 @@ const HeiknStockChart = (props) => {
       setOptionsViewTypes([
         { value: 'charting', label: 'Charting' },
         { value: 'performance', label: 'Performance' },
-        { value: 'sliced_charting', label: 'Sliced Chatting'}
+        { value: 'sliced_charting', label: 'Sliced Chatting'},
+        { value: 'chart_with_new_api', label: 'Chart With New API5' },
       ])
     }
   }, [selectedInstance, getStrategyList, get_tables, user.is_admin, user.role?.length])
@@ -247,6 +249,8 @@ const HeiknStockChart = (props) => {
       }
     } else if (value.value === 'sliced_charting') {
       handleChartRedirect(2)
+    } else if (value.value == 'chart_with_new_api') {
+      handleChartRedirect(3)
     }
   }
 
@@ -292,7 +296,7 @@ const HeiknStockChart = (props) => {
                 label: o,
               }
             })
-            
+
             setSymbolList(symbolOptions)
             setSymbol(symbolOptions[0])
             // setSymbol({value: 'MSFT', label: 'MSFT'})
@@ -302,7 +306,7 @@ const HeiknStockChart = (props) => {
       setStrategy(e)
     }
   }
-  
+
   const handleMicroStrategyChange = async (e) => {
     if (e) {
       setMicroStrategy(e)
@@ -314,13 +318,13 @@ const HeiknStockChart = (props) => {
             label: o,
           }
         })
-        
+
         setSymbolList(symbolOptions)
         setSymbol(symbolOptions[0])
       }
     }
   }
-  
+
   const handleIndicatorsChange = (options) => {
     setIndicators(options);
   }
@@ -402,7 +406,7 @@ const HeiknStockChart = (props) => {
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
           {microStrategy && symbol && (
-            < StockChart 
+            < StockChart
             extendMarketTime={extendMarketTime.value}
             selectedInstance={selectedInstance}
             selectedTradeDB='heikfilter-12mins-trades'
@@ -547,7 +551,7 @@ const HeiknStockChart = (props) => {
                   options={optionsMicroStrategy}
                   placeholder="Micro Strategy"
                 />
-              </div>  
+              </div>
             )}
             <div className="select-option">
               <Select
@@ -613,13 +617,13 @@ const HeiknStockChart = (props) => {
               </UncontrolledDropdown>
               <li className="separator d-lg-none" />
             </Nav>
-          </Collapse>    
+          </Collapse>
       </nav>
       {!user.is_admin && !user?.role.length
         ? (<div className="development-in-content dark">
             No Permission
           </div>)
-        : selectedInstance === 'stress_test' || selectedInstance === 'optimization' 
+        : selectedInstance === 'stress_test' || selectedInstance === 'optimization'
         ? (<div className="development-in-content dark">
           In development
         </div>)

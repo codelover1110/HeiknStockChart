@@ -51,15 +51,16 @@ const HeiknStockSlicedChart = (props) => {
       value: 'crypto', label: 'crypto',
     }
   ]
-  
+
   const [optionsViewTypes, setOptionsViewTypes] = useState([
     { value: 'charting', label: 'Charting' },
     { value: 'performance', label: 'Performance' },
     { value: 'sliced_charting', label: 'Sliced Charting' },
+    { value: 'chart_with_new_api', label: 'Chart With New API4' },
   ])
 
   const [optionsMicroStrategy, setOptionsMicroStrategy] = useState([])
-  
+
   const [optionsStratgy, setOptionsStrategy] = useState([])
 
   const [optionsIndicator, setOptionsIndicator] = useState([
@@ -76,7 +77,7 @@ const HeiknStockSlicedChart = (props) => {
       value: 'heik_diff', label: 'HEIK2',
     }
   ]);
-  
+
   const [optionsMarketTime] = useState([
     {
       value: 'markettime', label: 'market time',
@@ -141,7 +142,7 @@ const HeiknStockSlicedChart = (props) => {
               setSymbolList(symbolOptions)
               setSymbol(symbolOptions[0])
             }
-          })   
+          })
       } catch (error) {
         console.log(error)
       }
@@ -158,7 +159,7 @@ const HeiknStockSlicedChart = (props) => {
           'strategy': strategy
         })
       };
-      
+
       fetch(process.env.REACT_APP_BACKEND_URL + "/api/tables", requestOptions)
         .then(response => response.json())
         .then(data => {
@@ -183,7 +184,7 @@ const HeiknStockSlicedChart = (props) => {
       disableScroll.off();
     }
   }, [getStrategyList, user])
-  
+
   useEffect(() => {
     const handleInstanceChange = (value) => {
       if (value === 'live_trading') {
@@ -199,13 +200,13 @@ const HeiknStockSlicedChart = (props) => {
       }
       getStrategyList()
       setIsShowMicro(true);
-    } 
+    }
     if (!user.is_admin && !user?.role.length) {
       return;
     }
     handleInstanceChange(selectedInstance)
     if(selectedInstance === 'live_trading') {
-      get_tables('no_strategy');    
+      get_tables('no_strategy');
     }
     if (selectedInstance === 'optimization') {
       setOptionsViewTypes([
@@ -216,6 +217,7 @@ const HeiknStockSlicedChart = (props) => {
         { value: 'charting', label: 'Charting' },
         { value: 'performance', label: 'Performance' },
         { value: 'sliced_charting', label: 'Sliced Charting' },
+        { value: 'chart_with_new_api', label: 'Chart With New API3' },
       ])
     }
   }, [selectedInstance, getStrategyList, get_tables, user.is_admin, user.role?.length])
@@ -239,6 +241,8 @@ const HeiknStockSlicedChart = (props) => {
       }
     } else if (value.value === 'charting') {
       handleChartRedirect(0)
+    } else if (value.value === 'chart_with_new_api') {
+      handleChartRedirect(3)
     }
   }
 
@@ -293,13 +297,13 @@ const HeiknStockSlicedChart = (props) => {
       setStrategy(e)
     }
   }
-  
+
   const handleMicroStrategyChange = (e) => {
     if (e) {
       setMicroStrategy(e)
     }
   }
-  
+
   const handleIndicatorsChange = (options) => {
     setIndicators(options);
   }
@@ -397,7 +401,7 @@ const HeiknStockSlicedChart = (props) => {
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
           {microStrategy && symbol && (
-            < StockChart 
+            < StockChart
             extendMarketTime={extendMarketTime.value}
             selectedInstance={selectedInstance}
             selectedTradeDB='heikfilter-12mins-trades'
@@ -542,7 +546,7 @@ const HeiknStockSlicedChart = (props) => {
                   options={optionsMicroStrategy}
                   placeholder="Micro Strategy"
                 />
-              </div>  
+              </div>
             )}
             <div className="select-option">
               <Select
@@ -600,13 +604,13 @@ const HeiknStockSlicedChart = (props) => {
               </UncontrolledDropdown>
               <li className="separator d-lg-none" />
             </Nav>
-          </Collapse>    
+          </Collapse>
       </nav>
       {!user.is_admin && !user?.role.length
         ? (<div className="development-in-content dark">
             No Permission
           </div>)
-        : selectedInstance === 'stress_test' || selectedInstance === 'optimization' 
+        : selectedInstance === 'stress_test' || selectedInstance === 'optimization'
         ? (<div className="development-in-content dark">
           In development
         </div>)

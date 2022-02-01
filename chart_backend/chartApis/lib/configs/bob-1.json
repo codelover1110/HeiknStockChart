@@ -1,0 +1,1 @@
+{"bot_name": "bob-1", "timeframe": "12m,2m", "indicator": "rsi1,rsi2,rsi3,heik,heik_diff", "watchlist": "tech", "position_sizing": "equal", "order_routing": "alpaca", "data_source": "polygon", "live_trading": "false", "starting_cash": "10000", "hours": "emkt", "macro_strategy": "tsrh_dc", "indicator_signalling": "alternative", "name": "bob-1"}

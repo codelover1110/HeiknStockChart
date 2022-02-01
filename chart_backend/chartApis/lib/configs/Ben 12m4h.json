@@ -1,0 +1,1 @@
+{"name": "Ben 12m4h", "timeframe": "12m", "indicator": "rsi1,rsi2,rsi3,heik,heik_diff", "watchlist": "bigCryptos", "position_sizing": "equal", "order_routing": "coinbase", "data_source": "polygon", "live_trading": "false", "starting_cash": "1000000", "extended_hours": "True", "macro_strategy": "tsrh_dc", "indicator_signalling": "tsr12m4h", "asset_class": "crypto"}

@@ -36,7 +36,8 @@ const HeiknStockChartItem = (props) => {
   const [optionsViewTypes, setOptionsViewTypes] = useState([
     { value: 'charting', label: 'Charting' },
     { value: 'performance', label: 'Performance' },
-    { value: 'sliced_charting', label: 'Sliced Chatting'}
+    { value: 'sliced_charting', label: 'Sliced Chatting'},
+    { value: 'chart_with_new_api', label: 'Chart With New API2' },
   ])
 
   const [optionsMicroStrategy, setOptionsMicroStrategy] = useState([])
@@ -137,7 +138,8 @@ const HeiknStockChartItem = (props) => {
       setOptionsViewTypes([
         { value: 'charting', label: 'Charting' },
         { value: 'performance', label: 'Performance' },
-        { value: 'sliced_charting', label: 'Sliced Chatting'}
+        { value: 'sliced_charting', label: 'Sliced Chatting'},
+        { value: 'chart_with_new_api', label: 'Chart With New API1' },
       ])
     }
   }, [selectedInstance])
@@ -183,6 +185,8 @@ const HeiknStockChartItem = (props) => {
       handleChartRedirect(0)
     } else if (e.value === 'sliced_charting') {
       handleChartRedirect(2)
+    } else if (e.value === 'chart_with_new_api') {
+      handleChartRedirect(3)
     }
   }
 

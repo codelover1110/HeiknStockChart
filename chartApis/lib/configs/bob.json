@@ -1,1 +1,0 @@
-{"bot_name": "bob", "timeframe": "4m", "indicator": "rsi1,rsi2,rsi3,heik,heik_diff", "watchlist": "crypto", "position_sizing": "equal", "order_routing": "alpaca", "data_source": "polygon", "live_trading": "false", "starting_cash": "10000", "hours": "emkt", "name": "bob", "macro_strategy": "tsrh_dc", "indicator_signalling": "alternative", "asset_class": "crypto"}
