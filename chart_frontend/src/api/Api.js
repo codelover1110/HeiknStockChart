@@ -1284,4 +1284,31 @@ export const apiStopBackup = async(data) => {
 }
 
 
+export const apiGetGoogleNews = async (params) => {
+  // const req = {
+  //   method: 'GET',
+  //   path: 'api/get_google_news'
+  // }
 
+  // return await request(req);
+
+
+  const requestOptions = {
+    method: 'GET',
+    header: {'Content-Type': 'application/json'},
+  }
+
+  let apiURL = new URL(process.env.REACT_APP_BACKEND_URL + '/api/get_google_news')
+  apiURL.search = new URLSearchParams(params).toString()
+
+  try {
+    return await fetch(apiURL, requestOptions)
+      .then(response => response.json())
+      .then(result => result['data'])
+  } catch (e) {
+    return {
+      success: false,
+      message: e
+    }
+  }
+}

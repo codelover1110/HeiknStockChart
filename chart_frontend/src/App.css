@@ -793,3 +793,12 @@ pre {
 .form-control:focus {
   color: #212529!important;
 }
+
+
+.stockchart-new-api-filters {
+  padding: 20px 0;
+  z-index: 999;
+  height: auto!important;
+  align-items: center;
+  justify-content: center;
+}

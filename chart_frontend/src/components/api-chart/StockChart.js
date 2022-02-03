@@ -11,82 +11,146 @@ import {fitWidth} from 'react-stockcharts/lib/helper'
 import {timeIntervalBarWidth, last} from 'react-stockcharts/lib/utils'
 import { discontinuousTimeScaleProvider } from "react-stockcharts/lib/scale";
 import { atr, ema, macd, heikinAshi } from "react-stockcharts/lib/indicator";
+import { Select, MenuItem } from '@material-ui/core';
+import { withStyles } from "@material-ui/core/styles";
+import { apiGetGoogleNews } from "api/Api"
 
 let StockChart = (props) => {
-  // const {type, width, ratio} = props
+
+  const [sym, setSym] = useState("TSLA")
+  const [time, setTime] = useState("3ho")
+  const [bar, setBar] = useState("150")
+  const [close, setClose] = useState("false")
+  const [ext, setExt] = useState("true")
+  // const [sym, setSym] = useState("")
+  // const [time, setTime] = useState("")
+  // const [bar, setBar] = useState("")
+  // const [close, setClose] = useState("")
+  // const [ext, setExt] = useState("")
+
   const xAccessor = (d) => {
+    if (d == undefined) return new Date()
     return d.date
   }
-  // useEffect(() => {
-  //   const apiUrl = 'http://40.67.136.227/raw-bars/?symbol=TSLA&timeframe=3ho&bars=100&close=true&extended_hours=true&asset_class=equities&key=Thohn9po1mai7ba'
 
-  //   // axios.get(apiUrl,  {
-  //   //   headers: {
-  //   //     'Access-Control-Allow-Origin': '*',
-  //   //     'Access-Control-Allow-Credentials':true,
-  //   //   }
-  //   // })
-  // }, [])
-  let data = []
-  rawData['values'].map(row => data.push({date: new Date(row[0]), open: row[1], high: row[2], low: row[3], close: row[4], volume: row[6],}))
+  const [isLoading, setLoading] = useState(false)
+  const [chartData, setChartData] = useState([])
 
+  let xExtents = false
 
-  const xExtents = [
-    xAccessor(last(data)),
-    xAccessor(data[data.length - 100])
-  ];
+  useEffect(() => {
+    setLoading(true)
+    const params = {
+      symbol: sym,
+      timeframe: time,
+      bars: bar,
+      close: close,
+      extended_hours: ext,
+    }
 
-  const ha = heikinAshi();
-  const macdCalculator = macd()
-    .options({
-      fast: 12,
-      slow: 26,
-      signal: 9,
+    apiGetGoogleNews(params).then(result => {
+      setLoading(false)
+      if (!sym || !time || !bar || !close || !ext) return;
+      let data = []
+      let rawData = result
+      rawData['values'].map(row => data.push({date: new Date(row[0]), open: row[1], high: row[2], low: row[3], close: row[4], volume: row[6],}))
+
+      setChartData(data)
+
+      xExtents = [
+        xAccessor(last(data)),
+        xAccessor(data[data.length-100]),
+      ];
+
     })
-    .merge((d, c) => { d.macd = c; })
-    .accessor(d => d.macd);
-
-  const atr14 = atr()
-  .options({ windowSize: 14 })
-  .merge((d, c) => {d.atr14 = c;})
-  .accessor(d => d.atr14);
-
-  const { type, width, ratio, chartColumn, extendMarketTime } = props;
+  }, [sym, time, bar, close, ext])
 
 
-  const calculatedData = macdCalculator((ha(atr14(data))));
-  const xScaleProvider = discontinuousTimeScaleProvider
-			.inputDateAccessor(d => d.date);
 
-  const {
-    xScale,
-  } = xScaleProvider(calculatedData);
+
+  const Placeholder = ({ children }) => {
+    return <div style={{color: '#aaa'}}>{children}</div>;
+  };
+
+
+
+
+  const { type, width, ratio } = props;
+
+  const selectStyles = {
+    background: 'white',
+    borderRadius: '5px',
+    margin: '0 5px',
+    padding: '0 0 0 15px'
+  }
+
+
 
 
   return (
-    <div className="stockchart-new-api">
-      {data && <ChartCanvas
-        height={400}
-        ratio={ratio}
-        width={width}
-        margin={{left: 50, right: 50, top: 10, bottom: 30}}
-        type={type}
-        seriesName="MSFT"
-        xAccessor={xAccessor}
-        xScale={xScale}
-        xExtents={xExtents}
-        data={data}
-      >
-        <Chart
-          id={1}
-          yExtents={(d) => [d.high, d.low]}
-        >
-          <XAxis axisAt="bottom" orient="bottom" ticks={6} />
-          <YAxis axisAt="left" orient="left" ticks={5} />
-          <CandlestickSeries width={timeIntervalBarWidth(utcDay)} />
-        </Chart>
-      </ChartCanvas>}
-    </div>
+    <>
+      <div className="stockchart-new-api">
+        <div className="d-flex stockchart-new-api-filters">
+          <Select displayEmpty style={selectStyles} placeholder="sym" value={sym} renderValue={
+            sym !== "" ? undefined : () => <Placeholder>sym</Placeholder>
+          } onChange={e => setSym(e.target.value)}>
+            <MenuItem value="TSLA">TSLA</MenuItem>
+            <MenuItem value="BCH">BCH</MenuItem>
+            <MenuItem value="GOOG">GOOG</MenuItem>
+            <MenuItem value="BTC">BTC</MenuItem>
+          </Select>
+          <Select displayEmpty style={selectStyles} placeholder="time" value={time} renderValue={
+            time !== "" ? undefined : () => <Placeholder>time</Placeholder>
+          } onChange={e => setTime(e.target.value)}>
+            <MenuItem value="3ho">3ho</MenuItem>
+          </Select>
+          <Select displayEmpty style={selectStyles} placeholder="bar" value={bar} renderValue={
+            bar !== "" ? undefined : () => <Placeholder>bar</Placeholder>
+          } onChange={e => setBar(e.target.value)}>
+            <MenuItem value={'100'}>100</MenuItem>
+            <MenuItem value={'150'}>150</MenuItem>
+            <MenuItem value={'200'}>200</MenuItem>
+          </Select>
+          <Select displayEmpty style={selectStyles} placeholder="close" value={close} renderValue={
+            close !== "" ? undefined : () => <Placeholder>close</Placeholder>
+          } onChange={e => setClose(e.target.value)}>
+            <MenuItem value="false">false</MenuItem>
+            <MenuItem value="true">true</MenuItem>
+          </Select>
+          <Select displayEmpty style={selectStyles} placeholder="ext_" value={ext} renderValue={
+            ext !== "" ? undefined : () => <Placeholder>ext</Placeholder>
+          } onChange={e => setExt(e.target.value)}>
+            <MenuItem value="false">false</MenuItem>
+            <MenuItem value="true">true</MenuItem>
+          </Select>
+        </div>
+        {isLoading ? <div className="hunter-loadding-status-text">Loading...</div> :
+          <>
+            {xExtents && <ChartCanvas
+              plotFull
+              height={400}
+              ratio={ratio}
+              width={width}
+              margin={{left: 50, right: 50, top: 10, bottom: 30}}
+              type={type}
+              seriesName="MSFT"
+              xAccessor={xAccessor}
+              xScale={1}
+              xExtents={xExtents}
+              data={chartData}
+            >
+              <Chart
+                yExtents={(d) => [d.high, d.low]}
+              >
+                <XAxis axisAt="bottom" orient="bottom" ticks={6} />
+                <YAxis axisAt="left" orient="left" ticks={5} />
+                <CandlestickSeries width={timeIntervalBarWidth(utcDay)} />
+              </Chart>
+            </ChartCanvas>}
+          </>
+        }
+      </div>
+    </>
   );
 };
 
@@ -102,5 +166,5 @@ StockChart.defaultProps = {
   ratio: 1,
 
 }
-StockChart = fitWidth(StockChart)
+// StockChart = fitWidth(StockChart)
 export default StockChart;

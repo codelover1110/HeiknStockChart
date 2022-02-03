@@ -2,7 +2,7 @@ import React, { useCallback, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Select from 'react-select'
 import "react-datetime/css/react-datetime.css";
-import StockChart from "./StockChart"
+import TradeChart from "./TradeChart"
 import { useHistory } from "react-router-dom";
 import {
   Button,
@@ -29,7 +29,7 @@ const ChartWithNewApi = (props) => {
   const [collapseOpen,] = React.useState(false)
   const [chartColumn, setChartColumn] = useState({ value: 6, label: '6' })
   const [assetClass, setAssetClass] = useState({ value: 'stock', label: 'stock' })
-  const [selectedViewType, setSelectedViewType] = useState({ value: 'charting', label: 'Charting' });
+  const [selectedViewType, setSelectedViewType] = useState({ value: 'chart_with_new_api', label: 'Chart With New API7' });
   const [microStrategy, setMicroStrategy] = useState(null);
   const [strategy, setStrategy] = useState(null);//{ value: 'heikfilter', label: 'heikfilter' }
   const [strategyList, setStrategyList] = useState([]);
@@ -45,15 +45,6 @@ const ChartWithNewApi = (props) => {
     label: 'stock'
   })
 
-  const [optionsAssetClass] = useState([
-    {
-      value: 'stock', label: 'stock',
-    },
-    {
-      value: 'crypto', label: 'crypto',
-    }
-  ])
-
   const [optionsViewTypes, setOptionsViewTypes] = useState([
     { value: 'charting', label: 'Charting' },
     { value: 'performance', label: 'Performance' },
@@ -61,50 +52,6 @@ const ChartWithNewApi = (props) => {
     { value: 'chart_with_new_api', label: 'Chart With New API6' },
   ])
 
-  const [optionsMicroStrategy, setOptionsMicroStrategy] = useState([])
-
-  const [optionsStratgy, setOptionsStrategy] = useState([])
-
-  const [optionsIndicator, setOptionsIndicator] = useState([
-    {
-      value: 'volume', label: 'VOLUME',
-    },
-    {
-      value: 'rsi1', label: 'RSI1',
-    },
-    {
-      value: 'heik', label: 'HEIK1',
-    },
-    {
-      value: 'heik_diff', label: 'HEIK2',
-    }
-  ]);
-
-  const [optionsIndicatorExtend, setOptionsIndicatorExtend] = useState([]);
-
-  const [optionsMarketTime] = useState([
-    {
-      value: 'markettime', label: 'market time',
-    },
-    {
-      value: 'extend_markettime', label: 'extend market time',
-    }
-  ]);
-
-  const optionsColumn = [
-    {
-      value: 1, label: '1',
-    },
-    {
-      value: 2, label: '2',
-    },
-    {
-      value: 4, label: '4',
-    },
-    {
-      value: 6, label: '6',
-    }
-  ]
 
   const getStrategyList = useCallback(
     async () => {
@@ -118,7 +65,6 @@ const ChartWithNewApi = (props) => {
             label: o.macro,
           }
         }))
-        setOptionsStrategy(strategyOptions);
         setStrategy(strategyOptions[0]);
         if (data.result.length) {
           let flag = true
@@ -131,7 +77,6 @@ const ChartWithNewApi = (props) => {
               }
             })
 
-            setOptionsMicroStrategy( microStrategyOptions )
             setMicroStrategy(microStrategyOptions[0])
 
             const result = await getSymbolsByMicroStrategy(strategyOptions[0].value, microStrategyOptions[0].value)
@@ -182,7 +127,6 @@ const ChartWithNewApi = (props) => {
           label: o
         }
       ))
-      setOptionsIndicatorExtend(indicatorList)
     }
   }, [])
 
@@ -198,9 +142,6 @@ const ChartWithNewApi = (props) => {
       if (value === 'live_trading') {
         setIsShowMicro(false);
         setStrategy({ value: 'no_strategy', label: 'No Strategy' });
-        setOptionsStrategy([
-          { value: 'no_strategy', label: 'No Srategy' },
-        ])
         return
       } else if (value === 'forward_test') {
         // setStrategy({ value: 'heikfilter', label: 'heikfilter' });
@@ -254,105 +195,6 @@ const ChartWithNewApi = (props) => {
     }
   }
 
-  const handlSymbolChange = (e) => {
-    if (e) {
-      setSymbol(e)
-    }
-  }
-
-  const handleMarketTimeChange = (e) => {
-    if (e) {
-      setExtendMarketTime(e)
-    }
-  }
-
-  const handleStrategy = async (e) => {
-    if (e) {
-      if (strategyList.length) {
-        strategyList.forEach((item) => {
-          if (item.macro === e.value) {
-            const microStrategyOptions = item.micro.map(o => {
-              return {
-                value: o,
-                label: o,
-              }
-            })
-            setOptionsMicroStrategy( microStrategyOptions )
-
-            const is_2m = microStrategyOptions.filter((o => o.value === '2m'))
-
-            if (is_2m.length) {
-              setMicroStrategy({
-                value: '2m',
-                label: '2m'
-              })
-            } else {
-              setMicroStrategy(microStrategyOptions[0])
-            }
-
-            const symbolOptions = item.symbols.map(o => {
-              return {
-                value: o,
-                label: o,
-              }
-            })
-
-            setSymbolList(symbolOptions)
-            setSymbol(symbolOptions[0])
-            // setSymbol({value: 'MSFT', label: 'MSFT'})
-          }
-        })
-      }
-      setStrategy(e)
-    }
-  }
-
-  const handleMicroStrategyChange = async (e) => {
-    if (e) {
-      setMicroStrategy(e)
-      const result = await getSymbolsByMicroStrategy(strategy.value, e.value)
-      if (result.success) {
-        const symbolOptions = result.data.map(o => {
-          return {
-            value: o,
-            label: o,
-          }
-        })
-
-        setSymbolList(symbolOptions)
-        setSymbol(symbolOptions[0])
-      }
-    }
-  }
-
-  const handleIndicatorsChange = (options) => {
-    setIndicators(options);
-  }
-
-  const handleChartsColumnChange = (option) => {
-    if (option.value === 4 || option.value === 6) {
-      setIndicators([])
-      setOptionsIndicator([
-        {
-          value: 'volume', label: 'VOLUME',
-        },
-        {
-          value: 'rsi1', label: 'RSI1',
-        },
-        {
-          value: 'heik', label: 'HEIK1',
-        },
-        {
-          value: 'heik_diff', label: 'HEIK2',
-        }
-      ])
-    } else {
-      setIndicators([])
-      setOptionsIndicator(optionsIndicatorExtend)
-    }
-    setChartColumn(option)
-  }
-
   const calculateHeightStyle = () => {
     if (chartColumn.value === 1 || chartColumn.value === 2) {
       return 'full-height'
@@ -369,134 +211,37 @@ const ChartWithNewApi = (props) => {
     return 4
   }
 
-  const handleSymbolTypeChange = (e) => {
-    setSelectedSymbolType(e)
-  }
-
   const handleSignout = () => {
     auth.signout()
     history.push('/login')
   }
 
-  const handleAssetClass = () => {
-
-  }
 
   const displayChart = () => {
     return (
       <div className={`row ${calculateHeightStyle()}`}>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          {microStrategy && symbol && (
-            < StockChart
-              selectedSymbolType={selectedSymbolType.value}
-              extendMarketTime={extendMarketTime.value}
-              selectedInstance={selectedInstance}
-              selectedTradeDB='heikfilter-2mins-trades'
-              chartPeriod='20D 2min'
-              symbol={symbol.value}
-              indicators={indicators}
-              strategy={strategy}
-              isHomePage={true}
-              chartColumn={chartColumn.value}
-              microStrategy={microStrategy.value}
-              startDate={null}
-              endDate={null}
-            />
-          )}
+          <TradeChart />
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          {microStrategy && symbol && (
-            < StockChart
-            extendMarketTime={extendMarketTime.value}
-            selectedInstance={selectedInstance}
-            selectedTradeDB='heikfilter-12mins-trades'
-            chartPeriod='20D 12min'
-            symbol={symbol.value}
-            indicators={indicators}
-            strategy={strategy}
-            isHomePage={true}
-            chartColumn={chartColumn.value}
-            microStrategy={microStrategy.value}
-            startDate={null}
-            endDate={null}
-          />)}
+          <TradeChart />
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          {microStrategy && symbol && (
-            < StockChart
-              extendMarketTime={extendMarketTime.value}
-              selectedInstance={selectedInstance}
-              selectedTradeDB='heikfilter-1hour-trades'
-              chartPeriod='30D 1hour'
-              symbol={symbol.value}
-              indicators={indicators}
-              strategy={strategy}
-              isHomePage={true}
-              chartColumn={chartColumn.value}
-              microStrategy={microStrategy.value}
-              startDate={null}
-              endDate={null}
-            />)}
+          <TradeChart />
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          {microStrategy && symbol && (
-            < StockChart
-              extendMarketTime={extendMarketTime.value}
-              selectedInstance={selectedInstance}
-              selectedTradeDB='heikfilter-4hours-trades'
-              chartPeriod='90D 4hour'
-              symbol={symbol.value}
-              indicators={indicators}
-              strategy={strategy}
-              isHomePage={true}
-              chartColumn={chartColumn.value}
-              microStrategy={microStrategy.value}
-              startDate={null}
-              endDate={null}
-            />)}
+          <TradeChart />
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          {microStrategy && symbol && (
-            < StockChart
-              extendMarketTime={extendMarketTime.value}
-              selectedInstance={selectedInstance}
-              selectedTradeDB='heikfilter-12hours-trades'
-              chartPeriod='90D 12hour'
-              symbol={symbol.value}
-              indicators={indicators}
-              strategy={strategy}
-              isHomePage={true}
-              chartColumn={chartColumn.value}
-              microStrategy={microStrategy.value}
-              startDate={null}
-              endDate={null}
-            />)}
+          <TradeChart />
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          {microStrategy && symbol && (
-          < StockChart
-            extendMarketTime={extendMarketTime.value}
-            selectedInstance={selectedInstance}
-            selectedTradeDB='heikfilter-1day-trades'
-            chartPeriod='1Y 1day'
-            symbol={symbol.value}
-            indicators={indicators}
-            strategy={strategy}
-            isHomePage={true}
-            chartColumn={chartColumn.value}
-            microStrategy={microStrategy.value}
-            startDate={null}
-            endDate={null}
-          />)}
+          <TradeChart />
         </div>
       </div>
     )
   }
 
-  const handleAssetClassChange = (e) => {
-    setAssetClass(e)
-    return
-  }
 
   return (
     <div className="hunter-chart-container">
