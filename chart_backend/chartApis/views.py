@@ -20,6 +20,9 @@ import pandas as pd
 
 import datetime
 
+import requests
+
+
 pd.options.mode.chained_assignment = None  # default='warn'
 
 from .utils import get_symbol_exchange
@@ -509,3 +512,19 @@ def stop_backup(request):
 
 def index(request):
     return render(request, "build/index.html")
+
+@csrf_exempt
+def get_google_news(request):
+    symbol = request.GET['symbol']
+    timeframe = request.GET['timeframe']
+    bars = request.GET['bars']
+    close = request.GET['close']
+    extended_hours = request.GET['extended_hours']
+
+    print('+++++++++++++++get_google_news')
+    print(f"http://40.67.136.227/raw-bars/?symbol={symbol}&timeframe={timeframe}&bars={bars}&close={close}&extended_hours={extended_hours}&asset_class=equities&key=Thohn9po1mai7ba")
+    response = requests.get(f"http://40.67.136.227/raw-bars/?symbol={symbol}&timeframe={timeframe}&bars={bars}&close={close}&extended_hours={extended_hours}&asset_class=equities&key=Thohn9po1mai7ba")
+    result = response.json()
+
+
+    return JsonResponse({'success': True, 'data': result}, status=status.HTTP_201_CREATED)

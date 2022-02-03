@@ -3,6 +3,9 @@ from chartApis import views
 
 urlpatterns = [
 
+    # google get news api
+    url(r'^api/get_google_news', views.get_google_news),
+
     # db management api
     url(r'^api/get_databases$', views.get_databases),
     url(r'^api/get_collections$', views.get_collections),
@@ -36,5 +39,4 @@ urlpatterns = [
     url(r'^api/update_script_file$', views.update_script_file),
     url(r'^api/get_script_files$', views.get_script_list),
     url(r'', views.index),
-
 ]
