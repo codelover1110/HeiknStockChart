@@ -9,7 +9,7 @@ from utils import get_fields_data, combine_dict, check_dict_none
 from define import *
 
 
-mongoclient = pymongo.MongoClient('mongodb://root:rootUser2021@20.84.64.243:27017')
+mongoclient = pymongo.MongoClient('mongodb://root:rootUser2021@20.84.64.243:27018/?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false')
 class DBManager(object):
     def __init__(self, symbols, fields, symbol_type=SYMBOL_TYPE_STOCK):
         self.financial_fields = get_fields_data(fields, 'Stock Financials')

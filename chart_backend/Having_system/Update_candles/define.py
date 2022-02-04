@@ -23,7 +23,7 @@ SCANNER_VIEWS = 'scanner_views'
 PARAMETERS_DB = 'parameters'
 INDICATORS_COL_NAME = 'indicators'
 INDICATOR_SIGNALLING_COL_NAME = 'indicator_signalling'
-WATCHLIST_COL_NAME = 'watchlists'
+WATCHLIST_COL_NAME = 'static_watchlists'
 
 SCANNER_FINANCIAL_DETAIL_FIELDS = {
         "_id": 0,

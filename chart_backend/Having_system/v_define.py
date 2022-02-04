@@ -1,5 +1,5 @@
 API_KEY = 'tuQt2ur25Y7hTdGYdqI2VrE4dueVA8Xk'
-MONGO_URL = 'mongodb://root:rootUser2021@20.84.64.243:27017'
+MONGO_URL = 'mongodb://root:rootUser2021@20.84.64.243:27018/?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false'
 
 STOCK_WEBSOCKET_URL = "wss://delayed.polygon.io/stocks"
 CRYPTO_WEBSOCKET_URL = "wss://socket.polygon.io/crypto"

@@ -29,6 +29,7 @@ from .utils import get_symbol_exchange
 
 from .models import (
             get_stock_candles_for_strategy_all,
+            get_stock_candles_for_strategy_all_test,
             get_micro_strategies,
             get_macro_strategies,
             get_strategy_symbols,
@@ -56,6 +57,7 @@ from .models import (
 
 from .common import (
             get_chat_data_rsi_heik_v11,
+            get_chat_data_rsi_heik_v11_test,
             join_append,
             calc_percentEfficiency,
             calc_winningLosing,
@@ -300,6 +302,23 @@ def get_live_data(request):
     return JsonResponse({'chart_data': verdict, 'exchange': exchange}, status=status.HTTP_201_CREATED)
 
 @csrf_exempt
+def get_live_data_test(request):
+    print (" ++++++ API: get_live_data test ++++++")
+    request_data = JSONParser().parse(request)
+    db_name = request_data['db_name']
+    symbol = request_data['symbol']
+    macro = request_data['macro']
+    micro = request_data['micro']
+    strategy = '{}-{}-trades'.format(macro, micro)
+    chat_candles, strategy_trades = get_stock_candles_for_strategy_all_test(db_name, symbol, macro, micro)
+    if not chat_candles is None:
+        verdict = join_append(chat_candles, strategy_trades, strategy)
+    verdict = fill_missing_candles__(verdict, db_name, macro, micro)
+    exchange = get_symbol_exchange(symbol)
+
+    return JsonResponse({'chart_data': verdict, 'exchange': exchange}, status=status.HTTP_201_CREATED)
+
+@csrf_exempt
 def get_live_data_slice(request):
     print (" ++++++ API: get_live_data_slice ++++++")
     request_data = JSONParser().parse(request)
@@ -308,8 +327,9 @@ def get_live_data_slice(request):
     macro = request_data['macro']
     micro = request_data['micro']
     strategy = '{}-{}-trades'.format(macro, micro)
-    candles, strategy_trades = get_stock_candles_for_strategy_all(db_name, symbol, macro, micro)
-    chat_candles = get_chat_data_rsi_heik_v11(candles)
+    # candles, strategy_trades = get_stock_candles_for_strategy_all(db_name, symbol, macro, micro)
+    # chat_candles = get_chat_data_rsi_heik_v11(candles)
+    chat_candles, strategy_trades = get_stock_candles_for_strategy_all_test(db_name, symbol, macro, micro)
     verdict = join_append(chat_candles, strategy_trades, strategy)
     verdict = fill_missing_candles__(verdict, db_name, macro, micro)
     exchange = get_symbol_exchange(symbol)
@@ -325,9 +345,10 @@ def get_live_data_extended(request):
     macro = request_data['macro']
     micro = request_data['micro']
     strategy = '{}-{}-trades'.format(macro, micro)
-    candles, strategy_trades = get_stock_candles_for_strategy_all(db_name, symbol, macro, micro, extended=True)
-    # chat_candles = get_chat_data_from_candles(candles)
-    chat_candles = get_chat_data_rsi_heik_v11(candles)
+    # candles, strategy_trades = get_stock_candles_for_strategy_all(db_name, symbol, macro, micro, extended=True)
+    # # chat_candles = get_chat_data_from_candles(candles)
+    # chat_candles = get_chat_data_rsi_heik_v11(candles)
+    chat_candles, strategy_trades = get_stock_candles_for_strategy_all_test(db_name, symbol, macro, micro)
     verdict = join_append(chat_candles, strategy_trades, strategy)
     verdict = fill_missing_candles__(verdict, db_name, macro, micro)
     exchange = get_symbol_exchange(symbol)
@@ -343,8 +364,9 @@ def get_live_data_extended_slice(request):
     macro = request_data['macro']
     micro = request_data['micro']
     strategy = '{}-{}-trades'.format(macro, micro)
-    candles, strategy_trades = get_stock_candles_for_strategy_all(db_name, symbol, macro, micro, extended=True)
-    chat_candles = get_chat_data_rsi_heik_v11(candles)
+    # candles, strategy_trades = get_stock_candles_for_strategy_all(db_name, symbol, macro, micro, extended=True)
+    # chat_candles = get_chat_data_rsi_heik_v11(candles)
+    chat_candles, strategy_trades = get_stock_candles_for_strategy_all_test(db_name, symbol, macro, micro)
     verdict = join_append(chat_candles, strategy_trades, strategy)
     verdict = fill_missing_candles__(verdict, db_name, macro, micro)
     exchange = get_symbol_exchange(symbol)

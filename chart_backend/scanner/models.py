@@ -10,7 +10,7 @@ from financials.models import get_income_statement, get_balance_sheet, get_cash_
 from chartApis.lib.ts_rsi_heik_v1_1 import Filter as rsi_heik_v1_fitler_1
 
 # mongoclient = pymongo.MongoClient('mongodb://user:-Hz2f$!YBXbDcKG@cluster0-shard-00-00.vcom7.mongodb.net:27017,cluster0-shard-00-01.vcom7.mongodb.net:27017,cluster0-shard-00-02.vcom7.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-7w6acj-shard-0&authSource=admin&retryWrites=true&w=majority')
-mongoclient = pymongo.MongoClient('mongodb://root:rootUser2021@20.84.64.243:27017')
+mongoclient = pymongo.MongoClient('mongodb://root:rootUser2021@20.84.64.243:27018/?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false')
 # mongoclient = pymongo.MongoClient('mongodb://mluser:mlUser1000@20.84.64.243:27019')
 
 NEWS = 'sticker_news'
@@ -27,7 +27,7 @@ SCANNER_VALUE = 'scanner_value'
 SCANNER_VIEWS = 'scanner_views'
 
 PARAMETERS_DB = 'parameters'
-WATCHLIST_COL_NAME = 'watchlists'
+WATCHLIST_COL_NAME = 'static_watchlists'
 INDICATORS_COL_NAME = 'indicators'
 
 

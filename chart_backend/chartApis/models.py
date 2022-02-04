@@ -6,11 +6,13 @@ import pandas
 from wsgiref.util import FileWrapper
 from zipfile import ZipFile
 from backup.models import BackupProgress
+import requests
+import pandas as pd
 
 from Having_system.Update_candles.define import INDICATORS_COL_NAME, PARAMETERS_DB, INDICATOR_SIGNALLING_COL_NAME
-from .utils import define_start_date, check_candle_in_maket_time
+from .utils import define_start_date, check_candle_in_maket_time, get_data_chadAPI, define_color, define_percent_color
 
-azuremongo = pymongo.MongoClient('mongodb://root:rootUser2021@20.84.64.243:27017')
+azuremongo = pymongo.MongoClient('mongodb://root:rootUser2021@20.84.64.243:27018/?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false')
 BACKTESTING_TRADES = 'backtesting_trades'
 # ALL_TRADES_HISTORY = 'trading-history'
 ALL_TRADES_HISTORY = 'trade-history'
@@ -164,6 +166,127 @@ def get_strategy_name_only():
             strategy_names.append('{}-{}-trades'.format(macro['_id'], micro['_id']))
 
     return strategy_names
+    
+
+def get_stock_candles_for_strategy_all_test(candle_name, symbol, macro, micro, extended=False, close=False):
+    cur_date = datetime.now().date()
+    if candle_name == 'backtest_2_minute':
+        start_time = cur_date - timedelta(days=20)
+        timeframe = '2mi'
+        bars = '100'
+    elif candle_name == 'backtest_12_minute':
+        start_time = cur_date - timedelta(days=20)
+        timeframe = '12mi'
+        bars = '100'
+    elif candle_name == 'backtest_1_hour':
+        start_time = cur_date - timedelta(days=30)
+        timeframe = '1ho'
+        bars = '100'
+    elif candle_name == 'backtest_4_hour':
+        start_time = cur_date - timedelta(days=90)
+        timeframe = '4ho'
+        bars = '100'
+    elif candle_name == 'backtest_12_hour':
+        start_time = cur_date - timedelta(days=90)
+        timeframe = '12ho'
+        bars = '100'
+    elif candle_name == 'backtest_1_day':
+        timeframe = '1da'
+        bars = '100'
+        start_time = cur_date - timedelta(days=365)
+    
+    if extended:
+        extended_hours = 'true'
+    else:
+        extended_hours = 'false'
+    
+    if close:
+        close = 'true'
+    else:
+        close = 'false'
+    
+    start_date = datetime.strptime(str(start_time), '%Y-%m-%d')
+    end_date = datetime.strptime(str(cur_date), '%Y-%m-%d')
+
+    # get candles
+    # res_raw = requests.get(f"http://40.67.136.227/raw-bars/?symbol={symbol}&timeframe={timeframe}&bars={bars}&close={close}&extended_hours={extended_hours}&asset_class=equities&key=Thohn9po1mai7ba")
+    candles = get_data_chadAPI(symbol, 'raw-bars', timeframe, bars, close, extended_hours)
+    res_rsi1 = (get_data_chadAPI(symbol, 'rsi1', timeframe, bars, close, extended_hours))["values"]
+    res_rsi2 = (get_data_chadAPI(symbol, 'rsi2', timeframe, bars, close, extended_hours))["values"]
+    res_rsi3 = (get_data_chadAPI(symbol, 'rsi3', timeframe, bars, close, extended_hours))["values"]
+    res_heik = (get_data_chadAPI(symbol, 'heik', timeframe, bars, close, extended_hours))["values"]
+    res_heik_diff = (get_data_chadAPI(symbol, 'heik-diff', timeframe, bars, close, extended_hours))["values"]
+
+    result_data = []
+    for idx, candle in enumerate(candles["values"]):
+        d_time = datetime.strptime(candle[0], '%Y-%m-%dT%H:%M:%SZ')
+        o = candle[1]
+        h = candle[2]
+        l = candle[3]
+        c = candle[4]
+        v = candle[5]
+        rsi = res_rsi1[idx]
+        rsi2 = res_rsi2[idx]
+        pre_rsi = res_rsi2[idx-1]
+        rsi3 = res_rsi3[idx]
+        pre_rs2 = res_rsi3[idx-1]
+        heik = res_heik[idx]
+        pre_rs3 = res_heik[idx-1]
+        heik2 = res_heik_diff[idx]
+        pre_heik = res_heik_diff[idx-1]
+
+        if(rsi2 >= 0 and rsi3 >= 0):
+            side = "buy"
+        elif (rsi2 <= 0 and res_heik_diff[-1] <= 0):
+            side = "sell"
+        elif (rsi >= 0):
+            side = "hold"
+        else:
+            side = "wait"
+        
+        percent_down = 100*((o - l)/o)
+        percent_up = 100*((h - o)/o)
+        percent_net = percent_up - percent_down
+
+        result_data.append({
+            'close': float(c),
+            'date': d_time,
+            'high': float(h),
+            'low': float(l),
+            'open': float(o),
+            'percentChange': "",
+            'volume': int(v),
+            'RSI': rsi,
+            'side': side,
+            'percent_up': {'bearPower': percent_up, 'bullPower': percent_up, 'color': define_percent_color(percent_up)},
+            'percent_down': {'bearPower': percent_down, 'bullPower': percent_down, 'color': define_percent_color(percent_down)},
+            'percent_net': {'bearPower': percent_net, 'bullPower': percent_net, 'color': define_percent_color(percent_net)},
+            'rsi': {'bearPower': rsi, 'bullPower': rsi, 'side': side},
+            'rsi2': {'bearPower': rsi2, 'bullPower': rsi2, 'color': define_color(rsi2, rsi, pre_rsi)},
+            'rsi3': {'bearPower': rsi3, 'bullPower': rsi3, 'color': define_color(rsi3, rsi2, pre_rs2)},
+            'heik': {'bearPower': heik, 'bullPower': heik, 'color': define_color(heik, rsi3, pre_rs3)},
+            'heik2': {'bearPower': heik2, 'bullPower': heik2, 'color': define_color(heik2, heik, pre_heik)},
+        })
+
+    # get trades
+    if macro == 'no_strategy':
+        find_trades_query = {
+            'date': {'$gte': start_date, '$lt': end_date},
+            'symbol': symbol
+        }
+    else:
+        find_trades_query = {
+            'date': {'$gte': start_date, '$lt': end_date},
+            'micro_strategy': micro,
+            'macro_strategy': macro,
+            'symbol': symbol
+        }
+    masterdb = azuremongo[BACKTESTING_TRADES]
+    ob_table = masterdb[ALL_TRADES_HISTORY]
+    trade_result = ob_table.find(find_trades_query)
+    strategy_trades = list(trade_result.sort('date', pymongo.ASCENDING))
+    return result_data, strategy_trades
+
 
 def get_stock_candles_for_strategy_all(candle_name, symbol, macro, micro, extended=False):
     start_date, end_date = define_start_date(candle_name)
@@ -173,7 +296,6 @@ def get_stock_candles_for_strategy_all(candle_name, symbol, macro, micro, extend
     ob_table = masterdb[candle_name]
     candle_result = ob_table.find({'date': {'$gte': start_date, '$lt': end_date}, 'stock': symbol})
     sort_candles = list(candle_result.sort('date', pymongo.ASCENDING))
-
     candles = []
     if extended:
         candles = sort_candles

@@ -20,7 +20,12 @@ urlpatterns = [
 
 
     url(r'^api/tables$', views.get_table_list),
-    url(r'^api/get_data$', views.get_live_data),
+    # url(r'^api/get_data$', views.get_live_data),
+    url(r'^api/get_data$', views.get_live_data_test),
+
+    url(r'^api/get_data_test$', views.get_live_data_test),
+
+
     url(r'^api/get_data_extended$', views.get_live_data_extended),
     url(r'^api/get_backtesting_symbols$', views.backtesting_symbols),
     url(r'^api/get_backtesting_result$', views.backtesting_result),

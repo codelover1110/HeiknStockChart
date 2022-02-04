@@ -192,6 +192,8 @@ const ChartWithNewApi = (props) => {
       handleChartRedirect(2)
     } else if (value.value == 'chart_with_new_api') {
       handleChartRedirect(3)
+    } else if (value.value === 'charting') {
+      handleChartRedirect(0)
     }
   }
 

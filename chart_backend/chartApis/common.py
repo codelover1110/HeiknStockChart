@@ -6,7 +6,7 @@ from pymongo.common import MIN_SUPPORTED_SERVER_VERSION
 from .lib.heikfilter import HA, Filter
 from .lib.ts_rsi_heik_v1 import Filter as rsi_heik_v1_fitler
 from .lib.ts_rsi_heik_v1_1 import Filter as rsi_heik_v1_fitler_1
-from .models import get_strategy_name_only, get_micro_strategies
+from .models import get_micro_strategies
 
 def dataConverter(obj):
     if isinstance(obj, np.integer):
@@ -114,6 +114,9 @@ def get_chat_data_rsi_heik_v1(candles):
         })
 
     return result_data
+
+def get_chat_data_rsi_heik_v11_test(candles):
+    return []
 
 def get_chat_data_rsi_heik_v11(candles):
     df = util.df(candles)

@@ -6,7 +6,7 @@ from simple_term_menu import TerminalMenu
 
 
 
-MONGO_CONNECT_STRING = 'mongodb://root:rootUser2021@20.84.64.243:27017'
+MONGO_CONNECT_STRING = 'mongodb://root:rootUser2021@20.84.64.243:27018/?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false'
 mongo_client = pymongo.MongoClient(MONGO_CONNECT_STRING)
 
 

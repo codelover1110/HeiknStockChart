@@ -20,7 +20,7 @@ soc_obj_list = []
 initical_scanner_data = get_scanner_initials()
 
 # MONGO_URL = 'mongodb://user:-Hz2f$!YBXbDcKG@cluster0-shard-00-00.vcom7.mongodb.net:27017,cluster0-shard-00-01.vcom7.mongodb.net:27017,cluster0-shard-00-02.vcom7.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-7w6acj-shard-0&authSource=admin&retryWrites=true&w=majority'
-MONGO_URL = 'mongodb://root:rootUser2021@20.84.64.243:27018'
+MONGO_URL = 'mongodb://root:rootUser2021@20.84.64.243:27018/?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false'
 
 mongoclient = pymongo.MongoClient(MONGO_URL)
 masterdb = mongoclient['stock_market_data']

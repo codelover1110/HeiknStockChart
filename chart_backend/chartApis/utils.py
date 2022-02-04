@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 import pandas as pd
+import requests
 
 def define_start_date(candle_name):
     cur_date = datetime.now().date()
@@ -44,7 +45,39 @@ def get_symbol_exchange(symbol):
         return "nasdaq"
     elif symbol in crypto_symbols:
         return "crypto"
-    
+
+
+def get_data_chadAPI(sym, type, timeframe, bars, close, extended_hours):
+    baseurl = "http://40.67.136.227"
+    key = 'Thohn9po1mai7ba'
+
+    paramsFour = { 
+            "symbol":sym,
+            "timeframe":timeframe,
+            "bars":bars,
+            "close":close,
+            "extended_hours":extended_hours,
+            "key":key
+        }
+    data = requests.get(baseurl + f"/{type}", params = paramsFour).json()
         
-    
+    return data
+
+def define_color(value, candle, pre_candle):
+    if value > 0:
+        if candle > pre_candle :
+            return "l_g" # light green
+        else:
+            return "d_g" # dark green
+    else:
+        if candle > pre_candle :
+            return "l_r" # light red
+        else:
+            return "d_r" # dark red
+
+def define_percent_color(percent_value):
+    if percent_value > 0:
+        return 'green'
+    else:
+        return 'red'
 
