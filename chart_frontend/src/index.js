@@ -11,6 +11,7 @@ import PriceData from "layouts/User/PriceData";
 import TradeData from "layouts/User/TradeData";
 import HybridView from "layouts/User/HybridView";
 import FinancialDashboard from "layouts/User/FinancialDashboard";
+import NewsDashboard from "layouts/User/NewsDashboard";
 
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import "assets/scss/black-dashboard-react.scss";
@@ -85,6 +86,11 @@ ReactDOM.render(
             <PrivateRoute path="/financial_data">
               <DatatableProvider>
                 <FinancialDashboard />
+              </DatatableProvider>
+            </PrivateRoute>
+            <PrivateRoute path="/news_data">
+              <DatatableProvider>
+                <NewsDashboard />
               </DatatableProvider>
             </PrivateRoute>
             <PrivateRoute path="/scanner">

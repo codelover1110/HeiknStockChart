@@ -1,1 +1,0 @@
-{"name": "Adele V2", "timeframe": "12m", "indicator": "rsi1,rsi2,rsi3,heik,heik_diff", "watchlist": "bigbuffett", "position_sizing": "equal", "order_routing": "alpaca", "data_source": "polygon", "live_trading": "False", "starting_cash": "1000000", "extended_hours": "False", "macro_strategy": "tsrh_dc", "indicator_signalling": "tsr12m v2", "asset_class": "equities"}

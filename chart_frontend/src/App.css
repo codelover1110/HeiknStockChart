@@ -766,7 +766,7 @@ pre {
 }
 
 .mdb-dataTables_paginate, .mdb-datatable-entries, .datatable-select, .mdb-datatable-info {
-  display: none !important;
+  /* display: none !important; */
 }
 
 .hunter-loadding-status-text {

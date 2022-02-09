@@ -121,6 +121,12 @@ export var routes = [
     instance: "floats",
     pathname: '/floats'
   },
+  {
+    name: "News",
+    icon: "tim-icons icon-atom",
+    instance: "news_data",
+    pathname: '/news_data'
+  },
 ]
 
 export var adminRoutes = [

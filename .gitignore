@@ -1,0 +1,11 @@
+node_modules/
+*.log
+*.pot
+*.pyc
+
+__pycache__/
+*/__pycache__/
+
+chart_frontend/.env
+chart_frontend/yarn.lock
+chart_frontend/package-lock.json

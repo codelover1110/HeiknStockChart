@@ -1,1 +1,0 @@
-{"name": "crypto 2m12m4ht", "indicator": "rsi1,rsi2,rsi3,heik,heik_diff", "watchlist": "crypto", "position_sizing": "equal", "order_routing": "coinbase", "data_source": "polygon", "live_trading": "false", "starting_cash": "50000", "extended_hours": "True", "macro_strategy": "tsrh_dc v2", "indicator_signalling": "2m12m4h trend", "asset_class": "crypto"}

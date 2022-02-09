@@ -32,11 +32,23 @@ body {
 .financial-dashboard-toolbar {
   font-weight: normal !important; 
 }
+.news-dashboard-toolbar {
+  font-weight: normal !important; 
+  margin-left: 50px;
+}
 .dashboard-toolbar-title {
   font-size: 20px;
   font-weight: bold;
   color: white;
   justify-content: space-between;
+}
+.news-toolbar-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: white;
+  /* justify-content: space-between; */
+  display: flex;
+  margin-left: 20px;
 }
 .financial-dashboard-title {
   display: flex;

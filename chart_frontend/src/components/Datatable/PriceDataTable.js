@@ -16,25 +16,25 @@ import { useHistory } from "react-router-dom";
 import { useAuth } from 'contexts/authContext';
 import { getAllSymbols, filterPriceData } from 'api/Api'
 import { currentDateString } from 'utils/helper'
-import MultiRangeSlider from 'components/MultiRangeSlider/MultiRangeSlider'
+import MultiRangeSlider from 'components/MultiRangeSlider/MultiRangeSliderNumber'
 import { useCsvDownloadUpdate } from "contexts/CsvDownloadContext"
 import ButtonCsvDownload from 'components/ButtonCsvDownload'
 import {useDatatableLoading, useDatatable, usePagination, usePaginationUpdate} from "contexts/DatatableContext"
-import HeiknDatatable from 'components/HeiknDatatable'
+import HeiknDatatable from 'components/HeiknDatatablePrice'
 
 const PriceDataTable = () => {
   const auth = useAuth();
   const history = useHistory();
   const [collapseOpen,] = React.useState(false)
   const [symbol, setSymbol] = React.useState({value: "GOOG", label: "GOOG"})
-  const [timeFrame, setTimeFrame] = useState({ value: "1m", label: "1m"});
+  const [timeFrame, setTimeFrame] = useState({ value: "1mi", label: "1m"});
   const [tradeStartDate, setTradeStartDate] = useState('2021-01-01')
   const [tradeEndDate, setTradeEndDate] = useState(currentDateString())
   const [optionsSymbol, setOptionsSymbol] = useState([])
   const [optionsTimeFrame] = useState([
-    { value: "1m", label: "1m" },
-    { value: "1h", label: "1h" },
-    { value: "1d", label: "1d" }
+    { value: "1mi", label: "1m" },
+    { value: "1ho", label: "1h" },
+    { value: "1da", label: "1d" }
   ])
 
   // handle pagination state
@@ -201,9 +201,9 @@ const PriceDataTable = () => {
             />
           </div>
           <div className='input-group date hunter-date-time-picker' id='datetimepicker1'>
-            <MultiRangeSlider
+            {/* <MultiRangeSlider
               selectDateRange={selectDateRange}
-            />
+            /> */}
             <ButtonCsvDownload filename={"price.csv"}>Csv Download</ButtonCsvDownload>
           </div>
         </div>

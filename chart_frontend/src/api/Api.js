@@ -121,17 +121,17 @@ export const filterPriceData = async (symbol, timeFrame, tradeStartDate, tradeEn
       const candles = []
       data.candles.forEach((x) => {
         candles.push({
-          'o': x.o,
-          'h': x.h,
-          'c': x.c,
-          'l': x.l,
-          'v': x.v,
-          'date': x.date.replace('T', ' '),
+          'o': x[1],
+          'h': x[2],
+          'c': x[3],
+          'l': x[4],
+          'v': x[5],
+          'date': x[0].replace('T', ' '),
         })
       })
       return {
         candles,
-        page_total: data.page_total
+        page_total: 0
       }
     })
 }
@@ -160,7 +160,7 @@ export const filterTradesData = async (macroStrategy, microStrategy, tradeStartD
           'strategy': `${x.macro_strategy} - ${x.micro_strategy}`,
           'side': x.side,
           'quantity': x.quantity,
-          'date': x.date.replace('T', ' '),
+          'date': (x.date.replace('T', ' ')).replace('Z', ''),
           'price': x.price
         })
       })

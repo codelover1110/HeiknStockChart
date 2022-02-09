@@ -1,0 +1,1 @@
+{"bot_name": "test-bot-1", "timeframe": "2m", "indicator": "heik", "watchlist": "tech", "position_sizing": "equal", "order_routing": "alphaca", "data_source": "polygon", "live_trading": "true", "starting_cash": 10000, "hours": "", "name": "test-bot-1", "macro_strategy": "tsrh_dc", "indicator_signalling": "alternative", "asset_class": "crypto"}

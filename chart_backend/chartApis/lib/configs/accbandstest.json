@@ -1,1 +1,0 @@
-{"name": "accbandstest", "indicator": "rsi1,rsi2,rsi3,heik,heik_diff", "watchlist": "crypto", "position_sizing": "equal", "order_routing": "coinbase", "data_source": "polygon", "live_trading": "false", "starting_cash": "10000", "extended_hours": "True", "macro_strategy": "tsrh_dc", "indicator_signalling": "2m1h1d t2", "asset_class": "crypto"}
