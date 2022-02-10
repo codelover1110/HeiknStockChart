@@ -9,7 +9,7 @@ export const useApiChartContext = () => {
 export const ApiChartProvider = ({children}) => {
   const [chartData, setChartData] = useState(null)
   const [isLoading, setLoading] = useState(false)
-  const [sym, setSym] = useState("TSLA")
+  const [sym, setSym] = useState("BTC-USD")
   const [time, setTime] = useState("3ho")
   const [bar, setBar] = useState("150")
   const [close, setClose] = useState("false")

@@ -1312,3 +1312,23 @@ export const apiGetGoogleNews = async (params) => {
     }
   }
 }
+export const apiGetTradeHistories = async (params) => {
+  const requestOptions = {
+    method: 'GET',
+    header: {'Content-Type': 'application/json'},
+  }
+
+  let apiURL = new URL(process.env.REACT_APP_BACKEND_URL + '/api/get_trade_histories')
+  apiURL.search = new URLSearchParams(params).toString()
+
+  try {
+    return await fetch(apiURL, requestOptions)
+      .then(response => response.json())
+      .then(result => result['data'])
+  } catch (e) {
+    return {
+      success: false,
+      message: e
+    }
+  }
+}

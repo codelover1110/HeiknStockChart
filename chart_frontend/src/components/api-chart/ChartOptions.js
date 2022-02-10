@@ -36,11 +36,11 @@ const ChartOptions = () => {
         extended_hours: ext,
       }
 
-       apiGetGoogleNews(params).then(rawData => {
+       apiGetGoogleNews(params).then(data => {
         setLoading(false)
         //
-        let data = []
-        rawData['values'].map(row => data.push({date: new Date(row[0]), open: +row[1], high: +row[2], low: +row[3], close: +row[4], volume: +row[6],}))
+        // let data = []
+        // rawData['values'].map(row => data.push({date: new Date(row[0]), open: +row[1], high: +row[2], low: +row[3], close: +row[4], volume: +row[6], haohx: 'Hoang Xuan Hao'}))
 
         setChartData(data)
       })
@@ -53,9 +53,11 @@ const ChartOptions = () => {
       <Select displayEmpty style={selectStyles} placeholder="sym" value={sym} renderValue={
         sym !== "" ? undefined : () => <Placeholder>sym</Placeholder>
       } onChange={e => setSym(e.target.value)}>
-        <MenuItem value="TSLA">TSLA</MenuItem>
-        <MenuItem value="AXP">AXP</MenuItem>
-        <MenuItem value="LTC">LTC</MenuItem>
+        <MenuItem value="BTC-USD">BTC-USD</MenuItem>
+        <MenuItem value="DOGE-USD">DOGE-USD</MenuItem>
+        <MenuItem value="ETH-USD">ETH-USD</MenuItem>
+        <MenuItem value="ADA-USD">ADA-USD</MenuItem>
+        <MenuItem value="BCH-USD">BCH-USD</MenuItem>
       </Select>
       <Select displayEmpty style={selectStyles} placeholder="time" value={time} renderValue={
         time !== "" ? undefined : () => <Placeholder>time</Placeholder>

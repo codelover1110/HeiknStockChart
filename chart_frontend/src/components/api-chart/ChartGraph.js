@@ -10,7 +10,7 @@ import { fitWidth } from "react-stockcharts/lib/helper";
 import { discontinuousTimeScaleProvider } from "react-stockcharts/lib/scale";
 import { format } from "d3-format";
 import { withStyles } from "@material-ui/core";
-import { DrawingObjectSelector } from "react-stockcharts/lib/interactive";
+import { HoverTooltip } from "react-stockcharts/lib/tooltip";
 import {
 	CrossHairCursor,
 	MouseCoordinateX,
@@ -30,7 +30,42 @@ import {
 	buyPath,
 	sellPath,
 } from "react-stockcharts/lib/annotation";
-import {macdCalculator, ha, atr14, xScaleProvider} from './helpers'
+import {ema50, ema20, macdCalculator, ha, atr14, xScaleProvider} from './helpers'
+import { apiGetTradeHistories } from 'api/Api';
+const dateFormat = timeFormat("%Y-%m-%d");
+const numberFormat = format(".2f");
+
+
+function tooltipContent(symbol, ys) {
+  let tradeData = []
+	return ({ currentItem, xAccessor }) => {
+    const loadData = async () => {
+      await apiGetTradeHistories({symbol: symbol, date: currentItem.trade_date}).then(data => {
+        tradeData = data
+      })
+    }
+
+    loadData()
+
+    return {
+      x: `Ticker: ${symbol}`,
+      y: tradeData
+    }
+		// return {
+		// 	x: dateFormat(xAccessor(currentItem)),
+		// 	y: currentItem.trade_data
+		// 		.concat(
+		// 			ys.map(each => ({
+		// 				label: each.label,
+		// 				value: each.value(currentItem),
+		// 				stroke: each.stroke
+		// 			}))
+		// 		)
+		// 		.filter(line => line.value)
+		// };
+	};
+}
+
 
 let ChartGraph = (props) => {
   const {isLoading} = useApiChartContext()
@@ -221,6 +256,14 @@ let ChartGraph = (props) => {
                     && d.trades[0].strategy === `${props.strategy.value}-${props.microStrategy}-trades`
                     && d.trades[0].longShort === "SHORT" }
                     usingProps={shortAnnotationProps} />
+
+                  <HoverTooltip
+                    yAccessor={ema50.accessor()}
+                    tooltipContent={tooltipContent(sym, [
+
+                    ])}
+                    fontSize={12}
+                  />
                 </Chart>
                 <CrossHairCursor />
               </ChartCanvas>

@@ -5,6 +5,7 @@ urlpatterns = [
 
     # google get news api
     url(r'^api/get_google_news', views.get_google_news),
+    url(r'^api/get_trade_histories', views.get_trade_histories),
 
     # db management api
     url(r'^api/get_databases$', views.get_databases),

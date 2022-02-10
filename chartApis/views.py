@@ -22,6 +22,12 @@ import datetime
 
 import requests
 
+from types import SimpleNamespace
+import json
+
+from chartApis.models import api_get_trade_histories
+
+
 
 pd.options.mode.chained_assignment = None  # default='warn'
 
@@ -571,7 +577,30 @@ def get_google_news(request):
     print('+++++++++++++++get_google_news')
     print(f"http://40.67.136.227/raw-bars/?symbol={symbol}&timeframe={timeframe}&bars={bars}&close={close}&extended_hours={extended_hours}&asset_class=equities&key=Thohn9po1mai7ba")
     response = requests.get(f"http://40.67.136.227/raw-bars/?symbol={symbol}&timeframe={timeframe}&bars={bars}&close={close}&extended_hours={extended_hours}&asset_class=equities&key=Thohn9po1mai7ba")
+
     result = response.json()
+    result = result['values']
+    data = []
+    for row in result:
+        item = {
+            'date': row[0],
+            'open': row[1],
+            'high': row[2],
+            'low': row[3],
+            'close': row[4],
+            'volume': row[6],
+            'trade_date': row[0],
+        }
+        # item['trade_data'] = api_get_trade_histories(symbol, item['date'])
+        data.append(item)
+
+    return JsonResponse({'success': True, 'data': data}, status=status.HTTP_201_CREATED)
 
 
-    return JsonResponse({'success': True, 'data': result}, status=status.HTTP_201_CREATED)
+@csrf_exempt
+def get_trade_histories(request):
+    symbol = request.GET['symbol']
+    date = request.GET['date']
+    data = api_get_trade_histories(symbol, date)
+
+    return JsonResponse({'success': True, 'data': data}, status=status.HTTP_201_CREATED)

@@ -167,7 +167,7 @@ def get_strategy_name_only():
             strategy_names.append('{}-{}-trades'.format(macro['_id'], micro['_id']))
 
     return strategy_names
-    
+
 
 def get_stock_candles_for_strategy_all_test(candle_name, symbol, macro, micro, extended=False, close=False):
     cur_date = datetime.now().date()
@@ -195,22 +195,22 @@ def get_stock_candles_for_strategy_all_test(candle_name, symbol, macro, micro, e
         timeframe = '1da'
         bars = '100'
         start_time = cur_date - timedelta(days=365)
-    
+
     if extended:
         extended_hours = 'true'
     else:
         extended_hours = 'false'
-    
+
     if close:
         close = 'true'
     else:
         close = 'false'
-    
+
     start_date = datetime.strptime(str(start_time), '%Y-%m-%d')
     end_date = datetime.strptime(str(cur_date), '%Y-%m-%d')
 
     # get candles
-    
+
     combine_data = get_combine_data_chadAPI(symbol, timeframe, bars, close, extended_hours)
     try:
         candles = combine_data["values"]["raw-bars"]["values"]
@@ -226,7 +226,7 @@ def get_stock_candles_for_strategy_all_test(candle_name, symbol, macro, micro, e
         res_rsi3 = combine_data["values"]["rsi3"]["values"]
         res_heik = combine_data["values"]["heik"]["values"]
         res_heik_diff = combine_data["values"]["heik-diff"]["values"]
-    
+
     # candles = combine_data["values"]["raw-bars"]["values"]
     # res_rsi1 = combine_data["values"]["rsi1"]["values"]
     # res_rsi2 = combine_data["values"]["rsi2"]["values"]
@@ -261,7 +261,7 @@ def get_stock_candles_for_strategy_all_test(candle_name, symbol, macro, micro, e
             side = "hold"
         else:
             side = "wait"
-        
+
         percent_down = 100*((o - l)/o)
         percent_up = 100*((h - o)/o)
         percent_net = percent_up - percent_down
@@ -665,4 +665,31 @@ def api_get_indicator_signalling_list():
     result = []
     for indicator in indicator_names:
         result.append({'label':indicator['name'], 'value':indicator['name']})
+    return  result
+
+
+def api_get_trade_histories(sym, date):
+    masterdb = azuremongo[BACKTESTING_TRADES]
+    ob_table = masterdb[ALL_TRADES_HISTORY]
+
+    d = date
+    d = d.replace('T', ' ')
+    d = d.replace('Z', '')
+    d = datetime.fromisoformat(d)
+
+    from_date = d.replace(minute=0, second=0)
+    to_date = d.replace(minute=59, second=59)
+
+    print('from_date', from_date)
+    print('to_date', to_date)
+
+    agg_result = list(ob_table.find({'symbol': sym, 'date': { '$gte': from_date, '$lte': to_date } }).limit(10))
+
+    result = []
+    for trade in agg_result:
+        if 'side' in trade and 'price' in trade:
+            price = trade['price']
+            date = trade['date']
+            text = f'Price: {price} Trade Date: {date}'
+            result.append({'label': trade['side'].lower(), 'value': text})
     return  result
