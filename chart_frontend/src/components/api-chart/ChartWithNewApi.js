@@ -40,6 +40,22 @@ const ChartWithNewApi = (props) => {
     }
   );
 
+
+  const optionsColumn = [
+    {
+      value: 1, label: '1',
+    },
+    {
+      value: 2, label: '2',
+    },
+    {
+      value: 4, label: '4',
+    },
+    {
+      value: 6, label: '6',
+    }
+  ]
+
   const [selectedSymbolType, setSelectedSymbolType] = useState({
     value: 'stock',
     label: 'stock'
@@ -171,6 +187,10 @@ const ChartWithNewApi = (props) => {
     }
   }, [selectedInstance, getStrategyList, get_tables, user.is_admin, user.role?.length])
 
+  const handleChartsColumnChange = (option) => {
+    setChartColumn(option)
+  }
+
   const handleViewTypeChange = (value) => {
     setSelectedViewType(value)
     if (value.value === 'performance') {
@@ -264,6 +284,14 @@ const ChartWithNewApi = (props) => {
                 onChange={handleViewTypeChange}
                 options={optionsViewTypes}
                 placeholder="Charting"
+              />
+            </div>
+            <div className="select-option">
+              <Select
+                value={chartColumn}
+                onChange={handleChartsColumnChange}
+                options={optionsColumn}
+                placeholder="Columns"
               />
             </div>
           </div>
