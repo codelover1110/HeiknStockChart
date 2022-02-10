@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Select, MenuItem } from '@material-ui/core';
 import { useApiChartContext } from './contexts';
 import { apiGetGoogleNews } from "api/Api"
+import { format } from "d3-format";
 
 const Placeholder = ({ children }) => {
   return <div style={{color: '#aaa'}}>{children}</div>;
@@ -24,27 +25,30 @@ const ChartOptions = () => {
 
   const {setLoading, setChartData} = useApiChartContext()
 
-  useEffect(() => {
-    setLoading(true)
+  useEffect(() =>  {
+    const loadData =  () => {
+      setLoading(true)
 
-    if (!sym || !time || !bar || !close || !ext) return;
+      if (!sym || !time || !bar || !close || !ext) return;
 
-    const params = {
-      symbol: sym,
-      timeframe: time,
-      bars: bar,
-      close: close,
-      extended_hours: ext,
+      const params = {
+        symbol: sym,
+        timeframe: time,
+        bars: bar,
+        close: close,
+        extended_hours: ext,
+      }
+
+       apiGetGoogleNews(params).then(rawData => {
+        setLoading(false)
+        //
+        let data = []
+        rawData['values'].map(row => data.push({date: new Date(row[0]), open: +row[1], high: +row[2], low: +row[3], close: +row[4], volume: +row[6],}))
+
+        setChartData(data)
+      })
     }
-
-    apiGetGoogleNews(params).then(rawData => {
-      setLoading(false)
-      //
-      let data = []
-      rawData['values'].map(row => data.push({date: new Date(row[0]), open: row[1], high: row[2], low: row[3], close: row[4], volume: row[6],}))
-
-      setChartData(data)
-    })
+    loadData()
   }, [sym, time, bar, close, ext])
 
   return (

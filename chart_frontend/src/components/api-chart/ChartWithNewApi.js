@@ -243,22 +243,22 @@ const ChartWithNewApi = (props) => {
     return (
       <div className={`row ${calculateHeightStyle()}`}>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          <TradeChart />
+          <TradeChart chartColumn={chartColumn} />
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          <TradeChart />
+          <TradeChart chartColumn={chartColumn} />
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          <TradeChart />
+          <TradeChart chartColumn={chartColumn} />
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          <TradeChart />
+          <TradeChart chartColumn={chartColumn} />
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          <TradeChart />
+          <TradeChart chartColumn={chartColumn} />
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          <TradeChart />
+          <TradeChart chartColumn={chartColumn} />
         </div>
       </div>
     )

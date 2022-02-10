@@ -3,13 +3,15 @@ import ChartGraphWrap from './ChartGraphWrap';
 import ChartOptions from './ChartOptions';
 import { ApiChartProvider } from './contexts';
 
-const TradeChart = () => {
+import { fitWidth } from "react-stockcharts/lib/helper";
+let TradeChart = (props) => {
   return (
     <ApiChartProvider>
       <ChartOptions />
-      <ChartGraphWrap />
+      <ChartGraphWrap chartColumn={props.chartColumn.value} />
     </ApiChartProvider>
   );
 };
 
+TradeChart = fitWidth(TradeChart)
 export default TradeChart;
