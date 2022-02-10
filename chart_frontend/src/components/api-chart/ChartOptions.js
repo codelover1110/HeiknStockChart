@@ -17,13 +17,10 @@ const selectStyles = {
 
 
 const ChartOptions = () => {
-  const [sym, setSym] = useState("TSLA")
-  const [time, setTime] = useState("3ho")
-  const [bar, setBar] = useState("150")
-  const [close, setClose] = useState("false")
-  const [ext, setExt] = useState("true")
+
 
   const {setLoading, setChartData} = useApiChartContext()
+  const {sym, setSym, time, setTime, bar, setBar, close, setClose, ext, setExt} = useApiChartContext()
 
   useEffect(() =>  {
     const loadData =  () => {

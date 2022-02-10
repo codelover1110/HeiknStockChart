@@ -10,6 +10,7 @@ import { fitWidth } from "react-stockcharts/lib/helper";
 import { discontinuousTimeScaleProvider } from "react-stockcharts/lib/scale";
 import { format } from "d3-format";
 import { withStyles } from "@material-ui/core";
+import { DrawingObjectSelector } from "react-stockcharts/lib/interactive";
 import {
 	CrossHairCursor,
 	MouseCoordinateX,
@@ -33,7 +34,7 @@ import {macdCalculator, ha, atr14, xScaleProvider} from './helpers'
 
 let ChartGraph = (props) => {
   const {isLoading} = useApiChartContext()
-
+  const {sym} = useApiChartContext()
 
 
   // extract props
@@ -42,11 +43,6 @@ let ChartGraph = (props) => {
   if (isLoading || initialData == null) {
     return <div className="text-white">Loading...</div>
   }
-
-  console.log('chartColumn')
-  console.log(chartColumn)
-  console.log('width')
-  console.log(width)
 
   initialData.forEach(line => {
     line.date = dayjs(line.date).toDate();
@@ -137,7 +133,7 @@ let ChartGraph = (props) => {
   const xDisplayFormatProps2 = {
     xDisplayFormat: timeFormat(""),
     ohlcFormat: () => "",
-    volumeFormat: () => props.symbol,
+    volumeFormat: () => sym,
     percentFormat: () => "",
     displayTexts: {
       v: " Symbol: ",
@@ -196,8 +192,8 @@ let ChartGraph = (props) => {
                     fill={d => d.close > d.open ? "#6BA583" : "#DB0000"}
                   />
 
-                  {/* <OHLCTooltip
-                    origin={[-50, -10]}
+                  <OHLCTooltip
+                    origin={[-50, -5]}
                     {...xDisplayFormatProps}
                   />
 
@@ -207,9 +203,9 @@ let ChartGraph = (props) => {
                   />
 
                   <OHLCTooltip
-                    origin={[100, -5]}
+                    origin={[100, 0]}
                     {...xDisplayFormatProps2}
-                  /> */}
+                  />
 
                   <Annotate with={SvgPathAnnotation} when={ d =>
                     {
@@ -226,6 +222,7 @@ let ChartGraph = (props) => {
                     && d.trades[0].longShort === "SHORT" }
                     usingProps={shortAnnotationProps} />
                 </Chart>
+                <CrossHairCursor />
               </ChartCanvas>
           </>
       }
