@@ -802,3 +802,16 @@ pre {
   align-items: center;
   justify-content: center;
 }
+.stockchart-autocomplete .MuiFilledInput-root {
+    background: white!important;
+    color: #000!important;
+    padding-top: 0!important;
+    border-radius: 3px!important;
+}
+.stockchart-autocomplete .MuiFilledInput-input {
+  padding-top: 5px!important;
+  padding-bottom: 4px!important;
+}
+.MuiAutocomplete-popper * {
+  color: #000!important;
+}

@@ -75,7 +75,7 @@ let ChartGraph = (props) => {
   // extract props
   const { type, data: initialData, width, ratio, chartColumn, extendMarketTime } = props;
 
-  if (isLoading || initialData == null) {
+  if (isLoading || initialData == null || !Array.isArray(initialData)) {
     return <div className="text-white">Loading...</div>
   }
 

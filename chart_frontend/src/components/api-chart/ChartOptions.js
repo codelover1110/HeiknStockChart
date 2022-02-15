@@ -3,6 +3,10 @@ import { Select, MenuItem } from '@material-ui/core';
 import { useApiChartContext } from './contexts';
 import { apiGetGoogleNews } from "api/Api"
 import { format } from "d3-format";
+import Autocomplete from '@mui/material/Autocomplete';
+import TextField from '@mui/material/TextField';
+import symbolListOptions from './master'
+
 
 const Placeholder = ({ children }) => {
   return <div style={{color: '#aaa'}}>{children}</div>;
@@ -48,9 +52,19 @@ const ChartOptions = () => {
     loadData()
   }, [sym, time, bar, close, ext])
 
+  // const symbolList = [
+  //   { label: 'BTC-USD', year: 1994 },
+  //   { label: 'The Godfather', year: 1972 },
+  //   { label: 'The Godfather: Part II', year: 1974 },
+  // ]
+
+
+  const [typingValue, setTypingValue] = useState('')
+
+
   return (
     <div className="d-flex stockchart-new-api-filters">
-      <Select displayEmpty style={selectStyles} placeholder="sym" value={sym} renderValue={
+      {/* <Select displayEmpty style={selectStyles} placeholder="sym" value={sym} renderValue={
         sym !== "" ? undefined : () => <Placeholder>sym</Placeholder>
       } onChange={e => setSym(e.target.value)}>
         <MenuItem value="BTC-USD">BTC-USD</MenuItem>
@@ -58,11 +72,33 @@ const ChartOptions = () => {
         <MenuItem value="ETH-USD">ETH-USD</MenuItem>
         <MenuItem value="ADA-USD">ADA-USD</MenuItem>
         <MenuItem value="BCH-USD">BCH-USD</MenuItem>
-      </Select>
+      </Select> */}
+      <Autocomplete
+        className="stockchart-autocomplete"
+        disablePortal={true}
+        id={`autocomplete-`+Math.random()}
+        options={symbolListOptions}
+        renderInput={(params) => <TextField {...params} label="Symbols" variant={'filled'} />}
+        value={sym}
+        inputValue={typingValue}
+        sx={{
+          width: '150px'
+        }}
+        onChange={(event, newValue) => {
+          console.log('onChange', newValue)
+          if (!newValue) return
+          setSym(newValue.value)
+        }}
+        onInputChange={(event, newInputValue) => {
+          setTypingValue(newInputValue);
+        }}
+      />
       <Select displayEmpty style={selectStyles} placeholder="time" value={time} renderValue={
         time !== "" ? undefined : () => <Placeholder>time</Placeholder>
       } onChange={e => setTime(e.target.value)}>
+        <MenuItem value="60mi">60mi</MenuItem>
         <MenuItem value="3ho">3ho</MenuItem>
+        <MenuItem value="1da">1da</MenuItem>
       </Select>
       <Select displayEmpty style={selectStyles} placeholder="bar" value={bar} renderValue={
         bar !== "" ? undefined : () => <Placeholder>bar</Placeholder>
