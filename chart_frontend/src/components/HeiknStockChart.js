@@ -80,7 +80,26 @@ const HeiknStockChart = (props) => {
     }
   ]);
 
-  const [optionsIndicatorExtend, setOptionsIndicatorExtend] = useState([]);
+  const [optionsIndicatorExtend, setOptionsIndicatorExtend] = useState([
+    {
+      value: 'volume', label: 'VOLUME',
+    },
+    {
+      value: 'rsi1', label: 'RSI1',
+    },
+    {
+      value: 'rsi2', label: 'RSI2', 
+    },
+    {
+      value: 'rsi3', label: 'RSI3',
+    },
+    {
+      value: 'heik', label: 'HEIK1',
+    },
+    {
+      value: 'heik_diff', label: 'HEIK2',
+    }
+  ]);
 
   const [optionsMarketTime] = useState([
     {
@@ -174,16 +193,16 @@ const HeiknStockChart = (props) => {
   )
 
   useEffect(async () => {
-    const result = await getIndicators()
-    if (result.success) {
-      const indicatorList = result.data.map((o) => (
-        {
-          value: o,
-          label: o
-        }
-      ))
-      setOptionsIndicatorExtend(indicatorList)
-    }
+    // const result = await getIndicators()
+    // if (result.success) {
+    //   const indicatorList = result.data.map((o) => (
+    //     {
+    //       value: o,
+    //       label: o
+    //     }
+    //   ))
+    //   setOptionsIndicatorExtend(indicatorList)
+    // }
   }, [])
 
   useEffect(() => {

@@ -56,6 +56,7 @@ def available_items(request):
     print (" ++++++ API: /scanner/available_items ++++++")
     try:
         available_items = scanner.get_available_items()
+        print(available_items)
         return JsonResponse({"success": True, "result": available_items}, safe=True)
     except:
         return JsonResponse({"success": False, "message": "Failed to get available items for scanner!"}, safe=True)
