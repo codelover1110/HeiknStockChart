@@ -361,6 +361,26 @@ def calc_winningLosing(symbols, db_data):
         wL.append(winningLosing_temp)
     return wL
 
+def calc_winningLosing_api(symbols, db_data):
+    wL = []
+    for symbol in symbols:
+        winningLosing_temp = {
+            'symbol': symbol,
+            'winning': 0,
+            'losing': 0
+        }
+        for db_collection in db_data:
+            side = db_collection['side'].lower()
+            if symbol == db_collection['symbol'] and side == 'sell':
+                if db_collection['profit_dollars'] > 0:
+                    winningLosing_temp['winning'] =  winningLosing_temp['winning'] + 1
+                else:
+                    winningLosing_temp['losing'] =  winningLosing_temp['losing'] + 1
+        if winningLosing_temp['winning'] == 0 or winningLosing_temp['losing'] == 0:
+            continue
+        wL.append(winningLosing_temp)
+    return wL
+
 def calc_percentEfficiency(symbols, db_data):
     pE = []
     wLA = []
@@ -406,6 +426,87 @@ def calc_percentEfficiency(symbols, db_data):
                         'efficiency': percent
                     })
                     pair_pE = {}
+
+
+        avgWinning = 0
+        avgLosing = 0
+
+        avgWinning = sum(winningT) / len(winningT) if len(winningT) > 0 else 0
+        avgWinning = round(avgWinning, 3)
+        avgLosing = sum(losingT) / len(losingT) if len(losingT) > 0 else 0
+        avgLosing = round(avgLosing, 3)
+
+
+        totalWinning = abs(round( sum(winningT), 5))
+        totalLosing = abs(round( sum(losingT), 5))
+
+
+        if avgLosing == 0 or avgWinning == 0 or totalWinning == 0 or totalLosing == 0:
+            continue
+
+        wLA.append({
+            "symbol": symbol,
+            "avgWinning": abs(avgWinning),
+            "avgLosing": abs(avgLosing)
+        })
+        totWL.append({
+            "symbol": symbol,
+            "totWinning": totalWinning,
+            "totLosing": totalLosing
+        })
+
+        # Calculation Long and Short
+        short = 0
+        long = 0
+        if len(sym_pE) > 0 and sym_pE[-1]['entry'] == 'buy':
+            long = sym_pE[-1]['percent']
+            short = 0
+        elif len(sym_pE) > 0 and sym_pE[-1]['entry'] == 'sell':
+            long = 0
+            short = sym_pE[-1]['percent']
+        lS.append({
+            symbol: {
+                'long': long,
+                'short': short,
+            }
+        })
+
+        pE.append({
+            symbol: sym_pE
+        })
+
+    return {
+        "pE": pE,
+        "wLA": wLA,
+        "lS": lS,
+        "totWL": totWL
+    }
+
+def calc_percentEfficiency_api(symbols, db_data):
+    pE = []
+    wLA = []
+    lS = []
+    totWL = []
+    for symbol in symbols:
+        sym_pE = []
+        winningT = []
+        losingT = []
+        for db_collection in db_data:
+            side = db_collection['side'].lower()
+            if symbol == db_collection['symbol'] and side == 'sell':
+                percent = db_collection['profit_percent']
+                sym_pE.append({
+                    'date': db_collection['date'],
+                    'percent': percent,
+                    'entry': 'buy',
+                    'exit': 'sell',
+                    'efficiency': percent
+                })
+
+                if db_collection['profit_dollars'] > 0:
+                    winningT.append(percent)
+                else: #losing
+                    losingT.append(percent)
 
 
         avgWinning = 0

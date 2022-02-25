@@ -67,7 +67,9 @@ from .common import (
             get_chat_data_rsi_heik_v11_test,
             join_append,
             calc_percentEfficiency,
+            calc_percentEfficiency_api,
             calc_winningLosing,
+            calc_winningLosing_api,
             fill_missing_candles__)
 
 @csrf_exempt
@@ -95,9 +97,10 @@ def backtesting_result(request):
         end_date = request_data['end_date']
         symbols = request_data['symbols']
         list_db_data = get_backtesting_result(symbols, macro, micro, start_date, end_date)
-
-        wL = calc_winningLosing(symbols, list_db_data)
-        pE_wLA_lS = calc_percentEfficiency(symbols, list_db_data)
+        # wL = calc_winningLosing(symbols, list_db_data)
+        wL = calc_winningLosing_api(symbols, list_db_data)
+        # pE_wLA_lS = calc_percentEfficiency(symbols, list_db_data)
+        pE_wLA_lS = calc_percentEfficiency_api(symbols, list_db_data)
         if len(symbols) > 0:
             exchange = get_symbol_exchange(symbols[0])
         else:
