@@ -82,7 +82,7 @@ const ChartOptions = () => {
         <div className="text-label">Timeframe</div>
         <div className="d-flex">
           <input type="text" className="color-white input-timeframe" value={time} onChange={e => setTime(e.target.value)} />
-          <select onChange={e => setTimeType(e.target.value)}>
+          <select value={timeType} onChange={e => setTimeType(e.target.value)}>
             <option value="mi">mi</option>
             <option value="ho">ho</option>
             <option value="da">da</option>
