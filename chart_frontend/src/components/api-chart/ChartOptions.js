@@ -29,6 +29,7 @@ const ChartOptions = () => {
 
       apiGetNewChartData(params).then(data => {
         setLoading(false)
+
         setChartData(data)
       })
     }

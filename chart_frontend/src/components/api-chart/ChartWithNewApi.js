@@ -68,6 +68,21 @@ const ChartWithNewApi = (props) => {
     { value: 'chart_with_new_api', label: 'Chart With New API6' },
   ])
 
+  const [optionsIndicator, setOptionsIndicator] = useState([
+    {
+      value: 'volume', label: 'VOLUME',
+    },
+    {
+      value: 'rsi1', label: 'RSI1',
+    },
+    {
+      value: 'heik', label: 'HEIK1',
+    },
+    {
+      value: 'heik_diff', label: 'HEIK2',
+    }
+  ]);
+
 
   const getStrategyList = useCallback(
     async () => {
@@ -187,7 +202,12 @@ const ChartWithNewApi = (props) => {
     }
   }, [selectedInstance, getStrategyList, get_tables, user.is_admin, user.role?.length])
 
+  const handleIndicatorsChange = (options) => {
+    setIndicators(options);
+  }
+
   const handleChartsColumnChange = (option) => {
+    setIndicators([])
     setChartColumn(option)
   }
 
@@ -243,22 +263,22 @@ const ChartWithNewApi = (props) => {
     return (
       <div className={`row ${calculateHeightStyle()}`}>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          <TradeChart chartColumn={chartColumn} />
+          <TradeChart chartColumn={chartColumn} chartIndicators={indicators} />
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          <TradeChart chartColumn={chartColumn} />
+          <TradeChart chartColumn={chartColumn} chartIndicators={indicators} />
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          <TradeChart chartColumn={chartColumn} />
+          <TradeChart chartColumn={chartColumn} chartIndicators={indicators} />
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          <TradeChart chartColumn={chartColumn} />
+          <TradeChart chartColumn={chartColumn} chartIndicators={indicators} />
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          <TradeChart chartColumn={chartColumn} />
+          <TradeChart chartColumn={chartColumn} chartIndicators={indicators} />
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          <TradeChart chartColumn={chartColumn} />
+          <TradeChart chartColumn={chartColumn} chartIndicators={indicators} />
         </div>
       </div>
     )
@@ -294,6 +314,16 @@ const ChartWithNewApi = (props) => {
                 placeholder="Columns"
               />
             </div>
+            <div className="select-multi-option">
+              <Select
+                  name="filters"
+                  placeholder="Indicators"
+                  value={indicators}
+                  onChange={handleIndicatorsChange}
+                  options={optionsIndicator}
+                  isMulti={true}
+                />
+              </div>
           </div>
         )}
         <Collapse navbar isOpen={collapseOpen}>

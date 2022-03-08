@@ -34,6 +34,7 @@ pd.options.mode.chained_assignment = None  # default='warn'
 from .utils import get_symbol_exchange
 
 from .models import (
+            get_stock_candles_for_strategy_new_chart_api,
             get_stock_candles_for_strategy_all,
             get_stock_candles_for_strategy_all_test,
             get_micro_strategies,
@@ -575,6 +576,19 @@ def get_new_chart_data(request):
     timeframe = request.GET['timeframe']
     bars = request.GET['bars']
     close = request.GET['close']
+    extended = request.GET['extended_hours']
+
+    data = get_stock_candles_for_strategy_new_chart_api(timeframe, bars, symbol, extended, close)
+
+    return JsonResponse({'success': True, 'data': data}, status=status.HTTP_201_CREATED)
+
+
+@csrf_exempt
+def get_new_chart_data_backup(request):
+    symbol = request.GET['symbol']
+    timeframe = request.GET['timeframe']
+    bars = request.GET['bars']
+    close = request.GET['close']
     extended_hours = request.GET['extended_hours']
 
     print('+++++++++++++++get_new_chart_data')
@@ -583,6 +597,9 @@ def get_new_chart_data(request):
 
     result = response.json()
     result = result['values']
+
+    print('result', result)
+
     data = []
     for row in result:
         item = {
@@ -593,7 +610,37 @@ def get_new_chart_data(request):
             'close': row[4],
             'volume': row[6],
             'trade_date': row[0],
+
         }
+
+
+        item['rsi'] = {
+          'bearPower': 7.719123464290127,
+          'bullPower': 7.719123464290127,
+          'side': "hold"
+        }
+        item['rsi2'] = {
+          'bearPower': -1.418928447187744,
+          'bullPower': -1.418928447187744,
+          'color': "l_r"
+        }
+        item['rsi3'] = {
+          'bearPower': -0.946470217385734,
+          'bullPower': -0.946470217385734,
+          'color': "d_r"
+        }
+        item['heik'] = {
+          'bearPower': 0.017029435934588832,
+          'bullPower': 0.017029435934588832,
+          'color': "d_g"
+        }
+        item['heik2'] = {
+          'bearPower': -0.004312769267923972,
+          'bullPower': -0.004312769267923972,
+          'color': "d_r"
+        }
+
+
         # item['trade_data'] = api_get_trade_histories(symbol, item['date'])
         data.append(item)
 

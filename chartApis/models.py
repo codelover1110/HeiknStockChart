@@ -169,6 +169,97 @@ def get_strategy_name_only():
     return strategy_names
 
 
+def get_stock_candles_for_strategy_new_chart_api(timeframe, bars, symbol, extended=False, close=False):
+    if extended:
+        extended_hours = 'true'
+    else:
+        extended_hours = 'false'
+
+    if close:
+        close = 'true'
+    else:
+        close = 'false'
+
+    # get candles
+    combine_data = get_combine_data_chadAPI(symbol, timeframe, bars, close, extended_hours)
+    try:
+        candles = combine_data["values"]["raw-bars"]["values"]
+        res_rsi1 = combine_data["values"]["rsi1"]["values"]
+        res_rsi2 = combine_data["values"]["rsi2"]["values"]
+        res_rsi3 = combine_data["values"]["rsi3"]["values"]
+        res_heik = combine_data["values"]["heik"]["values"]
+        res_heik_diff = combine_data["values"]["heik-diff"]["values"]
+    except:
+        candles = combine_data["values"]["raw-bars"]["values"]
+        res_rsi1 = combine_data["values"]["rsi1"]["values"]
+        res_rsi2 = combine_data["values"]["rsi2"]["values"]
+        res_rsi3 = combine_data["values"]["rsi3"]["values"]
+        res_heik = combine_data["values"]["heik"]["values"]
+        res_heik_diff = combine_data["values"]["heik-diff"]["values"]
+
+    # candles = combine_data["values"]["raw-bars"]["values"]
+    # res_rsi1 = combine_data["values"]["rsi1"]["values"]
+    # res_rsi2 = combine_data["values"]["rsi2"]["values"]
+    # res_rsi3 = combine_data["values"]["rsi3"]["values"]
+    # res_heik = combine_data["values"]["heik"]["values"]
+    # res_heik_diff = combine_data["values"]["heik-diff"]["values"]
+
+
+    result_data = []
+    for idx, candle in enumerate(candles):
+        d_time = datetime.strptime(candle[0], '%Y-%m-%dT%H:%M:%SZ')
+        o = candle[1]
+        h = candle[2]
+        l = candle[3]
+        c = candle[4]
+        v = candle[5]
+        rsi = res_rsi1[idx]
+        rsi2 = res_rsi2[idx]
+        pre_rsi = res_rsi2[idx-1]
+        rsi3 = res_rsi3[idx]
+        pre_rs2 = res_rsi3[idx-1]
+        heik = res_heik[idx]
+        pre_rs3 = res_heik[idx-1]
+        heik2 = res_heik_diff[idx]
+        pre_heik = res_heik_diff[idx-1]
+
+        if(rsi2 >= 0 and rsi3 >= 0):
+            side = "buy"
+        elif (rsi2 <= 0 and res_heik_diff[-1] <= 0):
+            side = "sell"
+        elif (rsi >= 0):
+            side = "hold"
+        else:
+            side = "wait"
+
+        percent_down = 100*((o - l)/o)
+        percent_up = 100*((h - o)/o)
+        percent_net = percent_up - percent_down
+
+        result_data.append({
+            'trade_date': d_time,
+            'close': float(c),
+            'date': d_time,
+            'high': float(h),
+            'low': float(l),
+            'open': float(o),
+            'percentChange': "",
+            'volume': int(v),
+            'RSI': rsi,
+            'side': side,
+            'percent_up': {'bearPower': percent_up, 'bullPower': percent_up, 'color': define_percent_color(percent_up)},
+            'percent_down': {'bearPower': percent_down, 'bullPower': percent_down, 'color': define_percent_color(percent_down)},
+            'percent_net': {'bearPower': percent_net, 'bullPower': percent_net, 'color': define_percent_color(percent_net)},
+            'rsi': {'bearPower': rsi, 'bullPower': rsi, 'side': side},
+            'rsi2': {'bearPower': rsi2, 'bullPower': rsi2, 'color': define_color(rsi2, rsi, pre_rsi)},
+            'rsi3': {'bearPower': rsi3, 'bullPower': rsi3, 'color': define_color(rsi3, rsi2, pre_rs2)},
+            'heik': {'bearPower': heik, 'bullPower': heik, 'color': define_color(heik, rsi3, pre_rs3)},
+            'heik2': {'bearPower': heik2, 'bullPower': heik2, 'color': define_color(heik2, heik, pre_heik)},
+        })
+
+
+    return result_data
+
 def get_stock_candles_for_strategy_all_test(candle_name, symbol, macro, micro, extended=False, close=False):
     cur_date = datetime.now().date()
     if candle_name == 'backtest_2_minute':

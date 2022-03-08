@@ -7,9 +7,10 @@ import { fitWidth } from "react-stockcharts/lib/helper";
 let ChartGraphWrap = (props) => {
   const {chartData} = useApiChartContext()
   const chartColumn = props.chartColumn
+  const chartIndicators = props.chartIndicators
 
   const displayChart = () => {
-    return <ChartGraph data={chartData} chartColumn={props.chartColumn} />
+    return <ChartGraph data={chartData} chartColumn={props.chartColumn} indicators={chartIndicators} />
   }
   return (
     <>

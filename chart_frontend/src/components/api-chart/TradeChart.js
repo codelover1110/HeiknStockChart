@@ -8,7 +8,7 @@ let TradeChart = (props) => {
   return (
     <ApiChartProvider>
       <ChartOptions />
-      <ChartGraphWrap chartColumn={props.chartColumn.value} />
+      <ChartGraphWrap chartColumn={props.chartColumn.value} chartIndicators={props.chartIndicators} />
     </ApiChartProvider>
   );
 };

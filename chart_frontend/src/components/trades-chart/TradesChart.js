@@ -61,7 +61,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 		this.saveInteractiveNode = this.saveInteractiveNode.bind(this);
 		this.saveCanvasNode = this.saveCanvasNode.bind(this);
 		this.handleSelection = this.handleSelection.bind(this);
-		
+
 		this.saveInteractiveNodes = saveInteractiveNodes.bind(this);
 		this.getInteractiveNodes = getInteractiveNodes.bind(this);
 
@@ -210,7 +210,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 				const filter = this.props.indicators.filter(indicator => ['rsi2', 'rsi3', 'heik', 'heik_diff'].includes(indicator.value))
 				return 300 + filter.length * 70;
 			}
-	
+
 			if (indicator === 'rsi2') {
 				const filter = this.props.indicators.filter(indicator => ['rsi3', 'heik', 'heik_diff'].includes(indicator.value))
 				return 300 + filter.length * 70;
@@ -220,17 +220,17 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 				const filter = this.props.indicators.filter(indicator => ['heik', 'heik_diff'].includes(indicator.value))
 				return 300 + filter.length * 70;
 			}
-	
+
 			if (indicator === 'heik') {
 				const filter = this.props.indicators.filter(indicator => ['heik_diff'].includes(indicator.value))
 				return 300 + filter.length * 70;
 			}
-			
+
 			if (indicator === 'heik_diff') {
 				const filter = this.props.indicators.filter(indicator => [''].includes(indicator.value))
 				return 300 + filter.length * 70;
 			}
-			return 0	
+			return 0
 		}
 		if (indicator === 'rsi1') {
 			if (this.isIncludeIndicators(indicator)) {
@@ -288,7 +288,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 		// }
 		// return 0
 	}
-	
+
 	calculateTooltipOffset1(isFullChart) {
 		return 0;
 		// if (!this.props.isHomePage || isFullChart) {
@@ -308,7 +308,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 	// 			return dateLine.date.getTime() === dealLine.ddate.getTime()
 	// 		}
 	// 		);
-			
+
 	// 	if (deal.length > 0) {
 	// 		return deal[0].action;
 	// 	}
@@ -328,19 +328,19 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 			.merge((d, c) => { d.ema50 = c; })
 			.accessor(d => d.ema50);
 
-		
+
 		// const longFillProps = {
 		// 	stroke: "#22a46e",
 		// 	fill: "#22a46e",
 		// 	className: this.props.classes.deal_green_shadowed
 		//   };
-	  
+
 		//   const shortFillProps = {
 		// 	stroke: "#cc4060",
 		// 	fill: "#cc4060",
 		// 	className: this.props.classes.deal_red_shadowed
 		//   };
-	  
+
 		//   const fontProps = {
 		// 	fontFamily: "Material Icons",
 		// 	fontSize: 24,
@@ -348,21 +348,21 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 		// 	opacity: 1,
 		// 	onClick: this.addTextLable
 		//   };
-	  
+
 		// const yOpenProps = {
 		// y: ({ yScale, datum }) => yScale(datum.high * 1.04 - 100)
 		// };
-	  
+
 		// const yCloseProps = {
 		// y: ({ yScale, datum }) => yScale(datum.high * 1.04 - 100)
 		// };
-	  
+
 		// const buyTooltipProps = {
 		// 	tooltip: (o) => {
 		// 		return `Buy: ${o.date} \n Price: ${o.price}`
 		// 	}
 		// }
-		
+
 		// const sellTooltipProps = {
 		// 	tooltip: (o) => {
 		// 		return `Sell: ${o.date}\nPrice: ${o.price}`
@@ -377,7 +377,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 		// 	...buyTooltipProps,
 		// 	rotate: 180
 		// };
-	  
+
 		//   const sell = {
 		// 	...shortFillProps,
 		// 	...fontProps,
@@ -388,7 +388,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 		// };
 
 		const ha = heikinAshi();
-		
+
 		const macdCalculator = macd()
 			.options({
 				fast: 12,
@@ -401,7 +401,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 		const atr14 = atr()
 		.options({ windowSize: 14 })
 		.merge((d, c) => {d.atr14 = c;})
-		.accessor(d => d.atr14);	
+		.accessor(d => d.atr14);
 
 		const { type, data: initialData, width, ratio, chartColumn, extendMarketTime } = this.props;
 
@@ -411,14 +411,14 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 			line.date = dayjs(line.date).toDate();
 		  });
 
-		// const margin = { left: 80, right: 80, top: 30, bottom: 50 };  
+		// const margin = { left: 80, right: 80, top: 30, bottom: 50 };
 
 		// const height = 400;
 
 		// const [yAxisLabelX, yAxisLabelY] = [width - margin.left - 40, margin.top + (height - margin.top - margin.bottom) / 2];
-		
+
 		const calculatedData = macdCalculator((ha(atr14(initialData))));
-		
+
 		const xScaleProvider = discontinuousTimeScaleProvider
 			.inputDateAccessor(d => d.date);
 		const {
@@ -456,7 +456,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 		};
 
 		const start = xAccessor(last(data));
-		// const periodIndex = this.props.period === 'heikfilter-2mins-trades' 
+		// const periodIndex = this.props.period === 'heikfilter-2mins-trades'
 		// 	? 15
 		// 	: this.props.period === 'heikfilter-12mins-trades'
 		// 	? 30
@@ -466,7 +466,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 		// 	? 200
 		// 	: this.props.period === 'heikfilter-12hours-trades'
 		// 	? 200 : 1000
-		
+
 		// const end = xAccessor(data[Math.max(0, data.length - periodIndex)]);
 		const end = xAccessor(data[Math.max(0, data.length - 150)]);
 		const xExtents = [start, end];
@@ -476,7 +476,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 		// ];
 		// console.log("xExtents", last(data).date, data[Math.max(0, data.length - 150)].date)
 		// console.log("xExtents1", this.props.data[0].date, this.props.data[this.props.data.length - 1].date)
-		
+
 		const xDisplayFormatProps = {
 			xDisplayFormat: timeFormat("%Y-%m-%d : %H-%M-%S"),
 			ohlcFormat: () => "",
@@ -507,7 +507,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 				v: " Symbol: ",
 			},
 		}
-		
+
 		const SMATooltipProps = {
 			valueFill: '#ffffff'
 		}
@@ -551,37 +551,37 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 						orient="right"
 						displayFormat={format(".2f")} />
 
-					<CandlestickSeries 
+					<CandlestickSeries
 						stroke={d => d.close > d.open ? "#6BA583" : "#DB0000"}
 						wickStroke={d => d.close > d.open ? "#6BA583" : "#DB0000"}
 						fill={d => d.close > d.open ? "#6BA583" : "#DB0000"}
 					/>
 
-					<OHLCTooltip 
+					<OHLCTooltip
 						origin={[-50, -10]}
 						{...xDisplayFormatProps}
 					/>
-					
-					<OHLCTooltip 
+
+					<OHLCTooltip
 						origin={[-50, 20]}
 						{...xDisplayFormatProps1}
 					/>
-					
-					<OHLCTooltip 
+
+					<OHLCTooltip
 						origin={[100, -5]}
 						{...xDisplayFormatProps2}
 					/>
-					
-					<Annotate with={SvgPathAnnotation} when={ d => 
+
+					<Annotate with={SvgPathAnnotation} when={ d =>
 						{
-							return this.props.selectedInstance !== 'live_trading'  
+							return this.props.selectedInstance !== 'live_trading'
 							&& d.trades
 							&& d.trades[0].strategy === `${this.props.strategy.value}-${this.props.microStrategy}-trades`
-							&& d.trades[0].longShort === "LONG" 
+							&& d.trades[0].longShort === "LONG"
 						}}
 						usingProps={longAnnotationProps} />
-					<Annotate with={SvgPathAnnotation} when={d => 
-						this.props.selectedInstance !== 'live_trading' 
+					<Annotate with={SvgPathAnnotation} when={d =>
+						this.props.selectedInstance !== 'live_trading'
 						&& d.trades
 						&& d.trades[0].strategy === `${this.props.strategy.value}-${this.props.microStrategy}-trades`
 						&& d.trades[0].longShort === "SHORT" }
@@ -606,7 +606,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 					</Chart>
 				)}
 				{this.isIncludeIndicators('rsi1') && (
-					<Chart id={3} 
+					<Chart id={3}
 						// height={(!this.props.isHomePage || isFullChart) ? 100 : 70}
 						height={70}
 						yExtents={[0, d => d.rsi.bearPower]}
@@ -639,7 +639,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 					</Chart>
 				)}
 				{this.isIncludeIndicators('rsi2') && (
-					<Chart id={4} 
+					<Chart id={4}
 						// height={(!this.props.isHomePage || isFullChart) ? 100 : 70}
 						height={70}
 						yExtents={[0, d => d.rsi2.bearPower]}
@@ -659,7 +659,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 						<BarSeries
 							yAccessor={d => d.rsi2.bearPower}
 							baseAt={(xScale, yScale, d) => yScale(0)}
-							fill={d => 
+							fill={d =>
 								d.rsi2.color === 'l_g' ? '#90EE90' : d.rsi2.color === 'd_g' ? '#006400' : d.rsi2.color === 'l_r' ? '#ED0800' : '#8B0000'
 							} />
 						<StraightLine yValue={0} />
@@ -674,7 +674,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 					</Chart>
 				)}
 				{this.isIncludeIndicators('rsi3') && (
-					<Chart id={5} 
+					<Chart id={5}
 						// height={(!this.props.isHomePage || isFullChart) ? 100 : 70}
 						height={70}
 						yExtents={[0, d => d.rsi3.bearPower]}
@@ -694,7 +694,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 						<BarSeries
 							yAccessor={d => d.rsi3.bearPower}
 							baseAt={(xScale, yScale, d) => yScale(0)}
-							fill={d => 
+							fill={d =>
 								d.rsi3.color === 'l_g' ? '#90EE90' : d.rsi3.color === 'd_g' ? '#006400' : d.rsi3.color === 'l_r' ? '#ED0800' : '#8B0000'
 							} />
 						<StraightLine yValue={0} />
@@ -709,7 +709,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 					</Chart>
 				)}
 				{this.isIncludeIndicators('heik') && (
-					<Chart id={6} 
+					<Chart id={6}
 						// height={(!this.props.isHomePage || isFullChart) ? 100 : 70}
 						height={70}
 						yExtents={[0, d => d.heik.bearPower]}
@@ -729,7 +729,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 						<BarSeries
 							yAccessor={d => d.heik.bearPower}
 							baseAt={(xScale, yScale, d) => yScale(0)}
-							fill={d => 
+							fill={d =>
 								d.heik.color === 'l_g' ? '#90EE90' : d.heik.color === 'd_g' ? '#006400' : d.heik.color === 'l_r' ? '#ED0800' : '#8B0000'
 							} />
 						<StraightLine yValue={0} />
@@ -744,7 +744,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 					</Chart>
 				)}
 				{this.isIncludeIndicators('heik_diff') && (
-					<Chart id={7} 
+					<Chart id={7}
 						// height={(!this.props.isHomePage || isFullChart) ? 100 : 70}
 						height={70}
 						yExtents={[0, d => d.heik2.bearPower]}
@@ -764,7 +764,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 						<BarSeries
 							yAccessor={d => d.heik2.bearPower}
 							baseAt={(xScale, yScale, d) => yScale(0)}
-							fill={d => 
+							fill={d =>
 								d.heik2.color === 'l_g' ? '#90EE90' : d.heik2.color === 'd_g' ? '#006400' : d.heik2.color === 'l_r' ? '#ED0800' : '#8B0000'
 							} />
 						<StraightLine yValue={0} />
@@ -779,7 +779,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 					</Chart>
 				)}
 				{/* {this.isIncludeIndicators('RSI3') && (
-					<Chart id={5} 
+					<Chart id={5}
 						// height={(!this.props.isHomePage || isFullChart) ? 100 : 70}
 						height={70}
 						yExtents={[0, d => d.rsi2.bearPower]}
@@ -812,7 +812,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 					</Chart>
 				)} */}
 				{/* {this.isIncludeIndicators('HEIK1') && (
-					<Chart id={6} 
+					<Chart id={6}
 						// height={(!this.props.isHomePage || isFullChart) ? 100 : 70}
 						height={70}
 						yExtents={[0, d => {console.log(d); return d.heik.bearPower}]}
@@ -845,7 +845,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 					</Chart>
 				)} */}
 				{/* {this.isIncludeIndicators('HEIK2') && (
-					<Chart id={7} 
+					<Chart id={7}
 						// height={(!this.props.isHomePage || isFullChart) ? 100 : 70}
 						height={70}
 						yExtents={[0, d => d.heik2.bearPower]}
@@ -887,7 +887,7 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 					}}
 					onSelect={this.handleSelection}
 				/>
-			{(!this.props.isHomePage || isFullChart) && 
+			{(!this.props.isHomePage || isFullChart) &&
 				<g>
 					<rect
 						className={this.props.classes.CandleChart}
@@ -937,7 +937,7 @@ CandleStickChartWithEquidistantChannel.propTypes = {
 	ratio: PropTypes.number.isRequired,
 	type: PropTypes.oneOf(["svg", "hybrid"]).isRequired
 };
-  
+
 CandleStickChartWithEquidistantChannel.defaultProps = {
 	type: "svg",
 };
@@ -945,7 +945,7 @@ CandleStickChartWithEquidistantChannel.defaultProps = {
 CandleStickChartWithEquidistantChannel = fitWidth(CandleStickChartWithEquidistantChannel);
 
 
-  
+
 export default withStyles({
 	CandleChart_type_date: {
 	  fontSize: "12px",
@@ -965,4 +965,3 @@ export default withStyles({
 	  textShadow: "0 0 3px fuchsia"
 	}
 })(fitWidth(CandleStickChartWithEquidistantChannel));
-  

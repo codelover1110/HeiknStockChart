@@ -1304,6 +1304,8 @@ export const apiGetNewChartData = async (params) => {
     }
   }
 }
+
+
 export const apiGetTradeHistories = async (params) => {
   const requestOptions = {
     method: 'GET',
