@@ -61,6 +61,14 @@
   height: calc(100vh / 2);
 }
 
+.graph-container input,
+.graph-container select {
+  width: 100%;
+  border-radius: 3px;
+  font-size: 11px;
+  height: 30px;
+}
+
 
 
 .graphs-container .row .graph-container > div {
@@ -90,7 +98,7 @@
 }
 
 .graphs-container .row .graph-container > div select {
-  display: none;
+  /* display: none; */
 }
 .select-wrape{
   align-items: center;
@@ -809,9 +817,24 @@ pre {
     border-radius: 3px!important;
 }
 .stockchart-autocomplete .MuiFilledInput-input {
-  padding-top: 5px!important;
-  padding-bottom: 4px!important;
+  padding-top: 0px!important;
+  padding-bottom: 0px!important;
+  font-size: 11px;
 }
 .MuiAutocomplete-popper * {
   color: #000!important;
+}
+.text-label {
+  color: #fff;
+  font-size: 11px;
+}
+
+.graph-container .input-timeframe {
+  width: 40px;
+}
+.graph-container .input-bar {
+  width: 40px;
+}
+.graph-container .input-container {
+  margin-right: 5px;
 }

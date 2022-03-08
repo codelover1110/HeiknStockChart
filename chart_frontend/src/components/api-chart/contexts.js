@@ -10,7 +10,8 @@ export const ApiChartProvider = ({children}) => {
   const [chartData, setChartData] = useState(null)
   const [isLoading, setLoading] = useState(false)
   const [sym, setSym] = useState("BTC-USD")
-  const [time, setTime] = useState("3ho")
+  const [time, setTime] = useState("1")
+  const [timeType, setTimeType] = useState("ho")
   const [bar, setBar] = useState("150")
   const [close, setClose] = useState("false")
   const [ext, setExt] = useState("true")
@@ -25,6 +26,8 @@ export const ApiChartProvider = ({children}) => {
       setSym: setSym,
       time: time,
       setTime: setTime,
+      timeType: timeType,
+      setTimeType: setTimeType,
       bar: bar,
       setBar: setBar,
       close: close,

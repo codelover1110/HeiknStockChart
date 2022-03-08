@@ -570,14 +570,14 @@ def index(request):
     return render(request, "build/index.html")
 
 @csrf_exempt
-def get_google_news(request):
+def get_new_chart_data(request):
     symbol = request.GET['symbol']
     timeframe = request.GET['timeframe']
     bars = request.GET['bars']
     close = request.GET['close']
     extended_hours = request.GET['extended_hours']
 
-    print('+++++++++++++++get_google_news')
+    print('+++++++++++++++get_new_chart_data')
     print(f"http://40.67.136.227/raw-bars/?symbol={symbol}&timeframe={timeframe}&bars={bars}&close={close}&extended_hours={extended_hours}&asset_class=equities&key=Thohn9po1mai7ba")
     response = requests.get(f"http://40.67.136.227/raw-bars/?symbol={symbol}&timeframe={timeframe}&bars={bars}&close={close}&extended_hours={extended_hours}&asset_class=equities&key=Thohn9po1mai7ba")
 

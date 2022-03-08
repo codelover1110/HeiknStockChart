@@ -4,7 +4,7 @@ from chartApis import views
 urlpatterns = [
 
     # google get news api
-    url(r'^api/get_google_news', views.get_google_news),
+    url(r'^api/get_new_chart_data', views.get_new_chart_data),
     url(r'^api/get_trade_histories', views.get_trade_histories),
 
     # db management api
