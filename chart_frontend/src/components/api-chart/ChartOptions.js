@@ -7,7 +7,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import symbolListOptions from './master'
 
-const ChartOptions = () => {
+const ChartOptions = (props) => {
 
 
   const {setLoading, setChartData} = useApiChartContext()
@@ -39,6 +39,10 @@ const ChartOptions = () => {
   useEffect(() =>  {
     loadChart()
   }, [])
+
+  useEffect(() => {
+    loadChart()
+  }, [props.showAllClicked])
 
   // const symbolList = [
   //   { label: 'BTC-USD', year: 1994 },

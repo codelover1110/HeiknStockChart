@@ -34,6 +34,7 @@ const ChartWithNewApi = (props) => {
   const [strategy, setStrategy] = useState(null);//{ value: 'heikfilter', label: 'heikfilter' }
   const [strategyList, setStrategyList] = useState([]);
   const [user] = useState(JSON.parse(localStorage.getItem('user-info')));
+  const [countShowClicked, setCountShowClicked] = useState(0)
   const [extendMarketTime, setExtendMarketTime] = useState(
     {
       value: 'markettime', label: 'market time',
@@ -263,25 +264,29 @@ const ChartWithNewApi = (props) => {
     return (
       <div className={`row ${calculateHeightStyle()}`}>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          <TradeChart chartColumn={chartColumn} chartIndicators={indicators} />
+          <TradeChart chartColumn={chartColumn} chartIndicators={indicators} showAllClicked={countShowClicked} />
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          <TradeChart chartColumn={chartColumn} chartIndicators={indicators} />
+          <TradeChart chartColumn={chartColumn} chartIndicators={indicators} showAllClicked={countShowClicked} />
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          <TradeChart chartColumn={chartColumn} chartIndicators={indicators} />
+          <TradeChart chartColumn={chartColumn} chartIndicators={indicators} showAllClicked={countShowClicked} />
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          <TradeChart chartColumn={chartColumn} chartIndicators={indicators} />
+          <TradeChart chartColumn={chartColumn} chartIndicators={indicators} showAllClicked={countShowClicked} />
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          <TradeChart chartColumn={chartColumn} chartIndicators={indicators} />
+          <TradeChart chartColumn={chartColumn} chartIndicators={indicators} showAllClicked={countShowClicked} />
         </div>
         <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          <TradeChart chartColumn={chartColumn} chartIndicators={indicators} />
+          <TradeChart chartColumn={chartColumn} chartIndicators={indicators} showAllClicked={countShowClicked} />
         </div>
       </div>
     )
+  }
+
+  const handleShowAll = () => {
+    setCountShowClicked(countShowClicked+1)
   }
 
 
@@ -323,6 +328,9 @@ const ChartWithNewApi = (props) => {
                   options={optionsIndicator}
                   isMulti={true}
                 />
+              </div>
+              <div className="">
+                <Button variant={'contained'} onClick={handleShowAll}>Show</Button>
               </div>
           </div>
         )}
