@@ -184,18 +184,38 @@ def get_stock_candles_for_strategy_new_chart_api(timeframe, bars, symbol, extend
     combine_data = get_combine_data_chadAPI(symbol, timeframe, bars, close, extended_hours)
     try:
         candles = combine_data["values"]["raw-bars"]["values"]
-        res_rsi1 = combine_data["values"]["rsi1"]["values"]
-        res_rsi2 = combine_data["values"]["rsi2"]["values"]
-        res_rsi3 = combine_data["values"]["rsi3"]["values"]
-        res_heik = combine_data["values"]["heik"]["values"]
-        res_heik_diff = combine_data["values"]["heik-diff"]["values"]
+        res_rsi1 = []
+        if 'values' in combine_data["values"]["rsi1"]:
+            res_rsi1 = combine_data["values"]["rsi1"]["values"]
+        res_rsi2 = []
+        if 'values' in combine_data["values"]["rsi2"]:
+            res_rsi2 = combine_data["values"]["rsi2"]["values"]
+        res_rsi3 = []
+        if 'values' in combine_data["values"]["rsi3"]:
+            res_rsi3 = combine_data["values"]["rsi3"]["values"]
+        res_heik = []
+        if 'values' in combine_data["values"]["heik"]:
+            res_heik = combine_data["values"]["heik"]["values"]
+        res_heik_diff = []
+        if 'values' in combine_data["values"]["heik-diff"]:
+            res_heik_diff = combine_data["values"]["heik-diff"]["values"]
     except:
         candles = combine_data["values"]["raw-bars"]["values"]
-        res_rsi1 = combine_data["values"]["rsi1"]["values"]
-        res_rsi2 = combine_data["values"]["rsi2"]["values"]
-        res_rsi3 = combine_data["values"]["rsi3"]["values"]
-        res_heik = combine_data["values"]["heik"]["values"]
-        res_heik_diff = combine_data["values"]["heik-diff"]["values"]
+        res_rsi1 = []
+        if 'values' in combine_data["values"]["rsi1"]:
+            res_rsi1 = combine_data["values"]["rsi1"]["values"]
+        res_rsi2 = []
+        if 'values' in combine_data["values"]["rsi2"]:
+            res_rsi2 = combine_data["values"]["rsi2"]["values"]
+        res_rsi3 = []
+        if 'values' in combine_data["values"]["rsi3"]:
+            res_rsi3 = combine_data["values"]["rsi3"]["values"]
+        res_heik = []
+        if 'values' in combine_data["values"]["heik"]:
+            res_heik = combine_data["values"]["heik"]["values"]
+        res_heik_diff = []
+        if 'values' in combine_data["values"]["heik-diff"]:
+            res_heik_diff = combine_data["values"]["heik-diff"]["values"]
 
     # candles = combine_data["values"]["raw-bars"]["values"]
     # res_rsi1 = combine_data["values"]["rsi1"]["values"]
@@ -213,15 +233,42 @@ def get_stock_candles_for_strategy_new_chart_api(timeframe, bars, symbol, extend
         l = candle[3]
         c = candle[4]
         v = candle[5]
-        rsi = res_rsi1[idx]
-        rsi2 = res_rsi2[idx]
-        pre_rsi = res_rsi2[idx-1]
-        rsi3 = res_rsi3[idx]
-        pre_rs2 = res_rsi3[idx-1]
-        heik = res_heik[idx]
-        pre_rs3 = res_heik[idx-1]
-        heik2 = res_heik_diff[idx]
-        pre_heik = res_heik_diff[idx-1]
+        # rsi = res_rsi1[idx]
+        # rsi2 = res_rsi2[idx]
+        # pre_rsi = res_rsi2[idx-1]
+        # rsi3 = res_rsi3[idx]
+        # pre_rs2 = res_rsi3[idx-1]
+        # heik = res_heik[idx]
+        # pre_rs3 = res_heik[idx-1]
+        # heik2 = res_heik_diff[idx]
+        # pre_heik = res_heik_diff[idx-1]
+        rsi = 0
+        if len(res_rsi1) > 0:
+            rsi = res_rsi1[idx]
+        rsi2 = 0
+        if len(res_rsi2) > 0:
+            rsi2 = res_rsi2[idx]
+        pre_rsi = 0
+        if len(res_rsi2) > 0:
+            pre_rsi = res_rsi2[idx-1]
+        rsi3 = 0
+        if len(res_rsi3) > 0:
+            rsi3 = res_rsi3[idx]
+        pre_rs2 = 0
+        if len(res_rsi3) > 0:
+            pre_rs2 = res_rsi3[idx-1]
+        heik = 0
+        if len(res_heik) > 0:
+            heik = res_heik[idx]
+        pre_rs3 = 0
+        if len(res_heik) > 0:
+            pre_rs3 = res_heik[idx-1]
+        heik2 = 0
+        if len(res_heik_diff) > 0:
+            heik2 = res_heik_diff[idx]
+        pre_heik = 0
+        if len(res_heik_diff) > 0:
+            pre_heik = res_heik_diff[idx-1]
 
         if(rsi2 >= 0 and rsi3 >= 0):
             side = "buy"
@@ -305,18 +352,49 @@ def get_stock_candles_for_strategy_all_test(candle_name, symbol, macro, micro, e
     combine_data = get_combine_data_chadAPI(symbol, timeframe, bars, close, extended_hours)
     try:
         candles = combine_data["values"]["raw-bars"]["values"]
-        res_rsi1 = combine_data["values"]["rsi1"]["values"]
-        res_rsi2 = combine_data["values"]["rsi2"]["values"]
-        res_rsi3 = combine_data["values"]["rsi3"]["values"]
-        res_heik = combine_data["values"]["heik"]["values"]
-        res_heik_diff = combine_data["values"]["heik-diff"]["values"]
+        # res_rsi1 = combine_data["values"]["rsi1"]["values"]
+        # res_rsi2 = combine_data["values"]["rsi2"]["values"]
+        # res_rsi3 = combine_data["values"]["rsi3"]["values"]
+        # res_heik = combine_data["values"]["heik"]["values"]
+        # res_heik_diff = combine_data["values"]["heik-diff"]["values"]
+        res_rsi1 = []
+        if 'values' in combine_data["values"]["rsi1"]:
+            res_rsi1 = combine_data["values"]["rsi1"]["values"]
+        res_rsi2 = []
+        if 'values' in combine_data["values"]["rsi2"]:
+            res_rsi2 = combine_data["values"]["rsi2"]["values"]
+        res_rsi3 = []
+        if 'values' in combine_data["values"]["rsi3"]:
+            res_rsi3 = combine_data["values"]["rsi3"]["values"]
+        res_heik = []
+        if 'values' in combine_data["values"]["heik"]:
+            res_heik = combine_data["values"]["heik"]["values"]
+        res_heik_diff = []
+        if 'values' in combine_data["values"]["heik-diff"]:
+            res_heik_diff = combine_data["values"]["heik-diff"]["values"]
     except:
         candles = combine_data["values"]["raw-bars"]["values"]
-        res_rsi1 = combine_data["values"]["rsi1"]["values"]
-        res_rsi2 = combine_data["values"]["rsi2"]["values"]
-        res_rsi3 = combine_data["values"]["rsi3"]["values"]
-        res_heik = combine_data["values"]["heik"]["values"]
-        res_heik_diff = combine_data["values"]["heik-diff"]["values"]
+        # res_rsi1 = combine_data["values"]["rsi1"]["values"]
+        # res_rsi2 = combine_data["values"]["rsi2"]["values"]
+        # res_rsi3 = combine_data["values"]["rsi3"]["values"]
+        # res_heik = combine_data["values"]["heik"]["values"]
+        # res_heik_diff = combine_data["values"]["heik-diff"]["values"]
+        res_rsi1 = []
+        if 'values' in combine_data["values"]["rsi1"]:
+            res_rsi1 = combine_data["values"]["rsi1"]["values"]
+        res_rsi2 = []
+        if 'values' in combine_data["values"]["rsi2"]:
+            res_rsi2 = combine_data["values"]["rsi2"]["values"]
+        res_rsi3 = []
+        if 'values' in combine_data["values"]["rsi3"]:
+            res_rsi3 = combine_data["values"]["rsi3"]["values"]
+        res_heik = []
+        if 'values' in combine_data["values"]["heik"]:
+            res_heik = combine_data["values"]["heik"]["values"]
+        res_heik_diff = []
+        if 'values' in combine_data["values"]["heik-diff"]:
+            res_heik_diff = combine_data["values"]["heik-diff"]["values"]
+        
 
     # candles = combine_data["values"]["raw-bars"]["values"]
     # res_rsi1 = combine_data["values"]["rsi1"]["values"]
@@ -334,15 +412,33 @@ def get_stock_candles_for_strategy_all_test(candle_name, symbol, macro, micro, e
         l = candle[3]
         c = candle[4]
         v = candle[5]
-        rsi = res_rsi1[idx]
-        rsi2 = res_rsi2[idx]
-        pre_rsi = res_rsi2[idx-1]
-        rsi3 = res_rsi3[idx]
-        pre_rs2 = res_rsi3[idx-1]
-        heik = res_heik[idx]
-        pre_rs3 = res_heik[idx-1]
-        heik2 = res_heik_diff[idx]
-        pre_heik = res_heik_diff[idx-1]
+        rsi = 0
+        if len(res_rsi1) > 0:
+            rsi = res_rsi1[idx]
+        rsi2 = 0
+        if len(res_rsi2) > 0:
+            rsi2 = res_rsi2[idx]
+        pre_rsi = 0
+        if len(res_rsi2) > 0:
+            pre_rsi = res_rsi2[idx-1]
+        rsi3 = 0
+        if len(res_rsi3) > 0:
+            rsi3 = res_rsi3[idx]
+        pre_rs2 = 0
+        if len(res_rsi3) > 0:
+            pre_rs2 = res_rsi3[idx-1]
+        heik = 0
+        if len(res_heik) > 0:
+            heik = res_heik[idx]
+        pre_rs3 = 0
+        if len(res_heik) > 0:
+            pre_rs3 = res_heik[idx-1]
+        heik2 = 0
+        if len(res_heik_diff) > 0:
+            heik2 = res_heik_diff[idx]
+        pre_heik = 0
+        if len(res_heik_diff) > 0:
+            pre_heik = res_heik_diff[idx-1]
 
         if(rsi2 >= 0 and rsi3 >= 0):
             side = "buy"
