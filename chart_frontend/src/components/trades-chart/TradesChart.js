@@ -192,16 +192,16 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 	}
 
 	calculateHeight (isFullChart) {
-		if (this.props.isHomePage && !isFullChart) {
-			return 400;
-		}
+		// if (this.props.isHomePage && !isFullChart) {
+		// 	return 400;
+		// }
 		let index = 1
 		if (this.props.indicators) {
 			if (this.props.indicators.length > 1) {
 				index = this.props.indicators.length
 			}
 		}
-		return 500 + index * 100
+		return 600 + index * 100
 	}
 
 	calculateOffset (indicator, isFullChart) {

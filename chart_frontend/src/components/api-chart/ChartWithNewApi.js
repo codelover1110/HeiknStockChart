@@ -262,25 +262,33 @@ const ChartWithNewApi = (props) => {
 
   const displayChart = () => {
     return (
-      <div className={`row ${calculateHeightStyle()}`}>
-        <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          <TradeChart chartColumn={chartColumn} chartIndicators={indicators} showAllClicked={countShowClicked} />
-        </div>
-        <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          <TradeChart chartColumn={chartColumn} chartIndicators={indicators} showAllClicked={countShowClicked} />
-        </div>
-        <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          <TradeChart chartColumn={chartColumn} chartIndicators={indicators} showAllClicked={countShowClicked} />
-        </div>
-        <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          <TradeChart chartColumn={chartColumn} chartIndicators={indicators} showAllClicked={countShowClicked} />
-        </div>
-        <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          <TradeChart chartColumn={chartColumn} chartIndicators={indicators} showAllClicked={countShowClicked} />
-        </div>
-        <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          <TradeChart chartColumn={chartColumn} chartIndicators={indicators} showAllClicked={countShowClicked} />
-        </div>
+
+      // <div className={`row ${calculateHeightStyle()}`}>
+      //   <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
+      //     <TradeChart chartColumn={chartColumn} chartIndicators={indicators} showAllClicked={countShowClicked} />
+      //   </div>
+      //   <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
+      //     <TradeChart chartColumn={chartColumn} chartIndicators={indicators} showAllClicked={countShowClicked} />
+      //   </div>
+      //   <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
+      //     <TradeChart chartColumn={chartColumn} chartIndicators={indicators} showAllClicked={countShowClicked} />
+      //   </div>
+      //   <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
+      //     <TradeChart chartColumn={chartColumn} chartIndicators={indicators} showAllClicked={countShowClicked} />
+      //   </div>
+      //   <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
+      //     <TradeChart chartColumn={chartColumn} chartIndicators={indicators} showAllClicked={countShowClicked} />
+      //   </div>
+      //   <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
+      //     <TradeChart chartColumn={chartColumn} chartIndicators={indicators} showAllClicked={countShowClicked} />
+      //   </div>
+      // </div>
+      <div className={'graph-grid graph-grid-' + chartColumn.value}>
+        {[...Array(chartColumn.value).keys()].map(() =>
+          <div className={`graph-container`} >
+            <TradeChart chartColumn={chartColumn} chartIndicators={indicators} showAllClicked={countShowClicked} />
+          </div>
+        )}
       </div>
     )
   }

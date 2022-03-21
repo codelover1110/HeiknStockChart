@@ -838,3 +838,22 @@ pre {
 .graph-container .input-container {
   margin-right: 5px;
 }
+
+.graph-grid {
+  display: grid;
+  width: 100%;
+}
+.graph-grid-2 {
+  grid-template-columns: 50% 50%;
+}
+.graph-grid-4 {
+  grid-template-columns: 50% 50%;
+}
+.graph-grid-6 {
+  grid-template-columns: 33% 33% 33%;
+}
+.graph-container {
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 20px;
+}

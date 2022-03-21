@@ -132,47 +132,60 @@ let ChartGraph = (props) => {
 	}
 
   const calculateHeight = (isFullChart) => {
-    let height = 0
-		if (chartColumn==6) {
-			height = 400
-		}
-		if (chartColumn==4) {
-			height = 400
-		}
-		if (chartColumn==2) {
-			height = 650
-		}
-		if (chartColumn==1) {
-			height = 650
+    let height = calculateMainHeight(isFullChart)
+
+    if ( props.indicators ) {
+			if (props.indicators.length >= 1) {
+				return height + props.indicators.length * 100
+			}
 		}
 
-    return height
+    return height + 70
 	}
 
 
   const calculateMainHeight = (isFullChart) => {
-    const indicators = props.indicators.map(indicator => indicator.value)
-    let volume_height = 0
-    let rsi1_height = 0
-    let heik_height = 0
-    let heikdiff_height = 0
+    let height = 0
+		if (chartColumn==6) {
+			height = 300
+		}
+		if (chartColumn==4) {
+			height = 300
+		}
+		if (chartColumn==2) {
+			height = 550
+		}
+		if (chartColumn==1) {
+			height = 550
+		}
 
-    if (indicators.includes('volume')) {
-      volume_height = 100
-    }
-    if (indicators.includes('rsi1')) {
-      rsi1_height = 70
-    }
-    if (indicators.includes('heik')) {
-      heik_height = 70
-    }
-    if (indicators.includes('heik_diff')) {
-      heikdiff_height = 70
-    }
+    return height
 
-    let mainHeight = 300 - (volume_height+rsi1_height+heik_height+heikdiff_height)
+    // const indicators = props.indicators.map(indicator => indicator.value)
+    // let volume_height = 0
+    // let rsi1_height = 0
+    // let heik_height = 0
+    // let heikdiff_height = 0
 
-    return mainHeight
+    // if (indicators.includes('volume')) {
+    //   volume_height = 100
+    // }
+    // if (indicators.includes('rsi1')) {
+    //   rsi1_height = 70
+    // }
+    // if (indicators.includes('heik')) {
+    //   heik_height = 70
+    // }
+    // if (indicators.includes('heik_diff')) {
+    //   heikdiff_height = 70
+    // }
+
+    // return 300
+
+    // let mainHeight = 300 - (volume_height+rsi1_height+heik_height+heikdiff_height)
+    // return calculateHeight()
+
+    // return mainHeight
   }
 
 

@@ -67,7 +67,7 @@ const ChartOptions = (props) => {
           disablePortal={true}
           id={`autocomplete-`+Math.random()}
           options={symbolListOptions}
-          renderInput={(params) => <TextField {...params} label="Symbols" variant={'filled'} />}
+          renderInput={(params) => <TextField {...params} variant={'filled'} />}
           value={sym}
           inputValue={typingValue}
           sx={{
