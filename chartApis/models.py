@@ -11,7 +11,7 @@ import requests
 import pandas as pd
 
 from Having_system.Update_candles.define import INDICATORS_COL_NAME, PARAMETERS_DB, INDICATOR_SIGNALLING_COL_NAME
-from .utils import define_start_date, check_candle_in_maket_time, get_data_chadAPI, define_color, define_percent_color, get_combine_data_chadAPI
+from .utils import define_start_date, check_candle_in_maket_time, get_data_chadAPI, define_color, define_color_tsr, define_percent_color, get_combine_data_chadAPI
 
 azuremongo = pymongo.MongoClient('mongodb://root:rootUser2021@20.84.64.243:27018/?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false')
 BACKTESTING_TRADES = 'backtesting_trades'
@@ -192,9 +192,10 @@ def get_stock_candles_for_strategy_new_chart_api(timeframe, bars, symbol, extend
 
     # rsi1
     try:
-        res_rsi1 = combine_data["values"]["rsi"]["values"]
+        res_rsi1 = combine_data["values"]["rsi1"]["values"]
     except:
         res_rsi1 = []
+
 
     # rsi2
     try:
@@ -231,8 +232,6 @@ def get_stock_candles_for_strategy_new_chart_api(timeframe, bars, symbol, extend
         res_esdbands = combine_data["values"]["esdbands"]["values"]
     except:
         res_esdbands = []
-
-
 
     result_data = []
     for idx, candle in enumerate(candles):
@@ -294,10 +293,13 @@ def get_stock_candles_for_strategy_new_chart_api(timeframe, bars, symbol, extend
 
         tsr = 0
         if len(res_tsr) > 0:
-            tsrtsr = res_tsr[idx-1]
+        #     tsrtsr = res_tsr[idx-1]
+            tsr = res_tsr[idx]
         esdbands = 0
         if len(res_esdbands) > 0:
-            esdbands = res_esdbands[idx-1]
+        #     esdbands = res_esdbands[idx-1]
+            esdbands = res_esdbands[idx]
+        
 
         result_data.append({
             'trade_date': d_time,
@@ -318,10 +320,9 @@ def get_stock_candles_for_strategy_new_chart_api(timeframe, bars, symbol, extend
             'rsi3': {'bearPower': rsi3, 'bullPower': rsi3, 'color': define_color(rsi3, rsi2, pre_rs2)},
             'heik': {'bearPower': heik, 'bullPower': heik, 'color': define_color(heik, rsi3, pre_rs3)},
             'heik2': {'bearPower': heik2, 'bullPower': heik2, 'color': define_color(heik2, heik, pre_heik)},
-            'tsr': {'bearPower': tsr, 'bullPower': tsr},
-            'esdbands': {'bearPower': esdbands, 'bullPower': esdbands},
+            'tsr': {'bearPower': tsr, 'bullPower': tsr, 'color':  define_color_tsr(tsr)},
+            'esdbands': {'bearPower': esdbands, 'bullPower': esdbands, 'color':  define_color_tsr(tsr)},
         })
-
 
     return result_data
 

@@ -68,7 +68,7 @@ def get_combine_data_chadAPI(sym, timeframe, bars, close, extended_hours):
 
     baseurl = "http://40.67.136.227/combined"
     key = 'Thohn9po1mai7ba'
-    endpoints = 'raw-bars,rsi1,rsi2,rsi3,heik,heik-diff'
+    endpoints = 'raw-bars,rsi1,rsi2,rsi3,heik,heik-diff,esdbands,tsr'
 
     paramsFour = { 
             "symbol":sym,
@@ -82,6 +82,12 @@ def get_combine_data_chadAPI(sym, timeframe, bars, close, extended_hours):
     
     data = requests.get(baseurl, params = paramsFour).json()
     return data
+
+def define_color_tsr(value):
+    if value > 0:
+        return "l_g" # light green
+    else:
+        return "d_r" # dark red
 
 def define_color(value, candle, pre_candle):
     if value > 0:
