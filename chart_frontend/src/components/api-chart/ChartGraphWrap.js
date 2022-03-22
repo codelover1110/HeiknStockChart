@@ -9,6 +9,8 @@ let ChartGraphWrap = (props) => {
   const chartColumn = props.chartColumn
   const chartIndicators = props.chartIndicators
 
+  console.log('chartIndicators', chartIndicators)
+
   const displayChart = () => {
     return <ChartGraph data={chartData} chartColumn={props.chartColumn} indicators={chartIndicators} />
   }

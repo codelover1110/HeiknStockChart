@@ -77,10 +77,22 @@ const ChartWithNewApi = (props) => {
       value: 'rsi1', label: 'RSI1',
     },
     {
+      value: 'rsi2', label: 'RSI2',
+    },
+    {
+      value: 'rsi3', label: 'RSI3',
+    },
+    {
       value: 'heik', label: 'HEIK1',
     },
     {
-      value: 'heik_diff', label: 'HEIK2',
+      value: 'heik2', label: 'HEIK2',
+    },
+    {
+      value: 'tsr', label: 'TSR',
+    },
+    {
+      value: 'esdbands', label: 'EsdBands',
     }
   ]);
 

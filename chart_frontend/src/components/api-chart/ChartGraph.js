@@ -131,14 +131,25 @@ let ChartGraph = (props) => {
 		// return 0
 	}
 
+  const height_values = [
+    {key: 'volume', height: 100,},
+    {key: 'rsi1', height: 70,},
+    {key: 'rsi2', height: 70,},
+    {key: 'rsi3', height: 70,},
+    {key: 'heik', height: 70,},
+    {key: 'heik2', height: 70,},
+    {key: 'tsr', height: 70,},
+    {key: 'esdbands', height: 70,},
+  ]
+
   const calculateHeight = (isFullChart) => {
     let height = calculateMainHeight(isFullChart)
 
-    if ( props.indicators ) {
-			if (props.indicators.length >= 1) {
-				return height + props.indicators.length * 100
-			}
-		}
+    height_values.map(height_value => {
+      if (isIncludeIndicators(height_value.key)) {
+        height += height_value.height
+      }
+    })
 
     return height + 70
 	}
@@ -160,89 +171,34 @@ let ChartGraph = (props) => {
 		}
 
     return height
-
-    // const indicators = props.indicators.map(indicator => indicator.value)
-    // let volume_height = 0
-    // let rsi1_height = 0
-    // let heik_height = 0
-    // let heikdiff_height = 0
-
-    // if (indicators.includes('volume')) {
-    //   volume_height = 100
-    // }
-    // if (indicators.includes('rsi1')) {
-    //   rsi1_height = 70
-    // }
-    // if (indicators.includes('heik')) {
-    //   heik_height = 70
-    // }
-    // if (indicators.includes('heik_diff')) {
-    //   heikdiff_height = 70
-    // }
-
-    // return 300
-
-    // let mainHeight = 300 - (volume_height+rsi1_height+heik_height+heikdiff_height)
-    // return calculateHeight()
-
-    // return mainHeight
   }
 
 
 
   const calculateOffset = (indicator, height, isFullChart) => {
     let mainHeight = calculateMainHeight(isFullChart)
-    let volume_height = 0
-    let rsi1_height = 0
-    let heik_height = 0
-    let heikdiff_height = 0
+
+    let offset = mainHeight
+    const indicators = props.indicators.map(indicator => indicator.value)
 
 
+    let index = height_values.findIndex(function(height_value) {
+      return height_value.key == indicator
+    });
 
-			const indicators = props.indicators.map(indicator => indicator.value)
-      console.log('indicators', indicators)
-
-      if (indicators.includes('volume')) {
-        volume_height = 100
+    let i = 0;
+    while (i<index) {
+      console.log('OOOK', height_values[i].key)
+      if (isIncludeIndicators(height_values[i].key)) {
+        console.log('OKOK')
+        offset += height_values[i].height
       }
-      if (indicators.includes('rsi1')) {
-        rsi1_height = 70
-      }
-      if (indicators.includes('heik')) {
-        heik_height = 70
-      }
-      if (indicators.includes('heik_diff')) {
-        heikdiff_height = 70
-      }
+      i++
+    }
 
-			if (indicator === 'volume') {
-				return mainHeight;
-			}
-      if (indicator === 'rsi1') {
-        console.log('volume_height', volume_height)
-				return mainHeight + volume_height;
-			}
-			if (indicator === 'heik') {
-				return mainHeight + volume_height + rsi1_height;
-			}
+    console.log(index, offset, indicator)
 
-			if (indicator === 'heik_diff') {
-				return mainHeight + volume_height + rsi1_height + heik_height;
-			}
-
-			return height
-	}
-
-	const calculateMainHeightOffset = (height, isFullChart) => {
-		if (props.isHomePage && !isFullChart) {
-			return 100 + (props.indicators.length - 1) * 50
-		}
-		if ( props.indicators ) {
-			if (props.indicators.length > 1) {
-				return 300 + (props.indicators.length - 1) * 100
-			}
-		}
-		return 300
+    return offset
 	}
 
   const calculatedData = macdCalculator((ha(atr14(initialData))));
@@ -494,7 +450,7 @@ let ChartGraph = (props) => {
                     // height={(!props.isHomePage || isFullChart) ? 100 : 70}
                     height={70}
                     yExtents={[0, d => d.rsi3.bearPower]}
-                    origin={(w, h) => [0, h - calculateOffset('rsi3', isFullChart)]}
+                    origin={(w, h) => [0, calculateOffset('rsi3', isFullChart)]}
                     padding={{ top: 40, bottom: 10 }}
                   >
                     <XAxis axisAt="bottom" orient="bottom" stroke="white" tickStroke="white" />
@@ -559,12 +515,12 @@ let ChartGraph = (props) => {
                       origin={[-40, 35]}/>
                   </Chart>
                 )}
-                {isIncludeIndicators('heik_diff') && (
+                {isIncludeIndicators('heik2') && (
                   <Chart id={7}
                     // height={(!props.isHomePage || isFullChart) ? 100 : 70}
                     height={70}
                     yExtents={[0, d => d.heik2.bearPower]}
-                    origin={(w, h) => [0, calculateOffset('heik_diff', h, isFullChart)]}
+                    origin={(w, h) => [0, calculateOffset('heik2', h, isFullChart)]}
                     padding={{ top: 40, bottom: 10 }}
                   >
                     <XAxis axisAt="bottom" orient="bottom" stroke="white" tickStroke="white" />
@@ -588,6 +544,76 @@ let ChartGraph = (props) => {
                     <SingleValueTooltip
                       yAccessor={d => d.heik2.bearPower}
                       yLabel="HEIK2 - Bear power"
+                      yDisplayFormat={format(".2f")}
+                      appearance={rsiAppearance}
+                      {...SMATooltipProps}
+                      origin={[-40, 35]}/>
+                  </Chart>
+                )}
+                {isIncludeIndicators('tsr') && (
+                  <Chart id={8}
+                    // height={(!props.isHomePage || isFullChart) ? 100 : 70}
+                    height={70}
+                    yExtents={[0, d => d.tsr.bearPower]}
+                    origin={(w, h) => [0, calculateOffset('tsr', h, isFullChart)]}
+                    padding={{ top: 40, bottom: 10 }}
+                  >
+                    <XAxis axisAt="bottom" orient="bottom" stroke="white" tickStroke="white" />
+                    <YAxis axisAt="right" orient="right" stroke="white" tickStroke="white" ticks={4} tickFormat={format(".2f")}/>
+                    <MouseCoordinateX
+                      at="bottom"
+                      orient="bottom"
+                      displayFormat={timeFormat("%Y-%m-%d")} />
+                    <MouseCoordinateY
+                      at="right"
+                      orient="right"
+                      displayFormat={format(".2f")} />
+                    <BarSeries
+                      yAccessor={d => d.tsr.bearPower}
+                      baseAt={(xScale, yScale, d) => yScale(0)}
+                      fill={d =>
+                        d.tsr.color === 'l_g' ? '#90EE90' : d.tsr.color === 'd_g' ? '#006400' : d.tsr.color === 'l_r' ? '#ED0800' : '#8B0000'
+                      } />
+                    <StraightLine yValue={0} />
+
+                    <SingleValueTooltip
+                      yAccessor={d => d.tsr.bearPower}
+                      yLabel="TSR - Bear power"
+                      yDisplayFormat={format(".2f")}
+                      appearance={rsiAppearance}
+                      {...SMATooltipProps}
+                      origin={[-40, 35]}/>
+                  </Chart>
+                )}
+                {isIncludeIndicators('esdbands') && (
+                  <Chart id={9}
+                    // height={(!props.isHomePage || isFullChart) ? 100 : 70}
+                    height={70}
+                    yExtents={[0, d => d.esdbands.bearPower]}
+                    origin={(w, h) => [0, calculateOffset('esdbands', h, isFullChart)]}
+                    padding={{ top: 40, bottom: 10 }}
+                  >
+                    <XAxis axisAt="bottom" orient="bottom" stroke="white" tickStroke="white" />
+                    <YAxis axisAt="right" orient="right" stroke="white" tickStroke="white" ticks={4} tickFormat={format(".2f")}/>
+                    <MouseCoordinateX
+                      at="bottom"
+                      orient="bottom"
+                      displayFormat={timeFormat("%Y-%m-%d")} />
+                    <MouseCoordinateY
+                      at="right"
+                      orient="right"
+                      displayFormat={format(".2f")} />
+                    <BarSeries
+                      yAccessor={d => d.esdbands.bearPower}
+                      baseAt={(xScale, yScale, d) => yScale(0)}
+                      fill={d =>
+                        d.esdbands.color === 'l_g' ? '#90EE90' : d.esdbands.color === 'd_g' ? '#006400' : d.esdbands.color === 'l_r' ? '#ED0800' : '#8B0000'
+                      } />
+                    <StraightLine yValue={0} />
+
+                    <SingleValueTooltip
+                      yAccessor={d => d.esdbands.bearPower}
+                      yLabel="esdbands - Bear power"
                       yDisplayFormat={format(".2f")}
                       appearance={rsiAppearance}
                       {...SMATooltipProps}

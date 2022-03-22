@@ -853,6 +853,7 @@ pre {
   grid-template-columns: 33% 33% 33%;
 }
 .graph-container {
+  min-height: 400px;
   padding-left: 20px;
   padding-right: 20px;
   padding-bottom: 20px;

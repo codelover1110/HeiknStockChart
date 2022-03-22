@@ -182,47 +182,56 @@ def get_stock_candles_for_strategy_new_chart_api(timeframe, bars, symbol, extend
 
     # get candles
     combine_data = get_combine_data_chadAPI(symbol, timeframe, bars, close, extended_hours)
+
+
+
     try:
         candles = combine_data["values"]["raw-bars"]["values"]
-        res_rsi1 = []
-        if 'values' in combine_data["values"]["rsi1"]:
-            res_rsi1 = combine_data["values"]["rsi1"]["values"]
-        res_rsi2 = []
-        if 'values' in combine_data["values"]["rsi2"]:
-            res_rsi2 = combine_data["values"]["rsi2"]["values"]
-        res_rsi3 = []
-        if 'values' in combine_data["values"]["rsi3"]:
-            res_rsi3 = combine_data["values"]["rsi3"]["values"]
-        res_heik = []
-        if 'values' in combine_data["values"]["heik"]:
-            res_heik = combine_data["values"]["heik"]["values"]
-        res_heik_diff = []
-        if 'values' in combine_data["values"]["heik-diff"]:
-            res_heik_diff = combine_data["values"]["heik-diff"]["values"]
     except:
-        candles = combine_data["values"]["raw-bars"]["values"]
-        res_rsi1 = []
-        if 'values' in combine_data["values"]["rsi1"]:
-            res_rsi1 = combine_data["values"]["rsi1"]["values"]
-        res_rsi2 = []
-        if 'values' in combine_data["values"]["rsi2"]:
-            res_rsi2 = combine_data["values"]["rsi2"]["values"]
-        res_rsi3 = []
-        if 'values' in combine_data["values"]["rsi3"]:
-            res_rsi3 = combine_data["values"]["rsi3"]["values"]
-        res_heik = []
-        if 'values' in combine_data["values"]["heik"]:
-            res_heik = combine_data["values"]["heik"]["values"]
-        res_heik_diff = []
-        if 'values' in combine_data["values"]["heik-diff"]:
-            res_heik_diff = combine_data["values"]["heik-diff"]["values"]
+        candles = []
 
-    # candles = combine_data["values"]["raw-bars"]["values"]
-    # res_rsi1 = combine_data["values"]["rsi1"]["values"]
-    # res_rsi2 = combine_data["values"]["rsi2"]["values"]
-    # res_rsi3 = combine_data["values"]["rsi3"]["values"]
-    # res_heik = combine_data["values"]["heik"]["values"]
-    # res_heik_diff = combine_data["values"]["heik-diff"]["values"]
+    # rsi1
+    try:
+        res_rsi1 = combine_data["values"]["rsi"]["values"]
+    except:
+        res_rsi1 = []
+
+    # rsi2
+    try:
+        res_rsi2 = combine_data["values"]["rsi2"]["values"]
+    except:
+        res_rsi2 = []
+
+    # rsi3
+    try:
+        res_rsi3 = combine_data["values"]["rsi3"]["values"]
+    except:
+        res_rsi3 = []
+
+    # heik
+    try:
+        res_heik = combine_data["values"]["heik"]["values"]
+    except:
+        res_heik = []
+
+    # heik
+    try:
+        res_heik_diff = combine_data["values"]["heik-diff"]["values"]
+    except:
+        res_heik_diff = []
+
+    # tsr
+    try:
+        res_tsr = combine_data["values"]["tsr"]["values"]
+    except:
+        res_tsr = []
+
+    # esdbands
+    try:
+        res_esdbands = combine_data["values"]["esdbands"]["values"]
+    except:
+        res_esdbands = []
+
 
 
     result_data = []
@@ -283,6 +292,13 @@ def get_stock_candles_for_strategy_new_chart_api(timeframe, bars, symbol, extend
         percent_up = 100*((h - o)/o)
         percent_net = percent_up - percent_down
 
+        tsr = 0
+        if len(res_tsr) > 0:
+            tsrtsr = res_tsr[idx-1]
+        esdbands = 0
+        if len(res_esdbands) > 0:
+            esdbands = res_esdbands[idx-1]
+
         result_data.append({
             'trade_date': d_time,
             'close': float(c),
@@ -302,6 +318,8 @@ def get_stock_candles_for_strategy_new_chart_api(timeframe, bars, symbol, extend
             'rsi3': {'bearPower': rsi3, 'bullPower': rsi3, 'color': define_color(rsi3, rsi2, pre_rs2)},
             'heik': {'bearPower': heik, 'bullPower': heik, 'color': define_color(heik, rsi3, pre_rs3)},
             'heik2': {'bearPower': heik2, 'bullPower': heik2, 'color': define_color(heik2, heik, pre_heik)},
+            'tsr': {'bearPower': tsr, 'bullPower': tsr},
+            'esdbands': {'bearPower': esdbands, 'bullPower': esdbands},
         })
 
 
@@ -394,7 +412,7 @@ def get_stock_candles_for_strategy_all_test(candle_name, symbol, macro, micro, e
         res_heik_diff = []
         if 'values' in combine_data["values"]["heik-diff"]:
             res_heik_diff = combine_data["values"]["heik-diff"]["values"]
-        
+
 
     # candles = combine_data["values"]["raw-bars"]["values"]
     # res_rsi1 = combine_data["values"]["rsi1"]["values"]
