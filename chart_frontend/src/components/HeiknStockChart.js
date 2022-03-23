@@ -88,7 +88,7 @@ const HeiknStockChart = (props) => {
       value: 'rsi1', label: 'RSI1',
     },
     {
-      value: 'rsi2', label: 'RSI2', 
+      value: 'rsi2', label: 'RSI2',
     },
     {
       value: 'rsi3', label: 'RSI3',
@@ -402,51 +402,24 @@ const HeiknStockChart = (props) => {
   }
 
   const displayChart = () => {
+    const params = [
+      {selectedTradeDB: 'heikfilter-2mins-trades', chartPeriod: '20D 2min'},
+      {selectedTradeDB: 'heikfilter-12mins-trades', chartPeriod: '20D 12min'},
+      {selectedTradeDB: 'heikfilter-1hour-trades', chartPeriod: '30D 1hour'},
+      {selectedTradeDB: 'heikfilter-4hours-trades', chartPeriod: '90D 4hour'},
+      {selectedTradeDB: 'heikfilter-12hours-trades', chartPeriod: '90D 12hour'},
+      {selectedTradeDB: 'heikfilter-1day-trades', chartPeriod: '1Y 1day'},
+    ]
     return (
-      <div className={`row ${calculateHeightStyle()}`}>
-        <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          {microStrategy && symbol && (
-            < StockChart
+      <div className={'graph-grid graph-grid-' + chartColumn.value}>
+        {[...Array(chartColumn.value).keys()].map((index) =>
+          <div className={`graph-container`} >
+            {microStrategy && symbol && (< StockChart
               selectedSymbolType={selectedSymbolType.value}
               extendMarketTime={extendMarketTime.value}
               selectedInstance={selectedInstance}
-              selectedTradeDB='heikfilter-2mins-trades'
-              chartPeriod='20D 2min'
-              symbol={symbol.value}
-              indicators={indicators}
-              strategy={strategy}
-              isHomePage={true}
-              chartColumn={chartColumn.value}
-              microStrategy={microStrategy.value}
-              startDate={null}
-              endDate={null}
-            />
-          )}
-        </div>
-        <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          {microStrategy && symbol && (
-            < StockChart
-            extendMarketTime={extendMarketTime.value}
-            selectedInstance={selectedInstance}
-            selectedTradeDB='heikfilter-12mins-trades'
-            chartPeriod='20D 12min'
-            symbol={symbol.value}
-            indicators={indicators}
-            strategy={strategy}
-            isHomePage={true}
-            chartColumn={chartColumn.value}
-            microStrategy={microStrategy.value}
-            startDate={null}
-            endDate={null}
-          />)}
-        </div>
-        <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          {microStrategy && symbol && (
-            < StockChart
-              extendMarketTime={extendMarketTime.value}
-              selectedInstance={selectedInstance}
-              selectedTradeDB='heikfilter-1hour-trades'
-              chartPeriod='30D 1hour'
+              selectedTradeDB={params[index].selectedTradeDB}
+              chartPeriod={params[index].chartPeriod}
               symbol={symbol.value}
               indicators={indicators}
               strategy={strategy}
@@ -456,58 +429,8 @@ const HeiknStockChart = (props) => {
               startDate={null}
               endDate={null}
             />)}
-        </div>
-        <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          {microStrategy && symbol && (
-            < StockChart
-              extendMarketTime={extendMarketTime.value}
-              selectedInstance={selectedInstance}
-              selectedTradeDB='heikfilter-4hours-trades'
-              chartPeriod='90D 4hour'
-              symbol={symbol.value}
-              indicators={indicators}
-              strategy={strategy}
-              isHomePage={true}
-              chartColumn={chartColumn.value}
-              microStrategy={microStrategy.value}
-              startDate={null}
-              endDate={null}
-            />)}
-        </div>
-        <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          {microStrategy && symbol && (
-            < StockChart
-              extendMarketTime={extendMarketTime.value}
-              selectedInstance={selectedInstance}
-              selectedTradeDB='heikfilter-12hours-trades'
-              chartPeriod='90D 12hour'
-              symbol={symbol.value}
-              indicators={indicators}
-              strategy={strategy}
-              isHomePage={true}
-              chartColumn={chartColumn.value}
-              microStrategy={microStrategy.value}
-              startDate={null}
-              endDate={null}
-            />)}
-        </div>
-        <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-          {microStrategy && symbol && (
-          < StockChart
-            extendMarketTime={extendMarketTime.value}
-            selectedInstance={selectedInstance}
-            selectedTradeDB='heikfilter-1day-trades'
-            chartPeriod='1Y 1day'
-            symbol={symbol.value}
-            indicators={indicators}
-            strategy={strategy}
-            isHomePage={true}
-            chartColumn={chartColumn.value}
-            microStrategy={microStrategy.value}
-            startDate={null}
-            endDate={null}
-          />)}
-        </div>
+          </div>
+        )}
       </div>
     )
   }

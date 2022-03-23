@@ -51,6 +51,17 @@ const rsiAppearance = {
 	}
 };
 
+const height_values = [
+	{key: 'volume', height: 100,},
+	{key: 'rsi1', height: 70,},
+	{key: 'rsi2', height: 70,},
+	{key: 'rsi3', height: 70,},
+	{key: 'heik', height: 70,},
+	{key: 'heik_diff', height: 70,},
+	// {key: 'tsr', height: 70,},
+	// {key: 'esdbands', height: 70,},
+]
+
 // common stock chart
 class CandleStickChartWithEquidistantChannel extends React.Component {
 	constructor(props) {
@@ -191,90 +202,90 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 		}
 	}
 
-	calculateHeight (isFullChart) {
-		// if (this.props.isHomePage && !isFullChart) {
-		// 	return 400;
-		// }
-		let index = 1
-		if (this.props.indicators) {
-			if (this.props.indicators.length > 1) {
-				index = this.props.indicators.length
-			}
-		}
-		return 600 + index * 100
-	}
+	// calculateHeight (isFullChart) {
+	// 	// if (this.props.isHomePage && !isFullChart) {
+	// 	// 	return 400;
+	// 	// }
+	// 	let index = 1
+	// 	if (this.props.indicators) {
+	// 		if (this.props.indicators.length > 1) {
+	// 			index = this.props.indicators.length
+	// 		}
+	// 	}
+	// 	return 600 + index * 100
+	// }
 
-	calculateOffset (indicator, isFullChart) {
-		if (!this.props.isHomePage || isFullChart) {
-			if (indicator === 'rsi1') {
-				const filter = this.props.indicators.filter(indicator => ['rsi2', 'rsi3', 'heik', 'heik_diff'].includes(indicator.value))
-				return 300 + filter.length * 70;
-			}
+	// calculateOffset (indicator, isFullChart) {
+	// 	if (!this.props.isHomePage || isFullChart) {
+	// 		if (indicator === 'rsi1') {
+	// 			const filter = this.props.indicators.filter(indicator => ['rsi2', 'rsi3', 'heik', 'heik_diff'].includes(indicator.value))
+	// 			return 300 + filter.length * 70;
+	// 		}
 
-			if (indicator === 'rsi2') {
-				const filter = this.props.indicators.filter(indicator => ['rsi3', 'heik', 'heik_diff'].includes(indicator.value))
-				return 300 + filter.length * 70;
-			}
+	// 		if (indicator === 'rsi2') {
+	// 			const filter = this.props.indicators.filter(indicator => ['rsi3', 'heik', 'heik_diff'].includes(indicator.value))
+	// 			return 300 + filter.length * 70;
+	// 		}
 
-			if (indicator === 'rsi3') {
-				const filter = this.props.indicators.filter(indicator => ['heik', 'heik_diff'].includes(indicator.value))
-				return 300 + filter.length * 70;
-			}
+	// 		if (indicator === 'rsi3') {
+	// 			const filter = this.props.indicators.filter(indicator => ['heik', 'heik_diff'].includes(indicator.value))
+	// 			return 300 + filter.length * 70;
+	// 		}
 
-			if (indicator === 'heik') {
-				const filter = this.props.indicators.filter(indicator => ['heik_diff'].includes(indicator.value))
-				return 300 + filter.length * 70;
-			}
+	// 		if (indicator === 'heik') {
+	// 			const filter = this.props.indicators.filter(indicator => ['heik_diff'].includes(indicator.value))
+	// 			return 300 + filter.length * 70;
+	// 		}
 
-			if (indicator === 'heik_diff') {
-				const filter = this.props.indicators.filter(indicator => [''].includes(indicator.value))
-				return 300 + filter.length * 70;
-			}
-			return 0
-		}
-		if (indicator === 'rsi1') {
-			if (this.isIncludeIndicators(indicator)) {
-				if (this.isIncludeIndicators('volume')) {
-					if (this.props.indicators.length > 1) {
-						return (this.props.indicators.length-1) * 50 + 50
-					}
-					return 80;
-				} else {
-					if (this.props.indicators.length > 1) {
-						return (this.props.indicators.length) * 50 + 50
-					}
-					return 80;
-				}
-			}
-		}
+	// 		if (indicator === 'heik_diff') {
+	// 			const filter = this.props.indicators.filter(indicator => [''].includes(indicator.value))
+	// 			return 300 + filter.length * 70;
+	// 		}
+	// 		return 0
+	// 	}
+	// 	if (indicator === 'rsi1') {
+	// 		if (this.isIncludeIndicators(indicator)) {
+	// 			if (this.isIncludeIndicators('volume')) {
+	// 				if (this.props.indicators.length > 1) {
+	// 					return (this.props.indicators.length-1) * 50 + 50
+	// 				}
+	// 				return 80;
+	// 			} else {
+	// 				if (this.props.indicators.length > 1) {
+	// 					return (this.props.indicators.length) * 50 + 50
+	// 				}
+	// 				return 80;
+	// 			}
+	// 		}
+	// 	}
 
-		if (indicator === 'heik') {
-			if (this.isIncludeIndicators(indicator)) {
-				if (this.isIncludeIndicators('heik_diff')) {
-					return 130;
-				}
-				return 80;
-			}
-		}
+	// 	if (indicator === 'heik') {
+	// 		if (this.isIncludeIndicators(indicator)) {
+	// 			if (this.isIncludeIndicators('heik_diff')) {
+	// 				return 130;
+	// 			}
+	// 			return 80;
+	// 		}
+	// 	}
 
-		if (indicator === 'heik_diff') {
-			return 60;
-		}
+	// 	if (indicator === 'heik_diff') {
+	// 		return 60;
+	// 	}
 
-		return 10
-	}
+	// 	return 10
+	// }
 
-	calculateMainHeightOffset(isFullChart) {
-		if (this.props.isHomePage && !isFullChart) {
-			return 100 + (this.props.indicators.length - 1) * 50
-		}
-		if ( this.props.indicators ) {
-			if (this.props.indicators.length > 1) {
-				return 300 + (this.props.indicators.length - 1) * 100
-			}
-		}
-		return 300
-	}
+	// calculateMainHeightOffset(isFullChart) {
+	// 	if (this.props.isHomePage && !isFullChart) {
+	// 		return 100 + (this.props.indicators.length - 1) * 50
+	// 	}
+	// 	if ( this.props.indicators ) {
+	// 		if (this.props.indicators.length > 1) {
+	// 			return 300 + (this.props.indicators.length - 1) * 100
+	// 		}
+	// 	}
+	// 	return 300
+	// }
 
 	calculateTooltipOffset0(isFullChart) {
 		return 0;
@@ -313,6 +324,67 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 	// 		return deal[0].action;
 	// 	}
 	// }
+
+
+  calculateHeight(isFullChart) {
+    let height = this.calculateMainHeight(isFullChart)
+
+    height_values.map(height_value => {
+      if (this.isIncludeIndicators(height_value.key)) {
+        height += height_value.height
+      }
+    })
+
+    return height + 70
+	}
+
+
+  calculateMainHeight(isFullChart) {
+		const { chartColumn } = this.props;
+    let height = 0
+		if (chartColumn==6) {
+			height = 300
+		}
+		if (chartColumn==4) {
+			height = 300
+		}
+		if (chartColumn==2) {
+			height = 550
+		}
+		if (chartColumn==1) {
+			height = 550
+		}
+
+    return height
+  }
+
+
+
+  calculateOffset(indicator, height, isFullChart) {
+    let mainHeight = this.calculateMainHeight(isFullChart)
+
+    let offset = mainHeight
+    const indicators = this.props.indicators.map(indicator => indicator.value)
+
+
+    let index = height_values.findIndex(function(height_value) {
+      return height_value.key == indicator
+    });
+
+    let i = 0;
+    while (i<index) {
+      console.log('OOOK', height_values[i].key)
+      if (this.isIncludeIndicators(height_values[i].key)) {
+        console.log('OKOK')
+        offset += height_values[i].height
+      }
+      i++
+    }
+
+    console.log(index, offset, indicator)
+
+    return offset
+	}
 
 	render() {
 
@@ -532,13 +604,11 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 			>
 				<Chart id={1}
 					height={
-						(!this.props.isHomePage || isFullChart)
-						? this.isIncludeIndicators('volume') || this.props.indicators.length ? 250 : 400
-						: 300 - this.props.indicators.length * 50
+						this.calculateMainHeight(isFullChart)
 					}
 					yExtents={[d => [d.high, d.low], ema20.accessor(), ema50.accessor()]}
 					padding={{ top: 10, bottom: 20 }}
-				>
+					>
 					<XAxis axisAt="bottom" orient="bottom"  stroke="white" tickStroke="white" />
 					<YAxis axisAt="right" orient="right" ticks={5} stroke="white" tickStroke="white" />
 
@@ -591,9 +661,8 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 				{this.isIncludeIndicators('volume') && (
 					<Chart id={2} height={(!this.props.isHomePage || isFullChart) ? 100 : 50}
 						yExtents={[d => d.volume]}
-						origin={(w, h) => [0, h - this.calculateMainHeightOffset(isFullChart)]}
-						padding={{ top: 10, bottom: 10 }}
-					>
+						origin={(w, h) => [0, this.calculateOffset('volume', h, isFullChart)]}
+						padding={{ top: 10, bottom: 10 }}>
 						<XAxis axisAt="bottom" orient="bottom" stroke="white" tickStroke="white" />
 						<YAxis axisAt="right" orient="right" ticks={5} tickFormat={format(".2s")} stroke="white" tickStroke="white" />
 
@@ -610,9 +679,8 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 						// height={(!this.props.isHomePage || isFullChart) ? 100 : 70}
 						height={70}
 						yExtents={[0, d => d.rsi.bearPower]}
-						origin={(w, h) => [0, h - this.calculateOffset('rsi1', isFullChart)]}
-						padding={{ top: 40, bottom: 10 }}
-					>
+						origin={(w, h) => [0, this.calculateOffset('rsi1', h, isFullChart)]}
+						padding={{ top: 40, bottom: 10 }}>
 						<XAxis axisAt="bottom" orient="bottom" stroke="white" tickStroke="white" />
 						<YAxis axisAt="right" orient="right" stroke="white" tickStroke="white" ticks={4} tickFormat={format(".2f")}/>
 						<MouseCoordinateX
@@ -643,9 +711,8 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 						// height={(!this.props.isHomePage || isFullChart) ? 100 : 70}
 						height={70}
 						yExtents={[0, d => d.rsi2.bearPower]}
-						origin={(w, h) => [0, h - this.calculateOffset('rsi2', isFullChart)]}
-						padding={{ top: 40, bottom: 10 }}
-					>
+						origin={(w, h) => [0, this.calculateOffset('rsi2', h, isFullChart)]}
+						padding={{ top: 40, bottom: 10 }}>
 						<XAxis axisAt="bottom" orient="bottom" stroke="white" tickStroke="white" />
 						<YAxis axisAt="right" orient="right" stroke="white" tickStroke="white" ticks={4} tickFormat={format(".2f")}/>
 						<MouseCoordinateX
@@ -678,9 +745,8 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 						// height={(!this.props.isHomePage || isFullChart) ? 100 : 70}
 						height={70}
 						yExtents={[0, d => d.rsi3.bearPower]}
-						origin={(w, h) => [0, h - this.calculateOffset('rsi3', isFullChart)]}
-						padding={{ top: 40, bottom: 10 }}
-					>
+						origin={(w, h) => [0, this.calculateOffset('rsi3', h, isFullChart)]}
+						padding={{ top: 40, bottom: 10 }}>
 						<XAxis axisAt="bottom" orient="bottom" stroke="white" tickStroke="white" />
 						<YAxis axisAt="right" orient="right" stroke="white" tickStroke="white" ticks={4} tickFormat={format(".2f")}/>
 						<MouseCoordinateX
@@ -713,9 +779,8 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 						// height={(!this.props.isHomePage || isFullChart) ? 100 : 70}
 						height={70}
 						yExtents={[0, d => d.heik.bearPower]}
-						origin={(w, h) => [0, h - this.calculateOffset('heik', isFullChart)]}
-						padding={{ top: 40, bottom: 10 }}
-					>
+						origin={(w, h) => [0, this.calculateOffset('heik', h, isFullChart)]}
+						padding={{ top: 40, bottom: 10 }}>
 						<XAxis axisAt="bottom" orient="bottom" stroke="white" tickStroke="white" />
 						<YAxis axisAt="right" orient="right" stroke="white" tickStroke="white" ticks={4} tickFormat={format(".2f")}/>
 						<MouseCoordinateX
@@ -748,9 +813,8 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 						// height={(!this.props.isHomePage || isFullChart) ? 100 : 70}
 						height={70}
 						yExtents={[0, d => d.heik2.bearPower]}
-						origin={(w, h) => [0, h - this.calculateOffset('heik_diff', isFullChart)]}
-						padding={{ top: 40, bottom: 10 }}
-					>
+						origin={(w, h) => [0, this.calculateOffset('heik_diff', isFullChart)]}
+						padding={{ top: 40, bottom: 10 }}>
 						<XAxis axisAt="bottom" orient="bottom" stroke="white" tickStroke="white" />
 						<YAxis axisAt="right" orient="right" stroke="white" tickStroke="white" ticks={4} tickFormat={format(".2f")}/>
 						<MouseCoordinateX
