@@ -235,7 +235,10 @@ def get_stock_candles_for_strategy_new_chart_api(timeframe, bars, symbol, extend
 
     result_data = []
     for idx, candle in enumerate(candles):
-        d_time = datetime.strptime(candle[0], '%Y-%m-%dT%H:%M:%SZ')
+        try:
+            d_time = datetime.strptime(candle[0], '%Y-%m-%dT%H:%M:%SZ')
+        except:
+            d_time = datetime.strptime(candle[0], '%Y-%m-%dT%H:%M:%S')
         o = candle[1]
         h = candle[2]
         l = candle[3]
