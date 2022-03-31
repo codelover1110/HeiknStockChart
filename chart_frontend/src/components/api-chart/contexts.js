@@ -7,6 +7,7 @@ export const useApiChartContext = () => {
 }
 
 export const ApiChartProvider = ({children}) => {
+  const [error, setError] = useState(false)
   const [chartData, setChartData] = useState(null)
   const [isLoading, setLoading] = useState(false)
   const [sym, setSym] = useState("BTC-USD")
@@ -33,7 +34,9 @@ export const ApiChartProvider = ({children}) => {
       close: close,
       setClose: setClose,
       ext: ext,
-      setExt: setExt
+      setExt: setExt,
+      error: error,
+      setError: setError,
     }}>
         {children}
     </ApiChartContext.Provider>

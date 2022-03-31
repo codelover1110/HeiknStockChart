@@ -170,6 +170,9 @@ def get_strategy_name_only():
 
 
 def get_stock_candles_for_strategy_new_chart_api(timeframe, bars, symbol, extended=False, close=False):
+
+
+
     if extended:
         extended_hours = 'true'
     else:
@@ -302,7 +305,7 @@ def get_stock_candles_for_strategy_new_chart_api(timeframe, bars, symbol, extend
         if len(res_esdbands) > 0:
         #     esdbands = res_esdbands[idx-1]
             esdbands = res_esdbands[idx]
-        
+
 
         result_data.append({
             'trade_date': d_time,
@@ -326,6 +329,7 @@ def get_stock_candles_for_strategy_new_chart_api(timeframe, bars, symbol, extend
             'tsr': {'bearPower': tsr, 'bullPower': tsr, 'color':  define_color_tsr(tsr)},
             'esdbands': {'bearPower': esdbands, 'bullPower': esdbands, 'color':  define_color_tsr(tsr)},
         })
+
 
     return result_data
 

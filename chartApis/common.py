@@ -593,3 +593,12 @@ def fill_missing_candles__(chat_candles, candle_name, macro, micro):
         chat_candles.sort(key = lambda x: x['date'])
 
     return chat_candles
+
+
+def get_db_name(timeframe):
+  units = {'mi': 'minute', 'ho': 'hour', 'da': 'day'}
+  for unit, target in units.items():
+    if unit in timeframe:
+      return 'backtest_'+timeframe.replace(unit, '_'+target)
+
+  return timeframe

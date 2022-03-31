@@ -71,7 +71,8 @@ from .common import (
             calc_percentEfficiency_api,
             calc_winningLosing,
             calc_winningLosing_api,
-            fill_missing_candles__)
+            fill_missing_candles__,
+            get_db_name)
 
 @csrf_exempt
 def backtesting_symbols(request):
@@ -348,6 +349,7 @@ def get_live_data_test(request):
     chat_candles, strategy_trades = get_stock_candles_for_strategy_all_test(db_name, symbol, macro, micro)
     if not chat_candles is None:
         verdict = join_append(chat_candles, strategy_trades, strategy)
+
     verdict = fill_missing_candles__(verdict, db_name, macro, micro)
     exchange = get_symbol_exchange(symbol)
 
@@ -572,15 +574,32 @@ def index(request):
 
 @csrf_exempt
 def get_new_chart_data(request):
-    symbol = request.GET['symbol']
-    timeframe = request.GET['timeframe']
-    bars = request.GET['bars']
-    close = request.GET['close']
-    extended = request.GET['extended_hours']
+    try:
+        symbol = request.GET['symbol']
+        timeframe = request.GET['timeframe']
+        bars = request.GET['bars']
+        close = request.GET['close']
+        extended = request.GET['extended_hours']
+        macro = request.GET['macro']
+        micro = request.GET['micro']
 
-    data = get_stock_candles_for_strategy_new_chart_api(timeframe, bars, symbol, extended, close)
+        strategy = '{}-{}-trades'.format(macro, micro)
+        db_name = get_db_name(timeframe)
 
-    return JsonResponse({'success': True, 'data': data}, status=status.HTTP_201_CREATED)
+        # candles, strategy_trades = get_stock_candles_for_strategy_all(db_name, symbol, macro, micro)
+        candles = get_stock_candles_for_strategy_new_chart_api(timeframe, bars, symbol, extended, close)
+
+        # chat_candles = get_chat_data_rsi_heik_v11(candles)
+        # print('chat_candles', chat_candles)
+        # if not chat_candles is None:
+        #     verdict = join_append(chat_candles, strategy_trades, strategy)
+        # verdict = fill_missing_candles__(verdict, db_name, macro, micro)
+
+        return JsonResponse({'success': True, 'data': candles}, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        print(e)
+        error_message = "Error gettting data from polygon: Couldn't retreive enough data from polygon"
+        return JsonResponse({'success': False, 'error': error_message}, status=status.HTTP_201_CREATED)
 
 
 @csrf_exempt

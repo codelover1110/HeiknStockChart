@@ -1296,7 +1296,7 @@ export const apiGetNewChartData = async (params) => {
   try {
     return await fetch(apiURL, requestOptions)
       .then(response => response.json())
-      .then(result => result['data'])
+      // .then(result => result['data'])
   } catch (e) {
     return {
       success: false,

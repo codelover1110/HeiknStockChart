@@ -81,7 +81,7 @@ function tooltipContent(symbol, ys) {
 
 
 let ChartGraph = (props) => {
-  const {isLoading} = useApiChartContext()
+  const {isLoading, error} = useApiChartContext()
   const {sym} = useApiChartContext()
 
 
@@ -284,9 +284,9 @@ let ChartGraph = (props) => {
   return (
     <>
       {
-        isLoading || data==null?
+        (isLoading || data==null)?
           <div className="hunter-loadding-status-text color-white">Loading...</div>
-        :
+        : (data.length==0?<div className="mt-5" style={{color:'white', fontSize: '12px'}}>{error}</div>:
           <>
               <ChartCanvas
                 height={calculateHeight(isFullChart)}
@@ -623,6 +623,7 @@ let ChartGraph = (props) => {
                 <CrossHairCursor />
               </ChartCanvas>
           </>
+          )
       }
     </>
   );

@@ -57,10 +57,9 @@ const ChartWithNewApi = (props) => {
     }
   ]
 
-  const [selectedSymbolType, setSelectedSymbolType] = useState({
-    value: 'stock',
-    label: 'stock'
-  })
+  const [optionsMicroStrategy, setOptionsMicroStrategy] = useState([])
+
+  const [optionsStratgy, setOptionsStrategy] = useState([])
 
   const [optionsViewTypes, setOptionsViewTypes] = useState([
     { value: 'charting', label: 'Charting' },
@@ -100,6 +99,7 @@ const ChartWithNewApi = (props) => {
   const getStrategyList = useCallback(
     async () => {
       const strategyListRes = await getStrategyListReq();
+      console.log('strategyListRes', strategyListRes)
       if (strategyListRes.success) {
         const data = strategyListRes.data;
         setStrategyList(data.result);
@@ -109,6 +109,7 @@ const ChartWithNewApi = (props) => {
             label: o.macro,
           }
         }))
+        setOptionsStrategy(strategyOptions);
         setStrategy(strategyOptions[0]);
         if (data.result.length) {
           let flag = true
@@ -250,20 +251,64 @@ const ChartWithNewApi = (props) => {
     }
   }
 
-  const calculateHeightStyle = () => {
-    if (chartColumn.value === 1 || chartColumn.value === 2) {
-      return 'full-height'
+  const handleStrategy = async (e) => {
+    if (e) {
+      if (strategyList.length) {
+        strategyList.forEach((item) => {
+          if (item.macro === e.value) {
+            const microStrategyOptions = item.micro.map(o => {
+              return {
+                value: o,
+                label: o,
+              }
+            })
+
+            setOptionsMicroStrategy( microStrategyOptions )
+
+            const is_2m = microStrategyOptions.filter((o => o.value === '2m'))
+
+            if (is_2m.length) {
+              setMicroStrategy({
+                value: '2m',
+                label: '2m'
+              })
+            } else {
+              setMicroStrategy(microStrategyOptions[0])
+            }
+
+            const symbolOptions = item.symbols.map(o => {
+              return {
+                value: o,
+                label: o,
+              }
+            })
+
+            setSymbolList(symbolOptions)
+            setSymbol(symbolOptions[0])
+            // setSymbol({value: 'MSFT', label: 'MSFT'})
+          }
+        })
+      }
+      setStrategy(e)
     }
-    return 'half-height'
   }
 
-  const calculateGridColumn = () => {
-    if (chartColumn.value === 1) {
-      return 12
-    } else if ((chartColumn.value === 2) || (chartColumn.value === 4)) {
-      return 6
+  const handleMicroStrategyChange = async (e) => {
+    if (e) {
+      setMicroStrategy(e)
+      const result = await getSymbolsByMicroStrategy(strategy.value, e.value)
+      if (result.success) {
+        const symbolOptions = result.data.map(o => {
+          return {
+            value: o,
+            label: o,
+          }
+        })
+
+        setSymbolList(symbolOptions)
+        setSymbol(symbolOptions[0])
+      }
     }
-    return 4
   }
 
   const handleSignout = () => {
@@ -274,31 +319,16 @@ const ChartWithNewApi = (props) => {
 
   const displayChart = () => {
     return (
-
-      // <div className={`row ${calculateHeightStyle()}`}>
-      //   <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-      //     <TradeChart chartColumn={chartColumn} chartIndicators={indicators} showAllClicked={countShowClicked} />
-      //   </div>
-      //   <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-      //     <TradeChart chartColumn={chartColumn} chartIndicators={indicators} showAllClicked={countShowClicked} />
-      //   </div>
-      //   <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-      //     <TradeChart chartColumn={chartColumn} chartIndicators={indicators} showAllClicked={countShowClicked} />
-      //   </div>
-      //   <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-      //     <TradeChart chartColumn={chartColumn} chartIndicators={indicators} showAllClicked={countShowClicked} />
-      //   </div>
-      //   <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-      //     <TradeChart chartColumn={chartColumn} chartIndicators={indicators} showAllClicked={countShowClicked} />
-      //   </div>
-      //   <div className={`col-sm-12 col-md-${calculateGridColumn()} graph-container`} >
-      //     <TradeChart chartColumn={chartColumn} chartIndicators={indicators} showAllClicked={countShowClicked} />
-      //   </div>
-      // </div>
       <div className={'graph-grid graph-grid-' + chartColumn.value}>
         {[...Array(chartColumn.value).keys()].map(() =>
           <div className={`graph-container`} >
-            <TradeChart chartColumn={chartColumn} chartIndicators={indicators} showAllClicked={countShowClicked} />
+            {microStrategy && <TradeChart
+              chartColumn={chartColumn}
+              chartIndicators={indicators}
+              showAllClicked={countShowClicked}
+              microStrategy={microStrategy.value}
+              strategy={strategy}
+              selectedInstance={selectedInstance} />}
           </div>
         )}
       </div>
@@ -339,6 +369,24 @@ const ChartWithNewApi = (props) => {
                 placeholder="Columns"
               />
             </div>
+            <div className="select-option">
+              <Select
+                value={strategy}
+                onChange={handleStrategy}
+                options={optionsStratgy}
+                placeholder="Macro Strategy"
+              />
+            </div>
+            {isShowMicro && (
+              <div className="select-option">
+                <Select
+                  value={microStrategy}
+                  onChange={handleMicroStrategyChange}
+                  options={optionsMicroStrategy}
+                  placeholder="Micro Strategy"
+                />
+              </div>
+            )}
             <div className="select-multi-option">
               <Select
                   name="filters"

@@ -9,8 +9,7 @@ import symbolListOptions from './master'
 
 const ChartOptions = (props) => {
 
-
-  const {setLoading, setChartData} = useApiChartContext()
+  const {setLoading, setChartData, setError} = useApiChartContext()
   const {sym, setSym, time, setTime, timeType, setTimeType, bar, setBar, close, setClose, ext, setExt} = useApiChartContext()
 
   const loadChart = () => {
@@ -25,12 +24,18 @@ const ChartOptions = (props) => {
         bars: bar,
         close: close,
         extended_hours: ext,
+        macro: props.macro,
+        micro: props.micro,
       }
 
-      apiGetNewChartData(params).then(data => {
+      apiGetNewChartData(params).then(response => {
         setLoading(false)
-
-        setChartData(data)
+        if (response['success']) {
+          setChartData(response['data'])
+        } else {
+          setChartData([])
+          setError(response['error'])
+        }
       })
     }
     loadData()
