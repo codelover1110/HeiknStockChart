@@ -169,7 +169,7 @@ def get_strategy_name_only():
     return strategy_names
 
 
-def get_stock_candles_for_strategy_new_chart_api(timeframe, bars, symbol, extended=False, close=False):
+def get_stock_candles_for_strategy_new_chart_api(timeframe, bars, symbol, extended=False, close=False, macro=False, micro=False):
 
 
 
@@ -330,8 +330,27 @@ def get_stock_candles_for_strategy_new_chart_api(timeframe, bars, symbol, extend
             'esdbands': {'bearPower': esdbands, 'bullPower': esdbands, 'color':  define_color_tsr(tsr)},
         })
 
+    start_date = result_data[0]['trade_date']
+    end_date = result_data[-1]['trade_date']
 
-    return result_data
+    if macro == 'no_strategy':
+        find_trades_query = {
+            'date': {'$gte': start_date, '$lt': end_date},
+            'symbol': symbol
+        }
+    else:
+        find_trades_query = {
+            'date': {'$gte': start_date, '$lt': end_date},
+            'micro_strategy': micro,
+            'macro_strategy': macro,
+            'symbol': symbol
+        }
+    masterdb = azuremongo[BACKTESTING_TRADES]
+    ob_table = masterdb[ALL_TRADES_HISTORY]
+    trade_result = ob_table.find(find_trades_query)
+    strategy_trades = list(trade_result.sort('date', pymongo.ASCENDING))
+
+    return result_data, strategy_trades
 
 def get_stock_candles_for_strategy_all_test(candle_name, symbol, macro, micro, extended=False, close=False):
     cur_date = datetime.now().date()

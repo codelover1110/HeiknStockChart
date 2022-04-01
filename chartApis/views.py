@@ -586,68 +586,10 @@ def get_new_chart_data(request):
         strategy = '{}-{}-trades'.format(macro, micro)
         db_name = get_db_name(timeframe)
 
-        # candles, strategy_trades = get_stock_candles_for_strategy_all(db_name, symbol, macro, micro)
-        candles = get_stock_candles_for_strategy_new_chart_api(timeframe, bars, symbol, extended, close)
-
-        cur_date = datetime.now().date()
-        if candle_name == 'backtest_2_minute':
-            start_time = cur_date - timedelta(days=20)
-            timeframe = '2mi'
-            bars = '100'
-        elif candle_name == 'backtest_12_minute':
-            start_time = cur_date - timedelta(days=20)
-            timeframe = '12mi'
-            bars = '100'
-        elif candle_name == 'backtest_1_hour':
-            start_time = cur_date - timedelta(days=30)
-            timeframe = '1ho'
-            bars = '100'
-        elif candle_name == 'backtest_4_hour':
-            start_time = cur_date - timedelta(days=90)
-            timeframe = '4ho'
-            bars = '100'
-        elif candle_name == 'backtest_12_hour':
-            start_time = cur_date - timedelta(days=90)
-            timeframe = '12ho'
-            bars = '100'
-        elif candle_name == 'backtest_1_day':
-            timeframe = '1da'
-            bars = '100'
-            start_time = cur_date - timedelta(days=365)
-
-
-        start_date = datetime.strptime(str(start_time), '%Y-%m-%d')
-        end_date = datetime.strptime(str(cur_date), '%Y-%m-%d')
-        
-        # get trades
-        if macro == 'no_strategy':
-            find_trades_query = {
-                'date': {'$gte': start_date, '$lt': end_date},
-                'symbol': symbol
-            }
-        else:
-            find_trades_query = {
-                'date': {'$gte': start_date, '$lt': end_date},
-                'micro_strategy': micro,
-                'macro_strategy': macro,
-                'symbol': symbol
-            }
-        masterdb = azuremongo[BACKTESTING_TRADES]
-        ob_table = masterdb[ALL_TRADES_HISTORY]
-        trade_result = ob_table.find(find_trades_query)
-        strategy_trades = list(trade_result.sort('date', pymongo.ASCENDING))
-
+        candles, strategy_trades  = get_stock_candles_for_strategy_new_chart_api(timeframe, bars, symbol, extended, close, macro, micro)
         if not candles is None:
-            verdict = join_append(chat_candles, strategy_trades, strategy)
+            verdict = join_append(candles, strategy_trades, strategy)
         
-
-        # chat_candles = get_chat_data_rsi_heik_v11(candles)
-        # print('chat_candles', chat_candles)
-        # if not chat_candles is None:
-        #     verdict = join_append(chat_candles, strategy_trades, strategy)
-        # verdict = fill_missing_candles__(verdict, db_name, macro, micro)
-
-        # return JsonResponse({'success': True, 'data': candles}, status=status.HTTP_201_CREATED)
         return JsonResponse({'success': True, 'data': verdict}, status=status.HTTP_201_CREATED)
     except Exception as e:
         print(e)
