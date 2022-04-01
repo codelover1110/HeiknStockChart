@@ -122,6 +122,7 @@ const ChartWithNewApi = (props) => {
               }
             })
 
+            setOptionsMicroStrategy( microStrategyOptions )
             setMicroStrategy(microStrategyOptions[0])
 
             const result = await getSymbolsByMicroStrategy(strategyOptions[0].value, microStrategyOptions[0].value)
@@ -308,6 +309,7 @@ const ChartWithNewApi = (props) => {
       //   setSymbolList(symbolOptions)
       //   setSymbol(symbolOptions[0])
       // }
+      handleShowAll()
     }
   }
 
