@@ -293,21 +293,21 @@ const ChartWithNewApi = (props) => {
     }
   }
 
-  const handleMicroStrategyChange = async (e) => {
+  const handleMicroStrategyChange = (e) => {
     if (e) {
       setMicroStrategy(e)
-      const result = await getSymbolsByMicroStrategy(strategy.value, e.value)
-      if (result.success) {
-        const symbolOptions = result.data.map(o => {
-          return {
-            value: o,
-            label: o,
-          }
-        })
+      // const result = await getSymbolsByMicroStrategy(strategy.value, e.value)
+      // if (result.success) {
+      //   const symbolOptions = result.data.map(o => {
+      //     return {
+      //       value: o,
+      //       label: o,
+      //     }
+      //   })
 
-        setSymbolList(symbolOptions)
-        setSymbol(symbolOptions[0])
-      }
+      //   setSymbolList(symbolOptions)
+      //   setSymbol(symbolOptions[0])
+      // }
     }
   }
 

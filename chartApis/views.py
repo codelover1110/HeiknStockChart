@@ -589,8 +589,12 @@ def get_new_chart_data(request):
         candles, strategy_trades  = get_stock_candles_for_strategy_new_chart_api(timeframe, bars, symbol, extended, close, macro, micro)
         if not candles is None:
             verdict = join_append(candles, strategy_trades, strategy)
-        
-        return JsonResponse({'success': True, 'data': verdict}, status=status.HTTP_201_CREATED)
+
+        if len(verdict) <= 1:
+            error_message = "Error gettting data from polygon: Couldn't retreive enough data from polygon"
+            return JsonResponse({'success': False, 'error': error_message}, status=status.HTTP_201_CREATED)
+        else:
+            return JsonResponse({'success': True, 'data': verdict}, status=status.HTTP_201_CREATED)
     except Exception as e:
         print(e)
         error_message = "Error gettting data from polygon: Couldn't retreive enough data from polygon"

@@ -286,7 +286,7 @@ let ChartGraph = (props) => {
       {
         (isLoading || data==null)?
           <div className="hunter-loadding-status-text color-white">Loading...</div>
-        : (data.length==0?<div className="mt-5" style={{color:'white', fontSize: '12px'}}>{error}</div>:
+        : (data.length<=1?<div className="mt-5" style={{color:'white', fontSize: '12px'}}>{error}</div>:
           <>
               <ChartCanvas
                 height={calculateHeight(isFullChart)}
@@ -354,13 +354,7 @@ let ChartGraph = (props) => {
                     && d.trades[0].longShort === "SHORT" }
                     usingProps={shortAnnotationProps} />
 
-                  <HoverTooltip
-                    yAccessor={ema50.accessor()}
-                    tooltipContent={tooltipContent(sym, [
 
-                    ])}
-                    fontSize={12}
-                  />
                 </Chart>
                 {isIncludeIndicators('volume') && (
                 <Chart id={2} height={(!props.isHomePage || isFullChart) ? 100 : 50}
