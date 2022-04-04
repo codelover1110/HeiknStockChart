@@ -62,10 +62,10 @@ const ChartWithNewApi = (props) => {
   const [optionsStratgy, setOptionsStrategy] = useState([])
 
   const [optionsViewTypes, setOptionsViewTypes] = useState([
+    { value: 'chart_with_new_api', label: 'Chart With New API6' },
     { value: 'charting', label: 'Charting' },
     { value: 'performance', label: 'Performance' },
     { value: 'sliced_charting', label: 'Sliced Chatting'},
-    { value: 'chart_with_new_api', label: 'Chart With New API6' },
   ])
 
   const [optionsIndicator, setOptionsIndicator] = useState([
@@ -87,12 +87,12 @@ const ChartWithNewApi = (props) => {
     {
       value: 'heik2', label: 'HEIK2',
     },
-    {
-      value: 'tsr', label: 'TSR',
-    },
-    {
-      value: 'esdbands', label: 'EsdBands',
-    }
+    // {
+    //   value: 'tsr', label: 'TSR',
+    // },
+    // {
+    //   value: 'esdbands', label: 'EsdBands',
+    // }
   ]);
 
 
@@ -209,10 +209,10 @@ const ChartWithNewApi = (props) => {
       ])
     } else {
       setOptionsViewTypes([
+        { value: 'chart_with_new_api', label: 'Chart With New API5' },
         { value: 'charting', label: 'Charting' },
         { value: 'performance', label: 'Performance' },
         { value: 'sliced_charting', label: 'Sliced Chatting'},
-        { value: 'chart_with_new_api', label: 'Chart With New API5' },
       ])
     }
   }, [selectedInstance, getStrategyList, get_tables, user.is_admin, user.role?.length])

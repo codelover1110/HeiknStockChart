@@ -53,10 +53,10 @@ const HeiknStockSlicedChart = (props) => {
   ]
 
   const [optionsViewTypes, setOptionsViewTypes] = useState([
+    { value: 'chart_with_new_api', label: 'Chart With New API4' },
     { value: 'charting', label: 'Charting' },
     { value: 'performance', label: 'Performance' },
     { value: 'sliced_charting', label: 'Sliced Charting' },
-    { value: 'chart_with_new_api', label: 'Chart With New API4' },
   ])
 
   const [optionsMicroStrategy, setOptionsMicroStrategy] = useState([])
@@ -214,10 +214,10 @@ const HeiknStockSlicedChart = (props) => {
       ])
     } else {
       setOptionsViewTypes([
+        { value: 'chart_with_new_api', label: 'Chart With New API3' },
         { value: 'charting', label: 'Charting' },
         { value: 'performance', label: 'Performance' },
         { value: 'sliced_charting', label: 'Sliced Charting' },
-        { value: 'chart_with_new_api', label: 'Chart With New API3' },
       ])
     }
   }, [selectedInstance, getStrategyList, get_tables, user.is_admin, user.role?.length])
