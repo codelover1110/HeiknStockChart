@@ -13,7 +13,7 @@ import pandas as pd
 from Having_system.Update_candles.define import INDICATORS_COL_NAME, PARAMETERS_DB, INDICATOR_SIGNALLING_COL_NAME
 from .utils import define_start_date, check_candle_in_maket_time, get_data_chadAPI, define_color, define_color_tsr, define_percent_color, get_combine_data_chadAPI
 
-azuremongo = pymongo.MongoClient('mongodb://root:rootUser2021@20.84.64.243:27018/?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false')
+azuremongo = pymongo.MongoClient('mongodb://root:rootUser2021@20.228.162.0:27017/?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false')
 BACKTESTING_TRADES = 'backtesting_trades'
 # ALL_TRADES_HISTORY = 'trading-history'
 ALL_TRADES_HISTORY = 'trade-history'
