@@ -834,14 +834,15 @@ def count_total_database_record(db_name):
     return total
 
 def count_total_collection_record(db_name, collection_name):
-    db = azuremongo[db_name]
-    collection = db[collection_name]
-    return collection.find().count()
+    try:
+        db = azuremongo[db_name]
+        collection = db[collection_name]
+        return collection.find().count()
+    except:
+        return 0
 
 def api_create_backup(db_name, collection_name):
     backup = BackupProgress()
-
-
     backup.database = db_name
     backup.collection = collection_name
     backup.status = 'generated'

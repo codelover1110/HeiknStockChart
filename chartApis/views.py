@@ -544,8 +544,10 @@ def execute_backup(request):
             if refresh_backup.status == 'stop':
                 return True
         return False
-
-    fileData = api_execute_backup(backup, check_stopping)
+    try:
+        fileData = api_execute_backup(backup, check_stopping)
+    except:
+        fileData = ' '
     if not fileData:
         backup.delete()
         return JsonResponse({'success': False, 'data': {}}, status=status.HTTP_201_CREATED)

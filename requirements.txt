@@ -1,6 +1,6 @@
 django
 django-sslserver
-pymongo
+pymongo==3.7.2
 psycopg2-binary
 django-cors-headers
 asyncpg
