@@ -788,8 +788,7 @@ def api_delete_collection(db_name, collection_name):
     return True
 
 def api_delete_database(db_name):
-    db = azuremongo[db_name]
-    db.drop()
+    azuremongo.drop_database(db_name)
     return True
 
 def get_csv_collection(backup, collection_name, check_stopping):
