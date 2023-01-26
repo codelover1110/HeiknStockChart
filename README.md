@@ -1,4 +1,2 @@
 # Backtesting
 
-## Front-end
-
